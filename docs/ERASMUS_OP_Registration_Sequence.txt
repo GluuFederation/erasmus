@@ -1,0 +1,22 @@
+title ERASMUS OP Registration Sequence
+Org. Admin->FIDES Web Application: Request for org. registration\n(Basic Info, Legal, etc.)
+FIDES Web Application->OTTO APIs: Send request to OTTO
+OTTO APIs-->FIDES Web Application: Return response
+FIDES Web Application->FIDES Web Application: Display response message
+opt Successful registration of Org.
+FIDES Admin->FIDES Web Application: Approve registered Org. manually
+FIDES Web Application->OTTO APIs: Send request to OTTO
+OTTO APIs-->FIDES Web Application: Return response
+FIDES Web Application->FIDES Web Application: Display response message
+opt Org. approved
+OP Admin->FIDES Web Application: Request for OP registration under approved org.\n(OP info, URLs, Trust marks, etc)
+FIDES Web Application->OTTO APIs: Send request to OTTO
+OTTO APIs-->FIDES Web Application: Return response
+FIDES Web Application->FIDES Web Application: Display response message
+opt Successful registration of OP
+FIDES Admin->FIDES Web Application: Approve registered OP manually
+FIDES Web Application->OTTO APIs: Send request to OTTO
+OTTO APIs-->FIDES Web Application: Return response
+FIDES Web Application->FIDES Web Application: Display response message
+end
+end
