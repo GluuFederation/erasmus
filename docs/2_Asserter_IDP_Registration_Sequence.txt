@@ -1,0 +1,28 @@
+title ERASMUS Asserter IDP Registration Sequence
+Asserter->FIDES Web Application: Register Asserter with FIDES
+FIDES Web Application->FIDES Identity APIs: Register Asserter User
+FIDES Identity APIs->FIDES Identity APIs: Save Asserter
+FIDES Identity APIs-->FIDES Web Application: Response message
+alt failed
+FIDES Web Application->FIDES Web Application: Display message
+else successful
+FIDES Web Application->OTTO APIs: Fetch list of registered IDP
+OTTO APIs-->FIDES Web Application: Return list of registered IDP
+Asserter->FIDES Web Application: Select Asserter IDP
+FIDES Web Application->OTTO APIs: Get detail of IDP\n(client id, URLs, etc)
+OTTO APIs-->FIDES Web Application: Return detail\n(URLs, client id, etc.)
+FIDES Web Application->OP Server: Request server for authentication
+OP Server-->FIDES Web Application: Present consent screen
+Asserter->FIDES Web Application: Enter login credentials / Authorize
+FIDES Web Application->OP Server: Authenticate Asserter
+OP Server-->FIDES Web Application: Request Application to redirect on callback URL
+FIDES Web Application->FIDES Identity APIs: Redirect to callback URL
+FIDES Identity APIs->OP Server: Get access token
+OP Server-->FIDES Identity APIs: Access/Refresh token
+FIDES Identity APIs->FIDES Identity APIs: Save Access/Refresh token
+FIDES Identity APIs->OP Server: Get user claims
+OP Server-->FIDES Identity APIs: User claims
+FIDES Identity APIs->FIDES Identity APIs: Save Asserter claims
+FIDES Identity APIs-->FIDES Web Application: Response message
+FIDES Web Application->FIDES Web Application: Display message
+end
