@@ -1,0 +1,8 @@
+title ERASMUS Asserter claims lookup Sequence
+Asserter->FIDES Identity APIs: Get badge (URL)
+FIDES Identity APIs->Badge Manager: Request for Asserter badge
+Badge Manager-->FIDES Identity APIs: Asserter badge
+FIDES Identity APIs-->Asserter: Return Asserter badge
+Asserter->Validator: Send badge (URL)
+Validator->FIDES Identity APIs: Get Asserter claims from badge
+FIDES Identity APIs-->Validator: Return Asserter claims
