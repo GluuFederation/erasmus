@@ -16,7 +16,7 @@ opt Successful registration of OP
 Org. Admin->FIDES Web Application: Register Trustmarks
 FIDES Web Application->FIDES Admin: Notify
 FIDES Admin-->FIDES Web Application: Approve
-FIDES Web Application->OTTO APIs: Add Trusmarks
+FIDES Web Application->OTTO APIs: Add Trustmarks
 OTTO APIs-->FIDES Web Application: Return response
 FIDES Web Application->FIDES Web Application: Display response message
 end
