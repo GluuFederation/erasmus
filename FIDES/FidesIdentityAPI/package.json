@@ -1,0 +1,41 @@
+{
+  "name": "Auth",
+  "version": "1.0.0",
+  "description": "Auth server",
+  "main": "index.js",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "1.15.2",
+    "cookie-parser": "1.4.3",
+    "cors": "^2.8.1",
+    "dotenv": "2.0.0",
+    "ejs": "2.4.2",
+    "express": "4.14.0",
+    "express-jwt": "3.4.0",
+    "gulp": "3.9.1",
+    "gulp-nodemon": "2.1.0",
+    "gulp-swagger": "1.0.0",
+    "jsonwebtoken": "7.1.9",
+    "mongoose": "4.5.10",
+    "multer": "1.2.0",
+    "swagger-express": "1.0.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "node",
+    "ECS",
+    "Gluu"
+  ],
+  "author": "Meghana Joshi",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": ""
+}

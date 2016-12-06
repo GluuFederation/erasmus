@@ -1,0 +1,71 @@
+<div class="widgets">
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      <div ba-panel ba-panel-class="with-scroll">
+        <div class="add-row-editable-table">
+          <button class="btn btn-primary" ng-click="vm.openUserModal(null)">Create User</button>
+        </div>
+
+        <table st-safe-src="vm.users" st-table="vm.displayedCollection" class="table table-hover table-condensed">
+          <thead>
+          <tr class="sortable">
+            <td  class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</td>
+            <th st-sort="username" st-sort-default="true">Username</th>
+            <th st-sort="firstName">First Name</th>
+            <th st-sort="lastName">Last Name</th>
+            <th st-sort="email">Email</th>
+            <th>Actions</th>
+          </tr>
+          <tr>
+            <th style="display: none;"></th>
+            <th><input st-search="username" placeholder="Search Username" class="input-sm form-control search-input"
+                       type="search"/></th>
+            <th><input st-search="firstName" placeholder="Search First Name" class="input-sm form-control search-input"
+                       type="search"/></th>
+            <th><input st-search="lastName" placeholder="Search Last Name" class="input-sm form-control search-input"
+                       type="search"/></th>
+            <th><input st-search="email" placeholder="Search Email" class="input-sm form-control search-input"
+                       type="search"/>
+            </th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="user in vm.displayedCollection">
+            <td  style="display: none;"></td>
+            <td>
+              {{user.username}}
+            </td>
+            <td>
+              {{ user.firstName || 'empty' }}
+            </td>
+            <td>
+              {{ user.lastName || 'empty' }}
+            </td>
+            <td>
+              {{user.email}}
+            </td>
+            <td>
+              <div class="buttons" ng-show="!rowform.$visible">
+                <button class="btn btn-primary editable-table-button btn-xs" ng-click="vm.openUserModal(user)">
+                  Edit
+                </button>
+                <button class="btn btn-danger editable-table-button btn-xs"
+                        ng-click="vm.removeUser(user.username)">Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <td colspan="6" class="text-center">
+              <div st-pagination="" st-items-by-page="2" st-displayed-pages="10"></div>
+            </td>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

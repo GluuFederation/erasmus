@@ -1,0 +1,274 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: ECS API
+  description: ECS mobiel app API
+  version: "1.0.0"
+# the domain of the service
+host: http://127.0.0.1:8000/
+# array of all schemes that your API supports
+schemes:
+  - http
+# will be prefixed to all paths
+basePath: /
+resourcePath: /Providers
+description: All about openid connect provider
+apis: 
+
+- path: /providerRegistration
+  operations:
+
+  - httpMethod: POST
+    summary: Register openid connect providers
+    notes: Returns a provider
+    responseClass: provider
+    nickname: register openid connect provider
+    consumes:
+          - application/json
+    parameters:
+
+    - name: name
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Company Name
+
+    - name: opUrls
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your OpURLs
+
+    - name: keys
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Keys
+
+    - name: trustMarks
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your TrustMarks
+
+    - name: client_id
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Client Id
+
+    - name: client_secret
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Client Secret
+
+    - name: response_type
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Response Type
+
+    - name: redirect_uri
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Redirect Uri
+
+    - name: scope
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Scope
+
+    - name: state
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your State
+
+    - name: code
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Code
+
+    - name: error
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Error
+
+    - name: error_description
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Error Description
+
+    - name: error_uri
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Error Uri
+
+    - name: grant_type
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Grant Type
+
+    - name: access_token
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Access Token
+
+    - name: token_type
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Token Type
+
+    - name: expires_in
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Expires In
+
+    - name: username
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Username
+
+    - name: password
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Password
+
+    - name: refresh_token
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Refresh Token
+
+    - name: nonce
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Nonce
+
+    - name: display
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Display
+
+    - name: prompt
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Prompt
+
+    - name: acr_values
+      dataType: string
+      paramType: formData
+      required: true
+      description: Your Acr Values
+
+
+
+
+- path: /getAllProviders
+  operations:
+
+  - httpMethod: GET
+    summary: Retrives all the openid connect provider
+    notes: Returns all the openid connect provider
+    responseClass: Provider
+    nickname: Get Provider
+    consumes:
+      - application/json
+    
+models:
+    User:
+      id: Provider
+      properties:
+        name:
+          type: String
+          required: true
+        opUrls:
+          type: String
+          required: true
+        keys:
+          type: String
+          required: true
+        trustmarks:
+          type: String
+          required: true
+        client_id:
+          type: String
+          required: true
+        client_secret:
+          type: String
+          required: true
+        response_type:
+          type: String
+          required: true
+        redirect_uri:
+          type: String
+          required: true
+        scope:
+          type: String
+          required: true
+        state:
+          type: String
+          required: true
+        code:
+          type: String
+          required: true
+        error:
+          type: String
+          required: true
+        error_description:
+          type: String
+          required: true
+        error_uri:
+          type: String
+          required: true
+        grant_type:
+          type: String
+          required: true
+        access_token:
+          type: String
+          required: true
+        token_type:
+          type: String
+          required: true
+        expires_in:
+          type: String
+          required: true
+        username:
+          type: String
+          required: true
+        password:
+          type: String
+          required: true
+        refresh_token:
+          type: String
+          required: true
+        nonce:
+          type: String
+          required: true
+        display:
+          type: String
+          required: true
+        prompt:
+          type: String
+          required: true
+        acr_values:
+          type: String
+          required: true
+
