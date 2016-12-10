@@ -14,6 +14,7 @@
         controller: 'HomeController',
         controllerAs: "vm",
         role: ['admin', 'issuer'],
+        authenticate: true,
         sidebarMeta: {
           icon: 'ion-android-home',
           order: 0,

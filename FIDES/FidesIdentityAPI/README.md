@@ -1,6 +1,6 @@
-# ECS
+# FIDES Identity APIs
 
-ECS SERVER:
+FIDES Identity API:
 
 This is assumed that node and npm are installed on the machine.
 
@@ -8,17 +8,15 @@ This is assumed that node and npm are installed on the machine.
  * npm
  * mongodb
 
-For installing node and npm please refer [this link](https://nodejs.org/en/download/package-manager/).
+For installing node and npm please refer [here](https://nodejs.org/en/download/package-manager/).
 
-To install mongodb please refer [this link](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
+To install mongodb please refer [here](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/).
 
-Clone the repository and move to server directory and hit:
+Clone the repository and move to cloned directory and hit:
 
 ```npm install```
 
 This will install all the dependencies for the project.
-
-Then run this command ```cp .env.example .env-dev``` and replace details in .env-dev file.
 
 To start the project hit:  
 

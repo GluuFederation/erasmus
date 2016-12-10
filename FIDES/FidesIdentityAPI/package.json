@@ -1,7 +1,7 @@
 {
-  "name": "Auth",
+  "name": "FIDES Identity APIs",
   "version": "1.0.0",
-  "description": "Auth server",
+  "description": "FIDES Identity API",
   "main": "index.js",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",

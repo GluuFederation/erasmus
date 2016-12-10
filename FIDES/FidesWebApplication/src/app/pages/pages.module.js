@@ -4,6 +4,7 @@
   angular.module('FidesWebApplication.pages', [
     'ui.router',
 
+    'FidesWebApplication.pages.login',
     'FidesWebApplication.pages.home',
     'FidesWebApplication.pages.users',
     // 'FidesWebApplication.pages.dashboard',
@@ -25,7 +26,7 @@
      icon: 'ion-document',
      subMenu: [{
      title: 'Sign In',
-     fixedHref: 'auth.html',
+     fixedHref: 'login.html',
      blank: true
      }, {
      title: 'Sign Up',

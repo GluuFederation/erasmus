@@ -14,6 +14,7 @@
         controller: 'UsersController',
         controllerAs: "vm",
         role: ['admin'],
+        authenticate: true,
         sidebarMeta: {
           icon: 'fa fa-users',
           order: 2,

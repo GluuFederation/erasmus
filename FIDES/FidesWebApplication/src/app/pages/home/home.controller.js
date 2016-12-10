@@ -5,7 +5,18 @@
     .controller('HomeController', HomeController);
 
   /** @ngInject */
-  function HomeController($scope, fileReader, $filter, $uibModal) {
+  function HomeController($http, toastr, urls) {
+    //var vm = this;
+    $http.get(urls.BASE_API + "/loggedIn").then(onSuccess).catch(onError);
+
+    function onSuccess(response) {
+      //console.log(response.data);
+    }
+
+    function onError(error) {
+      //console.log(JSON.stringify(error));
+      toastr.error(error.data.message, 'FIDES', {})
+    }
   }
 
 })();

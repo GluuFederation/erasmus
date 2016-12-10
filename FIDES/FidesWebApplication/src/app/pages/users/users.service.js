@@ -10,13 +10,8 @@
       getUsers: getUsers,
       removeUser: removeUser,
       updateUser: updateUser,
-      login: login,
       createUser: createUser,
     };
-
-    function login(formData, onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/login", formData).then(onSuccess).catch(onError);
-    }
 
     function getUsers(onSuccess, onError) {
       return $http.get(urls.BASE_API + "/getAllUsers").then(onSuccess).catch(onError);
@@ -31,7 +26,6 @@
     }
 
     function updateUser(formData, onSuccess, onError) {
-      console.log(formData);
       return $http.post(urls.BASE_API + "/updateUser", formData).then(onSuccess).catch(onError);
     }
 

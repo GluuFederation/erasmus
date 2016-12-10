@@ -6,24 +6,24 @@ const User = require('../models/user');
 // =========================================================================
 // Authenticates a user ====================================================
 // =========================================================================
-let authenticateUser = (username, password, done) => {
-    if (username)
-        username = username.toLowerCase();
+let authenticateUser = (email, password, done) => {
+    if (email)
+        email = email.toLowerCase();
     process.nextTick(() => {
         User.findOne({
-            'username': username
+            $or: [{'username': email}, {'email': email}]
         }, (err, user) => {
             if (err)
                 return done(err);
 
             if (!user) {
                 return done(null, false, {
-                    'loginMessage': 'No user found.'
+                    'message': 'No user found.'
                 });
             }
             if (!user.validPassword(password)) {
                 return done(null, false, {
-                    'loginMessage': 'Oops! Wrong password.'
+                    'message': 'Oops! Wrong password.'
                 });
             } else {
                 return done(null, user);

@@ -21,7 +21,7 @@ const express = require('express'),
 // configuration ===============================================================
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.DB_URL, (err, res) => {
-    if(err)
+    if (err)
         console.log(`err connecting to db on ${process.env.DB_URL}, err: ${err}`);
     else
         console.log(`database connected on ${process.env.DB_URL}`);
@@ -57,20 +57,30 @@ app.use(swagger.init(app, {
     swaggerURL: '/swagger',
     swaggerJSON: '/api-docs.json',
     swaggerUI: './public/swagger/',
-       apis: ['./swagger/users.yml','./swagger/providers.yml']
+    apis: ['./swagger/users.yml', './swagger/providers.yml']
 }));
 
 //logger
 app.use(morgan('dev'));
 
 //JWT token
-/*app.use('/', expressJwt({ secret: process.env.APP_SECRET }));
-app.use('/', function(req, res, next) {
-	var authorization = req.header("authorization");
-	var session = JSON.parse( new Buffer((authorization.split(' ')[1]).split('.')[1], 'base64').toString());
-    res.locals.session = session;
+app.use(expressJwt({secret: process.env.APP_SECRET}).unless({path: ['/login']}));
+
+app.use('/', function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).send({
+            'message': 'Please login again. Session expired.'
+        });
+        return;
+    } else if (req.originalUrl !== '/login') {
+        var authorization = req.header("authorization");
+        if (authorization) {
+            var session = JSON.parse(new Buffer((authorization.split(' ')[1]).split('.')[1], 'base64').toString());
+            res.locals.session = session;
+        }
+    }
     next();
-});*/
+});
 
 app.use(cookieParser());
 
@@ -88,14 +98,14 @@ app.use(session({
 })); // session secret
 
 /*// Error handlers
-app.use(function (err, req, res, next) {
-    res.redirect('/login');
-});*/
+ app.use(function (err, req, res, next) {
+ res.redirect('/login');
+ });*/
 
 // routes ======================================================================
 app.use(require('./controllers/index')); // load our routes and pass in our app
 //require('./controllers/users');
 
 server.listen(process.env.PORT, () => {
-    console.log(`-------------------------------------------------------------------\nServer started successfully!, Open this URL ${process.env.BASE_URL}\n-------------------------------------------------------------------`);
+    console.log(`-----------------------\nServer started successfully!, Open this URL ${process.env.BASE_URL}\n-----------------------`);
 });

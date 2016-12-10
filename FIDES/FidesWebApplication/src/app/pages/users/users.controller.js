@@ -38,6 +38,7 @@
       }
 
       function onError(error) {
+        //console.log(JSON.stringify(error));
         toastr.error(error.data.message, 'Users', {})
       }
     }
@@ -72,12 +73,13 @@
     vm.displayedCollection = [].concat(vm.users);
 
     vm.getUsers();
+
     //Model Controller
     function CreateUserController($uibModalInstance, userData) {
       var vm = this;
       vm.modalUser = {};
       vm.isInEditMode = false;
-      console.log(userData);
+      //console.log(userData);
 
       if(userData) {
         vm.modalUser.username = userData.username;
