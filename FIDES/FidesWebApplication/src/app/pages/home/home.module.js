@@ -13,13 +13,11 @@
         templateUrl: 'app/pages/home/home.html',
         controller: 'HomeController',
         controllerAs: "vm",
-        role: ['admin', 'issuer'],
         authenticate: true,
         sidebarMeta: {
           icon: 'ion-android-home',
-          order: 0,
-        },
+          order: 0
+        }
       });
   }
-
 })();

@@ -34,7 +34,6 @@
         if (response.data) {
           vm.users = response.data;
         }
-        toastr.success('Fetched successfully', 'Users', {});
       }
 
       function onError(error) {
@@ -43,7 +42,7 @@
       }
     }
 
-    function openUserModal(userData) {
+    function openUserModal(userData, index) {
       vm.userModal = $uibModal.open({
         animation: true,
         templateUrl: '/app/pages/users/createUser.modal.html',
@@ -58,11 +57,12 @@
       });
 
       vm.userModal.result.then(function (newUser) {
-        if (userData) {
-          _.remove(vm.users, {username: newUser.username});
+        if (index >= 0) {
+          vm.users[index] = newUser;
+        } else {
+          vm.users.push(newUser);
         }
-
-        vm.users.push(newUser);
+        vm.displayedCollection = [].concat(vm.users);
       });
     }
 
@@ -79,23 +79,44 @@
       var vm = this;
       vm.modalUser = {};
       vm.isInEditMode = false;
-      //console.log(userData);
+      vm.roles = {};
 
-      if(userData) {
+      if (userData) {
+        vm.isInEditMode = true;
         vm.modalUser.username = userData.username;
         vm.modalUser.password = userData.password;
         vm.modalUser.firstName = userData.firstName;
         vm.modalUser.lastName = userData.lastName;
         vm.modalUser.email = userData.email;
-        vm.isInEditMode = true;
+        vm.modalUser.roleId = userData.role._id;
+      }
+
+      getAllRoles();
+
+      function getAllRoles() {
+        userService.getAllRoles(onSuccess, onError);
+        function onSuccess(response) {
+          if (response.data) {
+            vm.roles = response.data;
+            if (!vm.modalUser.roleId && vm.roles.length > 0) {
+              vm.modalUser.roleId = vm.roles[0]._id;
+            }
+          }
+        }
+
+        function onError(error) {
+          //console.log(JSON.stringify(error));
+          toastr.error(error.data.message, 'Roles', {})
+        }
       }
 
       function pushUser(isFormValid) {
         if (!isFormValid) {
           return false;
         }
+        console.log(vm.modalUser.roleId);
 
-        if(vm.isInEditMode){
+        if (vm.isInEditMode) {
           userService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);
         } else {
           userService.createUser(JSON.stringify(vm.modalUser), onSuccess, onError);

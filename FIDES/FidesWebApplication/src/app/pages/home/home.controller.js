@@ -18,5 +18,4 @@
       toastr.error(error.data.message, 'FIDES', {})
     }
   }
-
 })();

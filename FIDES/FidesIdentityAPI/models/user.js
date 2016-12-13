@@ -3,6 +3,8 @@
 const mongoose = require('mongoose'),
     bcrypt = require('bcrypt-nodejs');
 
+var Role = require('./role');
+
 // define the schema for our user model
 const userSchema = mongoose.Schema({
     username: {
@@ -34,6 +36,10 @@ const userSchema = mongoose.Schema({
     createdOn: {
         type: Date,
         default: new Date()
+    },
+    role: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role'
     }
 });
 

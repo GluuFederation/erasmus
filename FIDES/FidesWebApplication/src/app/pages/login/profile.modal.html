@@ -1,0 +1,56 @@
+<div class="modal-content">
+  <form name="vm.profileForm" novalidate>
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
+        <em class="ion-ios-close-empty sn-link-close"></em>
+      </button>
+      <h4 class="modal-title" id="profileLabel">User Profile</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <!--<label for="userFirstName">Username</label>-->
+            <input id="userUsername" type="text" class="form-control" ng-disabled="true"
+                   placeholder="Username" ng-model="vm.modalUser.username">
+            </input>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <!--<label for="userFirstName">First Name</label>-->
+            <input id="userFirstName" type="text" class="form-control"
+                   placeholder="First Name" ng-model="vm.modalUser.firstName">
+            </input>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <!--<label for="userLastName">Last Name</label>-->
+            <input id="userLastName" type="text" class="form-control"
+                   placeholder="Last Name" ng-model="vm.modalUser.lastName">
+            </input>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <!--<label for="userEmail">Email</label>-->
+            <input id="userEmail" type="text" class="form-control" ng-disabled="true"
+                   placeholder="Email" ng-model="vm.modalUser.email">
+            </input>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+      <button type="submit" class="btn btn-primary" ng-click="vm.updateProfile(vm.profileForm.$valid)">Save</button>
+    </div>
+  </form>
+</div>

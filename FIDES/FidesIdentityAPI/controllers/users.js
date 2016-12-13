@@ -27,7 +27,7 @@ router.post('/login', (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            return res.status(401).send(info);
+            return res.status(200).send(JSON.stringify({data: [], info}));
         }
 
         //Creating a JWT token for user session which is valid for 24 hrs.
@@ -36,6 +36,7 @@ router.post('/login', (req, res, next) => {
         });
         return res.status(200).send({
             user,
+            role: user.role.name,
             token
         });
 
@@ -58,7 +59,7 @@ router.delete('/removeUser/:username', (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            return res.status(401).send(info);
+            return res.status(200).send(JSON.stringify({data: [], info}));
         }
 
         return res.status(200).send(user);
@@ -84,14 +85,19 @@ router.post('/signup', (req, res, next) => {
             'message': 'Please provide password.'
         });
 
-    Users.createUser(req.body.username, req.body.email, req.body.password, req.body.firstName, req.body.lastName, (err, user, info) => {
+    if (!req.body.roleId)
+        return res.status(409).send({
+            'message': 'Please provide at least one role.'
+        });
+
+    Users.createUser(req.body.username, req.body.email, req.body.password, req.body.firstName, req.body.lastName, req.body.roleId, (err, user, info) => {
         if (err) {
             return res.status(500).send({
                 'message': err.message
             });
         }
         if (!user) {
-            return res.status(401).send(info);
+            return res.status(200).send(JSON.stringify({data: [], info}));
         }
 
         return res.status(200).send(user);
@@ -102,7 +108,6 @@ router.post('/signup', (req, res, next) => {
 // UPDATE USER DATA ============================================================
 // =============================================================================
 router.post('/updateUser', (req, res, next) => {
-    console.log(req.body);
     if (!req.body.username)
         return res.status(409).send({
             'message': 'Please provide username.'
@@ -113,14 +118,18 @@ router.post('/updateUser', (req, res, next) => {
             'message': 'Please provide email.'
         });
 
-    Users.updateUser(req.body.username, req.body.email, req.body.firstName, req.body.lastName, (err, user, info) => {
+    if (!req.body.roleId)
+        return res.status(409).send({
+            'message': 'Please provide role.'
+        });
+    Users.updateUser(req.body.username, req.body.email, req.body.firstName, req.body.lastName, req.body.roleId, (err, user, info) => {
         if (err) {
             return res.status(500).send({
                 'message': err.message
             });
         }
         if (!user) {
-            return res.status(401).send(info);
+            return res.status(200).send(JSON.stringify({data: [], info}));
         }
 
         return res.status(200).send(user);
@@ -137,7 +146,7 @@ router.get('/getAllUsers', (req, res, next) => {
             return next(err);
         }
         if (info) {
-            return res.status(200).send(JSON.stringify({data: [], message: info}));
+            return res.status(200).send(JSON.stringify({data: [], info}));
         } else {
             return res.status(200).send(user);
         }

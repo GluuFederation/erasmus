@@ -11,6 +11,7 @@
       removeUser: removeUser,
       updateUser: updateUser,
       createUser: createUser,
+      getAllRoles: getAllRoles
     };
 
     function getUsers(onSuccess, onError) {
@@ -26,7 +27,12 @@
     }
 
     function updateUser(formData, onSuccess, onError) {
+      console.log(formData);
       return $http.post(urls.BASE_API + "/updateUser", formData).then(onSuccess).catch(onError);
+    }
+
+    function getAllRoles(onSuccess, onError) {
+      return $http.get(urls.BASE_API + "/getAllRoles").then(onSuccess).catch(onError);
     }
 
     return service;

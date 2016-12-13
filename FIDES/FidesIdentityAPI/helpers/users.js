@@ -2,6 +2,7 @@
 
 // load up the user model
 const User = require('../models/user');
+const Role = require('../models/role');
 
 // =========================================================================
 // Authenticates a user ====================================================
@@ -12,7 +13,7 @@ let authenticateUser = (email, password, done) => {
     process.nextTick(() => {
         User.findOne({
             $or: [{'username': email}, {'email': email}]
-        }, (err, user) => {
+        }).populate('role').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -35,7 +36,7 @@ let authenticateUser = (email, password, done) => {
 // =============================================================================
 // Creates a new user ==========================================================
 // =============================================================================
-let createUser = (username, email, password, firstName, lastName, done) => {
+let createUser = (username, email, password, firstName, lastName, roleId, done) => {
     if (username)
         username = username.toLowerCase();
 
@@ -60,12 +61,19 @@ let createUser = (username, email, password, firstName, lastName, done) => {
                 newUser.password = newUser.generateHash(password);
                 newUser.firstName = firstName;
                 newUser.lastName = lastName;
+                newUser.role = roleId;
 
                 newUser.save(err => {
                     if (err)
                         return done(err);
 
-                    return done(null, newUser);
+                    User.populate(newUser, 'role', function (err, newUser) {
+                        if (err)
+                            return done(err);
+
+                        console.log(newUser);
+                        return done(null, newUser);
+                    });
                 });
             }
         });
@@ -75,14 +83,14 @@ let createUser = (username, email, password, firstName, lastName, done) => {
 // =============================================================================
 // Update user =================================================================
 // =============================================================================
-let updateUser = (username, email, firstName, lastName, done) => {
+let updateUser = (username, email, firstName, lastName, roleId, done) => {
     if (username)
         username = username.toLowerCase();
 
     process.nextTick(() => {
         User.findOne({
             $or: [{'username': username}, {'email': email}]
-        }, (err, user) => {
+        }).populate('role').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -94,12 +102,22 @@ let updateUser = (username, email, firstName, lastName, done) => {
             } else {
                 user.firstName = firstName;
                 user.lastName = lastName;
+                user.role = roleId;
 
                 user.save(err => {
                     if (err)
                         return done(err);
 
-                    return done(null, user);
+                    /*console.log(user);
+                    return done(null, user);*/
+
+                    User.populate(user, 'role', function (err, user) {
+                        if (err)
+                            return done(err);
+
+                        console.log(user);
+                        return done(null, user);
+                    });
                 });
             }
         });
@@ -144,7 +162,7 @@ let getAllUsers = (done) => {
     process.nextTick(() => {
         User.find().sort({
             firstName: 1
-        }).select('-_id -password')
+        }).select('-_id -password').populate('role')
             .exec(function (err, users) {
                 if (err) {
                     done(err);

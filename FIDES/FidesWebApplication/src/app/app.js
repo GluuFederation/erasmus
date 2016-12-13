@@ -27,44 +27,47 @@ angular.module('FidesWebApplication', [
   AUTH_URL: 'http://192.168.200.70:3000/login.html',
   BASE_API: 'http://192.168.200.70:8000',
   USER_PROFILE: 'assets/img/theme/no-photo.png'
-}).run(function ($rootScope, $localStorage, $http, $window, $state, urls) {
+}).run(function ($rootScope, $localStorage, $http, $window, $state, urls, toastr) {
   if ($window.location.pathname == "/login.html" || $window.location.pathname == "/login") {
-    removeToken($localStorage, $http, $window, urls, false);
+    removeTokenAndRedirect($localStorage, $http, $window, urls);
     return;
   }
 
   if ($window.location.href !== urls.AUTH_URL && $localStorage.currentUser == undefined) {
-    removeToken($localStorage, $http, $window, urls, true);
+    removeTokenAndRedirect($localStorage, $http, $window, urls, true);
   } else {
-    $rootScope.$on('$stateChangeStart', function (event, toState) {
+    $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 
       if (toState.name == "login" || $window.location.pathname == "/login.html") {
-        removeToken($localStorage, $http, $window, urls, false);
+        removeTokenAndRedirect($localStorage, $http, $window, urls);
         return;
       }
 
       if (toState.authenticate && $localStorage.currentUser == undefined) {
-        removeToken($localStorage, $http, $window, urls, true);
+        removeTokenAndRedirect($localStorage, $http, $window, urls, true);
         return;
       }
 
       // add jwt token to auth header for all requests made by the $http service
       $http.defaults.headers.common.Authorization = 'Bearer ' + $localStorage.currentUser.token;
 
-      /*var userRole = $localStorage.userRole;
-       if (userRole != undefined) {
-       if (!toState.role.includes(userRole)) {
-       $localStorage.$reset();
-       // //$state.transitionTo('login');
-       // var cookies = $localStorage.getAll();
-       // angular.forEach(cookies, function (v, k) {
-       // $localStorage.remove(k);
-       // });
-       $window.location = urls.AUTH_URL + "?error=You are not authorized person to view this content. Please contact admin for more details.";
-       }
-       } else {
-       $window.location = urls.AUTH_URL + "?error=Please login first.";
-       }*/
+      var userRole = $localStorage.currentUser.role;
+      if (userRole != undefined) {
+        if (toState.roles != undefined) {
+          if (!toState.roles.includes(userRole)) {
+            toastr.error("You are not authorized person to view this content. Please contact admin for more details.", '', {});
+            event.preventDefault();
+
+            if(fromState && fromState.name) {
+              $state.go(fromState.name);
+            } else {
+              $state.go('home');
+            }
+          }
+        }
+      } else {
+        removeTokenAndRedirect($localStorage, $http, $window, urls, true, "?error=Please login first.");
+      }
     });
   }
 }).factory('authHttpResponseInterceptor', ['$q', '$window', 'urls', function ($q, $window, urls) {
@@ -77,7 +80,7 @@ angular.module('FidesWebApplication', [
     },
     responseError: function (rejection) {
       if (rejection.status === 401) {
-       // console.log("Response Error 401", rejection);
+        // console.log("Response Error 401", rejection);
         $window.location = urls.AUTH_URL;
       }
       return $q.reject(rejection);
@@ -89,10 +92,14 @@ angular.module('FidesWebApplication', [
 }])
 ;
 
-function removeToken($localStorage, $http, $window, urls, redirectToLogin) {
+function removeTokenAndRedirect($localStorage, $http, $window, urls, redirectToLogin, message) {
+  if(!message) {
+    message = '';
+  }
+
   delete $localStorage.currentUser;
   $http.defaults.headers.common.Authorization = '';
-  if(redirectToLogin){
-    $window.location = urls.AUTH_URL;
+  if (redirectToLogin) {
+    $window.location = urls.AUTH_URL + message;
   }
 }
