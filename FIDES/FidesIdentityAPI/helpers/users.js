@@ -2,7 +2,6 @@
 
 // load up the user model
 const User = require('../models/user');
-const Role = require('../models/role');
 
 // =========================================================================
 // Authenticates a user ====================================================

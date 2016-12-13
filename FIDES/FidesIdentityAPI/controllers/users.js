@@ -34,6 +34,8 @@ router.post('/login', (req, res, next) => {
         let token = jwt.sign(user, process.env.APP_SECRET, {
             expiresIn: process.env.JWT_EXPIRES_IN
         });
+
+        delete user._doc.password;
         return res.status(200).send({
             user,
             role: user.role.name,
@@ -100,6 +102,7 @@ router.post('/signup', (req, res, next) => {
             return res.status(200).send(JSON.stringify({data: [], info}));
         }
 
+        delete user._doc.password;
         return res.status(200).send(user);
     });
 });
@@ -132,6 +135,7 @@ router.post('/updateUser', (req, res, next) => {
             return res.status(200).send(JSON.stringify({data: [], info}));
         }
 
+        delete user._doc.password;
         return res.status(200).send(user);
     });
 });

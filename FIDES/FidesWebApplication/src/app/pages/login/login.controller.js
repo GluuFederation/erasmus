@@ -23,7 +23,7 @@
         // login successful if there's a token in the response
         if (response.token) {
           // store username and token in local storage to keep user logged in between page refreshes
-          $localStorage.currentUser = {username: vm.username, role: response.role, token: response.token};
+          $localStorage.currentUser = {user: response.user, role: response.role, token: response.token};
           $window.location = urls.BASE;
         } else {
           // execute callback with false to indicate failed login
@@ -52,7 +52,7 @@
         controllerAs: 'vm',
         resolve: {
           userData: function () {
-            return vm.user;
+            return $localStorage.currentUser.user;
           }
         }
       });
@@ -75,7 +75,7 @@
         vm.modalUser.firstName = userData.firstName;
         vm.modalUser.lastName = userData.lastName;
         vm.modalUser.email = userData.email;
-        //vm.modalUser.roleId = userData.role._id;
+        vm.modalUser.roleId = userData.role._id;
       }
 
       function updateProfile(isFormValid) {
@@ -83,12 +83,13 @@
           return false;
         }
 
-        userService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);
+        loginService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);
 
         function onSuccess(response) {
           toastr.success('Saved successfully', 'Profile', {});
 
           if (response.data) {
+            $localStorage.currentUser.user = response.data;
             $uibModalInstance.close(response.data);
           }
         }

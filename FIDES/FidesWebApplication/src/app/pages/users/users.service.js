@@ -27,7 +27,6 @@
     }
 
     function updateUser(formData, onSuccess, onError) {
-      console.log(formData);
       return $http.post(urls.BASE_API + "/updateUser", formData).then(onSuccess).catch(onError);
     }
 

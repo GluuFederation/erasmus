@@ -5,7 +5,7 @@
     .controller('UsersController', UsersController);
 
   /** @ngInject */
-  function UsersController($scope, $filter, $uibModal, toastr, userService) {
+  function UsersController($scope, $filter, $localStorage, $uibModal, toastr, userService) {
     var vm = this;
     vm.users = {};
 
@@ -114,7 +114,6 @@
         if (!isFormValid) {
           return false;
         }
-        console.log(vm.modalUser.roleId);
 
         if (vm.isInEditMode) {
           userService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);
@@ -126,6 +125,9 @@
           toastr.success('Saved successfully', 'Users', {});
 
           if (response.data) {
+            if($localStorage.currentUser.user.username === response.data.username) {
+              $localStorage.currentUser.user = response.data;
+            }
             $uibModalInstance.close(response.data);
           }
         }
