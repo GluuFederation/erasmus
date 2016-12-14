@@ -6,12 +6,12 @@ const User = require('../models/user');
 // =========================================================================
 // Authenticates a user ====================================================
 // =========================================================================
-let authenticateUser = (email, password, done) => {
-    if (email)
-        email = email.toLowerCase();
+let authenticateUser = (username, password, done) => {
+    if (username)
+        username = username.toLowerCase();
     process.nextTick(() => {
         User.findOne({
-            $or: [{'username': email}, {'email': email}]
+            $or: [{'username': username}, {'email': username}]
         }).populate('role').exec(function (err, user) {
             if (err)
                 return done(err);
@@ -82,7 +82,7 @@ let createUser = (username, email, password, firstName, lastName, roleId, done) 
 // =============================================================================
 // Update user =================================================================
 // =============================================================================
-let updateUser = (username, email, firstName, lastName, roleId, done) => {
+let updateUser = (username, password, email, firstName, lastName, roleId, done) => {
     if (username)
         username = username.toLowerCase();
 
@@ -99,6 +99,10 @@ let updateUser = (username, email, firstName, lastName, roleId, done) => {
                     'message': 'User not found with that username/email.'
                 });
             } else {
+                if(password){
+                    user.password = user.generateHash(password);
+                }
+
                 user.firstName = firstName;
                 user.lastName = lastName;
                 user.role = roleId;
@@ -118,6 +122,44 @@ let updateUser = (username, email, firstName, lastName, roleId, done) => {
                         return done(null, user);
                     });
                 });
+            }
+        });
+    });
+};
+
+// =============================================================================
+// Update password =============================================================
+// =============================================================================
+let updatePassword = (username, currentPassword, newPassword, done) => {
+    if (username)
+        username = username.toLowerCase();
+
+    process.nextTick(() => {
+        User.findOne({
+            $or: [{'username': username}, {'email': username}]
+        }).populate('role').exec(function (err, user) {
+            if (err)
+                return done(err);
+
+            // check to see if there is already exists or not.
+            if (!user) {
+                return done(null, false, {
+                    'message': 'User not found with that username/email.'
+                });
+            } else {
+                if (!user.validPassword(currentPassword)) {
+                    return done(null, false, {
+                        'message': 'Oops! Wrong password.'
+                    });
+                } else {
+                    user.password = user.generateHash(newPassword);
+                    user.save(err => {
+                        if (err)
+                            return done(err);
+
+                         return done(null, user);
+                    });
+                }
             }
         });
     });
@@ -179,5 +221,6 @@ module.exports = {
     authenticateUser,
     getAllUsers,
     updateUser,
+    updatePassword,
     removeUser
 };

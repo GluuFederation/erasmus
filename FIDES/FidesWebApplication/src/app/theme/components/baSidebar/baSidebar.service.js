@@ -66,7 +66,9 @@
         function defineMenuItemStates() {
           return $state.get()
             .filter(function (s) {
-              return s.sidebarMeta;
+                if (s.visible) {
+                  return s.sidebarMeta;
+                }
             })
             .map(function (s) {
               var meta = s.sidebarMeta;

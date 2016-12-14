@@ -79,12 +79,12 @@
       var vm = this;
       vm.modalUser = {};
       vm.isInEditMode = false;
+      vm.editPassword = false;
       vm.roles = {};
 
       if (userData) {
         vm.isInEditMode = true;
         vm.modalUser.username = userData.username;
-        vm.modalUser.password = userData.password;
         vm.modalUser.firstName = userData.firstName;
         vm.modalUser.lastName = userData.lastName;
         vm.modalUser.email = userData.email;
@@ -113,6 +113,13 @@
       function pushUser(isFormValid) {
         if (!isFormValid) {
           return false;
+        }
+
+        if(vm.editPassword){
+          if(!vm.modalUser.password){
+            toastr.error("Please provide password.", "Update User", {});
+            return false;
+          }
         }
 
         if (vm.isInEditMode) {

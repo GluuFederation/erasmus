@@ -9,7 +9,8 @@
 
     var service = {
       login: login,
-      updateUser: updateUser
+      updateUser: updateUser,
+      updatePassword: updatePassword
     };
 
     function login(username, password, onSuccess, onError) {
@@ -21,6 +22,10 @@
 
     function updateUser(formData, onSuccess, onError) {
       return $http.post(urls.BASE_API + "/updateUser", formData).then(onSuccess).catch(onError);
+    }
+
+    function updatePassword(formData, onSuccess, onError) {
+      return $http.post(urls.BASE_API + "/updatePassword", formData).then(onSuccess).catch(onError);
     }
 
     return service;

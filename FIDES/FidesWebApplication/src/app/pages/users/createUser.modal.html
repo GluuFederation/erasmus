@@ -11,24 +11,28 @@
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.createUserForm.username.$invalid && (vm.createUserForm.username.$dirty || vm.createUserForm.$submitted)}">
-            <!--<label for="username">Username</label>-->
+            <label for="username">Username</label>
             <input type="text" class="form-control" id="username" name="username" ng-disabled="vm.isInEditMode"
                    placeholder="Username" ng-model="vm.modalUser.username" required>
           </div>
         </div>
         <div class="col-md-6">
-          <div class="form-group" ng-show="!vm.isInEditMode"
+          <div class="form-group" ng-show="!vm.isInEditMode || vm.editPassword"
                ng-class="{'has-error': vm.createUserForm.password.$invalid && (vm.createUserForm.password.$dirty || vm.createUserForm.$submitted)}">
-            <!--<label for="password">Password</label>-->
+            <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password"
-                   placeholder="Password" ng-model="vm.modalUser.password" ng-required="!vm.isInEditMode">
+                   placeholder="Password" ng-model="vm.modalUser.password" ng-required="!vm.isInEditMode || vm.editPassword">
+          </div>
+          <div class="form-group" ng-show="vm.isInEditMode && !vm.editPassword">
+            <br />
+            <a class="btn btn-default btn-md" id="lnkPassword" ng-click="vm.editPassword = true;">Change Password</a>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <!--<label for="userFirstName">First Name</label>-->
+            <label for="userFirstName">First Name</label>
             <input id="userFirstName" type="text" class="form-control"
                    placeholder="First Name" ng-model="vm.modalUser.firstName">
             </input>
@@ -36,7 +40,7 @@
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <!--<label for="userLastName">Last Name</label>-->
+            <label for="userLastName">Last Name</label>
             <input id="userLastName" type="text" class="form-control"
                    placeholder="Last Name" ng-model="vm.modalUser.lastName">
             </input>
@@ -47,15 +51,15 @@
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.createUserForm.email.$invalid && (vm.createUserForm.email.$dirty || vm.createUserForm.$submitted)}">
-            <!--<label for="userEmail">Email</label>-->
+            <label for="userEmail">Email</label>
             <input type="email" class="form-control" id="userEmail" name="email" ng-disabled="vm.isInEditMode"
                    placeholder="Email" ng-model="vm.modalUser.email" required>
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <!--<label for="userRole">Role</label>-->
-            <select class="form-control" name="userRole" title="Select Role" selectpicker required
+            <label for="userRole">User Role</label>
+            <select class="form-control" id="userRole" title="Select Role" selectpicker required
                     ng-model="vm.modalUser.roleId"
                     ng-options="role._id as role.nameSlug for role in vm.roles">
             </select>

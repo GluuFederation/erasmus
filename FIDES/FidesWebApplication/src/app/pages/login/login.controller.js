@@ -10,6 +10,7 @@
     vm.login = login;
     vm.logout = logout;
     vm.openProfileModal = openProfileModal;
+    vm.openChangePasswordModal = openChangePasswordModal;
     vm.userProfilePic = userProfilePic;
 
     function login(isFormValid) {
@@ -58,6 +59,21 @@
       });
     }
 
+    function openChangePasswordModal() {
+      vm.profileModal = $uibModal.open({
+        animation: true,
+        templateUrl: '/app/pages/login/changePassword.modal.html',
+        size: 'md',
+        controller: ['$uibModalInstance', 'userData', changePasswordController],
+        controllerAs: 'vm',
+        resolve: {
+          userData: function () {
+            return $localStorage.currentUser.user;
+          }
+        }
+      });
+    }
+
     function logout() {
       // remove user from local storage and clear http auth header
       delete $localStorage.currentUser;
@@ -65,6 +81,7 @@
       $window.location = urls.AUTH_URL;
     }
 
+    //Profile controller
     function profileInfoController($uibModalInstance, userData) {
       var vm = this;
       vm.modalUser = {};
@@ -100,6 +117,42 @@
       }
 
       vm.updateProfile = updateProfile;
+    }
+
+    //Change password controller
+    function changePasswordController($uibModalInstance, userData) {
+      var vm = this;
+      vm.modalUser = {};
+
+      if (userData) {
+        vm.modalUser.username = userData.username;
+      }
+
+      function updateUserPassword(isFormValid) {
+        if (!isFormValid) {
+          return false;
+        }
+
+        if (vm.modalUser.newPassword !== vm.modalUser.confirmPassword) {
+          return false;
+        }
+
+        loginService.updatePassword(JSON.stringify(vm.modalUser), onSuccess, onError);
+
+        function onSuccess(response) {
+          toastr.success('Password changed successfully', 'Profile', {});
+
+          if (response.data) {
+            $uibModalInstance.close(response.data);
+          }
+        }
+
+        function onError(error) {
+          toastr.error(error.data.message, 'Change Password', {})
+        }
+      }
+
+      vm.updateUserPassword = updateUserPassword;
     }
   }
 })();

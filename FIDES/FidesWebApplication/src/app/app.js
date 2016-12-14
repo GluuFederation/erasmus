@@ -36,6 +36,16 @@ angular.module('FidesWebApplication', [
   if ($window.location.href !== urls.AUTH_URL && $localStorage.currentUser == undefined) {
     removeTokenAndRedirect($localStorage, $http, $window, urls, true);
   } else {
+    angular.forEach($state.get(), function(s) {
+      s.visible = false;
+      var userRole = $localStorage.currentUser.role;
+      if (userRole != undefined) {
+        if (s.roles === undefined || s.roles.includes(userRole)) {
+          s.visible = true;
+        }
+      }
+    });
+
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
 
       if (toState.name == "login" || $window.location.pathname == "/login.html") {

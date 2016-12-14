@@ -13,12 +13,12 @@ const express = require('express'),
 router.post('/login', (req, res, next) => {
 
     if (!req.body.username)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide username.'
         });
 
     if (!req.body.password)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide password.'
         });
 
@@ -27,7 +27,7 @@ router.post('/login', (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            return res.status(200).send(JSON.stringify({data: [], info}));
+            return res.status(406).send(info);
         }
 
         //Creating a JWT token for user session which is valid for 24 hrs.
@@ -51,7 +51,7 @@ router.post('/login', (req, res, next) => {
 
 router.delete('/removeUser/:username', (req, res, next) => {
     if (!req.params.username) {
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide username.'
         });
     }
@@ -61,7 +61,7 @@ router.delete('/removeUser/:username', (req, res, next) => {
             return next(err);
         }
         if (!user) {
-            return res.status(200).send(JSON.stringify({data: [], info}));
+            return res.status(406).send(info);
         }
 
         return res.status(200).send(user);
@@ -73,33 +73,31 @@ router.delete('/removeUser/:username', (req, res, next) => {
 // =============================================================================
 router.post('/signup', (req, res, next) => {
     if (!req.body.username)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide username.'
         });
 
     if (!req.body.email)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide email.'
         });
 
     if (!req.body.password)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide password.'
         });
 
     if (!req.body.roleId)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide at least one role.'
         });
 
     Users.createUser(req.body.username, req.body.email, req.body.password, req.body.firstName, req.body.lastName, req.body.roleId, (err, user, info) => {
         if (err) {
-            return res.status(500).send({
-                'message': err.message
-            });
+            return next(err);
         }
         if (!user) {
-            return res.status(200).send(JSON.stringify({data: [], info}));
+            return res.status(406).send(info);
         }
 
         delete user._doc.password;
@@ -112,27 +110,56 @@ router.post('/signup', (req, res, next) => {
 // =============================================================================
 router.post('/updateUser', (req, res, next) => {
     if (!req.body.username)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide username.'
         });
 
     if (!req.body.email)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide email.'
         });
 
     if (!req.body.roleId)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide role.'
         });
-    Users.updateUser(req.body.username, req.body.email, req.body.firstName, req.body.lastName, req.body.roleId, (err, user, info) => {
+    Users.updateUser(req.body.username, req.body.password, req.body.email, req.body.firstName, req.body.lastName, req.body.roleId, (err, user, info) => {
         if (err) {
-            return res.status(500).send({
-                'message': err.message
-            });
+            return next(err);
         }
         if (!user) {
-            return res.status(200).send(JSON.stringify({data: [], info}));
+            return res.status(406).send(info);
+        }
+
+        delete user._doc.password;
+        return res.status(200).send(user);
+    });
+});
+
+// =============================================================================
+// UPDATE USER PASSWORD ========================================================
+// =============================================================================
+router.post('/updatePassword', (req, res, next) => {
+    if (!req.body.username)
+        return res.status(406).send({
+            'message': 'Please provide username.'
+        });
+
+    if (!req.body.currentPassword)
+        return res.status(406).send({
+            'message': 'Please provide current password.'
+        });
+
+    if (!req.body.newPassword)
+        return res.status(406).send({
+            'message': 'Please provide new password.'
+        });
+    Users.updatePassword(req.body.username, req.body.currentPassword, req.body.newPassword, (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.status(406).send(info);
         }
 
         delete user._doc.password;

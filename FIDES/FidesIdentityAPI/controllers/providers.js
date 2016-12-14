@@ -13,22 +13,22 @@ const express = require('express'),
 router.post('/providerRegistration', (req, res, next) => {
 
     if (!req.body.name)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide name.'
         });
 
     if (!req.body.opUrls)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide opUrls.'
         });
 
     if (!req.body.keys)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide keys.'
         });
 
     if (!req.body.trustMarks)
-        return res.status(409).send({
+        return res.status(406).send({
             'message': 'Please provide trustMarks.'
         });
 
