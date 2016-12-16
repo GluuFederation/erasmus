@@ -99,9 +99,9 @@ let updateUser = (username, password, email, firstName, lastName, roleId, done) 
                     'message': 'User not found with that username/email.'
                 });
             } else {
-                if(password){
-                    user.password = user.generateHash(password);
-                }
+                // if(password){
+                //     user.password = user.generateHash(password);
+                // }
 
                 user.firstName = firstName;
                 user.lastName = lastName;

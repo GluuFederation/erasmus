@@ -79,7 +79,7 @@
       var vm = this;
       vm.modalUser = {};
       vm.isInEditMode = false;
-      vm.editPassword = false;
+      //vm.editPassword = false;
       vm.roles = {};
 
       if (userData) {
@@ -115,12 +115,12 @@
           return false;
         }
 
-        if(vm.editPassword){
-          if(!vm.modalUser.password){
-            toastr.error("Please provide password.", "Update User", {});
-            return false;
-          }
-        }
+        // if(vm.editPassword){
+        //   if(!vm.modalUser.password){
+        //     toastr.error("Please provide password.", "Update User", {});
+        //     return false;
+        //   }
+        // }
 
         if (vm.isInEditMode) {
           userService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);

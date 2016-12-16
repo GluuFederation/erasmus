@@ -17,15 +17,11 @@
           </div>
         </div>
         <div class="col-md-6">
-          <div class="form-group" ng-show="!vm.isInEditMode || vm.editPassword"
+          <div class="form-group" ng-show="!vm.isInEditMode"
                ng-class="{'has-error': vm.createUserForm.password.$invalid && (vm.createUserForm.password.$dirty || vm.createUserForm.$submitted)}">
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password"
-                   placeholder="Password" ng-model="vm.modalUser.password" ng-required="!vm.isInEditMode || vm.editPassword">
-          </div>
-          <div class="form-group" ng-show="vm.isInEditMode && !vm.editPassword">
-            <br />
-            <a class="btn btn-default btn-md" id="lnkPassword" ng-click="vm.editPassword = true;">Change Password</a>
+                   placeholder="Password" ng-model="vm.modalUser.password" ng-required="!vm.isInEditMode">
           </div>
         </div>
       </div>
