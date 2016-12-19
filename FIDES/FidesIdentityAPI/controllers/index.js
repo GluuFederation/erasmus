@@ -11,5 +11,6 @@ router.get('/loggedIn', (req, res) => res.status(200).send({
 router.use('/', require('./users'));
 router.use('/', require('./providers'));
 router.use('/', require('./roles'));
+router.use('/', require('./organizations'));
 
 module.exports = router;

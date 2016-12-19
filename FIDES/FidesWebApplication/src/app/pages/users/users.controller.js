@@ -7,7 +7,7 @@
   /** @ngInject */
   function UsersController($scope, $filter, $localStorage, $uibModal, toastr, userService) {
     var vm = this;
-    vm.users = {};
+    vm.users = vm.displayedCollection = {};
 
     function removeUser(username) {
       var deleteUser = confirm('Are you sure you want to remove this user?');
@@ -24,7 +24,7 @@
       }
 
       function onError(error) {
-        toastr.error(error.data.message, 'Users', {})
+        toastr.error(error.data.message, 'Users', {});
       }
     }
 
@@ -33,12 +33,13 @@
       function onSuccess(response) {
         if (response.data) {
           vm.users = response.data;
+          vm.displayedCollection = [].concat(vm.users);
         }
       }
 
       function onError(error) {
         //console.log(JSON.stringify(error));
-        toastr.error(error.data.message, 'Users', {})
+        toastr.error(error.data.message, 'Users', {});
       }
     }
 
@@ -70,7 +71,6 @@
     vm.openUserModal = openUserModal;
     vm.removeUser = removeUser;
     vm.getUsers = getUsers;
-    vm.displayedCollection = [].concat(vm.users);
 
     vm.getUsers();
 
@@ -80,7 +80,12 @@
       vm.modalUser = {};
       vm.isInEditMode = false;
       //vm.editPassword = false;
+      vm.selectedRole='admin';
       vm.roles = {};
+      vm.organizations = {};
+
+      getAllRoles();
+      getAllOrganizations();
 
       if (userData) {
         vm.isInEditMode = true;
@@ -89,9 +94,18 @@
         vm.modalUser.lastName = userData.lastName;
         vm.modalUser.email = userData.email;
         vm.modalUser.roleId = userData.role._id;
+        vm.selectedRole = userData.role.name;
+        if(userData.organization) {
+          vm.modalUser.organizationId = userData.organization._id;
+        }
       }
 
-      getAllRoles();
+      function roleChanged(itemId) {
+        var selectedRole = _.find(vm.roles, {'_id': itemId});
+        if(selectedRole) {
+          vm.selectedRole = selectedRole.name;
+        }
+      }
 
       function getAllRoles() {
         userService.getAllRoles(onSuccess, onError);
@@ -110,6 +124,23 @@
         }
       }
 
+      function getAllOrganizations() {
+        userService.getAllOrganizations(onSuccess, onError);
+        function onSuccess(response) {
+          if (response.data) {
+            if (response.data.length > 0) {
+              console.log(response.data);
+              vm.organizations = response.data;
+            }
+          }
+        }
+
+        function onError(error) {
+          console.log(JSON.stringify(error));
+          toastr.error(error.data.message, 'Organizations', {})
+        }
+      }
+
       function pushUser(isFormValid) {
         if (!isFormValid) {
           return false;
@@ -121,6 +152,15 @@
         //     return false;
         //   }
         // }
+
+        if(vm.selectedRole === 'orgadmin'){
+          if(!vm.modalUser.organizationId){
+            toastr.error("Please select organization.", "Update User", {});
+            return false;
+          }
+        } else {
+          vm.modalUser.organizationId = undefined;
+        }
 
         if (vm.isInEditMode) {
           userService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);
@@ -144,6 +184,7 @@
         }
       }
 
+      vm.roleChanged = roleChanged;
       vm.pushUser = pushUser;
     }
   }

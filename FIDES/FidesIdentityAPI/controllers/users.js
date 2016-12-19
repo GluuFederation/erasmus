@@ -12,15 +12,17 @@ const express = require('express'),
 
 router.post('/login', (req, res, next) => {
 
-    if (!req.body.username)
+    if (!req.body.username) {
         return res.status(406).send({
             'message': 'Please provide username.'
         });
+    }
 
-    if (!req.body.password)
+    if (!req.body.password) {
         return res.status(406).send({
             'message': 'Please provide password.'
         });
+    }
 
     Users.authenticateUser(req.body.username, req.body.password, (err, user, info) => {
         if (err) {
@@ -72,27 +74,31 @@ router.delete('/removeUser/:username', (req, res, next) => {
 // SIGNUP (USER REGISTRATION) ==================================================
 // =============================================================================
 router.post('/signup', (req, res, next) => {
-    if (!req.body.username)
+    if (!req.body.username) {
         return res.status(406).send({
             'message': 'Please provide username.'
         });
+    }
 
-    if (!req.body.email)
+    if (!req.body.email) {
         return res.status(406).send({
             'message': 'Please provide email.'
         });
+    }
 
-    if (!req.body.password)
+    if (!req.body.password) {
         return res.status(406).send({
             'message': 'Please provide password.'
         });
+    }
 
-    if (!req.body.roleId)
+    if (!req.body.roleId) {
         return res.status(406).send({
             'message': 'Please provide at least one role.'
         });
+    }
 
-    Users.createUser(req.body.username, req.body.email, req.body.password, req.body.firstName, req.body.lastName, req.body.roleId, (err, user, info) => {
+    Users.createUser(req.body.username, req.body.email, req.body.password, req.body.firstName, req.body.lastName, req.body.roleId, req.body.organizationId, (err, user, info) => {
         if (err) {
             return next(err);
         }
@@ -109,21 +115,25 @@ router.post('/signup', (req, res, next) => {
 // UPDATE USER DATA ============================================================
 // =============================================================================
 router.post('/updateUser', (req, res, next) => {
-    if (!req.body.username)
+    if (!req.body.username) {
         return res.status(406).send({
             'message': 'Please provide username.'
         });
+    }
 
-    if (!req.body.email)
+    if (!req.body.email) {
         return res.status(406).send({
             'message': 'Please provide email.'
         });
+    }
 
-    if (!req.body.roleId)
+    if (!req.body.roleId) {
         return res.status(406).send({
             'message': 'Please provide role.'
         });
-    Users.updateUser(req.body.username, req.body.password, req.body.email, req.body.firstName, req.body.lastName, req.body.roleId, (err, user, info) => {
+    }
+
+    Users.updateUser(req.body.username, req.body.password, req.body.email, req.body.firstName, req.body.lastName, req.body.roleId, req.body.organizationId, (err, user, info) => {
         if (err) {
             return next(err);
         }
@@ -140,20 +150,24 @@ router.post('/updateUser', (req, res, next) => {
 // UPDATE USER PASSWORD ========================================================
 // =============================================================================
 router.post('/updatePassword', (req, res, next) => {
-    if (!req.body.username)
+    if (!req.body.username) {
         return res.status(406).send({
             'message': 'Please provide username.'
         });
+    }
 
-    if (!req.body.currentPassword)
+    if (!req.body.currentPassword) {
         return res.status(406).send({
             'message': 'Please provide current password.'
         });
+    }
 
-    if (!req.body.newPassword)
+    if (!req.body.newPassword) {
         return res.status(406).send({
             'message': 'Please provide new password.'
         });
+    }
+
     Users.updatePassword(req.body.username, req.body.currentPassword, req.body.newPassword, (err, user, info) => {
         if (err) {
             return next(err);
@@ -168,10 +182,9 @@ router.post('/updatePassword', (req, res, next) => {
 });
 
 // =============================================================================
-// GET ALL USERS ===========================================================
+// GET ALL USERS ===============================================================
 // =============================================================================
 router.get('/getAllUsers', (req, res, next) => {
-
     Users.getAllUsers((err, user, info) => {
         if (err) {
             return next(err);

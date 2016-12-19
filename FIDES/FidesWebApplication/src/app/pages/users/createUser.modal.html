@@ -21,43 +21,50 @@
                ng-class="{'has-error': vm.createUserForm.password.$invalid && (vm.createUserForm.password.$dirty || vm.createUserForm.$submitted)}">
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password"
-                   placeholder="Password" ng-model="vm.modalUser.password" ng-required="!vm.isInEditMode">
+                   placeholder="Password" ng-model="vm.modalUser.password" ng-required="!vm.isInEditMode"/>
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="userFirstName">First Name</label>
+        <div class="form-group col-md-6">
+          <label for="divUserName">Name</label>
+          <div id="divUserName" class="input-group">
             <input id="userFirstName" type="text" class="form-control"
-                   placeholder="First Name" ng-model="vm.modalUser.firstName">
-            </input>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group">
-            <label for="userLastName">Last Name</label>
+                   placeholder="First Name" ng-model="vm.modalUser.firstName"/>
+            <span class="input-group-btn" style="width:5px;"></span>
             <input id="userLastName" type="text" class="form-control"
-                   placeholder="Last Name" ng-model="vm.modalUser.lastName">
-            </input>
+                   placeholder="Last Name" ng-model="vm.modalUser.lastName"/>
           </div>
         </div>
-      </div>
-      <div class="row">
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.createUserForm.email.$invalid && (vm.createUserForm.email.$dirty || vm.createUserForm.$submitted)}">
             <label for="userEmail">Email</label>
             <input type="email" class="form-control" id="userEmail" name="email" ng-disabled="vm.isInEditMode"
-                   placeholder="Email" ng-model="vm.modalUser.email" required>
+                   placeholder="Email" ng-model="vm.modalUser.email" required/>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="userRole">Role</label>
+            <select class="form-control" id="userRole" title="Select Role" ng-change="vm.roleChanged(vm.modalUser.roleId)" selectpicker required
+                    ng-model="vm.modalUser.roleId"
+                    ng-options="role._id as role.nameSlug for role in vm.roles">
+            </select>
           </div>
         </div>
         <div class="col-md-6">
-          <div class="form-group">
-            <label for="userRole">User Role</label>
-            <select class="form-control" id="userRole" title="Select Role" selectpicker required
-                    ng-model="vm.modalUser.roleId"
-                    ng-options="role._id as role.nameSlug for role in vm.roles">
+          <div id="divOrganization" class="form-group"
+               ng-class="{'has-error': vm.createUserForm.organization.$invalid && (vm.createUserForm.organization.$dirty || vm.createUserForm.$submitted)}"
+               ng-show="vm.selectedRole === 'orgadmin'">
+            <label for="userOrg">Organization</label>
+            <select class="form-control" id="userOrg" name="organization" title="Select Organization" selectpicker
+                    ng-required="vm.selectedRole === 'orgadmin'"
+                    ng-model="vm.modalUser.organizationId"
+                    ng-options="organization._id as organization.name for organization in vm.organizations">
+              <option value="">Select Organization</option>
             </select>
           </div>
         </div>

@@ -15,6 +15,7 @@
             <th st-sort="lastName">Last Name</th>
             <th st-sort="email">Email</th>
             <th st-sort="role.nameSlug">Role</th>
+            <th st-sort="organization.name">Organization</th>
             <th>Actions</th>
           </tr>
           <tr>
@@ -28,6 +29,8 @@
             <th><input st-search="email" placeholder="Search Email" class="input-sm form-control search-input"
                        type="search"/></th>
             <th><input st-search="role.nameSlug" placeholder="Search Role" class="input-sm form-control search-input"
+                       type="search"/></th>
+            <th><input st-search="organization.name" placeholder="Search Organization" class="input-sm form-control search-input"
                        type="search"/></th>
             <th></th>
           </tr>
@@ -51,6 +54,9 @@
               {{user.role.nameSlug}}
             </td>
             <td>
+              {{user.organization.name}}
+            </td>
+            <td>
               <div class="buttons" ng-show="!rowform.$visible">
                 <button style="margin: 0px 5px;" class="btn btn-primary editable-table-button btn-xs" ng-click="vm.openUserModal(user, $index)">Edit</button>
                 <button style="margin: 0px 5px;" class="btn btn-danger editable-table-button btn-xs"ng-click="vm.removeUser(user.username)">Delete</button>
@@ -60,7 +66,7 @@
           </tbody>
           <tfoot>
           <tr>
-            <td colspan="6" class="text-center">
+            <td colspan="7" class="text-center">
               <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
             </td>
           </tr>

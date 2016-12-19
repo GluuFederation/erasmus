@@ -37,6 +37,10 @@ const userSchema = mongoose.Schema({
         type: Date,
         default: new Date()
     },
+    organization: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization'
+    },
     role: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role'

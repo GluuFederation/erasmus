@@ -12,7 +12,7 @@ let authenticateUser = (username, password, done) => {
     process.nextTick(() => {
         User.findOne({
             $or: [{'username': username}, {'email': username}]
-        }).populate('role').exec(function (err, user) {
+        }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -35,7 +35,7 @@ let authenticateUser = (username, password, done) => {
 // =============================================================================
 // Creates a new user ==========================================================
 // =============================================================================
-let createUser = (username, email, password, firstName, lastName, roleId, done) => {
+let createUser = (username, email, password, firstName, lastName, roleId, organizationId, done) => {
     if (username)
         username = username.toLowerCase();
 
@@ -61,12 +61,13 @@ let createUser = (username, email, password, firstName, lastName, roleId, done) 
                 newUser.firstName = firstName;
                 newUser.lastName = lastName;
                 newUser.role = roleId;
+                newUser.organization = organizationId;
 
                 newUser.save(err => {
                     if (err)
                         return done(err);
 
-                    User.populate(newUser, 'role', function (err, newUser) {
+                    User.populate(newUser, 'role organization', function (err, newUser) {
                         if (err)
                             return done(err);
 
@@ -82,14 +83,14 @@ let createUser = (username, email, password, firstName, lastName, roleId, done) 
 // =============================================================================
 // Update user =================================================================
 // =============================================================================
-let updateUser = (username, password, email, firstName, lastName, roleId, done) => {
+let updateUser = (username, password, email, firstName, lastName, roleId, organizationId, done) => {
     if (username)
         username = username.toLowerCase();
 
     process.nextTick(() => {
         User.findOne({
             $or: [{'username': username}, {'email': email}]
-        }).populate('role').exec(function (err, user) {
+        }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -106,6 +107,7 @@ let updateUser = (username, password, email, firstName, lastName, roleId, done) 
                 user.firstName = firstName;
                 user.lastName = lastName;
                 user.role = roleId;
+                user.organization = organizationId;
 
                 user.save(err => {
                     if (err)
@@ -114,7 +116,7 @@ let updateUser = (username, password, email, firstName, lastName, roleId, done) 
                     /*console.log(user);
                     return done(null, user);*/
 
-                    User.populate(user, 'role', function (err, user) {
+                    User.populate(user, 'role organization', function (err, user) {
                         if (err)
                             return done(err);
 
@@ -137,7 +139,7 @@ let updatePassword = (username, currentPassword, newPassword, done) => {
     process.nextTick(() => {
         User.findOne({
             $or: [{'username': username}, {'email': username}]
-        }).populate('role').exec(function (err, user) {
+        }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -203,7 +205,7 @@ let getAllUsers = (done) => {
     process.nextTick(() => {
         User.find().sort({
             firstName: 1
-        }).select('-_id -password').populate('role')
+        }).select('-_id -password').populate('role organization')
             .exec(function (err, users) {
                 if (err) {
                     done(err);
