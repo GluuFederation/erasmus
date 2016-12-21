@@ -76,7 +76,8 @@ let addProvider = (req, done) => {
                 objProvider.password = req.password;
                 objProvider.refreshToken = req.refreshToken;
                 objProvider.organization = req.organizationId;
-                objProvider.isApproved = req.isApproved;
+                objProvider.isApproved = false;
+                objProvider.isVerified = false;
 
                 objProvider.save(err => {
                     if (err)
@@ -134,7 +135,6 @@ let updateProvider = (req, done) => {
                 objProvider.password = req.password;
                 objProvider.refreshToken = req.refreshToken;
                 objProvider.organization = req.organizationId;
-                objProvider.isApproved = req.isApproved;
 
                 objProvider.save(err => {
                     if (err)
@@ -181,6 +181,35 @@ let removeProvider = (providerId, done) => {
     });
 };
 
+// =============================================================================
+// Approve Provider =============================================================
+// =============================================================================
+let approveProvider = (providerId, done) => {
+    process.nextTick(() => {
+        Provider.findOne({
+            '_id': providerId
+        }).populate('organization').exec(function (err, objProvider) {
+            if (err)
+                return done(err);
+
+            // check if already exists or not.
+            if (!objProvider) {
+                return done(null, false, {
+                    'message': 'Provider not found.'
+                });
+            } else {
+                objProvider.isApproved = true;
+                objProvider.save(err => {
+                    if (err)
+                        return done(err);
+
+                    return done(null, objProvider);
+                });
+            }
+        });
+    });
+};
+
 module.exports = {
-    getAllProviders, addProvider, updateProvider, removeProvider
+    getAllProviders, addProvider, updateProvider, removeProvider, approveProvider
 };

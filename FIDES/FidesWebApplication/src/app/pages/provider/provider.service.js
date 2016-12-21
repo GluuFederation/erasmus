@@ -12,6 +12,7 @@
       updateProvider: updateProvider,
       createProvider: createProvider,
       approveProvider: approveProvider,
+      verifyProvider: verifyProvider,
       //getAllOrganizations: getAllOrganizations
     };
 
@@ -24,7 +25,7 @@
     }
 
     function approveProvider(providerId, onSuccess, onError) {
-      //return $http.delete(urls.BASE_API + "/approveProvider/" + providerId).then(onSuccess).catch(onError);
+      return $http.get(urls.BASE_API + "/approveProvider/" + providerId).then(onSuccess).catch(onError);
     }
 
     function createProvider(formData, onSuccess, onError) {
@@ -37,6 +38,10 @@
 
     function getAllOrganizations(onSuccess, onError) {
       return $http.get(urls.BASE_API + "/getAllOrganizations").then(onSuccess).catch(onError);
+    }
+
+    function verifyProvider(provider, onSuccess, onError) {
+      //return $http.get(urls.BASE_API + "/approveProvider/" + providerId).then(onSuccess).catch(onError);
     }
 
     return service;

@@ -185,4 +185,26 @@ router.delete('/removeProvider/:providerId', (req, res, next) => {
     });
 });
 
+// =============================================================================
+// Approve Provider =============================================================
+// =============================================================================
+router.get('/approveProvider/:providerId', (req, res, next) => {
+    if (!req.params.providerId) {
+        return res.status(406).send({
+            'message': 'Please provide id.'
+        });
+    }
+
+    Providers.approveProvider(req.params.providerId, (err, provider, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!provider) {
+            return res.status(406).send(info);
+        }
+
+        return res.status(200).send(provider);
+    });
+});
+
 module.exports = router;

@@ -8,6 +8,7 @@
   function ProviderController($scope, $filter, $localStorage, $uibModal, toastr, providerService) {
     var vm = this;
     vm.providers = vm.displayedCollection = undefined;
+    vm.userRole = $localStorage.currentUser.role;
 
     function removeProvider(providerId) {
       var deleteProvider = confirm('Are you sure you want to remove this provider?');
@@ -20,7 +21,7 @@
       function onSuccess(response) {
         if (response.data) {
           _.remove(vm.providers, {_id: response.data._id});
-          vm.displayedCollection = [].concat(vm.providers);
+          vm.displayedCollection = angular.copy(vm.providers);
         }
         toastr.success('Removed successfully', 'Provider', {});
       }
@@ -31,8 +32,13 @@
     }
 
     function approveProvider(providerId) {
-      var confirm = confirm('Do you want to approve this provider?');
-      if (!confirm) {
+      if(vm.userRole != 'admin'){
+        toastr.success('You are not authorized to do this operation', 'Provider', {});
+        return null;
+      }
+
+      var confirmApproval = confirm('Do you want to approve this provider?');
+      if (!confirmApproval) {
         return null;
       }
 
@@ -40,9 +46,41 @@
 
       function onSuccess(response) {
         if (response.data) {
-          _.remove(vm.providers, {providerId: response.data._id});
+          var index = _.findIndex(vm.providers, {_id: response.data._id});
+          if (index >= 0) {
+            vm.providers[index] = response.data;
+          }
+
+          vm.displayedCollection = angular.copy(vm.providers);
         }
+
         toastr.success('Approved successfully', 'Provider', {});
+      }
+
+      function onError(error) {
+        toastr.error(error.data.message, 'Provider', {});
+      }
+    }
+
+    function verifyProvider(provider) {
+      var confirmVerify = confirm('Do you want to verify this provider?');
+      if (!confirmVerify) {
+        return null;
+      }
+
+      providerService.verifyProvider(provider, onSuccess, onError);
+
+      function onSuccess(response) {
+        if (response.data) {
+          var index = _.findIndex(vm.providers, {_id: response.data._id});
+          if (index >= 0) {
+            vm.providers[index] = response.data;
+          }
+
+          vm.displayedCollection = angular.copy(vm.providers);
+        }
+
+        toastr.success('Verified successfully', 'Provider', {});
       }
 
       function onError(error) {
@@ -58,9 +96,9 @@
 
       providerService.getProviders(orgId, onSuccess, onError);
       function onSuccess(response) {
-        if (response.data && response.data.length > 0) {
+        if (response.data) {
           vm.providers = response.data;
-          vm.displayedCollection = [].concat(vm.providers);
+          vm.displayedCollection = angular.copy(vm.providers);
         }
       }
 
@@ -70,7 +108,7 @@
       }
     }
 
-    function openProviderModal(providerData, index) {
+    function openProviderModal(providerData) {
       vm.providerModal = $uibModal.open({
         animation: true,
         templateUrl: '/app/pages/provider/createProvider.modal.html',
@@ -85,15 +123,18 @@
       });
 
       vm.providerModal.result.then(function (newProvider) {
+        var index = _.findIndex(vm.providers, {_id: newProvider._id});
         if (index >= 0) {
           vm.providers[index] = newProvider;
         } else {
           if(vm.providers === undefined) {
             vm.providers = vm.displayedCollection = [];
           }
+
           vm.providers.push(newProvider);
         }
-        vm.displayedCollection = [].concat(vm.providers);
+
+        vm.displayedCollection = angular.copy(vm.providers);
       });
     }
 
@@ -101,6 +142,8 @@
     vm.openProviderModal = openProviderModal;
     vm.removeProvider = removeProvider;
     vm.getProviders = getProviders;
+    vm.approveProvider = approveProvider;
+    vm.verifyProvider = verifyProvider;
 
     vm.getProviders();
 

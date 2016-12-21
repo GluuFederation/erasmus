@@ -10,7 +10,7 @@
           <thead>
           <tr class="sortable">
             <td class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</td>
-            <th st-sort="name" st-sort-default="true">Name</th>
+            <th st-sort="name">Name</th>
             <th st-sort="url">URL</th>
             <th st-sort="clientId" style="max-width: 250px;">Client ID</th>
             <th st-sort="redirectUri" style="max-width: 250px;">Redirect URI</th>
@@ -43,16 +43,18 @@
               {{provider.organization.name}}
             </td>
             <td>
-              <input type="checkbox" title="Is Approved" disabled value="provider.isApproved"/>
+              <input type="checkbox" title="Is Approved" disabled ng-checked="provider.isApproved"/>
             </td>
             <td>
               <div class="buttons" ng-show="!rowform.$visible">
-                <button style="margin: 0px 5px;" class="btn btn-success btn-icon" ng-show="!provider.isApproved"
-                        ng-click="vm.approveProvider(provider._id)" title="Approve"><i class="ion-android-checkmark-circle"></i></button>
                 <button style="margin: 0px 5px;" class="btn btn-primary btn-icon"
-                        ng-click="vm.openProviderModal(provider, $index)" title="Edit"><i class="ion-edit"></i></button>
+                        ng-click="vm.openProviderModal(provider)" title="Edit"><i class="ion-edit"></i></button>
                 <button style="margin: 0px 5px;" class="btn btn-danger btn-icon"
                         ng-click="vm.removeProvider(provider._id)" title="Delete"><i class="ion-android-delete"></i></button>
+                <button style="margin: 0px 5px;" class="btn btn-warning btn-icon" ng-show="!provider.isApproved && !provider.isVerified"
+                        ng-click="vm.verifyProvider(provider)" title="Verify"><i class="ion-android-warning"></i></button>
+                <button style="margin: 0px 5px;" class="btn btn-success btn-icon" ng-show="!provider.isApproved && vm.userRole === 'admin'"
+                        ng-click="vm.approveProvider(provider._id)" title="Approve"><i class="ion-android-checkmark-circle"></i></button>
               </div>
             </td>
           </tr>

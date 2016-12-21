@@ -205,7 +205,7 @@ let getAllUsers = (done) => {
     process.nextTick(() => {
         User.find().sort({
             firstName: 1
-        }).select('-_id -password').populate('role organization')
+        }).select('-password').populate('role organization')
             .exec(function (err, users) {
                 if (err) {
                     done(err);

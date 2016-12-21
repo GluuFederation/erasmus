@@ -19,7 +19,7 @@
       function onSuccess(response) {
         if (response.data) {
           _.remove(vm.users, {username: response.data.username});
-          vm.displayedCollection = [].concat(vm.users);
+          vm.displayedCollection = angular.copy(vm.users);
         }
         toastr.success('Removed successfully', 'User', {});
       }
@@ -34,7 +34,7 @@
       function onSuccess(response) {
         if (response.data) {
           vm.users = response.data;
-          vm.displayedCollection = [].concat(vm.users);
+          vm.displayedCollection = angular.copy(vm.users);
         }
       }
 
@@ -44,7 +44,7 @@
       }
     }
 
-    function openUserModal(userData, index) {
+    function openUserModal(userData) {
       vm.userModal = $uibModal.open({
         animation: true,
         templateUrl: '/app/pages/user/createUser.modal.html',
@@ -59,12 +59,14 @@
       });
 
       vm.userModal.result.then(function (newUser) {
-        if (index >= 0) {
-          vm.users[index] = newUser;
+        var userIndex = _.findIndex(vm.users, {username: newUser.username});
+        if (userIndex >= 0) {
+          vm.users[userIndex] = newUser;
         } else {
           vm.users.push(newUser);
         }
-        vm.displayedCollection = [].concat(vm.users);
+
+        vm.displayedCollection = angular.copy(vm.users);
       });
     }
 

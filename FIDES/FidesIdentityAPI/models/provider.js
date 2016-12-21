@@ -93,6 +93,10 @@ const providerSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization'
     },
+    isVerified: {
+        type: Boolean,
+        required: false
+    },
     isApproved: {
         type: Boolean,
         required: false
