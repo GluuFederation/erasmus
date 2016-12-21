@@ -1,14 +1,13 @@
 "use strict";
 
 // load up the role model
-const roleModel = require('../models/role');
+const Role = require('../models/role');
 
 // =============================================================================
-// Retrieves all provider ===============================================
+// Retrieves all provider ======================================================
 // =============================================================================
 let getAllRoles = (done) => {
-
-    let query = roleModel.find({
+    let query = Role.find({
         isActive: true
     });
     query.sort({

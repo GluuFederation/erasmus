@@ -1,13 +1,13 @@
 (function () {
   'use strict';
 
-  angular.module('FidesWebApplication.pages.users')
-    .controller('UsersController', UsersController);
+  angular.module('FidesWebApplication.pages.user')
+    .controller('UserController', UserController);
 
   /** @ngInject */
-  function UsersController($scope, $filter, $localStorage, $uibModal, toastr, userService) {
+  function UserController($scope, $filter, $localStorage, $uibModal, toastr, userService) {
     var vm = this;
-    vm.users = vm.displayedCollection = {};
+    vm.users = vm.displayedCollection = undefined;
 
     function removeUser(username) {
       var deleteUser = confirm('Are you sure you want to remove this user?');
@@ -19,12 +19,13 @@
       function onSuccess(response) {
         if (response.data) {
           _.remove(vm.users, {username: response.data.username});
+          vm.displayedCollection = [].concat(vm.users);
         }
-        toastr.success('Removed successfully', 'Users', {});
+        toastr.success('Removed successfully', 'User', {});
       }
 
       function onError(error) {
-        toastr.error(error.data.message, 'Users', {});
+        toastr.error(error.data.message, 'User', {});
       }
     }
 
@@ -39,14 +40,14 @@
 
       function onError(error) {
         //console.log(JSON.stringify(error));
-        toastr.error(error.data.message, 'Users', {});
+        toastr.error(error.data.message, 'User', {});
       }
     }
 
     function openUserModal(userData, index) {
       vm.userModal = $uibModal.open({
         animation: true,
-        templateUrl: '/app/pages/users/createUser.modal.html',
+        templateUrl: '/app/pages/user/createUser.modal.html',
         size: 'lg',
         controller: ['$uibModalInstance', 'userData', CreateUserController],
         controllerAs: 'vm',
@@ -129,7 +130,6 @@
         function onSuccess(response) {
           if (response.data) {
             if (response.data.length > 0) {
-              console.log(response.data);
               vm.organizations = response.data;
             }
           }
@@ -169,7 +169,7 @@
         }
 
         function onSuccess(response) {
-          toastr.success('Saved successfully', 'Users', {});
+          toastr.success('Saved successfully', 'User', {});
 
           if (response.data) {
             if($localStorage.currentUser.user.username === response.data.username) {
@@ -180,7 +180,7 @@
         }
 
         function onError(error) {
-          toastr.error(error.data.message, 'Users', {})
+          toastr.error(error.data.message, 'User', {})
         }
       }
 

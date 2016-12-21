@@ -1,14 +1,13 @@
 "use strict";
 
 // load up the organization model
-const organizationModel = require('../models/organization');
+const Organization = require('../models/organization');
 
 // =============================================================================
-// Retrieves all provider ===============================================
+// Retrieves all provider ======================================================
 // =============================================================================
 let getAllOrganizations = (done) => {
-
-    let query = organizationModel.find({
+    let query = Organization.find({
         isActive: true
     });
     query.sort({
@@ -18,7 +17,7 @@ let getAllOrganizations = (done) => {
     query.exec((err, organizations) => {
         if (err)
             done(err);
-        else {0
+        else {
             if (organizations.length) {
                 console.log(organizations);
                 done(null, organizations);

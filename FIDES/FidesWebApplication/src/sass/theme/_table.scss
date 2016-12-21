@@ -197,6 +197,14 @@ input.search-input {
       height: 30px;
     }
   }
+
+  .ellipis {
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .form-inline button[type="submit"].editable-table-button {

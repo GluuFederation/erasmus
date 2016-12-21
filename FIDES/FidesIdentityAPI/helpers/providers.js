@@ -1,75 +1,186 @@
 "use strict";
 
-// load up the user model
-const providerModel = require('../models/provider');
+// load up the provider model
+const Provider = require('../models/provider');
 
 // =============================================================================
-// Register Openid connect provider ============================================
+// Retrieves all provider ======================================================
 // =============================================================================
-let registerProvider = (body,done) => {
-                 // Register OpenId Connect
-                let objProviderModel = new providerModel();
+let getAllProviders = (organizationId, done) => {
+    let queryCondition = {};
+    if(organizationId && organizationId != 'undefined') {
+        console.log('asdf');
+        queryCondition['organization'] = organizationId;
+    }
 
-                objProviderModel.name = body.name;
-                objProviderModel.opUrls = body.opUrls;
-                objProviderModel.trustMarks = body.trustMarks;
-                objProviderModel.client_id=body.client_id;
-                objProviderModel.client_secret=body.client_secret;
-                objProviderModel.response_type=body.response_type;
-                objProviderModel.code=body.code;
-                objProviderModel.state=body.state;
-                objProviderModel.error=body.error;
-                objProviderModel.error_description=body.error_description;
-                objProviderModel.nonce=body.nonce;
-                objProviderModel.error_uri=body.error_uri;
-                objProviderModel.expires_in=body.expires_in;
-                objProviderModel.redirect_uri=body.redirect_uri;
-                objProviderModel.scope=body.scope;
-                objProviderModel.username=body.username;
-                objProviderModel.password=body.password;
-                objProviderModel.refresh_token=body.refresh_token;
-                objProviderModel.grant_type=body.grant_type;
-                objProviderModel.access_token=body.access_token;
-                objProviderModel.keys = body.keys;
-                objProviderModel.token_type=body.token_type;
-                objProviderModel.display=body.display;
-                objProviderModel.prompt=body.prompt;
-                objProviderModel.acr_values=body.acr_values;
+    let query = Provider.find(queryCondition).populate('organization');
+    query.sort({
+        name: 'asc'
+    });
 
-                objProviderModel.save(err => {
+    query.exec((err, providers) => {
+        if (err)
+            done(err);
+        else {
+            if (providers.length) {
+                console.log(providers);
+                done(null, providers);
+            } else {
+                done(null, null, {
+                    message: 'No records found'
+                });
+            }
+        }
+    });
+};
+
+// =============================================================================
+// Add Openid connect provider =================================================
+// =============================================================================
+let addProvider = (req, done) => {
+    process.nextTick(() => {
+        Provider.findOne({
+            'url': req.url
+        }, (err, provider) => {
+            if (err)
+                return done(err);
+
+            // check if already exists or not
+            if (provider) {
+                return done(null, false, {
+                    'message': 'Provider is already exists.'
+                });
+            } else {
+                // Register OpenId Connect
+                let objProvider = new Provider();
+
+                objProvider.name = req.name;
+                objProvider.url = req.url;
+                objProvider.keys = req.keys;
+                objProvider.trustMarks = req.trustMarks;
+                objProvider.clientId = req.clientId;
+                objProvider.clientSecret = req.clientSecret;
+                objProvider.responseType = req.responseType;
+                objProvider.scope = req.scope;
+                objProvider.state = req.state;
+                objProvider.redirectUri = req.redirectUri;
+                objProvider.error = req.error;
+                objProvider.errorDescription = req.errorDescription;
+                objProvider.errorUri = req.errorUri;
+                objProvider.grantType = req.grantType;
+                objProvider.code = req.code;
+                objProvider.accessToken = req.accessToken;
+                objProvider.tokenType = req.tokenType;
+                objProvider.expiresIn = req.expiresIn;
+                objProvider.username = req.username;
+                objProvider.password = req.password;
+                objProvider.refreshToken = req.refreshToken;
+                objProvider.organization = req.organizationId;
+                objProvider.isApproved = req.isApproved;
+
+                objProvider.save(err => {
                     if (err)
                         return done(err);
                 });
 
-    return done(null, objProviderModel);
+                Provider.populate(objProvider, 'organization', function (err, objProvider) {
+                    if (err)
+                        return done(err);
+
+                    console.log(objProvider);
+                    return done(null, objProvider);
+                });
+            }
+        });
+    });
 };
 
 // =============================================================================
-// Retrieves all provider ===============================================
+// Update Provider =============================================================
 // =============================================================================
-let getAllProviders = (done) => {
-
-    let query = providerModel.find(true);
-    query.sort({
-       name: 'asc'
-    });
-
-   query.exec((err, providers) => {
+let updateProvider = (req, done) => {
+    process.nextTick(() => {
+        Provider.findOne({
+            '_id': req._id
+        }).populate('organization').exec(function (err, objProvider) {
             if (err)
-                done(err);
-            else {
-                if (providers.length) {
-                    console.log(providers);
-                    done(null, providers);
-                } else {
-                    done(null, null, {
-                        message: 'No records found'
+                return done(err);
+
+            // check to see if there is already exists or not.
+            if (!objProvider) {
+                return done(null, false, {
+                    'message': 'Provider not found.'
+                });
+            } else {
+                objProvider.name = req.name;
+                objProvider.url = req.url;
+                objProvider.keys = req.keys;
+                objProvider.trustMarks = req.trustMarks;
+                objProvider.clientId = req.clientId;
+                objProvider.clientSecret = req.clientSecret;
+                objProvider.responseType = req.responseType;
+                objProvider.scope = req.scope;
+                objProvider.state = req.state;
+                objProvider.redirectUri = req.redirectUri;
+                objProvider.error = req.error;
+                objProvider.errorDescription = req.errorDescription;
+                objProvider.errorUri = req.errorUri;
+                objProvider.grantType = req.grantType;
+                objProvider.code = req.code;
+                objProvider.accessToken = req.accessToken;
+                objProvider.tokenType = req.tokenType;
+                objProvider.expiresIn = req.expiresIn;
+                objProvider.username = req.username;
+                objProvider.password = req.password;
+                objProvider.refreshToken = req.refreshToken;
+                objProvider.organization = req.organizationId;
+                objProvider.isApproved = req.isApproved;
+
+                objProvider.save(err => {
+                    if (err)
+                        return done(err);
+
+                    Provider.populate(objProvider, 'organization', function (err, objProvider) {
+                        if (err)
+                            return done(err);
+
+                        console.log(objProvider);
+                        return done(null, objProvider);
                     });
-                }
+                });
             }
         });
+    });
+};
+
+// =============================================================================
+// Remove Provider =============================================================
+// =============================================================================
+let removeProvider = (providerId, done) => {
+    process.nextTick(() => {
+        Provider.findOne({
+            '_id': providerId
+        }, (err, objProvider) => {
+            if (err)
+                return done(err);
+
+            // check if already exists or not.
+            if (!objProvider) {
+                return done(null, false, {
+                    'message': 'Provider not found.'
+                });
+            } else {
+                objProvider.remove(err => {
+                    if (err)
+                        return done(err);
+
+                    return done(null, objProvider);
+                });
+            }
+        });
+    });
 };
 
 module.exports = {
-    registerProvider,getAllProviders
+    getAllProviders, addProvider, updateProvider, removeProvider
 };

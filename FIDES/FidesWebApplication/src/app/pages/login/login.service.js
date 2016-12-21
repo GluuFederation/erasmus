@@ -9,7 +9,6 @@
 
     var service = {
       login: login,
-      updateUser: updateUser,
       updatePassword: updatePassword
     };
 
@@ -18,10 +17,6 @@
         username: username,
         password: password
       }).success(onSuccess).catch(onError);
-    }
-
-    function updateUser(formData, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/updateUser", formData).then(onSuccess).catch(onError);
     }
 
     function updatePassword(formData, onSuccess, onError) {

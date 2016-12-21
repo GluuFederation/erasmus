@@ -20,19 +20,7 @@
           </tr>
           <tr>
             <th style="display: none;"></th>
-            <th><input st-search="username" placeholder="Search Username" class="input-sm form-control search-input"
-                       type="search"/></th>
-            <th><input st-search="firstName" placeholder="Search First Name" class="input-sm form-control search-input"
-                       type="search"/></th>
-            <th><input st-search="lastName" placeholder="Search Last Name" class="input-sm form-control search-input"
-                       type="search"/></th>
-            <th><input st-search="email" placeholder="Search Email" class="input-sm form-control search-input"
-                       type="search"/></th>
-            <th><input st-search="role.nameSlug" placeholder="Search Role" class="input-sm form-control search-input"
-                       type="search"/></th>
-            <th><input st-search="organization.name" placeholder="Search Organization" class="input-sm form-control search-input"
-                       type="search"/></th>
-            <th></th>
+            <th colspan="7"><input st-search="" placeholder="Search" class="input-sm form-control search-input" type="search"/></th>
           </tr>
           </thead>
           <tbody>
@@ -58,8 +46,10 @@
             </td>
             <td>
               <div class="buttons" ng-show="!rowform.$visible">
-                <button style="margin: 0px 5px;" class="btn btn-primary editable-table-button btn-xs" ng-click="vm.openUserModal(user, $index)">Edit</button>
-                <button style="margin: 0px 5px;" class="btn btn-danger editable-table-button btn-xs"ng-click="vm.removeUser(user.username)">Delete</button>
+                <button style="margin: 0px 5px;" class="btn btn-primary btn-icon"
+                        ng-click="vm.openUserModal(user, $index)" title="Edit"><i class="ion-edit"></i></button>
+                <button style="margin: 0px 5px;" class="btn btn-danger btn-icon"
+                        ng-click="vm.removeUser(user.username)" title="Delete"><i class="ion-android-delete"></i></button>
               </div>
             </td>
           </tr>

@@ -7,8 +7,7 @@ const mongoose = require('mongoose'),
 const providerSchema = mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     url: {
         type: String,
@@ -22,15 +21,15 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: false
     },
-    client_id: {
+    clientId: {
         type: String,
         required: true
     },
-    client_secret: {
+    clientSecret: {
         type: String,
         required: true
     },
-    response_type: {
+    responseType: {
         type: String,
         required: true
     },
@@ -42,7 +41,7 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    redirect_uri: {
+    redirectUri: {
         type: String,
         required: true
     },
@@ -50,15 +49,15 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: false
     },
-    error_description: {
+    errorDescription: {
         type: String,
         required: false
     },
-    error_uri: {
+    errorUri: {
         type: String,
         required: false
     },
-    grant_type: {
+    grantType: {
         type: String,
         required: true
     },
@@ -66,15 +65,15 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    access_token: {
+    accessToken: {
         type: String,
         required: false
     },
-    token_type: {
+    tokenType: {
         type: String,
         required: false
     },
-    expires_in: {
+    expiresIn: {
         type: String,
         required: false
     },
@@ -86,9 +85,13 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: false
     },
-    refresh_token: {
+    refreshToken: {
         type: String,
         required: false
+    },
+    organization: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Organization'
     },
     isApproved: {
         type: Boolean,

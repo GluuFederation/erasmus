@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  angular.module('FidesWebApplication.pages.users')
+  angular.module('FidesWebApplication.pages.user')
     .factory('userService', userService);
 
   /** @ngInject */

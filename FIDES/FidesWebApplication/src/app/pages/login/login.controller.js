@@ -49,7 +49,7 @@
         animation: true,
         templateUrl: '/app/pages/login/profile.modal.html',
         size: 'md',
-        controller: ['$uibModalInstance', 'userData', profileInfoController],
+        controller: ['$uibModalInstance', 'userData', 'userService', profileInfoController],
         controllerAs: 'vm',
         resolve: {
           userData: function () {
@@ -82,7 +82,7 @@
     }
 
     //Profile controller
-    function profileInfoController($uibModalInstance, userData) {
+    function profileInfoController($uibModalInstance, userData, userService) {
       var vm = this;
       vm.modalUser = {};
 
@@ -100,7 +100,7 @@
           return false;
         }
 
-        loginService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);
+        userService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);
 
         function onSuccess(response) {
           toastr.success('Saved successfully', 'Profile', {});

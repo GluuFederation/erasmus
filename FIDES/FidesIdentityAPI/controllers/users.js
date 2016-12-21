@@ -24,7 +24,7 @@ router.post('/login', (req, res, next) => {
         });
     }
 
-    Users.authenticateUser(req.body.username, req.body.password, (err, user, info) => {
+    Users.authenticateUser(req.body, (err, user, info) => {
         if (err) {
             return next(err);
         }
@@ -98,7 +98,7 @@ router.post('/signup', (req, res, next) => {
         });
     }
 
-    Users.createUser(req.body.username, req.body.email, req.body.password, req.body.firstName, req.body.lastName, req.body.roleId, req.body.organizationId, (err, user, info) => {
+    Users.createUser(req.body, (err, user, info) => {
         if (err) {
             return next(err);
         }
@@ -133,7 +133,7 @@ router.post('/updateUser', (req, res, next) => {
         });
     }
 
-    Users.updateUser(req.body.username, req.body.password, req.body.email, req.body.firstName, req.body.lastName, req.body.roleId, req.body.organizationId, (err, user, info) => {
+    Users.updateUser(req.body, (err, user, info) => {
         if (err) {
             return next(err);
         }
@@ -168,7 +168,7 @@ router.post('/updatePassword', (req, res, next) => {
         });
     }
 
-    Users.updatePassword(req.body.username, req.body.currentPassword, req.body.newPassword, (err, user, info) => {
+    Users.updatePassword(req.body, (err, user, info) => {
         if (err) {
             return next(err);
         }

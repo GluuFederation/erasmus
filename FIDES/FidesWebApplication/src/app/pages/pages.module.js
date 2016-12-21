@@ -5,8 +5,9 @@
     'ui.router',
 
     'FidesWebApplication.pages.home',
-    'FidesWebApplication.pages.users',
-    'FidesWebApplication.pages.login',
+    'FidesWebApplication.pages.user',
+    'FidesWebApplication.pages.provider',
+    'FidesWebApplication.pages.login'
   ]).config(routeConfig);
 
   /** @ngInject */

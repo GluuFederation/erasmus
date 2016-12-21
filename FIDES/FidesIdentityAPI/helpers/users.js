@@ -6,12 +6,12 @@ const User = require('../models/user');
 // =========================================================================
 // Authenticates a user ====================================================
 // =========================================================================
-let authenticateUser = (username, password, done) => {
-    if (username)
-        username = username.toLowerCase();
+let authenticateUser = (req, done) => {
+    if (req.username)
+        req.username = req.username.toLowerCase();
     process.nextTick(() => {
         User.findOne({
-            $or: [{'username': username}, {'email': username}]
+            $or: [{'username': req.username}, {'email': req.username}]
         }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);
@@ -21,7 +21,7 @@ let authenticateUser = (username, password, done) => {
                     'message': 'No user found.'
                 });
             }
-            if (!user.validPassword(password)) {
+            if (!user.validPassword(req.password)) {
                 return done(null, false, {
                     'message': 'Oops! Wrong password.'
                 });
@@ -35,13 +35,13 @@ let authenticateUser = (username, password, done) => {
 // =============================================================================
 // Creates a new user ==========================================================
 // =============================================================================
-let createUser = (username, email, password, firstName, lastName, roleId, organizationId, done) => {
-    if (username)
-        username = username.toLowerCase();
+let createUser = (req, done) => {
+    if (req.username)
+        req.username = req.username.toLowerCase();
 
     process.nextTick(() => {
         User.findOne({
-            $or: [{'username': username}, {'email': email}]
+            $or: [{'username': req.username}, {'email': req.email}]
         }, (err, user) => {
             if (err)
                 return done(err);
@@ -55,13 +55,13 @@ let createUser = (username, email, password, firstName, lastName, roleId, organi
                 // create the user
                 let newUser = new User();
 
-                newUser.username = username;
-                newUser.email = email;
-                newUser.password = newUser.generateHash(password);
-                newUser.firstName = firstName;
-                newUser.lastName = lastName;
-                newUser.role = roleId;
-                newUser.organization = organizationId;
+                newUser.username = req.username;
+                newUser.email = req.email;
+                newUser.password = newUser.generateHash(req.password);
+                newUser.firstName = req.firstName;
+                newUser.lastName = req.lastName;
+                newUser.role = req.roleId;
+                newUser.organization = req.organizationId;
 
                 newUser.save(err => {
                     if (err)
@@ -83,13 +83,13 @@ let createUser = (username, email, password, firstName, lastName, roleId, organi
 // =============================================================================
 // Update user =================================================================
 // =============================================================================
-let updateUser = (username, password, email, firstName, lastName, roleId, organizationId, done) => {
-    if (username)
-        username = username.toLowerCase();
+let updateUser = (req, done) => {
+    if (req.username)
+        req.username = req.username.toLowerCase();
 
     process.nextTick(() => {
         User.findOne({
-            $or: [{'username': username}, {'email': email}]
+            $or: [{'username': req.username}, {'email': req.email}]
         }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);
@@ -101,13 +101,13 @@ let updateUser = (username, password, email, firstName, lastName, roleId, organi
                 });
             } else {
                 // if(password){
-                //     user.password = user.generateHash(password);
+                //     user.password = user.generateHash(req.password);
                 // }
 
-                user.firstName = firstName;
-                user.lastName = lastName;
-                user.role = roleId;
-                user.organization = organizationId;
+                user.firstName = req.firstName;
+                user.lastName = req.lastName;
+                user.role = req.roleId;
+                user.organization = req.organizationId;
 
                 user.save(err => {
                     if (err)
@@ -132,13 +132,13 @@ let updateUser = (username, password, email, firstName, lastName, roleId, organi
 // =============================================================================
 // Update password =============================================================
 // =============================================================================
-let updatePassword = (username, currentPassword, newPassword, done) => {
-    if (username)
-        username = username.toLowerCase();
+let updatePassword = (req, done) => {
+    if (req.username)
+        req.username = req.username.toLowerCase();
 
     process.nextTick(() => {
         User.findOne({
-            $or: [{'username': username}, {'email': username}]
+            $or: [{'username': req.username}, {'email': req.username}]
         }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);
@@ -149,12 +149,12 @@ let updatePassword = (username, currentPassword, newPassword, done) => {
                     'message': 'User not found with that username/email.'
                 });
             } else {
-                if (!user.validPassword(currentPassword)) {
+                if (!user.validPassword(req.currentPassword)) {
                     return done(null, false, {
                         'message': 'Oops! Wrong password.'
                     });
                 } else {
-                    user.password = user.generateHash(newPassword);
+                    user.password = user.generateHash(req.newPassword);
                     user.save(err => {
                         if (err)
                             return done(err);
