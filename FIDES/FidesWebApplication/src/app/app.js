@@ -28,12 +28,12 @@ angular.module('FidesWebApplication', [
   BASE_API: 'http://192.168.200.70:8000',
   USER_PROFILE: 'assets/img/theme/no-photo.png'
 }).run(function ($rootScope, $localStorage, $http, $window, $state, urls, toastr) {
-  if ($window.location.pathname == "/login.html" || $window.location.pathname == "/login") {
+  if ($window.location.pathname == "/login.html" || $window.location.pathname == "/register.html") {
     removeTokenAndRedirect($localStorage, $http, $window, urls);
     return;
   }
 
-  if ($window.location.href !== urls.AUTH_URL && $localStorage.currentUser == undefined) {
+  if (($window.location.href !== urls.AUTH_URL && $localStorage.currentUser == undefined) || $window.location.pathname == "/register.html") {
     removeTokenAndRedirect($localStorage, $http, $window, urls, true);
   } else {
     angular.forEach($state.get(), function(s) {
@@ -47,8 +47,7 @@ angular.module('FidesWebApplication', [
     });
 
     $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-
-      if (toState.name == "login" || $window.location.pathname == "/login.html") {
+      if ($window.location.pathname == "/login.html" || $window.location.pathname == "/register.html") {
         removeTokenAndRedirect($localStorage, $http, $window, urls);
         return;
       }
@@ -60,7 +59,6 @@ angular.module('FidesWebApplication', [
 
       // add jwt token to auth header for all requests made by the $http service
       $http.defaults.headers.common.Authorization = 'Bearer ' + $localStorage.currentUser.token;
-
       var userRole = $localStorage.currentUser.role;
       if (userRole != undefined) {
         if (toState.roles != undefined) {
@@ -79,6 +77,11 @@ angular.module('FidesWebApplication', [
         removeTokenAndRedirect($localStorage, $http, $window, urls, true, "?error=Please login first.");
       }
     });
+
+    //navigate to home page if state is not found.
+    if(!$state.current.name) {
+      $state.go('home');
+    }
   }
 }).factory('authHttpResponseInterceptor', ['$q', '$window', 'urls', function ($q, $window, urls) {
   return {

@@ -35,7 +35,7 @@ gulp.task('inject', ['scripts', 'styles', 'injectAuth', 'inject404', 'copyVendor
     addRootSlash: false
   };
 
-  return gulp.src(path.join(conf.paths.src, '/index.html'))
+  return gulp.src([path.join(conf.paths.src, '/index.html'), path.join(conf.paths.src, '/register.html')])
     .pipe($.inject(injectStyles, injectOptions))
     .pipe($.inject(injectScripts, injectOptions))
     .pipe(wiredep(_.extend({}, conf.wiredep)))
@@ -45,7 +45,7 @@ gulp.task('inject', ['scripts', 'styles', 'injectAuth', 'inject404', 'copyVendor
 gulp.task('injectAuth', ['stylesAuth'], function () {
   return injectAlone({
     css: [path.join('!' + conf.paths.tmp, '/serve/app/vendor.css'), path.join(conf.paths.tmp, '/serve/app/auth.css')],
-    paths: [path.join(conf.paths.src, '/login.html'), path.join(conf.paths.src, '/reg.html')]
+    paths: [path.join(conf.paths.src, '/login.html')]
   })
 });
 

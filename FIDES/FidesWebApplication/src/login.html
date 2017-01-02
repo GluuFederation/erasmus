@@ -31,8 +31,10 @@
 <body>
 <main class="auth-main">
   <div class="auth-block" ng-controller="LoginController as vm">
+    <h1>Sign in to FIDES App lication</h1>
+    <a href="register.html" class="auth-link">New to FIDES? Sign up!</a>
+
     <form name="vm.loginForm" novalidate>
-      <h1>Sign in to FIDES Application</h1>
       <div class="form-horizontal">
         <div class="form-group"
              ng-class="{'has-error': vm.loginForm.username.$invalid && (vm.loginForm.username.$dirty || vm.loginForm.$submitted)}">

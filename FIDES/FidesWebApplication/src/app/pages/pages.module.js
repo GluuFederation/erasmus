@@ -7,11 +7,12 @@
     'FidesWebApplication.pages.home',
     'FidesWebApplication.pages.user',
     'FidesWebApplication.pages.provider',
-    'FidesWebApplication.pages.login'
+    'FidesWebApplication.pages.login',
+    'FidesWebApplication.pages.register'
   ]).config(routeConfig);
 
   /** @ngInject */
   function routeConfig($urlRouterProvider) {
-    $urlRouterProvider.otherwise('/home');
+    //$urlRouterProvider.otherwise('/home');
   }
 })();

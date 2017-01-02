@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="FidesWebApplication.pages.register">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fides Web Application</title>
+  <link
+      href='https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900&subset=latin,greek,greek-ext,vietnamese,cyrillic-ext,latin-ext,cyrillic'
+      rel='stylesheet' type='text/css'>
+
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/img/favicon-96x96.png">
+  <link rel="stylesheet" href="app/auth.css">
+
+  <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
+  <!-- bower:css -->
+  <!-- run `gulp inject` to automatically populate bower styles dependencies -->
+  <!-- endbower -->
+  <!-- endbuild -->
+
+  <!-- build:css({.tmp/serve,src}) styles/app.css -->
+  <!-- inject:css -->
+  <!-- css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- endbuild -->
+</head>
+<body>
+<div class="body-bg"></div>
+<main ng-controller="RegisterController as vm">
+  <div class="auth-block" style="width: 70% !important;">
+    <h1>Sign up to FIDES Application</h1>
+    <a href="login.html" class="auth-link">Already have an account? Sign in!</a>
+    <div class="widgets">
+      <div class="row">
+        <div class="col-md-12">
+          <div ba-panel ba-panel-title="Form Wizard" ba-panel-class="with-scroll">
+            <ba-wizard>
+              <ba-wizard-step title="Personal info" form="vm.personalInfoForm">
+                <form name="vm.personalInfoForm" novalidate>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group has-feedback"
+                           ng-class="{'has-error': vm.personalInfoForm.username.$invalid && (vm.personalInfoForm.username.$dirty || vm.personalInfoForm.$submitted)}">
+                        <label for="exampleUsername1">Username</label>
+                        <input type="text" class="form-control" id="exampleUsername1" name="username"
+                               placeholder="Username" ng-model="vm.personalInfo.username" required>
+                        <span class="help-block error-block basic-block">Required</span>
+                      </div>
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.personalInfoForm.email.$invalid && (vm.personalInfoForm.email.$dirty || vm.personalInfoForm.$submitted)}">
+                        <label for="exampleInputEmail1">Email address</label>
+                        <input type="email" class="form-control" id="exampleInputEmail1" name="email"
+                               placeholder="Email" ng-model="vm.personalInfo.email" required>
+                        <span class="help-block error-block basic-block">Proper email required</span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.personalInfoForm.password.$invalid && (vm.personalInfoForm.password.$dirty || vm.personalInfoForm.$submitted)}">
+                        <label for="exampleInputPassword1">Password</label>
+                        <input type="password" class="form-control" id="exampleInputPassword1" name="password"
+                               placeholder="Password" ng-model="vm.personalInfo.password" required>
+                        <span class="help-block error-block basic-block">Required</span>
+                      </div>
+                      <div class="form-group"
+                           ng-class="{'has-error': !vm.arePersonalInfoPasswordsEqual() && (vm.personalInfoForm.confirmPassword.$dirty || vm.personalInfoForm.$submitted)}">
+                        <label for="exampleInputConfirmPassword1">Confirm Password</label>
+                        <input type="password" class="form-control" id="exampleInputConfirmPassword1"
+                               name="confirmPassword" placeholder="Confirm Password"
+                               ng-model="vm.personalInfo.confirmPassword" required>
+                        <span class="help-block error-block basic-block">Passwords should match</span>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </ba-wizard-step>
+              <ba-wizard-step title="Product Info" form="vm.productInfoForm">
+                <form name="vm.productInfoForm" novalidate>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group has-feedback"
+                           ng-class="{'has-error': vm.productInfoForm.productName.$invalid && (vm.productInfoForm.productName.$dirty || vm.productInfoForm.$submitted)}">
+                        <label for="productName">Product name</label>
+                        <input type="text" class="form-control" id="productName" name="productName"
+                               placeholder="Product name" ng-model="vm.productInfo.productName" required>
+                        <span class="help-block error-block basic-block">Required</span>
+                      </div>
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.productInfoForm.productId.$invalid && (vm.productInfoForm.productId.$dirty || vm.productInfoForm.$submitted)}">
+                        <label for="productId">Product id</label>
+                        <input type="text" class="form-control" id="productId" name="productId"
+                               placeholder="productId" ng-model="vm.productInfo.productId" required>
+                        <span class="help-block error-block basic-block">Required</span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="productName">Category</label>
+                        <select class="form-control" title="Category" selectpicker>
+                          <option selected>Electronics</option>
+                          <option>Toys</option>
+                          <option>Accessories</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </ba-wizard-step>
+              <ba-wizard-step title="Shipment" form="vm.addressForm">
+                <form name="vm.addressForm" novalidate>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group has-feedback"
+                           ng-class="{'has-error': vm.addressForm.address.$invalid && (vm.addressForm.address.$dirty || vm.addressForm.$submitted)}">
+                        <label for="productName">Shipment address</label>
+                        <input type="text" class="form-control" id="address" name="address"
+                               placeholder="Shipment address" ng-model="vm.shipment.address" required>
+                        <span class="help-block error-block basic-block">Required</span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="productName">Shipment method</label>
+                        <select class="form-control" title="Category" selectpicker>
+                          <option selected>Fast & expensive</option>
+                          <option>Cheap & free</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="checkbox">
+                    <label class="custom-checkbox">
+                      <input type="checkbox">
+                      <span>Save shipment info</span>
+                    </label>
+                  </div>
+                </form>
+              </ba-wizard-step>
+              <ba-wizard-step title="Finish">
+                <form class="form-horizontal" name="vm.finishForm" novalidate>
+                  Congratulations! You have successfully filled the form!
+                </form>
+              </ba-wizard-step>
+            </ba-wizard>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- build:js(src) scripts/vendor.js -->
+<!-- bower:js -->
+<!-- run `gulp inject` to automatically populate bower script dependencies -->
+<!-- endbower -->
+<!-- endbuild -->
+
+<!-- build:js({.tmp/serve,.tmp/partials,src}) scripts/app.js -->
+<!-- inject:js -->
+<!-- js files will be automatically insert here -->
+<!-- endinject -->
+
+<!-- inject:partials -->
+<!-- angular templates will be automatically converted in js and inserted here -->
+<!-- endinject -->
+<!-- endbuild -->
+</body>
+</html>
