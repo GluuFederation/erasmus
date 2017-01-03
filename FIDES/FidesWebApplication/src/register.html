@@ -12,7 +12,6 @@
   <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="96x96" href="assets/img/favicon-96x96.png">
-  <link rel="stylesheet" href="app/auth.css">
 
   <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
   <!-- bower:css -->
@@ -25,122 +24,163 @@
   <!-- css files will be automatically insert here -->
   <!-- endinject -->
   <!-- endbuild -->
+
+  <link rel="stylesheet" href="app/auth.css">
 </head>
 <body>
 <div class="body-bg"></div>
-<main ng-controller="RegisterController as vm">
+<main class="auth-main" ng-controller="RegisterController as vm">
   <div class="auth-block" style="width: 70% !important;">
     <h1>Sign up to FIDES Application</h1>
     <a href="login.html" class="auth-link">Already have an account? Sign in!</a>
     <div class="widgets">
       <div class="row">
         <div class="col-md-12">
-          <div ba-panel ba-panel-title="Form Wizard" ba-panel-class="with-scroll">
-            <ba-wizard>
-              <ba-wizard-step title="Personal info" form="vm.personalInfoForm">
-                <form name="vm.personalInfoForm" novalidate>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group has-feedback"
-                           ng-class="{'has-error': vm.personalInfoForm.username.$invalid && (vm.personalInfoForm.username.$dirty || vm.personalInfoForm.$submitted)}">
-                        <label for="exampleUsername1">Username</label>
-                        <input type="text" class="form-control" id="exampleUsername1" name="username"
-                               placeholder="Username" ng-model="vm.personalInfo.username" required>
-                        <span class="help-block error-block basic-block">Required</span>
+          <div ba-panel-class="with-scroll">
+            <ba-wizard on-index-change="vm.onIndexChange()" on-finish="vm.pushDetail()">
+              <ba-wizard-step title="Person" form="vm.personForm">
+                <form name="vm.personForm" novalidate>
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': vm.personForm.username.$invalid && (vm.personForm.username.$dirty || vm.personForm.$submitted)}">
+                          <label class="control-label" for="username">Username</label>
+                          <input type="text" class="form-control" id="username" name="username"
+                                 placeholder="Username" ng-model="vm.personInfo.username" ng-required="true">
+                        </div>
                       </div>
-                      <div class="form-group"
-                           ng-class="{'has-error': vm.personalInfoForm.email.$invalid && (vm.personalInfoForm.email.$dirty || vm.personalInfoForm.$submitted)}">
-                        <label for="exampleInputEmail1">Email address</label>
-                        <input type="email" class="form-control" id="exampleInputEmail1" name="email"
-                               placeholder="Email" ng-model="vm.personalInfo.email" required>
-                        <span class="help-block error-block basic-block">Proper email required</span>
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': vm.personForm.email.$invalid && (vm.personForm.email.$dirty || vm.personForm.$submitted)}">
+                          <label class="control-label" for="userEmail">Email</label>
+                          <input type="email" class="form-control" id="userEmail" name="email"
+                                 placeholder="Email" ng-model="vm.personInfo.email" ng-required="true"/>
+                        </div>
                       </div>
                     </div>
-                    <div class="col-md-6">
-                      <div class="form-group"
-                           ng-class="{'has-error': vm.personalInfoForm.password.$invalid && (vm.personalInfoForm.password.$dirty || vm.personalInfoForm.$submitted)}">
-                        <label for="exampleInputPassword1">Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1" name="password"
-                               placeholder="Password" ng-model="vm.personalInfo.password" required>
-                        <span class="help-block error-block basic-block">Required</span>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': vm.personForm.firstName.$invalid && (vm.personForm.firstName.$dirty || vm.personForm.$submitted)}">
+                          <label class="control-label" for="userFirstName">First Name</label>
+                          <input id="userFirstName" type="text" class="form-control" name="firstName"
+                                 placeholder="First Name" ng-model="vm.personInfo.firstName" ng-required="true"/>
+                        </div>
                       </div>
-                      <div class="form-group"
-                           ng-class="{'has-error': !vm.arePersonalInfoPasswordsEqual() && (vm.personalInfoForm.confirmPassword.$dirty || vm.personalInfoForm.$submitted)}">
-                        <label for="exampleInputConfirmPassword1">Confirm Password</label>
-                        <input type="password" class="form-control" id="exampleInputConfirmPassword1"
-                               name="confirmPassword" placeholder="Confirm Password"
-                               ng-model="vm.personalInfo.confirmPassword" required>
-                        <span class="help-block error-block basic-block">Passwords should match</span>
+                      <div class="col-md-6">
+                        <div class="form-group">
+                          <label class="control-label" for="userLastName">Last Name</label>
+                          <input id="userLastName" type="text" class="form-control"
+                                 placeholder="Last Name" ng-model="vm.personInfo.lastName"/>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': vm.personForm.password.$invalid && (vm.personForm.password.$dirty || vm.personForm.$submitted)}">
+                          <label class="control-label" for="password">Password</label>
+                          <input type="password" class="form-control" id="password" name="password"
+                                 placeholder="Password" ng-model="vm.personInfo.password" ng-required="true"/>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': !(vm.personInfo.confirmPassword && vm.personInfo.password === vm.personInfo.confirmPassword) && (vm.personForm.confirmPassword.$dirty || vm.personForm.$submitted)}">
+                          <label class="control-label" for="confirmPassword">Confirm Password</label>
+                          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                 placeholder="Confirm Password" ng-model="vm.personInfo.confirmPassword"
+                                 ng-required="true"/>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </form>
               </ba-wizard-step>
-              <ba-wizard-step title="Product Info" form="vm.productInfoForm">
-                <form name="vm.productInfoForm" novalidate>
+              <ba-wizard-step title="Organization" form="vm.organizationForm">
+                <form name="vm.organizationForm" novalidate>
                   <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group has-feedback"
-                           ng-class="{'has-error': vm.productInfoForm.productName.$invalid && (vm.productInfoForm.productName.$dirty || vm.productInfoForm.$submitted)}">
-                        <label for="productName">Product name</label>
-                        <input type="text" class="form-control" id="productName" name="productName"
-                               placeholder="Product name" ng-model="vm.productInfo.productName" required>
-                        <span class="help-block error-block basic-block">Required</span>
-                      </div>
-                      <div class="form-group"
-                           ng-class="{'has-error': vm.productInfoForm.productId.$invalid && (vm.productInfoForm.productId.$dirty || vm.productInfoForm.$submitted)}">
-                        <label for="productId">Product id</label>
-                        <input type="text" class="form-control" id="productId" name="productId"
-                               placeholder="productId" ng-model="vm.productInfo.productId" required>
-                        <span class="help-block error-block basic-block">Required</span>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <div class="form-group">
-                        <label for="productName">Category</label>
-                        <select class="form-control" title="Category" selectpicker>
-                          <option selected>Electronics</option>
-                          <option>Toys</option>
-                          <option>Accessories</option>
-                        </select>
+                        <div class="checkbox">
+                          <label class="custom-checkbox" style="color: #ffffff;">
+                            <input type="checkbox" ng-model="vm.useExisting">
+                            <span>Use existing</span>
+                          </label>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </form>
-              </ba-wizard-step>
-              <ba-wizard-step title="Shipment" form="vm.addressForm">
-                <form name="vm.addressForm" novalidate>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group has-feedback"
-                           ng-class="{'has-error': vm.addressForm.address.$invalid && (vm.addressForm.address.$dirty || vm.addressForm.$submitted)}">
-                        <label for="productName">Shipment address</label>
-                        <input type="text" class="form-control" id="address" name="address"
-                               placeholder="Shipment address" ng-model="vm.shipment.address" required>
-                        <span class="help-block error-block basic-block">Required</span>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                       <div class="form-group">
-                        <label for="productName">Shipment method</label>
-                        <select class="form-control" title="Category" selectpicker>
-                          <option selected>Fast & expensive</option>
-                          <option>Cheap & free</option>
-                        </select>
+                        <div id="divOrganization" class="form-group"
+                             ng-class="{'has-error': vm.organizationForm.organizationId.$invalid && (vm.organizationForm.organizationId.$dirty || vm.organizationForm.$submitted)}"
+                             ng-show="vm.useExisting">
+                          <select class="form-control" id="userOrg" name="organizationId" title="Select Organization"
+                                  selectpicker
+                                  ng-required="vm.useExisting"
+                                  ng-model="vm.organizationInfo.organizationId"
+                                  ng-options="organization._id as organization.name for organization in vm.organizations">
+                            <option value="">Select Organization</option>
+                          </select>
+                        </div>
+                        <div id="divOrganizationText" class="form-group"
+                             ng-class="{'has-error': vm.organizationForm.organization.$invalid && (vm.organizationForm.organization.$dirty || vm.organizationForm.$submitted)}"
+                             ng-show="!vm.useExisting">
+                          <input id="userOrgText" type="text" class="form-control" name="organization"
+                                 ng-required="!vm.useExisting"
+                                 placeholder="Organization Name" title="Organization Name"
+                                 ng-model="vm.organizationInfo.organizationName"/>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div class="checkbox">
-                    <label class="custom-checkbox">
-                      <input type="checkbox">
-                      <span>Save shipment info</span>
-                    </label>
-                  </div>
                 </form>
               </ba-wizard-step>
-              <ba-wizard-step title="Finish">
-                <form class="form-horizontal" name="vm.finishForm" novalidate>
-                  Congratulations! You have successfully filled the form!
+              <ba-wizard-step title="Provider" form="vm.providerForm">
+                <form name="vm.providerForm" novalidate>
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': vm.providerForm.name.$invalid && (vm.providerForm.name.$dirty || vm.providerForm.$submitted)}">
+                          <label class="control-label" for="providerName">Name</label>
+                          <input type="text" class="form-control" id="providerName" name="name" title="Name"
+                                 placeholder="Name" ng-model="vm.providerInfo.name" ng-required="true">
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': vm.providerForm.discoveryUrl.$invalid && (vm.providerForm.discoveryUrl.$dirty || vm.providerForm.$submitted)}">
+                          <label class="control-label" for="discoveryUrl">Discovery URL</label>
+                          <input type="text" class="form-control" id="discoveryUrl" name="discoveryUrl"
+                                 title="Discovery URL"
+                                 placeholder="Discovery URL" ng-model="vm.providerInfo.discoveryUrl"
+                                 ng-required="true"/>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': vm.providerForm.clientId.$invalid && (vm.providerForm.clientId.$dirty || vm.providerForm.$submitted)}">
+                          <label class="control-label" for="clientId">Client ID</label>
+                          <input type="text" class="form-control" id="clientId" name="clientId" title="Client ID"
+                                 placeholder="Client ID" ng-model="vm.providerInfo.clientId" ng-required="true">
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="form-group"
+                             ng-class="{'has-error': vm.providerForm.clientSecret.$invalid && (vm.providerForm.clientSecret.$dirty || vm.providerForm.$submitted)}">
+                          <label class="control-label" for="clientSecret">Client Secret</label>
+                          <input type="text" class="form-control" id="clientSecret" name="clientSecret"
+                                 title="Client Secret"
+                                 placeholder="Client Secret" ng-model="vm.providerInfo.clientSecret"
+                                 ng-required="true"/>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </form>
               </ba-wizard-step>
             </ba-wizard>

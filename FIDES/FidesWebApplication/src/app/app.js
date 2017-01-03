@@ -33,7 +33,7 @@ angular.module('FidesWebApplication', [
     return;
   }
 
-  if (($window.location.href !== urls.AUTH_URL && $localStorage.currentUser == undefined) || $window.location.pathname == "/register.html") {
+  if (($window.location.href !== urls.AUTH_URL && $localStorage.currentUser == undefined)) {
     removeTokenAndRedirect($localStorage, $http, $window, urls, true);
   } else {
     angular.forEach($state.get(), function(s) {
@@ -65,12 +65,6 @@ angular.module('FidesWebApplication', [
           if (!toState.roles.includes(userRole)) {
             toastr.error("You are not authorized person to view this content. Please contact admin for more details.", '', {});
             event.preventDefault();
-
-            if(fromState && fromState.name) {
-              $state.go(fromState.name);
-            } else {
-              $state.go('home');
-            }
           }
         }
       } else {

@@ -15,16 +15,16 @@
     vm.addTab = function (tab) {
       tab.setPrev(vm.tabs[vm.tabs.length - 1]);
       vm.tabs.push(tab);
-      vm.selectTab(0);
+      vm.selectTab(0, true);
     };
 
     $scope.$watch(angular.bind(vm, function () {
       return vm.tabNum;
     }), calcProgress);
 
-    vm.selectTab = function (tabNum) {
+    vm.selectTab = function (tabNum, isIndexChanged) {
       vm.tabs[vm.tabNum].submit();
-      if (vm.tabs[tabNum].isAvailiable()) {
+      if (vm.tabs[tabNum].isAvailiable() && (isIndexChanged || vm.validateTab(vm.tabs[vm.tabNum], vm.tabs[tabNum]))) {
         vm.tabNum = tabNum;
         vm.tabs.forEach(function (t, tIndex) {
           tIndex == vm.tabNum ? t.select(true) : t.select(false);
@@ -41,7 +41,14 @@
     };
 
     vm.nextTab = function () {
-      vm.selectTab(vm.tabNum + 1)
+      if (!vm.isLastTab()) {
+        vm.selectTab(vm.tabNum + 1);
+      } else {
+        vm.tabs[vm.tabNum].submit();
+        if (vm.tabs[vm.tabNum].isComplete() && vm.validateTab()) {
+          vm.finishWizard();
+        }
+      }
     };
 
     vm.previousTab = function () {
@@ -51,6 +58,22 @@
     function calcProgress() {
       vm.progress = ((vm.tabNum + 1) / vm.tabs.length) * 100;
     }
+
+    //call validateTab() which calls onIndexChange() which is declared on an attribute and linked to controller via wizard directive.
+    vm.validateTab = function () {
+      if ($scope.onIndexChange) {
+        return $scope.onIndexChange();
+      }
+      return false;
+    };
+
+    //call finishWizard() which calls onFinish() which is declared on an attribute and linked to controller via wizard directive.
+    vm.finishWizard = function () {
+      if ($scope.onFinish) {
+        return $scope.onFinish();
+      }
+      return false;
+    };
   }
 })();
 

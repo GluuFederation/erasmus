@@ -316,7 +316,7 @@ label.custom-input-danger {
 
 @mixin validationState($color, $focusColor) {
   .control-label {
-    color: $default-text !important;
+    //color: $default-text !important;
   }
   .form-control {
     border: 1px solid $color !important;
