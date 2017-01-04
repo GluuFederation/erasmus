@@ -57,5 +57,19 @@ userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
 
+// making the model safe
+userSchema.methods.safeModel = function() {
+    return {
+        _id: this._id,
+        email: this.email,
+        firstName: this.firstName,
+        lastName: this.lastName,
+        isActive: this.isActive,
+        createdOn: this.createdOn,
+        organization: this.organization,
+        role: this.role
+    }
+};
+
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);

@@ -24,7 +24,7 @@
 
     vm.selectTab = function (tabNum, isIndexChanged) {
       vm.tabs[vm.tabNum].submit();
-      if (vm.tabs[tabNum].isAvailiable() && (isIndexChanged || vm.validateTab(vm.tabs[vm.tabNum], vm.tabs[tabNum]))) {
+      if (vm.tabs[tabNum].isAvailiable() && (isIndexChanged || ((vm.tabNum - tabNum >= -1) && vm.validateTab(vm.tabNum, tabNum)))) {
         vm.tabNum = tabNum;
         vm.tabs.forEach(function (t, tIndex) {
           tIndex == vm.tabNum ? t.select(true) : t.select(false);
@@ -60,9 +60,9 @@
     }
 
     //call validateTab() which calls onIndexChange() which is declared on an attribute and linked to controller via wizard directive.
-    vm.validateTab = function () {
+    vm.validateTab = function (lastIndex, index) {
       if ($scope.onIndexChange) {
-        return $scope.onIndexChange();
+        return $scope.onIndexChange({lastIndex: lastIndex, index: index});
       }
       return false;
     };

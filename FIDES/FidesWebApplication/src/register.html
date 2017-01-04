@@ -36,8 +36,8 @@
     <div class="widgets">
       <div class="row">
         <div class="col-md-12">
-          <div ba-panel-class="with-scroll">
-            <ba-wizard on-index-change="vm.onIndexChange()" on-finish="vm.pushDetail()">
+          <div>
+            <ba-wizard on-index-change="vm.onIndexChange(lastIndex, index)" on-finish="vm.pushDetail()">
               <ba-wizard-step title="Person" form="vm.personForm">
                 <form name="vm.personForm" novalidate>
                   <div class="modal-body">
@@ -46,7 +46,7 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.personForm.username.$invalid && (vm.personForm.username.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="username">Username</label>
-                          <input type="text" class="form-control" id="username" name="username"
+                          <input type="text" class="form-control" id="username" name="username" title="Username"
                                  placeholder="Username" ng-model="vm.personInfo.username" ng-required="true">
                         </div>
                       </div>
@@ -54,7 +54,7 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.personForm.email.$invalid && (vm.personForm.email.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="userEmail">Email</label>
-                          <input type="email" class="form-control" id="userEmail" name="email"
+                          <input type="email" class="form-control" id="userEmail" name="email" title="Email"
                                  placeholder="Email" ng-model="vm.personInfo.email" ng-required="true"/>
                         </div>
                       </div>
@@ -64,14 +64,14 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.personForm.firstName.$invalid && (vm.personForm.firstName.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="userFirstName">First Name</label>
-                          <input id="userFirstName" type="text" class="form-control" name="firstName"
+                          <input id="userFirstName" type="text" class="form-control" name="firstName" title="First Name"
                                  placeholder="First Name" ng-model="vm.personInfo.firstName" ng-required="true"/>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group">
                           <label class="control-label" for="userLastName">Last Name</label>
-                          <input id="userLastName" type="text" class="form-control"
+                          <input id="userLastName" type="text" class="form-control" title="Last Name"
                                  placeholder="Last Name" ng-model="vm.personInfo.lastName"/>
                         </div>
                       </div>
@@ -81,7 +81,7 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.personForm.password.$invalid && (vm.personForm.password.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="password">Password</label>
-                          <input type="password" class="form-control" id="password" name="password"
+                          <input type="password" class="form-control" id="password" name="password" title="Password"
                                  placeholder="Password" ng-model="vm.personInfo.password" ng-required="true"/>
                         </div>
                       </div>
@@ -89,7 +89,7 @@
                         <div class="form-group"
                              ng-class="{'has-error': !(vm.personInfo.confirmPassword && vm.personInfo.password === vm.personInfo.confirmPassword) && (vm.personForm.confirmPassword.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="confirmPassword">Confirm Password</label>
-                          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"  title="Confirm Password"
                                  placeholder="Confirm Password" ng-model="vm.personInfo.confirmPassword"
                                  ng-required="true"/>
                         </div>
@@ -125,9 +125,9 @@
                           </select>
                         </div>
                         <div id="divOrganizationText" class="form-group"
-                             ng-class="{'has-error': vm.organizationForm.organization.$invalid && (vm.organizationForm.organization.$dirty || vm.organizationForm.$submitted)}"
+                             ng-class="{'has-error': vm.organizationForm.organizationName.$invalid && (vm.organizationForm.organizationName.$dirty || vm.organizationForm.$submitted)}"
                              ng-show="!vm.useExisting">
-                          <input id="userOrgText" type="text" class="form-control" name="organization"
+                          <input id="userOrgText" type="text" class="form-control" name="organizationName"
                                  ng-required="!vm.useExisting"
                                  placeholder="Organization Name" title="Organization Name"
                                  ng-model="vm.organizationInfo.organizationName"/>

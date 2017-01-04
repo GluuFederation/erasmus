@@ -8,19 +8,22 @@
   function registerService($http, urls) {
 
     var service = {
-      register: register,
-      updatePassword: updatePassword
+      isUserAlreadyExist: isUserAlreadyExist,
+      registerDetail: registerDetail
     };
 
-    function register(username, password, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/register", {
-        username: username,
-        password: password
-      }).success(onSuccess).catch(onError);
+    function isUserAlreadyExist(personInfo, onSuccess, onError) {
+      return $http.get(urls.BASE_API + "/isUserAlreadyExist", {
+        params: {username: personInfo.username, email: personInfo.email}
+      }).then(onSuccess).catch(onError);
     }
 
-    function updatePassword(formData, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/updatePassword", formData).then(onSuccess).catch(onError);
+    function registerDetail(personInfo, organizationInfo, providerInfo, onSuccess, onError) {
+      return $http.post(urls.BASE_API + "/registerDetail", {
+        personInfo: personInfo,
+        organizationInfo: organizationInfo,
+        providerInfo: providerInfo
+      }).then(onSuccess).catch(onError);
     }
 
     return service;

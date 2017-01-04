@@ -23,7 +23,6 @@
         </button>
       </li>
       <li class="next">
-        <label ng-show="$baWizardController.isLastTab()">Please press finish button to submit.</label>
         <button ng-click="$baWizardController.nextTab()" type="button"
                 class="btn btn-primary">{{$baWizardController.isLastTab() ? "Finish" : "Next"}} <span ng-show="!$baWizardController.isLastTab()" aria-hidden='true'>&rarr;</span></button>
       </li>

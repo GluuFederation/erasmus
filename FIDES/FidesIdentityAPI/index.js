@@ -64,7 +64,7 @@ app.use(swagger.init(app, {
 app.use(morgan('dev'));
 
 //JWT token
-app.use(expressJwt({secret: process.env.APP_SECRET}).unless({path: ['/login']}));
+app.use(expressJwt({secret: process.env.APP_SECRET}).unless({path: ['/login', '/registerDetail', '/isUserAlreadyExist', '/getAllOrganizations']}));
 
 app.use('/', function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {

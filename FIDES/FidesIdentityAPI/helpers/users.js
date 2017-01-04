@@ -199,6 +199,34 @@ let removeUser = (username, done) => {
 };
 
 // =============================================================================
+// Get user =================================================================
+// =============================================================================
+let getUser = (req, done) => {
+    if (req.username)
+        req.username = req.username.toLowerCase();
+    if (req.email)
+        req.email = req.email.toLowerCase();
+
+    process.nextTick(() => {
+        User.findOne({
+            $or: [{'username': req.username}, {'email': req.email}]
+        }).populate('role organization').exec(function (err, user) {
+            if (err)
+                return done(err);
+
+            // check to see if there is already exists or not.
+            if (!user) {
+                return done(null, false, {
+                    'message': 'User not found with that username/email.'
+                });
+            } else {
+                return done(null, user);
+            }
+        });
+    });
+};
+
+// =============================================================================
 // Retrieves all user ==========================================================
 // =============================================================================
 let getAllUsers = (done) => {
@@ -221,6 +249,7 @@ let getAllUsers = (done) => {
 module.exports = {
     createUser,
     authenticateUser,
+    getUser,
     getAllUsers,
     updateUser,
     updatePassword,
