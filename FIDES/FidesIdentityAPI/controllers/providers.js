@@ -8,8 +8,8 @@ const express = require('express'),
 // =============================================================================
 // GET ALL PROVIDERS ===========================================================
 // =============================================================================
-router.get('/getAllProviders/:organizationId', (req, res, next) => {
-    Providers.getAllProviders(req.params.organizationId, (err, provider, info) => {
+router.get('/getAllProviders/:userId', (req, res, next) => {
+    Providers.getAllProviders(req.params.userId, (err, provider, info) => {
         if (err) {
             console.log("err: " + err);
             return next(err);
@@ -47,6 +47,11 @@ router.post('/createProvider', (req, res, next) => {
             'message': 'Please provide client secret.'
         });
     }
+    /*if (!req.body.redirectUri) {
+        return res.status(406).send({
+            'message': 'Please provide redirect uri.'
+        });
+    }
     if (!req.body.responseType) {
         return res.status(406).send({
             'message': 'Please provide response type.'
@@ -55,11 +60,6 @@ router.post('/createProvider', (req, res, next) => {
     if (!req.body.state) {
         return res.status(406).send({
             'message': 'Please provide state.'
-        });
-    }
-    if (!req.body.redirectUri) {
-        return res.status(406).send({
-            'message': 'Please provide redirect uri.'
         });
     }
     if (!req.body.grantType) {
@@ -71,7 +71,7 @@ router.post('/createProvider', (req, res, next) => {
         return res.status(406).send({
             'message': 'Please provide code.'
         });
-    }
+    }*/
     if (!req.body.organizationId) {
         return res.status(406).send({
             'message': 'Please provide organization.'
@@ -119,6 +119,11 @@ router.post('/updateProvider', (req, res, next) => {
             'message': 'Please provide client secret.'
         });
     }
+    /*if (!req.body.redirectUri) {
+        return res.status(406).send({
+            'message': 'Please provide redirect uri.'
+        });
+    }
     if (!req.body.responseType) {
         return res.status(406).send({
             'message': 'Please provide response type.'
@@ -129,11 +134,7 @@ router.post('/updateProvider', (req, res, next) => {
             'message': 'Please provide state.'
         });
     }
-    if (!req.body.redirectUri) {
-        return res.status(406).send({
-            'message': 'Please provide redirect uri.'
-        });
-    }
+
     if (!req.body.grantType) {
         return res.status(406).send({
             'message': 'Please provide grant type.'
@@ -143,7 +144,7 @@ router.post('/updateProvider', (req, res, next) => {
         return res.status(406).send({
             'message': 'Please provide code.'
         });
-    }
+    }*/
     if (!req.body.organizationId) {
         return res.status(406).send({
             'message': 'Please provide organization.'

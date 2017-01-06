@@ -89,12 +89,12 @@
     }
 
     function getProviders() {
-      var orgId = undefined;
-      if($localStorage.currentUser.user.organization){
-        orgId = $localStorage.currentUser.user.organization._id;
+      var userId = undefined;
+      if(vm.userRole != 'admin' && $localStorage.currentUser.user){
+        userId = $localStorage.currentUser.user._id;
       }
 
-      providerService.getProviders(orgId, onSuccess, onError);
+      providerService.getProviders(userId, onSuccess, onError);
       function onSuccess(response) {
         if (response.data) {
           vm.providers = response.data;

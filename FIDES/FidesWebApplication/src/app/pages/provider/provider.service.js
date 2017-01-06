@@ -16,8 +16,8 @@
       //getAllOrganizations: getAllOrganizations
     };
 
-    function getProviders(organizationId, onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/getAllProviders/" + organizationId).then(onSuccess).catch(onError);
+    function getProviders(userId, onSuccess, onError) {
+      return $http.get(urls.BASE_API + "/getAllProviders/" + userId).then(onSuccess).catch(onError);
     }
 
     function removeProvider(providerId, onSuccess, onError) {

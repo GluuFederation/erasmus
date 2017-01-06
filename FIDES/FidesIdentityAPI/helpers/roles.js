@@ -3,9 +3,18 @@
 // load up the role model
 const Role = require('../models/role');
 
-// =============================================================================
-// Retrieves all provider ======================================================
-// =============================================================================
+/**
+ * Callback function for all the export functions.
+ * @callback requestCallback
+ * @param {Error} error - Error information from base function.
+ * @param {Object} [data] - Data from base function.
+ * @param {string} [info] - Message from base function if object not found.
+ */
+
+/**
+ * Get all available roles
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let getAllRoles = (done) => {
     let query = Role.find({
         isActive: true
@@ -19,7 +28,6 @@ let getAllRoles = (done) => {
             done(err);
         else {
             if (roles.length) {
-                console.log(roles);
                 done(null, roles);
             } else {
                 done(null, null, {
@@ -30,6 +38,33 @@ let getAllRoles = (done) => {
     });
 };
 
+/**
+ * Get role by name string
+ * @param {string} name - name or role
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
+let getRoleByName = (name, done) => {
+    let query = Role.findOne({
+        name: name,
+        isActive: true
+    });
+
+    query.exec((err, role) => {
+        if (err)
+            done(err);
+        else {
+            if (!role) {
+                done(null, null, {
+                    message: 'Role not found or not active'
+                });
+            } else {
+                done(null, role);
+            }
+        }
+    });
+};
+
 module.exports = {
-    getAllRoles
+    getAllRoles,
+    getRoleByName
 };

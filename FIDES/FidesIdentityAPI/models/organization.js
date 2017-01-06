@@ -12,11 +12,11 @@ const organizationSchema = mongoose.Schema({
     },
     order: {
         type: Number,
-        required: true,
+        required: false,
     },
     isActive: {
         type: Boolean,
-        default: true
+        default: false
     },
     createdOn: {
         type: Date,

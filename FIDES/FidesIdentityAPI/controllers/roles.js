@@ -5,20 +5,40 @@ const express = require('express'),
     router = express.Router(),
     Roles = require('../helpers/roles');
 
-// =============================================================================
-// GET ALL ROLES ===============================================================
-// =============================================================================
+/**
+ * Get all available roles.
+ */
 router.get('/getAllRoles', (req, res, next) => {
-    Roles.getAllRoles((err, role, info) => {
+    Roles.getAllRoles((err, roles, info) => {
         if (err) {
-            console.log("err: " + err);
+            return next(err);
+        }
+        if (!roles) {
+            return res.status(200).send(JSON.stringify({data: [], message: info}));
+        }
+
+        return res.status(200).send(roles);
+    });
+});
+
+/**
+ * Get role by name string.
+ */
+router.get('/getRoleByName/:name', (req, res, next) => {
+    if (!req.params.name) {
+        return res.name(406).send({
+            'message': 'Please provide name.'
+        });
+    }
+
+    Roles.getRoleByName(req.params.name, (err, role, info) => {
+        if (err) {
             return next(err);
         }
         if (!role) {
-            console.log("info: " + info);
             return res.status(200).send(JSON.stringify({data: [], message: info}));
         }
-        console.log("role: " + JSON.stringify(role));
+
         return res.status(200).send(role);
     });
 });

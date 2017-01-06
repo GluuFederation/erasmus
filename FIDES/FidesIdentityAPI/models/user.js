@@ -31,11 +31,15 @@ const userSchema = mongoose.Schema({
     },
     isActive: {
         type: Boolean,
-        default: true
+        default: false
     },
     createdOn: {
         type: Date,
         default: new Date()
+    },
+    scimId: {
+        type: String,
+        required: false
     },
     organization: {
         type: mongoose.Schema.Types.ObjectId,
@@ -66,6 +70,7 @@ userSchema.methods.safeModel = function() {
         lastName: this.lastName,
         isActive: this.isActive,
         createdOn: this.createdOn,
+        scimId: this.scimId,
         organization: this.organization,
         role: this.role
     }

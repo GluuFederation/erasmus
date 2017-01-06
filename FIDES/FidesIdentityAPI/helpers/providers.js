@@ -6,14 +6,13 @@ const Provider = require('../models/provider');
 // =============================================================================
 // Retrieves all provider ======================================================
 // =============================================================================
-let getAllProviders = (organizationId, done) => {
+let getAllProviders = (userId, done) => {
     let queryCondition = {};
-    if(organizationId && organizationId != 'undefined') {
-        console.log('asdf');
-        queryCondition['organization'] = organizationId;
+    if(userId && userId != 'undefined') {
+        queryCondition['createdBy'] = userId;
     }
 
-    let query = Provider.find(queryCondition).populate('organization');
+    let query = Provider.find(queryCondition).populate('createdBy organization');
     query.sort({
         name: 'asc'
     });
@@ -46,7 +45,7 @@ let addProvider = (req, done) => {
                 return done(err);
 
             // check if already exists or not
-            if (provider) {
+            if (!!provider) {
                 return done(null, false, {
                     'message': 'Provider is already exists.'
                 });
@@ -76,20 +75,21 @@ let addProvider = (req, done) => {
                 objProvider.password = req.password;
                 objProvider.refreshToken = req.refreshToken;
                 objProvider.organization = req.organizationId;
+                objProvider.createdBy = req.userId;
                 objProvider.isApproved = false;
                 objProvider.isVerified = false;
 
                 objProvider.save(err => {
                     if (err)
                         return done(err);
-                });
 
-                Provider.populate(objProvider, 'organization', function (err, objProvider) {
-                    if (err)
-                        return done(err);
+                    Provider.populate(objProvider, 'organization', function (err, objProvider) {
+                        if (err)
+                            return done(err);
 
-                    console.log(objProvider);
-                    return done(null, objProvider);
+                        console.log(objProvider);
+                        return done(null, objProvider);
+                    });
                 });
             }
         });
@@ -103,7 +103,7 @@ let updateProvider = (req, done) => {
     process.nextTick(() => {
         Provider.findOne({
             '_id': req._id
-        }).populate('organization').exec(function (err, objProvider) {
+        }).populate('createdBy organization').exec(function (err, objProvider) {
             if (err)
                 return done(err);
 
@@ -135,6 +135,7 @@ let updateProvider = (req, done) => {
                 objProvider.password = req.password;
                 objProvider.refreshToken = req.refreshToken;
                 objProvider.organization = req.organizationId;
+                //objProvider.createdBy = req.userId;
 
                 objProvider.save(err => {
                     if (err)
@@ -188,7 +189,7 @@ let approveProvider = (providerId, done) => {
     process.nextTick(() => {
         Provider.findOne({
             '_id': providerId
-        }).populate('organization').exec(function (err, objProvider) {
+        }).populate('createdBy organization').exec(function (err, objProvider) {
             if (err)
                 return done(err);
 
