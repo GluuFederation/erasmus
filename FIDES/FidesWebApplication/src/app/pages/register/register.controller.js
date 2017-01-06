@@ -70,9 +70,13 @@
       registerService.registerDetail(vm.personInfo, vm.organizationInfo, vm.providerInfo, onSuccess, onError);
 
       function onSuccess(response) {
+        $scope.message = "Your information has been saved successfully!";
+        $scope.buttonCaption = "Sign In now!";
+
         $uibModal.open({
           animation: true,
-          templateUrl: '/app/theme/template/successModal.html'
+          templateUrl: '/app/theme/template/successModal.html',
+          scope: $scope
         }).result.then(function (result) {
           $window.location = urls.AUTH_URL;
         }).catch(function (reason) {
@@ -81,7 +85,16 @@
       }
 
       function onError(error) {
-        toastr.error(error.data.message, 'Sign Up', {});
+        $scope.message = "The server encountered an internal error and was unable to complete your request. Please contact administrator.";
+        if(error.data && error.data.message) {
+          $scope.message = error.data.message;
+        }
+
+        $uibModal.open({
+          animation: true,
+          templateUrl: '/app/theme/template/errorModal.html',
+          scope: $scope
+        });
       }
 
       return true;

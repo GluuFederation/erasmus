@@ -102,6 +102,8 @@ app.use(session({
  res.redirect('/login');
  });*/
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // For self-signed certificate.
+
 // routes ======================================================================
 app.use(require('./controllers/index')); // load our routes and pass in our app
 //require('./controllers/users');

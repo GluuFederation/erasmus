@@ -47,7 +47,7 @@ let createUser = (req, done) => {
                 return done(err);
 
             // check to see if there is already a user with that username/email
-            if (user) {
+            if (!!user) {
                 return done(null, false, {
                     'message': 'That username/email is already taken.'
                 });
@@ -62,6 +62,7 @@ let createUser = (req, done) => {
                 newUser.lastName = req.lastName;
                 newUser.role = req.roleId;
                 newUser.organization = req.organizationId;
+                newUser.isActive = req.isActive || false;
 
                 newUser.save(err => {
                     if (err)
@@ -108,13 +109,11 @@ let updateUser = (req, done) => {
                 user.lastName = req.lastName;
                 user.role = req.roleId;
                 user.organization = req.organizationId;
+                user.isActive = req.isActive;
 
                 user.save(err => {
                     if (err)
                         return done(err);
-
-                    /*console.log(user);
-                    return done(null, user);*/
 
                     User.populate(user, 'role organization', function (err, user) {
                         if (err)
@@ -162,6 +161,35 @@ let updatePassword = (req, done) => {
                          return done(null, user);
                     });
                 }
+            }
+        });
+    });
+};
+
+// =============================================================================
+// Update SCIM Id ==============================================================
+// =============================================================================
+let updateScimId = (username, scimId, done) => {
+    process.nextTick(() => {
+        User.findOne({
+            $or: [{'username': username}, {'email': username}]
+        }).populate('role organization').exec(function (err, user) {
+            if (err)
+                return done(err);
+
+            // check to see if there is already exists or not.
+            if (!user) {
+                return done(null, false, {
+                    'message': 'User not found with that username/email.'
+                });
+            } else {
+                user.scimId = scimId;
+                user.save(err => {
+                    if (err)
+                        return done(err);
+
+                    return done(null, user);
+                });
             }
         });
     });
@@ -253,5 +281,6 @@ module.exports = {
     getAllUsers,
     updateUser,
     updatePassword,
+    updateScimId,
     removeUser
 };

@@ -46,7 +46,7 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.personForm.username.$invalid && (vm.personForm.username.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="username">Username</label>
-                          <input type="text" class="form-control" id="username" name="username" title="Username"
+                          <input type="text" class="form-control" id="username" name="username" title="Username required!"
                                  placeholder="Username" ng-model="vm.personInfo.username" ng-required="true">
                         </div>
                       </div>
@@ -54,7 +54,7 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.personForm.email.$invalid && (vm.personForm.email.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="userEmail">Email</label>
-                          <input type="email" class="form-control" id="userEmail" name="email" title="Email"
+                          <input type="email" class="form-control" id="userEmail" name="email" title="Email required and must be valid email address."
                                  placeholder="Email" ng-model="vm.personInfo.email" ng-required="true"/>
                         </div>
                       </div>
@@ -64,7 +64,7 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.personForm.firstName.$invalid && (vm.personForm.firstName.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="userFirstName">First Name</label>
-                          <input id="userFirstName" type="text" class="form-control" name="firstName" title="First Name"
+                          <input id="userFirstName" type="text" class="form-control" name="firstName" title="First name required!"
                                  placeholder="First Name" ng-model="vm.personInfo.firstName" ng-required="true"/>
                         </div>
                       </div>
@@ -81,17 +81,21 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.personForm.password.$invalid && (vm.personForm.password.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="password">Password</label>
-                          <input type="password" class="form-control" id="password" name="password" title="Password"
+                          <input type="password" class="form-control" id="password" name="password"
+                                 title="Password should be at least 8 characters long and should contain one number, one character and one special character."
+                                 ng-pattern="/^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$/"
                                  placeholder="Password" ng-model="vm.personInfo.password" ng-required="true"/>
+                          <span class="help-block error-block basic-block">Password should be at least 8 characters long and should contain one number, one character and one special character.</span>
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group"
                              ng-class="{'has-error': !(vm.personInfo.confirmPassword && vm.personInfo.password === vm.personInfo.confirmPassword) && (vm.personForm.confirmPassword.$dirty || vm.personForm.$submitted)}">
                           <label class="control-label" for="confirmPassword">Confirm Password</label>
-                          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"  title="Confirm Password"
+                          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"  title="Confirm password required and passwords should match."
                                  placeholder="Confirm Password" ng-model="vm.personInfo.confirmPassword"
                                  ng-required="true"/>
+                          <span class="help-block error-block basic-block">Passwords should match.</span>
                         </div>
                       </div>
                     </div>
@@ -128,9 +132,8 @@
                              ng-class="{'has-error': vm.organizationForm.organizationName.$invalid && (vm.organizationForm.organizationName.$dirty || vm.organizationForm.$submitted)}"
                              ng-show="!vm.useExisting">
                           <input id="userOrgText" type="text" class="form-control" name="organizationName"
-                                 ng-required="!vm.useExisting"
-                                 placeholder="Organization Name" title="Organization Name"
-                                 ng-model="vm.organizationInfo.organizationName"/>
+                                 ng-required="!vm.useExisting" placeholder="Organization Name" title="Organization name required!"
+                                 ng-model="vm.organizationInfo.name"/>
                         </div>
                       </div>
                     </div>
@@ -145,17 +148,17 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.providerForm.name.$invalid && (vm.providerForm.name.$dirty || vm.providerForm.$submitted)}">
                           <label class="control-label" for="providerName">Name</label>
-                          <input type="text" class="form-control" id="providerName" name="name" title="Name"
+                          <input type="text" class="form-control" id="providerName" name="name" title="Provider name required!"
                                  placeholder="Name" ng-model="vm.providerInfo.name" ng-required="true">
                         </div>
                       </div>
                       <div class="col-md-6">
                         <div class="form-group"
-                             ng-class="{'has-error': vm.providerForm.discoveryUrl.$invalid && (vm.providerForm.discoveryUrl.$dirty || vm.providerForm.$submitted)}">
-                          <label class="control-label" for="discoveryUrl">Discovery URL</label>
-                          <input type="text" class="form-control" id="discoveryUrl" name="discoveryUrl"
-                                 title="Discovery URL"
-                                 placeholder="Discovery URL" ng-model="vm.providerInfo.discoveryUrl"
+                             ng-class="{'has-error': vm.providerForm.providerUrl.$invalid && (vm.providerForm.providerUrl.$dirty || vm.providerForm.$submitted)}">
+                          <label class="control-label" for="providerUrl">URL</label>
+                          <input type="url" class="form-control" id="providerUrl" name="providerUrl"
+                                 title="URL required and must be valid URL."
+                                 placeholder="URL" ng-model="vm.providerInfo.url"
                                  ng-required="true"/>
                         </div>
                       </div>
@@ -165,7 +168,7 @@
                         <div class="form-group"
                              ng-class="{'has-error': vm.providerForm.clientId.$invalid && (vm.providerForm.clientId.$dirty || vm.providerForm.$submitted)}">
                           <label class="control-label" for="clientId">Client ID</label>
-                          <input type="text" class="form-control" id="clientId" name="clientId" title="Client ID"
+                          <input type="text" class="form-control" id="clientId" name="clientId" title="Client ID required!"
                                  placeholder="Client ID" ng-model="vm.providerInfo.clientId" ng-required="true">
                         </div>
                       </div>
@@ -174,7 +177,7 @@
                              ng-class="{'has-error': vm.providerForm.clientSecret.$invalid && (vm.providerForm.clientSecret.$dirty || vm.providerForm.$submitted)}">
                           <label class="control-label" for="clientSecret">Client Secret</label>
                           <input type="text" class="form-control" id="clientSecret" name="clientSecret"
-                                 title="Client Secret"
+                                 title="Client secret required!"
                                  placeholder="Client Secret" ng-model="vm.providerInfo.clientSecret"
                                  ng-required="true"/>
                         </div>

@@ -11,7 +11,8 @@ const providerSchema = mongoose.Schema({
     },
     url: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     keys: {
         type: String,
@@ -31,7 +32,7 @@ const providerSchema = mongoose.Schema({
     },
     responseType: {
         type: String,
-        required: true
+        required: false //true
     },
     scope: {
         type: String,
@@ -39,11 +40,11 @@ const providerSchema = mongoose.Schema({
     },
     state: {
         type: String,
-        required: true
+        required: false //true
     },
     redirectUri: {
         type: String,
-        required: true
+        required: false //true
     },
     error: {
         type: String,
@@ -59,11 +60,11 @@ const providerSchema = mongoose.Schema({
     },
     grantType: {
         type: String,
-        required: true
+        required: false //true
     },
     code: {
         type: String,
-        required: true
+        required: false //true
     },
     accessToken: {
         type: String,
@@ -104,6 +105,10 @@ const providerSchema = mongoose.Schema({
     createdOn: {
         type: Date,
         default: new Date()
+    },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 });
 
