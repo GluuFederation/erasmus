@@ -7,9 +7,9 @@
     'toastr'
   ])//.config(routeConfig)
     .constant('urls', {
-      BASE: 'http://192.168.200.70:3000',
-      AUTH_URL: 'http://192.168.200.70:3000/login.html',
-      BASE_API: 'http://192.168.200.70:8000'
+      BASE: 'http://erasmus.gluu.org',
+      AUTH_URL: 'http://erasmus.gluu.org/login.html',
+      BASE_API: 'http://erasmus.gluu.org:8000'
     });
 
   /** @ngInject */
