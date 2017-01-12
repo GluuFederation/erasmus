@@ -7,8 +7,8 @@ var scimConfig = {
     clientId: '@!FFDB.955F.C09D.E9FB!0001!2A77.8551!0008!C1BA.63D6',
     keyId: '63eed5a0-f1ea-42cb-bd21-5d904b0b894d'
 };
+var scim = require('scim-node')(scimConfig);
 
-// load all the things we need
 const express = require('express'),
     router = express.Router(),
     jwt = require('jsonwebtoken'),
@@ -17,11 +17,9 @@ const express = require('express'),
     Organizations = require('../helpers/organizations'),
     Providers = require('../helpers/providers');
 
-var scim = require('scim-node')(scimConfig);
-
-// =============================================================================
-// AUTHENTICATE (FIRST LOGIN) ==================================================
-// =============================================================================
+/**
+ * Authenticate user for login. (TODO: Authenticate using SCIM 2.0)
+ */
 router.post('/login', (req, res, next) => {
 
     if (!req.body.username) {
@@ -58,9 +56,9 @@ router.post('/login', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Remove User =================================================================
-// =============================================================================
+/**
+ * Remove user. (TODO: update detail to SCIM)
+ */
 router.delete('/removeUser/:username', (req, res, next) => {
     if (!req.params.username) {
         return res.status(406).send({
@@ -80,9 +78,9 @@ router.delete('/removeUser/:username', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// SIGNUP (USER REGISTRATION) ==================================================
-// =============================================================================
+/**
+ * Add user. (TODO: Add detail to SCIM)
+ */
 router.post('/signup', (req, res, next) => {
     if (!req.body.username) {
         return res.status(406).send({
@@ -120,9 +118,9 @@ router.post('/signup', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// UPDATE USER PASSWORD ========================================================
-// =============================================================================
+/**
+ * Update user password. (TODO: update password in SCIM)
+ */
 router.post('/updatePassword', (req, res, next) => {
     if (!req.body.username) {
         return res.status(406).send({
@@ -154,9 +152,9 @@ router.post('/updatePassword', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// UPDATE USER DATA ============================================================
-// =============================================================================
+/**
+ * Update user detail. (TODO: update detail to SCIM)
+ */
 router.post('/updateUser', (req, res, next) => {
     if (!req.body.username) {
         return res.status(406).send({
@@ -188,9 +186,9 @@ router.post('/updateUser', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// GET ALL USERS ===============================================================
-// =============================================================================
+/**
+ * Get list of all the users.
+ */
 router.get('/getAllUsers', (req, res, next) => {
     Users.getAllUsers((err, user, info) => {
         if (err) {
@@ -204,9 +202,9 @@ router.get('/getAllUsers', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// GET USER DATA ===============================================================
-// =============================================================================
+/**
+ * Get user detail.
+ */
 router.post('/getUser', (req, res, next) => {
     if (!req.body.username && !req.body.email && !req.body.id) {
         return res.status(406).send({
@@ -226,9 +224,9 @@ router.post('/getUser', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Check whether user exists or not ============================================
-// =============================================================================
+/**
+ * Check if username is already exists or not.
+ */
 router.get('/isUserAlreadyExist', (req, res, next) => {
     if (!req.query.username && !req.query.email) {
         return res.status(406).send({
@@ -245,9 +243,9 @@ router.get('/isUserAlreadyExist', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Register user, organization and provider ====================================
-// =============================================================================
+/**
+ * Register user, organization and provider. Adds user to gluu server using SCOM 2.0.
+ */
 router.post('/registerDetail', (req, res, next) => {
     // region User detail validation
     if (!req.body.personInfo) {

@@ -1,17 +1,17 @@
 "use strict";
-// load the things we need
+
 const mongoose = require('mongoose'),
     bcrypt = require('bcrypt-nodejs');
 
-// define the schema for our role model
+// define the schema for our role
 const organizationSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
         unique: true
     },
-    order: {
-        type: Number,
+    ottoId: {
+        type: mongoose.Schema.Types.ObjectId,
         required: false,
     },
     isActive: {

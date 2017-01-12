@@ -1,11 +1,20 @@
 "use strict";
 
-// load up the user model
 const User = require('../models/user');
 
-// =========================================================================
-// Authenticates a user ====================================================
-// =========================================================================
+/**
+ * Callback function for all the export functions.
+ * @callback requestCallback
+ * @param {Error} error - Error information from base function.
+ * @param {Object} [data] - Data from base function.
+ * @param {Object} [info] - Message from base function if object not found.
+ */
+
+/**
+ * Authenticate user for login.
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let authenticateUser = (req, done) => {
     if (req.username)
         req.username = req.username.toLowerCase();
@@ -32,9 +41,11 @@ let authenticateUser = (req, done) => {
     });
 };
 
-// =============================================================================
-// Creates a new user ==========================================================
-// =============================================================================
+/**
+ * Add user. (TODO: Add detail to SCIM)
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let createUser = (req, done) => {
     if (req.username)
         req.username = req.username.toLowerCase();
@@ -81,9 +92,11 @@ let createUser = (req, done) => {
     });
 };
 
-// =============================================================================
-// Update user =================================================================
-// =============================================================================
+/**
+ * Update user detail. (TODO: update detail to SCIM)
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let updateUser = (req, done) => {
     if (req.username)
         req.username = req.username.toLowerCase();
@@ -128,9 +141,11 @@ let updateUser = (req, done) => {
     });
 };
 
-// =============================================================================
-// Update password =============================================================
-// =============================================================================
+/**
+ * Update user password. (TODO: update password in SCIM)
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let updatePassword = (req, done) => {
     if (req.username)
         req.username = req.username.toLowerCase();
@@ -166,9 +181,12 @@ let updatePassword = (req, done) => {
     });
 };
 
-// =============================================================================
-// Update SCIM Id ==============================================================
-// =============================================================================
+/**
+ * Update SCIM ID of user after adding user to SCIM.
+ * @param {string} username - Username of user
+ * @param {String} scimId - SCIM ID of user, returned after adding user to server using SCIM 2.0.
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let updateScimId = (username, scimId, done) => {
     process.nextTick(() => {
         User.findOne({
@@ -195,9 +213,11 @@ let updateScimId = (username, scimId, done) => {
     });
 };
 
-// =============================================================================
-// Remove user =================================================================
-// =============================================================================
+/**
+ * Remove user. (TODO: update detail to SCIM)
+ * @param {string} username - Username of user
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let removeUser = (username, done) => {
     if (username)
         username = username.toLowerCase();
@@ -226,9 +246,11 @@ let removeUser = (username, done) => {
     });
 };
 
-// =============================================================================
-// Get user =================================================================
-// =============================================================================
+/**
+ * Get user detail.
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let getUser = (req, done) => {
     if (req.username)
         req.username = req.username.toLowerCase();
@@ -254,9 +276,10 @@ let getUser = (req, done) => {
     });
 };
 
-// =============================================================================
-// Retrieves all user ==========================================================
-// =============================================================================
+/**
+ * Get list of all the users.
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let getAllUsers = (done) => {
     process.nextTick(() => {
         User.find().sort({

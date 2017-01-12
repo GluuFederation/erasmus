@@ -1,6 +1,5 @@
 "use strict";
 
-// load up the role model
 const Role = require('../models/role');
 
 /**
@@ -8,7 +7,7 @@ const Role = require('../models/role');
  * @callback requestCallback
  * @param {Error} error - Error information from base function.
  * @param {Object} [data] - Data from base function.
- * @param {string} [info] - Message from base function if object not found.
+ * @param {Object} [info] - Message from base function if object not found.
  */
 
 /**

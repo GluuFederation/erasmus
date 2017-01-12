@@ -1,13 +1,12 @@
 "use strict";
 
-// load all the things we need
 const express = require('express'),
     router = express.Router(),
     Providers = require('../helpers/providers');
 
-// =============================================================================
-// GET ALL PROVIDERS ===========================================================
-// =============================================================================
+/**
+ * Get all providers. Accepts userId as parameter if user is organization admin.
+ */
 router.get('/getAllProviders/:userId', (req, res, next) => {
     Providers.getAllProviders(req.params.userId, (err, provider, info) => {
         if (err) {
@@ -23,9 +22,9 @@ router.get('/getAllProviders/:userId', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// REGISTRATION (OPENID CONNECT PROVIDER REGISTRATION) =========================
-// =============================================================================
+/**
+ * Add provider.
+ */
 router.post('/createProvider', (req, res, next) => {
     if (!req.body.name) {
         return res.status(406).send({
@@ -90,9 +89,9 @@ router.post('/createProvider', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Update Provider =============================================================
-// =============================================================================
+/**
+ * Update detail of provider.
+ */
 router.post('/updateProvider', (req, res, next) => {
     if (!req.body._id) {
         return res.status(406).send({
@@ -164,9 +163,9 @@ router.post('/updateProvider', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Remove Provider =============================================================
-// =============================================================================
+/**
+ * Remove provider. Accepts providerId as parameter.
+ */
 router.delete('/removeProvider/:providerId', (req, res, next) => {
     if (!req.params.providerId) {
         return res.status(406).send({
@@ -186,9 +185,9 @@ router.delete('/removeProvider/:providerId', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Approve Provider =============================================================
-// =============================================================================
+/**
+ * Approve provider. Accepts providerId as parameter.
+ */
 router.get('/approveProvider/:providerId', (req, res, next) => {
     if (!req.params.providerId) {
         return res.status(406).send({
@@ -196,7 +195,15 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
         });
     }
 
-    Providers.approveProvider(req.params.providerId, (err, provider, info) => {
+    var ottoId = undefined;
+    //TODO: add provider to OTTO and link org3 with it.
+
+    if (!ottoId) {
+        return res.status(500).send({
+            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+        });
+    }
+    Providers.approveProvider(req.params.providerId, ottoId, (err, provider, info) => {
         if (err) {
             return next(err);
         }
@@ -207,5 +214,6 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
         return res.status(200).send(provider);
     });
 });
+
 
 module.exports = router;

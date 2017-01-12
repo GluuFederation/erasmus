@@ -1,11 +1,20 @@
 "use strict";
 
-// load up the provider model
 const Provider = require('../models/provider');
 
-// =============================================================================
-// Retrieves all provider ======================================================
-// =============================================================================
+/**
+ * Callback function for all the export functions.
+ * @callback requestCallback
+ * @param {Error} error - Error information from base function.
+ * @param {Object} [data] - Data from base function.
+ * @param {Object} [info] - Message from base function if object not found.
+ */
+
+/**
+ * Retrieves all providers.
+ * @param {ObjectId} userId - Org admin user id, pass undefined if user is admin.
+ * @param {requestCallback} done - Callback function that returns error, object or info.
+ */
 let getAllProviders = (userId, done) => {
     let queryCondition = {};
     if(userId && userId != 'undefined') {
@@ -33,9 +42,11 @@ let getAllProviders = (userId, done) => {
     });
 };
 
-// =============================================================================
-// Add Openid connect provider =================================================
-// =============================================================================
+/**
+ * Add provider
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let addProvider = (req, done) => {
     process.nextTick(() => {
         Provider.findOne({
@@ -96,9 +107,11 @@ let addProvider = (req, done) => {
     });
 };
 
-// =============================================================================
-// Update Provider =============================================================
-// =============================================================================
+/**
+ * Update provider
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let updateProvider = (req, done) => {
     process.nextTick(() => {
         Provider.findOne({
@@ -154,9 +167,11 @@ let updateProvider = (req, done) => {
     });
 };
 
-// =============================================================================
-// Remove Provider =============================================================
-// =============================================================================
+/**
+ * Remove provider
+ * @param {ObjectId} providerId - Provider id
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let removeProvider = (providerId, done) => {
     process.nextTick(() => {
         Provider.findOne({
@@ -182,10 +197,20 @@ let removeProvider = (providerId, done) => {
     });
 };
 
-// =============================================================================
-// Approve Provider =============================================================
-// =============================================================================
-let approveProvider = (providerId, done) => {
+/**
+ *
+ * @param {ObjectId} providerId - Provider id
+ * @param ottoId
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ * @returns {Object} info - Object with information message.
+ */
+let approveProvider = (providerId, ottoId, done) => {
+    if(!ottoId){
+        return done(null, false, {
+            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+        });
+    }
+
     process.nextTick(() => {
         Provider.findOne({
             '_id': providerId
@@ -199,6 +224,7 @@ let approveProvider = (providerId, done) => {
                     'message': 'Provider not found.'
                 });
             } else {
+                objProvider.ottoId = ottoId;
                 objProvider.isApproved = true;
                 objProvider.save(err => {
                     if (err)

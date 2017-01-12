@@ -1,6 +1,4 @@
 var gulp = require('gulp'),
-    //livereload = require('gulp-livereload'),
-    //watch = require('gulp-watch'),
     nodemon = require('gulp-nodemon'),
     swagger = require('gulp-swagger');
 

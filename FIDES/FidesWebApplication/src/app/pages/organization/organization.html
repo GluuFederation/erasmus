@@ -1,0 +1,72 @@
+<div class="widgets">
+  <div class="row">
+    <div class="col-lg-6 col-md-6">
+      <div ba-panel ba-panel-class="with-scroll">
+        <table st-safe-src="vm.organizations" st-table="vm.displayedCollection"
+               class="table table-hover table-condensed">
+          <thead>
+          <tr class="sortable">
+            <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
+            <th class="col-lg-6" st-sort="name">Name</th>
+            <th>Approved</th>
+            <th>Actions</th>
+          </tr>
+          <tr>
+            <th style="display: none;"></th>
+            <th colspan="2"><input st-search="name" placeholder="Search"
+                                   class="input-sm form-control search-input col-lg-6"
+                                   type="search"/></th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="organization in vm.displayedCollection track by $index" class="editable-row">
+            <td style="display: none;"></td>
+            <td class="col-lg-6">
+                <span editable-text="organization.name" e-name="name" e-form="organizationForm"
+                      onbeforesave="vm.validateName($data)"
+                      e-required>{{organization.name}}</span>
+            </td>
+            <td>
+              <input type="checkbox" title="Is Approved" disabled ng-checked="organization.isApproved"/>
+            </td>
+            <td>
+              <form editable-form name="organizationForm" ng-show="organizationForm.$visible"
+                    onbeforesave="vm.pushOrganization($data, organization)"
+                    class="form-buttons form-inline"
+                    shown="inserted == organization">
+                <button type="submit" style="margin: 0px 5px;" ng-disabled="organizationForm.$waiting"
+                        class="btn btn-success btn-icon" title="Save">
+                  <i class="ion-ios-checkmark-outline"></i>
+                </button>
+                <button type="button" style="margin: 0px 5px;" ng-disabled="organizationForm.$waiting"
+                        ng-click="organizationForm.$cancel()"
+                        class="btn btn-default btn-icon" title="Cancel">
+                  <i class="ion-ios-close-outline"></i>
+                </button>
+              </form>
+              <div class="buttons" ng-show="!organizationForm.$visible">
+                <button style="margin: 0px 5px;" class="btn btn-primary btn-icon"
+                        ng-click="organizationForm.$show()" title="Edit"><i class="ion-edit"></i></button>
+                <button style="margin: 0px 5px;" class="btn btn-danger btn-icon"
+                        ng-click="vm.removeOrganization(organization._id)" title="Delete"><i
+                    class="ion-android-delete"></i></button>
+                <button style="margin: 0px 5px;" class="btn btn-success btn-icon" ng-show="!organization.isApproved"
+                        ng-click="vm.approveOrganization(organization)" title="Approve"><i
+                    class="ion-android-checkmark-circle"></i></button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <td colspan="7" class="text-center">
+              <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
+            </td>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

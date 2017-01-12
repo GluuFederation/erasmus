@@ -185,6 +185,7 @@ input.search-input {
 .table {
   .editable-wrap .editable-controls, .editable-wrap .editable-error {
     vertical-align: sub;
+    display: inline;
     .btn {
       &.dropdown-toggle {
         padding: 3px 20px;
@@ -196,6 +197,9 @@ input.search-input {
       line-height: 1px;
       height: 30px;
     }
+  }
+  .editable-wrap .editable-error {
+    color: #ff0000;
   }
 
   .ellipis {

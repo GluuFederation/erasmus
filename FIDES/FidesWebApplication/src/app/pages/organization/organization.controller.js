@@ -1,0 +1,102 @@
+(function () {
+  'use strict';
+
+  angular.module('FidesWebApplication.pages.organization')
+    .controller('OrganizationController', OrganizationController);
+
+  /** @ngInject */
+  function OrganizationController($scope, $filter, $localStorage, toastr, organizationService) {
+    var vm = this;
+    vm.organizations = vm.displayedCollection = undefined;
+
+    function validateName(data) {
+      if (!data) {
+        return "*";
+      }
+    }
+
+    function removeOrganization(orgId) {
+      var deleteOrganization = confirm('Are you sure you want to remove this organization?');
+      if (!deleteOrganization) {
+        return null;
+      }
+      organizationService.removeOrganization(orgId, onSuccess, onError);
+
+      function onSuccess(response) {
+        if (response.data) {
+          _.remove(vm.organizations, {_id: orgId});
+          vm.displayedCollection = angular.copy(vm.organizations);
+        }
+        toastr.success('Removed successfully', 'Organization', {});
+      }
+
+      function onError(error) {
+        toastr.error(error.data.message, 'Organization', {});
+      }
+    }
+
+    function getAllOrganizations() {
+      organizationService.getAllOrganizations(onSuccess, onError);
+      function onSuccess(response) {
+        if (response.data) {
+          vm.organizations = response.data;
+          vm.displayedCollection = angular.copy(vm.organizations);
+        }
+      }
+
+      function onError(error) {
+        toastr.error(error.data.message, 'Organizations', {})
+      }
+    }
+
+    function pushOrganization(data, org) {
+      var name = org.name;
+      angular.extend(data, {_id: org._id});
+      organizationService.updateOrganization(data, onSuccess, onError);
+
+      function onSuccess(response) {
+        toastr.success('Saved successfully', 'Organization', {});
+      }
+
+      function onError(error) {
+        org.name = name;
+        toastr.error(error.data.message, 'Organization', {})
+      }
+    }
+
+    function approveOrganization(orgData) {
+      var approveConfirm = confirm('Do you want to approve this organization?');
+      if (!approveConfirm) {
+        return null;
+      }
+
+      organizationService.approveOrganization(orgData._id, onSuccess, onError);
+
+      function onSuccess(response) {
+        if (response.data) {
+          var index = _.findIndex(vm.organizations, {_id: response.data._id});
+          if (index >= 0) {
+            vm.organizations[index] = response.data;
+          }
+
+          vm.displayedCollection = angular.copy(vm.organizations);
+        }
+
+        toastr.success('Approved successfully.', 'Organization', {});
+      }
+
+      function onError(error) {
+        toastr.error(error.data.message, 'Organization', {});
+      }
+    }
+
+    //Export the modules for view.
+    vm.validateName = validateName;
+    vm.pushOrganization = pushOrganization;
+    vm.removeOrganization = removeOrganization;
+    vm.getAllOrganizations = getAllOrganizations;
+    vm.approveOrganization = approveOrganization;
+
+    vm.getAllOrganizations();
+  }
+})();

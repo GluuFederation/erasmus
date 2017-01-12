@@ -1,6 +1,5 @@
 "use strict";
 
-// load all the things we need
 const express = require('express'),
     router = express.Router(),
     Roles = require('../helpers/roles');

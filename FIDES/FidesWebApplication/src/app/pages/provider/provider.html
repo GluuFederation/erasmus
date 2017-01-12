@@ -21,7 +21,7 @@
           <tr>
             <th style="display: none;"></th>
             <th colspan="7"><input st-search="" placeholder="Search" class="input-sm form-control search-input"
-                       type="search"/></th>
+                                   type="search"/></th>
           </tr>
           </thead>
           <tbody>
@@ -50,11 +50,12 @@
                 <button style="margin: 0px 5px;" class="btn btn-primary btn-icon"
                         ng-click="vm.openProviderModal(provider)" title="Edit"><i class="ion-edit"></i></button>
                 <button style="margin: 0px 5px;" class="btn btn-danger btn-icon"
-                        ng-click="vm.removeProvider(provider._id)" title="Delete"><i class="ion-android-delete"></i></button>
-                <button style="margin: 0px 5px;" class="btn btn-warning btn-icon" ng-show="!provider.isApproved && !provider.isVerified"
-                        ng-click="vm.verifyProvider(provider)" title="Verify"><i class="ion-android-warning"></i></button>
-                <button style="margin: 0px 5px;" class="btn btn-success btn-icon" ng-show="!provider.isApproved && vm.userRole === 'admin'"
-                        ng-click="vm.approveProvider(provider._id)" title="Approve"><i class="ion-android-checkmark-circle"></i></button>
+                        ng-click="vm.removeProvider(provider._id)" title="Delete"><i class="ion-android-delete"></i>
+                </button>
+                <button style="margin: 0px 5px;" class="btn btn-success btn-icon"
+                        ng-show="!provider.isApproved && vm.userRole === 'admin'"
+                        ng-click="vm.approveProvider(provider._id)" title="Approve"><i
+                    class="ion-android-checkmark-circle"></i></button>
               </div>
             </td>
           </tr>

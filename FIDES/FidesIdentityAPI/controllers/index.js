@@ -3,7 +3,9 @@
 const express = require('express'),
     router = express.Router();
 
-// normal routes ===============================================================
+/**
+ * Default route.
+ */
 router.get('/loggedIn', (req, res) => res.status(200).send({
     "message": "User logged in."
 }));
