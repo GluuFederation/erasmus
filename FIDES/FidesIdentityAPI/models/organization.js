@@ -14,6 +14,10 @@ const organizationSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: false,
     },
+    isApproved: {
+        type: Boolean,
+        default: false
+    },
     isActive: {
         type: Boolean,
         default: false

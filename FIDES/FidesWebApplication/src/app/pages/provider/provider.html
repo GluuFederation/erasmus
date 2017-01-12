@@ -9,11 +9,10 @@
         <table st-safe-src="vm.providers" st-table="vm.displayedCollection" class="table table-hover table-condensed">
           <thead>
           <tr class="sortable">
-            <td class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</td>
+            <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
             <th st-sort="name">Name</th>
             <th st-sort="url">URL</th>
             <th st-sort="clientId" style="max-width: 250px;">Client ID</th>
-            <th st-sort="redirectUri" style="max-width: 250px;">Redirect URI</th>
             <th st-sort="organization.name">Organization</th>
             <th></th>
             <th>Actions</th>
@@ -36,9 +35,6 @@
             <td class="ellipis" style="max-width: 250px;" title="{{provider.clientId}}">
               {{provider.clientId}}
             </td>
-            <td class="ellipis" style="max-width: 250px;" title="{{provider.redirectUri}}">
-              {{provider.redirectUri}}
-            </td>
             <td>
               {{provider.organization.name}}
             </td>
@@ -47,14 +43,14 @@
             </td>
             <td>
               <div class="buttons" ng-show="!rowform.$visible">
-                <button style="margin: 0px 5px;" class="btn btn-primary btn-icon"
+                <button style="margin: 0px 5px;" class="btn btn-primary btn-icon" ng-disabled="provider.isApproved"
                         ng-click="vm.openProviderModal(provider)" title="Edit"><i class="ion-edit"></i></button>
-                <button style="margin: 0px 5px;" class="btn btn-danger btn-icon"
-                        ng-click="vm.removeProvider(provider._id)" title="Delete"><i class="ion-android-delete"></i>
+                <button style="margin: 0px 5px;" class="btn btn-danger btn-icon" ng-disabled="provider.isApproved"
+                        ng-click="vm.removeProvider(provider)" title="Delete"><i class="ion-android-delete"></i>
                 </button>
-                <button style="margin: 0px 5px;" class="btn btn-success btn-icon"
+                <button style="margin: 0px 5px;" class="btn btn-success btn-icon" ng-disabled="!provider.organization.isApproved"
                         ng-show="!provider.isApproved && vm.userRole === 'admin'"
-                        ng-click="vm.approveProvider(provider._id)" title="Approve"><i
+                        ng-click="vm.approveProvider(provider)" title="{{provider.organization.isApproved ? 'Approve' : 'Please approve related organization first.'}}"><i
                     class="ion-android-checkmark-circle"></i></button>
               </div>
             </td>

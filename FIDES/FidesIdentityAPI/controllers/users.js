@@ -363,7 +363,7 @@ router.post('/registerDetail', (req, res, next) => {
             }
 
             // Add provider
-            req.body.providerInfo.userId = user._id;
+            req.body.providerInfo.createdBy = user._id;
             req.body.providerInfo.organizationId = orgId;
             req.body.providerInfo.isApproved = false;
             Providers.addProvider(req.body.providerInfo, (err, provider, info) => {

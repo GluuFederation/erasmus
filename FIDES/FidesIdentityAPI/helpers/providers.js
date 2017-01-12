@@ -42,6 +42,26 @@ let getAllProviders = (userId, done) => {
     });
 };
 
+let getProviderById = (providerId, done) => {
+    let query = Provider.findOne({
+        _id: providerId
+    }).populate('createdBy organization');
+
+    query.exec((err, provider) => {
+        if (err)
+            return done(err);
+        else {
+            if (!provider) {
+                return done(null, null, {
+                    message: 'Provider not found'
+                });
+            } else {
+                return done(null, provider);
+            }
+        }
+    });
+};
+
 /**
  * Add provider
  * @param {object} req - Request json object
@@ -66,27 +86,27 @@ let addProvider = (req, done) => {
 
                 objProvider.name = req.name;
                 objProvider.url = req.url;
-                objProvider.keys = req.keys;
-                objProvider.trustMarks = req.trustMarks;
                 objProvider.clientId = req.clientId;
                 objProvider.clientSecret = req.clientSecret;
-                objProvider.responseType = req.responseType;
-                objProvider.scope = req.scope;
-                objProvider.state = req.state;
-                objProvider.redirectUri = req.redirectUri;
-                objProvider.error = req.error;
-                objProvider.errorDescription = req.errorDescription;
-                objProvider.errorUri = req.errorUri;
-                objProvider.grantType = req.grantType;
-                objProvider.code = req.code;
-                objProvider.accessToken = req.accessToken;
-                objProvider.tokenType = req.tokenType;
-                objProvider.expiresIn = req.expiresIn;
-                objProvider.username = req.username;
-                objProvider.password = req.password;
-                objProvider.refreshToken = req.refreshToken;
+                // objProvider.keys = req.keys;
+                // objProvider.trustMarks = req.trustMarks;
+                // objProvider.responseType = req.responseType;
+                // objProvider.scope = req.scope;
+                // objProvider.state = req.state;
+                // objProvider.redirectUri = req.redirectUri;
+                // objProvider.error = req.error;
+                // objProvider.errorDescription = req.errorDescription;
+                // objProvider.errorUri = req.errorUri;
+                // objProvider.grantType = req.grantType;
+                // objProvider.code = req.code;
+                // objProvider.accessToken = req.accessToken;
+                // objProvider.tokenType = req.tokenType;
+                // objProvider.expiresIn = req.expiresIn;
+                // objProvider.username = req.username;
+                // objProvider.password = req.password;
+                // objProvider.refreshToken = req.refreshToken;
                 objProvider.organization = req.organizationId;
-                objProvider.createdBy = req.userId;
+                objProvider.createdBy = req.createdBy;
                 objProvider.isApproved = false;
                 objProvider.isVerified = false;
 
@@ -128,27 +148,26 @@ let updateProvider = (req, done) => {
             } else {
                 objProvider.name = req.name;
                 objProvider.url = req.url;
-                objProvider.keys = req.keys;
-                objProvider.trustMarks = req.trustMarks;
                 objProvider.clientId = req.clientId;
                 objProvider.clientSecret = req.clientSecret;
-                objProvider.responseType = req.responseType;
-                objProvider.scope = req.scope;
-                objProvider.state = req.state;
-                objProvider.redirectUri = req.redirectUri;
-                objProvider.error = req.error;
-                objProvider.errorDescription = req.errorDescription;
-                objProvider.errorUri = req.errorUri;
-                objProvider.grantType = req.grantType;
-                objProvider.code = req.code;
-                objProvider.accessToken = req.accessToken;
-                objProvider.tokenType = req.tokenType;
-                objProvider.expiresIn = req.expiresIn;
-                objProvider.username = req.username;
-                objProvider.password = req.password;
-                objProvider.refreshToken = req.refreshToken;
+                // objProvider.keys = req.keys;
+                // objProvider.trustMarks = req.trustMarks;
+                // objProvider.responseType = req.responseType;
+                // objProvider.scope = req.scope;
+                // objProvider.state = req.state;
+                // objProvider.redirectUri = req.redirectUri;
+                // objProvider.error = req.error;
+                // objProvider.errorDescription = req.errorDescription;
+                // objProvider.errorUri = req.errorUri;
+                // objProvider.grantType = req.grantType;
+                // objProvider.code = req.code;
+                // objProvider.accessToken = req.accessToken;
+                // objProvider.tokenType = req.tokenType;
+                // objProvider.expiresIn = req.expiresIn;
+                // objProvider.username = req.username;
+                // objProvider.password = req.password;
+                // objProvider.refreshToken = req.refreshToken;
                 objProvider.organization = req.organizationId;
-                //objProvider.createdBy = req.userId;
 
                 objProvider.save(err => {
                     if (err)
@@ -238,5 +257,5 @@ let approveProvider = (providerId, ottoId, done) => {
 };
 
 module.exports = {
-    getAllProviders, addProvider, updateProvider, removeProvider, approveProvider
+    getAllProviders, getProviderById, addProvider, updateProvider, removeProvider, approveProvider
 };

@@ -15,16 +15,21 @@
       }
     }
 
-    function removeOrganization(orgId) {
+    function removeOrganization(orgData) {
+      if(orgData.isApproved === true) {
+        toastr.error('You can not remove already approved organization.', 'Organization', {});
+        return null;
+      }
+
       var deleteOrganization = confirm('Are you sure you want to remove this organization?');
       if (!deleteOrganization) {
         return null;
       }
-      organizationService.removeOrganization(orgId, onSuccess, onError);
+      organizationService.removeOrganization(orgData._id, onSuccess, onError);
 
       function onSuccess(response) {
         if (response.data) {
-          _.remove(vm.organizations, {_id: orgId});
+          _.remove(vm.organizations, {_id: orgData._id});
           vm.displayedCollection = angular.copy(vm.organizations);
         }
         toastr.success('Removed successfully', 'Organization', {});
@@ -49,9 +54,13 @@
       }
     }
 
-    function pushOrganization(data, org) {
-      var name = org.name;
-      angular.extend(data, {_id: org._id});
+    function pushOrganization(data, orgData) {
+      if(orgData.isApproved === true) {
+        toastr.error('You can not modify data of already approved organization.', 'Organization', {});
+        return null;
+      }
+
+      angular.extend(data, {_id: orgData._id});
       organizationService.updateOrganization(data, onSuccess, onError);
 
       function onSuccess(response) {
@@ -59,12 +68,17 @@
       }
 
       function onError(error) {
-        org.name = name;
+        orgData.name = name;
         toastr.error(error.data.message, 'Organization', {})
       }
     }
 
     function approveOrganization(orgData) {
+      if(orgData.isApproved === true) {
+        toastr.error('Organization is already approved.', 'Organization', {});
+        return null;
+      }
+
       var approveConfirm = confirm('Do you want to approve this organization?');
       if (!approveConfirm) {
         return null;
