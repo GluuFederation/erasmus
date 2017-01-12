@@ -10,13 +10,18 @@
     vm.providers = vm.displayedCollection = undefined;
     vm.userRole = $localStorage.currentUser.role;
 
-    function removeProvider(providerId) {
+    function removeProvider(providerData) {
+      if(providerData.isApproved === true) {
+        toastr.error('You can not remove already approved provider.', 'Provider', {});
+        return null;
+      }
+
       var deleteProvider = confirm('Are you sure you want to remove this provider?');
       if (!deleteProvider) {
         return null;
       }
 
-      providerService.removeProvider(providerId, onSuccess, onError);
+      providerService.removeProvider(providerData._id, onSuccess, onError);
 
       function onSuccess(response) {
         if (response.data) {
@@ -31,9 +36,19 @@
       }
     }
 
-    function approveProvider(providerId) {
+    function approveProvider(providerData) {
+      if(providerData.isApproved === true) {
+        toastr.error('Provider is already approved.', 'Provider', {});
+        return null;
+      }
+
+      if(providerData.organization.isApproved !== true) {
+        toastr.error('Please approve related organization first to proceed.', 'Provider', {});
+        return null;
+      }
+
       if(vm.userRole != 'admin'){
-        toastr.success('You are not authorized to do this operation', 'Provider', {});
+        toastr.error('You are not authorized to do this operation.', 'Provider', {});
         return null;
       }
 
@@ -42,7 +57,7 @@
         return null;
       }
 
-      providerService.approveProvider(providerId, onSuccess, onError);
+      providerService.approveProvider(providerData._id, onSuccess, onError);
 
       function onSuccess(response) {
         if (response.data) {
@@ -109,6 +124,11 @@
     }
 
     function openProviderModal(providerData) {
+      if(providerData && providerData.isApproved === true) {
+        toastr.error('You can not modify data of already approved provider.', 'Provider', {});
+        return null;
+      }
+
       vm.providerModal = $uibModal.open({
         animation: true,
         templateUrl: '/app/pages/provider/createProvider.modal.html',
@@ -147,12 +167,11 @@
 
     vm.getProviders();
 
-    //Model Controller
+    // Model Controller
     function CreateProviderController($uibModalInstance, providerData, userService) {
       var vm = this;
       vm.modalProvider = {};
       vm.isInEditMode = false;
-      //vm.editPassword = false;
       vm.userRole = $localStorage.currentUser.role;
       vm.roles = {};
       vm.organizations = {};
@@ -166,15 +185,15 @@
         vm.modalProvider.url = providerData.url;
         vm.modalProvider.clientId = providerData.clientId;
         vm.modalProvider.clientSecret = providerData.clientSecret;
-        vm.modalProvider.responseType = providerData.responseType;
-        vm.modalProvider.state = providerData.state;
-        vm.modalProvider.redirectUri = providerData.redirectUri;
-        vm.modalProvider.grantType = providerData.grantType;
-        vm.modalProvider.code = providerData.code;
-        vm.modalProvider.scope = providerData.scope;
-        vm.modalProvider.username = providerData.username;
-        vm.modalProvider.password = providerData.password;
-        vm.modalProvider.errorUri = providerData.errorUri;
+        // vm.modalProvider.responseType = providerData.responseType;
+        // vm.modalProvider.state = providerData.state;
+        // vm.modalProvider.redirectUri = providerData.redirectUri;
+        // vm.modalProvider.grantType = providerData.grantType;
+        // vm.modalProvider.code = providerData.code;
+        // vm.modalProvider.scope = providerData.scope;
+        // vm.modalProvider.username = providerData.username;
+        // vm.modalProvider.password = providerData.password;
+        // vm.modalProvider.errorUri = providerData.errorUri;
         if (providerData.organization) {
           vm.modalProvider.organizationId = providerData.organization._id;
         }
@@ -207,6 +226,7 @@
         } else {
           vm.modalProvider.organizationId = $localStorage.currentUser.user.organization._id;
         }
+        vm.modalProvider.createdBy = $localStorage.currentUser.user._id;
 
         if (vm.isInEditMode) {
           providerService.updateProvider(JSON.stringify(vm.modalProvider), onSuccess, onError);

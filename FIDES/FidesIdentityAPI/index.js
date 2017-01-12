@@ -1,8 +1,7 @@
-//index.js
 "user strict";
 
 require('dotenv').config({path: './.env-dev'}); //for development
-//require('dotenv').config({path: './.env-prod'}); // for production
+// require('dotenv').config({path: './.env-prod'}); // for production
 
 const express = require('express'),
     app = express(),
@@ -18,7 +17,7 @@ const express = require('express'),
     cors = require('cors'),
     server = require('http').Server(app);
 
-// configuration ===============================================================
+// MongoDB connection configuration
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.DB_URL, (err, res) => {
     if (err)
@@ -27,29 +26,17 @@ mongoose.connect(process.env.DB_URL, (err, res) => {
         console.log(`database connected on ${process.env.DB_URL}`);
 }); // connect to our database
 
+// Set port
 app.set('port', process.env.PORT || 8000);
+
+//Set view engine and view directory.
 //app.set('views', __dirname + '/views');
 //app.set('view engine', 'ejs');
 
-// app.get('/', function (req, res) {
-//     console.log('test');
-//     res.status(200);
-// });
-
-// app.get('/', function (req, res) {
-//    res.render('pages/index');
-// });
-// app.get('/index', function (req, res) {
-//     res.render('pages/index');
-// });
-// app.get('/registerServer', function (req, res) {
-//     res.render('pages/registerServer');
-// });
-
-//Allow cross origin
+// Allow cross origin
 app.use(cors());
 
-//Swagger Settings
+// Swagger Settings
 app.use(swagger.init(app, {
     apiVersion: '1.0',
     swaggerVersion: '1.0.5',
@@ -60,12 +47,13 @@ app.use(swagger.init(app, {
     apis: ['./swagger/users.yml', './swagger/providers.yml']
 }));
 
-//logger
+// Logger
 app.use(morgan('dev'));
 
-//JWT token
+// JWT token
 app.use(expressJwt({secret: process.env.APP_SECRET}).unless({path: ['/login', '/registerDetail', '/isUserAlreadyExist', '/getAllOrganizations']}));
 
+// Validate each call before route
 app.use('/', function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
         res.status(401).send({
@@ -82,10 +70,13 @@ app.use('/', function (err, req, res, next) {
     next();
 });
 
+// Load cookie parser
 app.use(cookieParser());
 
+// Set directory for express
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Load body parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
@@ -97,17 +88,13 @@ app.use(session({
     saveUninitialized: true
 })); // session secret
 
-/*// Error handlers
- app.use(function (err, req, res, next) {
- res.redirect('/login');
- });*/
+// For self-signed certificate.
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // For self-signed certificate.
+// Register routes. Loaded main route. Index route loads other routes.
+app.use(require('./controllers/index'));
 
-// routes ======================================================================
-app.use(require('./controllers/index')); // load our routes and pass in our app
-//require('./controllers/users');
-
+// Start listening server
 server.listen(process.env.PORT, () => {
     console.log(`-----------------------\nServer started successfully!, Open this URL ${process.env.BASE_URL}\n-----------------------`);
 });

@@ -1,11 +1,11 @@
 "use strict";
-// load the things we need
+
 const mongoose = require('mongoose'),
     bcrypt = require('bcrypt-nodejs');
 
 var Role = require('./role');
 
-// define the schema for our user model
+// define the schema for user
 const userSchema = mongoose.Schema({
     username: {
         type: String,

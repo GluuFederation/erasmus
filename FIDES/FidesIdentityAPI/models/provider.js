@@ -1,9 +1,9 @@
 "use strict";
-// load the things we need
+
 const mongoose = require('mongoose'),
     bcrypt = require('bcrypt-nodejs');
 
-// define the schema for our openid connect provider model
+// define the schema for openid connect provider
 const providerSchema = mongoose.Schema({
     name: {
         type: String,
@@ -101,6 +101,10 @@ const providerSchema = mongoose.Schema({
     isApproved: {
         type: Boolean,
         required: false
+    },
+    ottoId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
     },
     createdOn: {
         type: Date,

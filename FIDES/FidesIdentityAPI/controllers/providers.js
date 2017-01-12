@@ -1,13 +1,13 @@
 "use strict";
 
-// load all the things we need
 const express = require('express'),
     router = express.Router(),
+    request = require('request'),
     Providers = require('../helpers/providers');
 
-// =============================================================================
-// GET ALL PROVIDERS ===========================================================
-// =============================================================================
+/**
+ * Get all providers. Accepts userId as parameter if user is organization admin.
+ */
 router.get('/getAllProviders/:userId', (req, res, next) => {
     Providers.getAllProviders(req.params.userId, (err, provider, info) => {
         if (err) {
@@ -23,9 +23,9 @@ router.get('/getAllProviders/:userId', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// REGISTRATION (OPENID CONNECT PROVIDER REGISTRATION) =========================
-// =============================================================================
+/**
+ * Add provider.
+ */
 router.post('/createProvider', (req, res, next) => {
     if (!req.body.name) {
         return res.status(406).send({
@@ -90,9 +90,9 @@ router.post('/createProvider', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Update Provider =============================================================
-// =============================================================================
+/**
+ * Update detail of provider.
+ */
 router.post('/updateProvider', (req, res, next) => {
     if (!req.body._id) {
         return res.status(406).send({
@@ -164,9 +164,9 @@ router.post('/updateProvider', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Remove Provider =============================================================
-// =============================================================================
+/**
+ * Remove provider. Accepts providerId as parameter.
+ */
 router.delete('/removeProvider/:providerId', (req, res, next) => {
     if (!req.params.providerId) {
         return res.status(406).send({
@@ -186,9 +186,9 @@ router.delete('/removeProvider/:providerId', (req, res, next) => {
     });
 });
 
-// =============================================================================
-// Approve Provider =============================================================
-// =============================================================================
+/**
+ * Approve provider. Accepts providerId as parameter.
+ */
 router.get('/approveProvider/:providerId', (req, res, next) => {
     if (!req.params.providerId) {
         return res.status(406).send({
@@ -196,15 +196,112 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
         });
     }
 
-    Providers.approveProvider(req.params.providerId, (err, provider, info) => {
+    // Get provider details.
+    Providers.getProviderById(req.params.providerId, (err, provider, info) => {
         if (err) {
-            return next(err);
+            return res.status(500).send({
+                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+            });
         }
         if (!provider) {
             return res.status(406).send(info);
         }
 
-        return res.status(200).send(provider);
+        if (provider.isApproved === true) {
+            return res.status(406).send({
+                'message': 'Provider is already approved.'
+            });
+        }
+
+        if (provider.organization.isApproved !== true) {
+            return res.status(406).send({
+                'message': 'Please approve related organization first to proceed.'
+            });
+        }
+
+        // Get provider configuration using discovery URL.
+        request.get(provider.url + "/.well-known/openid-configuration", function (error, response, body) {
+            let dataJson = {};
+            if (response) {
+                try {
+                    dataJson = JSON.parse(body);
+                } catch (exception){
+                    console.log(exception.toString());
+                }
+            }
+
+            dataJson.id = provider.url;
+            dataJson.url = provider.url;
+            dataJson.name = provider.name;
+            dataJson.client_id = provider.clientId;
+            dataJson.client_secret = provider.clientSecret;
+
+            let options = {
+                method: 'POST',
+                url: process.env.OTTO_BASE_URL + "/federation_entity",
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: dataJson,
+                json: true
+            };
+
+            // Add provider (federation entity) to OTTO
+            request(options, function (error, response, body) {
+                if (error) {
+                    return res.status(500).send({
+                        'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    });
+                }
+
+                if (!response) {
+                    return res.status(500).send({
+                        'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    });
+                }
+
+                let resValues = body['@id'].split('/');
+                let ottoId = resValues[resValues.length - 1];
+
+                let options = {
+                    method: 'POST',
+                    url: process.env.OTTO_BASE_URL + "/organization/" + provider.organization.ottoId + "/federation_entity/" + ottoId,
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    json: true
+                };
+
+                // Link provider (federation entity) and organization in OTTO
+                request(options, function (error, response, body) {
+                    if (error) {
+                        return res.status(500).send({
+                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                        });
+                    }
+
+                    if (!response) {
+                        return res.status(500).send({
+                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                        });
+                    }
+
+                    // Update local mongodb with provider's OTTO Id and approve flag.
+                    Providers.approveProvider(req.params.providerId, ottoId, (err, provider, info) => {
+                        if (err) {
+                            return res.status(500).send({
+                                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                            });
+                        }
+                        if (!provider) {
+                            return res.status(406).send(info);
+                        }
+
+                        return res.status(200).send(provider);
+                    });
+                });
+            });
+        });
     });
 });
 

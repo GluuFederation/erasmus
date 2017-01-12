@@ -11,6 +11,7 @@
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.createProviderForm.name.$invalid && (vm.createProviderForm.name.$dirty || vm.createProviderForm.$submitted)}">
+            <label for="providerName">Name</label>
             <input type="text" class="form-control" id="providerName" name="name" title="Name"
                    placeholder="Name" ng-model="vm.modalProvider.name" ng-required="true">
           </div>
@@ -18,6 +19,7 @@
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.createProviderForm.url.$invalid && (vm.createProviderForm.url.$dirty || vm.createProviderForm.$submitted)}">
+            <label for="url">URL</label>
             <input type="text" class="form-control" id="url" name="url" title="URL"
                    placeholder="URL" ng-model="vm.modalProvider.url" ng-required="true"/>
           </div>
@@ -27,6 +29,7 @@
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.createProviderForm.clientId.$invalid && (vm.createProviderForm.clientId.$dirty || vm.createProviderForm.$submitted)}">
+            <label for="clientId">Client ID</label>
             <input type="text" class="form-control" id="clientId" name="clientId" title="Client ID"
                    placeholder="Client ID" ng-model="vm.modalProvider.clientId" ng-required="true">
           </div>
@@ -34,59 +37,13 @@
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.createProviderForm.clientSecret.$invalid && (vm.createProviderForm.clientSecret.$dirty || vm.createProviderForm.$submitted)}">
+            <label for="clientSecret">Client Secret</label>
             <input type="text" class="form-control" id="clientSecret" name="clientSecret" title="Client Secret"
                    placeholder="Client Secret" ng-model="vm.modalProvider.clientSecret" ng-required="true"/>
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group"
-               ng-class="{'has-error': vm.createProviderForm.responseType.$invalid && (vm.createProviderForm.responseType.$dirty || vm.createProviderForm.$submitted)}">
-            <input type="text" class="form-control" id="responseType" name="responseType" title="Response Type"
-                   placeholder="Response Type" ng-model="vm.modalProvider.responseType" ng-required="true">
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group"
-               ng-class="{'has-error': vm.createProviderForm.state.$invalid && (vm.createProviderForm.state.$dirty || vm.createProviderForm.$submitted)}">
-            <input type="text" class="form-control" id="state" name="state" title="State"
-                   placeholder="State" ng-model="vm.modalProvider.state" ng-required="true"/>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group"
-               ng-class="{'has-error': vm.createProviderForm.redirectUri.$invalid && (vm.createProviderForm.redirectUri.$dirty || vm.createProviderForm.$submitted)}">
-            <input type="text" class="form-control" id="redirectUri" name="redirectUri" title="Redirect URI"
-                   placeholder="Redirect URI" ng-model="vm.modalProvider.redirectUri" ng-required="true">
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group"
-               ng-class="{'has-error': vm.createProviderForm.grantType.$invalid && (vm.createProviderForm.grantType.$dirty || vm.createProviderForm.$submitted)}">
-            <input type="text" class="form-control" id="grantType" name="grantType" title="Grant Type"
-                   placeholder="Grant Type" ng-model="vm.modalProvider.grantType" ng-required="true"/>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group"
-               ng-class="{'has-error': vm.createProviderForm.code.$invalid && (vm.createProviderForm.code.$dirty || vm.createProviderForm.$submitted)}">
-            <input type="text" class="form-control" id="code" name="code" title="Code"
-                   placeholder="Code" ng-model="vm.modalProvider.code" ng-required="true">
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group">
-            <input type="text" class="form-control" id="scope" name="scope" title="Scope"
-                   placeholder="Scope" ng-model="vm.modalProvider.scope"/>
-          </div>
-        </div>
-      </div>
-      <div class="row">
+      <!--<div class="row">
         <div class="col-md-6">
           <div class="form-group">
             <input type="text" class="form-control" id="username" name="username" title="Username"
@@ -99,18 +56,13 @@
                    placeholder="Password" ng-model="vm.modalProvider.password"/>
           </div>
         </div>
-      </div>
+      </div>-->
       <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-            <input type="text" class="form-control" id="errorUri" name="errorUri" title="Error URI"
-                   placeholder="Error URI" ng-model="vm.modalProvider.errorUri"/>
-          </div>
-        </div>
-        <div class="col-md-6">
+        <div class="col-md-12">
           <div id="divOrganization" class="form-group"
                ng-class="{'has-error': vm.createProviderForm.organization.$invalid && (vm.createProviderForm.organization.$dirty || vm.createProviderForm.$submitted)}"
                ng-show="vm.userRole === 'admin'">
+            <label for="userOrg">Organization</label>
             <select class="form-control" id="userOrg" name="organization" title="Select Organization" selectpicker
                     ng-required="vm.userRole === 'admin'"
                     ng-model="vm.modalProvider.organizationId"

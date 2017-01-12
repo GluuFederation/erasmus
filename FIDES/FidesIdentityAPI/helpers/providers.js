@@ -1,11 +1,20 @@
 "use strict";
 
-// load up the provider model
 const Provider = require('../models/provider');
 
-// =============================================================================
-// Retrieves all provider ======================================================
-// =============================================================================
+/**
+ * Callback function for all the export functions.
+ * @callback requestCallback
+ * @param {Error} error - Error information from base function.
+ * @param {Object} [data] - Data from base function.
+ * @param {Object} [info] - Message from base function if object not found.
+ */
+
+/**
+ * Retrieves all providers.
+ * @param {ObjectId} userId - Org admin user id, pass undefined if user is admin.
+ * @param {requestCallback} done - Callback function that returns error, object or info.
+ */
 let getAllProviders = (userId, done) => {
     let queryCondition = {};
     if(userId && userId != 'undefined') {
@@ -33,9 +42,31 @@ let getAllProviders = (userId, done) => {
     });
 };
 
-// =============================================================================
-// Add Openid connect provider =================================================
-// =============================================================================
+let getProviderById = (providerId, done) => {
+    let query = Provider.findOne({
+        _id: providerId
+    }).populate('createdBy organization');
+
+    query.exec((err, provider) => {
+        if (err)
+            return done(err);
+        else {
+            if (!provider) {
+                return done(null, null, {
+                    message: 'Provider not found'
+                });
+            } else {
+                return done(null, provider);
+            }
+        }
+    });
+};
+
+/**
+ * Add provider
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let addProvider = (req, done) => {
     process.nextTick(() => {
         Provider.findOne({
@@ -55,27 +86,27 @@ let addProvider = (req, done) => {
 
                 objProvider.name = req.name;
                 objProvider.url = req.url;
-                objProvider.keys = req.keys;
-                objProvider.trustMarks = req.trustMarks;
                 objProvider.clientId = req.clientId;
                 objProvider.clientSecret = req.clientSecret;
-                objProvider.responseType = req.responseType;
-                objProvider.scope = req.scope;
-                objProvider.state = req.state;
-                objProvider.redirectUri = req.redirectUri;
-                objProvider.error = req.error;
-                objProvider.errorDescription = req.errorDescription;
-                objProvider.errorUri = req.errorUri;
-                objProvider.grantType = req.grantType;
-                objProvider.code = req.code;
-                objProvider.accessToken = req.accessToken;
-                objProvider.tokenType = req.tokenType;
-                objProvider.expiresIn = req.expiresIn;
-                objProvider.username = req.username;
-                objProvider.password = req.password;
-                objProvider.refreshToken = req.refreshToken;
+                // objProvider.keys = req.keys;
+                // objProvider.trustMarks = req.trustMarks;
+                // objProvider.responseType = req.responseType;
+                // objProvider.scope = req.scope;
+                // objProvider.state = req.state;
+                // objProvider.redirectUri = req.redirectUri;
+                // objProvider.error = req.error;
+                // objProvider.errorDescription = req.errorDescription;
+                // objProvider.errorUri = req.errorUri;
+                // objProvider.grantType = req.grantType;
+                // objProvider.code = req.code;
+                // objProvider.accessToken = req.accessToken;
+                // objProvider.tokenType = req.tokenType;
+                // objProvider.expiresIn = req.expiresIn;
+                // objProvider.username = req.username;
+                // objProvider.password = req.password;
+                // objProvider.refreshToken = req.refreshToken;
                 objProvider.organization = req.organizationId;
-                objProvider.createdBy = req.userId;
+                objProvider.createdBy = req.createdBy;
                 objProvider.isApproved = false;
                 objProvider.isVerified = false;
 
@@ -96,9 +127,11 @@ let addProvider = (req, done) => {
     });
 };
 
-// =============================================================================
-// Update Provider =============================================================
-// =============================================================================
+/**
+ * Update provider
+ * @param {object} req - Request json object
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let updateProvider = (req, done) => {
     process.nextTick(() => {
         Provider.findOne({
@@ -115,27 +148,26 @@ let updateProvider = (req, done) => {
             } else {
                 objProvider.name = req.name;
                 objProvider.url = req.url;
-                objProvider.keys = req.keys;
-                objProvider.trustMarks = req.trustMarks;
                 objProvider.clientId = req.clientId;
                 objProvider.clientSecret = req.clientSecret;
-                objProvider.responseType = req.responseType;
-                objProvider.scope = req.scope;
-                objProvider.state = req.state;
-                objProvider.redirectUri = req.redirectUri;
-                objProvider.error = req.error;
-                objProvider.errorDescription = req.errorDescription;
-                objProvider.errorUri = req.errorUri;
-                objProvider.grantType = req.grantType;
-                objProvider.code = req.code;
-                objProvider.accessToken = req.accessToken;
-                objProvider.tokenType = req.tokenType;
-                objProvider.expiresIn = req.expiresIn;
-                objProvider.username = req.username;
-                objProvider.password = req.password;
-                objProvider.refreshToken = req.refreshToken;
+                // objProvider.keys = req.keys;
+                // objProvider.trustMarks = req.trustMarks;
+                // objProvider.responseType = req.responseType;
+                // objProvider.scope = req.scope;
+                // objProvider.state = req.state;
+                // objProvider.redirectUri = req.redirectUri;
+                // objProvider.error = req.error;
+                // objProvider.errorDescription = req.errorDescription;
+                // objProvider.errorUri = req.errorUri;
+                // objProvider.grantType = req.grantType;
+                // objProvider.code = req.code;
+                // objProvider.accessToken = req.accessToken;
+                // objProvider.tokenType = req.tokenType;
+                // objProvider.expiresIn = req.expiresIn;
+                // objProvider.username = req.username;
+                // objProvider.password = req.password;
+                // objProvider.refreshToken = req.refreshToken;
                 objProvider.organization = req.organizationId;
-                //objProvider.createdBy = req.userId;
 
                 objProvider.save(err => {
                     if (err)
@@ -154,9 +186,11 @@ let updateProvider = (req, done) => {
     });
 };
 
-// =============================================================================
-// Remove Provider =============================================================
-// =============================================================================
+/**
+ * Remove provider
+ * @param {ObjectId} providerId - Provider id
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let removeProvider = (providerId, done) => {
     process.nextTick(() => {
         Provider.findOne({
@@ -182,10 +216,20 @@ let removeProvider = (providerId, done) => {
     });
 };
 
-// =============================================================================
-// Approve Provider =============================================================
-// =============================================================================
-let approveProvider = (providerId, done) => {
+/**
+ *
+ * @param {ObjectId} providerId - Provider id
+ * @param ottoId
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ * @returns {Object} info - Object with information message.
+ */
+let approveProvider = (providerId, ottoId, done) => {
+    if(!ottoId){
+        return done(null, false, {
+            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+        });
+    }
+
     process.nextTick(() => {
         Provider.findOne({
             '_id': providerId
@@ -199,6 +243,7 @@ let approveProvider = (providerId, done) => {
                     'message': 'Provider not found.'
                 });
             } else {
+                objProvider.ottoId = ottoId;
                 objProvider.isApproved = true;
                 objProvider.save(err => {
                     if (err)
@@ -212,5 +257,5 @@ let approveProvider = (providerId, done) => {
 };
 
 module.exports = {
-    getAllProviders, addProvider, updateProvider, removeProvider, approveProvider
+    getAllProviders, getProviderById, addProvider, updateProvider, removeProvider, approveProvider
 };
