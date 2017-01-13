@@ -2,10 +2,10 @@
 
 var scimConfig = {
     keyAlg: 'RS256',
-    domain: 'https://gluu.local.org/',
+    domain: 'https://ce-dev.gluu.org/',
     privateKey: 'scim-rp-sample.key',
-    clientId: '@!FFDB.955F.C09D.E9FB!0001!2A77.8551!0008!C1BA.63D6',
-    keyId: '63eed5a0-f1ea-42cb-bd21-5d904b0b894d'
+    clientId: '@!5A58.AE0D.D383.1E46!0001!E38B.7DBE!0008!543A.08B9',
+    keyId: 'ec29e57d-0970-4ec4-8d84-5497858d737f'
 };
 var scim = require('scim-node')(scimConfig);
 
