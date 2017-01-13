@@ -32,14 +32,13 @@
     function getUsers() {
       userService.getUsers(onSuccess, onError);
       function onSuccess(response) {
-        if (response.data) {
+        if (response.data && response.data.length > 0) {
           vm.users = response.data;
           vm.displayedCollection = angular.copy(vm.users);
         }
       }
 
       function onError(error) {
-        //console.log(JSON.stringify(error));
         toastr.error(error.data.message, 'User', {});
       }
     }

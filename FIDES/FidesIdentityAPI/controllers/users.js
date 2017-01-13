@@ -195,10 +195,10 @@ router.get('/getAllUsers', (req, res, next) => {
             return next(err);
         }
         if (info) {
-            return res.status(200).send(JSON.stringify({data: [], info}));
-        } else {
-            return res.status(200).send(user);
+            return res.status(200).send(info);
         }
+
+        return res.status(200).send(user);
     });
 });
 
