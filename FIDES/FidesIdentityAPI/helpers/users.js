@@ -27,12 +27,12 @@ let authenticateUser = (req, done) => {
 
             if (!user) {
                 return done(null, false, {
-                    'message': 'No user found.'
+                    'message': 'Incorrect username or password.'
                 });
             }
             if (!user.validPassword(req.password)) {
                 return done(null, false, {
-                    'message': 'Oops! Wrong password.'
+                    'message': 'Incorrect username or password.'
                 });
             } else {
                 return done(null, user);
