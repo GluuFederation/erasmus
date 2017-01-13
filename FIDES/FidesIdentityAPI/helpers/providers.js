@@ -31,7 +31,6 @@ let getAllProviders = (userId, done) => {
             done(err);
         else {
             if (providers.length) {
-                console.log(providers);
                 done(null, providers);
             } else {
                 done(null, null, {
@@ -118,7 +117,6 @@ let addProvider = (req, done) => {
                         if (err)
                             return done(err);
 
-                        console.log(objProvider);
                         return done(null, objProvider);
                     });
                 });
@@ -177,7 +175,6 @@ let updateProvider = (req, done) => {
                         if (err)
                             return done(err);
 
-                        console.log(objProvider);
                         return done(null, objProvider);
                     });
                 });

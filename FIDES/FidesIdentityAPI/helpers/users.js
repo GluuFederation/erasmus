@@ -83,7 +83,6 @@ let createUser = (req, done) => {
                         if (err)
                             return done(err);
 
-                        console.log(newUser);
                         return done(null, newUser);
                     });
                 });
@@ -132,7 +131,6 @@ let updateUser = (req, done) => {
                         if (err)
                             return done(err);
 
-                        console.log(user);
                         return done(null, user);
                     });
                 });

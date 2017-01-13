@@ -43,7 +43,7 @@
     function getAllOrganizations() {
       organizationService.getAllOrganizations(onSuccess, onError);
       function onSuccess(response) {
-        if (response.data) {
+        if (response.data && response.data.length > 0) {
           vm.organizations = response.data;
           vm.displayedCollection = angular.copy(vm.organizations);
         }

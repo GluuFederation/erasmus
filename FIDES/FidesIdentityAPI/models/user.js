@@ -65,6 +65,7 @@ userSchema.methods.validPassword = function(password) {
 userSchema.methods.safeModel = function() {
     return {
         _id: this._id,
+        username: this.username,
         email: this.email,
         firstName: this.firstName,
         lastName: this.lastName,

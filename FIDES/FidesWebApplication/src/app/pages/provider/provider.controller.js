@@ -111,14 +111,13 @@
 
       providerService.getProviders(userId, onSuccess, onError);
       function onSuccess(response) {
-        if (response.data) {
+        if (response.data && response.data.length > 0) {
           vm.providers = response.data;
           vm.displayedCollection = angular.copy(vm.providers);
         }
       }
 
       function onError(error) {
-        //console.log(JSON.stringify(error));
         toastr.error(error.data.message, 'Provider', {});
       }
     }

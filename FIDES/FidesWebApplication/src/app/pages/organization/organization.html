@@ -13,10 +13,8 @@
           </tr>
           <tr>
             <th style="display: none;"></th>
-            <th colspan="3"><input st-search="name" placeholder="Search"
-                                   class="input-sm form-control search-input col-lg-6"
-                                   type="search"/></th>
-            <th></th>
+            <th colspan="3" ng-show="vm.organizations"><input st-search="name" placeholder="Search" class="input-sm form-control search-input col-lg-6" type="search"/></th>
+            <th colspan="3" ng-show="!vm.organizations" style="color: #e85656;">There are no records to display.</th>
           </tr>
           </thead>
           <tbody>

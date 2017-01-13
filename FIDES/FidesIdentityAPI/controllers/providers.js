@@ -11,14 +11,12 @@ const express = require('express'),
 router.get('/getAllProviders/:userId', (req, res, next) => {
     Providers.getAllProviders(req.params.userId, (err, provider, info) => {
         if (err) {
-            console.log("err: " + err);
             return next(err);
         }
         if (!provider) {
-            console.log("info: " + info);
-            return res.status(406).send(info);
+            return res.status(200).send(info);
         }
-        console.log("provider: " + JSON.stringify(provider));
+
         return res.status(200).send(provider);
     });
 });

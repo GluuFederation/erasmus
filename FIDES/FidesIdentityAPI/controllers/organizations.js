@@ -16,7 +16,7 @@ router.get('/getAllOrganizations', (req, res, next) => {
             });
         }
         if (!organization) {
-            return res.status(200).send(JSON.stringify({data: [], message: info}));
+            return res.status(200).send(info);
         }
 
         return res.status(200).send(organization);
