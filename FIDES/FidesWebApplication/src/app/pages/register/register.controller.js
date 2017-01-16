@@ -67,9 +67,20 @@
     };
 
     vm.pushDetail = function () {
+      var progressModal = $uibModal.open({
+        animation: true,
+        backdrop: false,
+        keyboard: false,
+        scope: $scope,
+        size: 'sm',
+        templateUrl: '/app/theme/template/progressModal.html'
+      });
+
       registerService.registerDetail(vm.personInfo, vm.organizationInfo, vm.providerInfo, onSuccess, onError);
 
       function onSuccess(response) {
+        progressModal.close();
+
         $scope.message = "Your information has been saved successfully!";
         $scope.buttonCaption = "Sign In now!";
 
@@ -82,9 +93,13 @@
         }).catch(function (reason) {
           $window.location = urls.AUTH_URL;
         });
+
+        return true;
       }
 
       function onError(error) {
+        progressModal.close();
+
         $scope.message = "The server encountered an internal error and was unable to complete your request. Please contact administrator.";
         if(error.data && error.data.message) {
           $scope.message = error.data.message;
@@ -95,9 +110,9 @@
           templateUrl: '/app/theme/template/errorModal.html',
           scope: $scope
         });
-      }
 
-      return true;
+        return true;
+      }
     };
   }
 })();

@@ -42,17 +42,19 @@
 
     vm.nextTab = function () {
       if (!vm.isLastTab()) {
-        vm.selectTab(vm.tabNum + 1);
+        return vm.selectTab(vm.tabNum + 1);
       } else {
         vm.tabs[vm.tabNum].submit();
         if (vm.tabs[vm.tabNum].isComplete() && vm.validateTab()) {
-          vm.finishWizard();
+          return vm.finishWizard();
+        } else {
+          return true;
         }
       }
     };
 
     vm.previousTab = function () {
-      vm.selectTab(vm.tabNum - 1)
+      return vm.selectTab(vm.tabNum - 1);
     };
 
     function calcProgress() {
