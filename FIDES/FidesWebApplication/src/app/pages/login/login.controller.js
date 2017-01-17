@@ -47,7 +47,7 @@
     function openProfileModal() {
       vm.profileModal = $uibModal.open({
         animation: true,
-        templateUrl: '/app/pages/login/profile.modal.html',
+        templateUrl: 'app/pages/login/profile.modal.html',
         size: 'md',
         controller: ['$uibModalInstance', 'userData', 'userService', profileInfoController],
         controllerAs: 'vm',
@@ -62,7 +62,7 @@
     function openChangePasswordModal() {
       vm.profileModal = $uibModal.open({
         animation: true,
-        templateUrl: '/app/pages/login/changePassword.modal.html',
+        templateUrl: 'app/pages/login/changePassword.modal.html',
         size: 'md',
         controller: ['$uibModalInstance', 'userData', changePasswordController],
         controllerAs: 'vm',

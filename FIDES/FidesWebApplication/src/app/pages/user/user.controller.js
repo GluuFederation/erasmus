@@ -46,7 +46,7 @@
     function openUserModal(userData) {
       vm.userModal = $uibModal.open({
         animation: true,
-        templateUrl: '/app/pages/user/createUser.modal.html',
+        templateUrl: 'app/pages/user/createUser.modal.html',
         size: 'lg',
         controller: ['$uibModalInstance', 'userData', CreateUserController],
         controllerAs: 'vm',

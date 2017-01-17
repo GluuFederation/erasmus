@@ -96,8 +96,7 @@ angular.module('FidesWebApplication', [
 }]).config(['$httpProvider', function ($httpProvider) {
   //Http Interceptor to check auth failures for xhr requests
   $httpProvider.interceptors.push('authHttpResponseInterceptor');
-}])
-;
+}]);
 
 function removeTokenAndRedirect($localStorage, $http, $window, urls, redirectToLogin, message) {
   if(!message) {

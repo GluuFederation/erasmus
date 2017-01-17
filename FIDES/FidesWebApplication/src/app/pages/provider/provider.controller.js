@@ -130,7 +130,7 @@
 
       vm.providerModal = $uibModal.open({
         animation: true,
-        templateUrl: '/app/pages/provider/createProvider.modal.html',
+        templateUrl: 'app/pages/provider/createProvider.modal.html',
         size: 'lg',
         controller: ['$uibModalInstance', 'providerData', 'userService', CreateProviderController],
         controllerAs: 'vm',

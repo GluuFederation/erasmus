@@ -73,7 +73,7 @@
         keyboard: false,
         scope: $scope,
         size: 'sm',
-        templateUrl: '/app/theme/template/progressModal.html'
+        templateUrl: 'app/theme/template/progressModal.html'
       });
 
       registerService.registerDetail(vm.personInfo, vm.organizationInfo, vm.providerInfo, onSuccess, onError);
@@ -86,7 +86,7 @@
 
         $uibModal.open({
           animation: true,
-          templateUrl: '/app/theme/template/successModal.html',
+          templateUrl: 'app/theme/template/successModal.html',
           scope: $scope
         }).result.then(function (result) {
           $window.location = urls.AUTH_URL;
@@ -107,7 +107,7 @@
 
         $uibModal.open({
           animation: true,
-          templateUrl: '/app/theme/template/errorModal.html',
+          templateUrl: 'app/theme/template/errorModal.html',
           scope: $scope
         });
 
