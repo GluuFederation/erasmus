@@ -27,7 +27,7 @@
 </head>
 <body class="auth">
 <div class="body-bg"></div>
-<main class="auth-main" ng-controller="RegisterController as vm">
+<main ng-if="$pageFinishedLoading" class="auth-main" ng-controller="RegisterController as vm">
   <div class="auth-block" style="width: 70% !important;">
     <h1>Sign up to FIDES Application</h1>
     <a href="login.html" class="auth-link">Already have an account? Sign in!</a>
@@ -191,6 +191,10 @@
     </div>
   </div>
 </main>
+
+<div id="preloader" ng-show="!$pageFinishedLoading">
+  <div></div>
+</div>
 
 <!-- build:js(src) scripts/vendor.js -->
 <!-- bower:js -->
