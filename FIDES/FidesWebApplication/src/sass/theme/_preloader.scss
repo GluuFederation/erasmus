@@ -76,3 +76,15 @@
     }
   }
 }
+
+#loading-bar .bar {
+  background: $primary;
+  height: 3px;
+}
+#loading-bar-spinner .spinner-icon {
+  border-top-color: $primary;
+  border-left-color: $primary;
+  margin: 8px 0;
+  width: 22px;
+  height: 22px;
+}

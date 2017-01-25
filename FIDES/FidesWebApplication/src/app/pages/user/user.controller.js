@@ -9,12 +9,12 @@
     var vm = this;
     vm.users = vm.displayedCollection = undefined;
 
-    function removeUser(username) {
+    function removeUser(id) {
       var deleteUser = confirm('Are you sure you want to remove this user?');
       if (!deleteUser) {
         return null;
       }
-      userService.removeUser(username, onSuccess, onError);
+      userService.removeUser(id, onSuccess, onError);
 
       function onSuccess(response) {
         if (response.data) {

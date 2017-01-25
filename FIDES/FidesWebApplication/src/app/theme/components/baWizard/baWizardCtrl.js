@@ -24,7 +24,7 @@
 
     vm.selectTab = function (tabNum, isIndexChanged) {
       vm.tabs[vm.tabNum].submit();
-      if (vm.tabs[tabNum].isAvailiable() && (isIndexChanged || ((vm.tabNum - tabNum >= -1) && vm.validateTab(vm.tabNum, tabNum)))) {
+      if (vm.tabs[tabNum].isAvailiable() && (isIndexChanged || (tabNum >= 0 && (vm.tabNum - tabNum >= -1) && vm.validateTab(vm.tabNum, tabNum)))) {
         vm.tabNum = tabNum;
         vm.tabs.forEach(function (t, tIndex) {
           tIndex == vm.tabNum ? t.select(true) : t.select(false);

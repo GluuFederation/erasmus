@@ -41,9 +41,39 @@ let getAllProviders = (userId, done) => {
     });
 };
 
+/**
+ * Gets provider detail by provider Id.
+ * @param {ObjectId} providerId
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
 let getProviderById = (providerId, done) => {
     let query = Provider.findOne({
         _id: providerId
+    }).populate('createdBy organization');
+
+    query.exec((err, provider) => {
+        if (err)
+            return done(err);
+        else {
+            if (!provider) {
+                return done(null, null, {
+                    message: 'Provider not found'
+                });
+            } else {
+                return done(null, provider);
+            }
+        }
+    });
+};
+
+/**
+ * Gets provider detail by Discovery URL
+ * @param {string} url - Discovery URL of provider
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
+let getProviderByUrl = (url, done) => {
+    let query = Provider.findOne({
+        'discoveryUrl': url
     }).populate('createdBy organization');
 
     query.exec((err, provider) => {
@@ -69,7 +99,7 @@ let getProviderById = (providerId, done) => {
 let addProvider = (req, done) => {
     process.nextTick(() => {
         Provider.findOne({
-            'url': req.url
+            'discoveryUrl': req.discoveryUrl
         }, (err, provider) => {
             if (err)
                 return done(err);
@@ -84,7 +114,7 @@ let addProvider = (req, done) => {
                 let objProvider = new Provider();
 
                 objProvider.name = req.name;
-                objProvider.url = req.url;
+                objProvider.discoveryUrl = req.discoveryUrl;
                 objProvider.clientId = req.clientId;
                 objProvider.clientSecret = req.clientSecret;
                 // objProvider.keys = req.keys;
@@ -145,7 +175,7 @@ let updateProvider = (req, done) => {
                 });
             } else {
                 objProvider.name = req.name;
-                objProvider.url = req.url;
+                objProvider.discoveryUrl = req.discoveryUrl;
                 objProvider.clientId = req.clientId;
                 objProvider.clientSecret = req.clientSecret;
                 // objProvider.keys = req.keys;
@@ -254,5 +284,5 @@ let approveProvider = (providerId, ottoId, done) => {
 };
 
 module.exports = {
-    getAllProviders, getProviderById, addProvider, updateProvider, removeProvider, approveProvider
+    getAllProviders, getProviderById, getProviderByUrl, addProvider, updateProvider, removeProvider, approveProvider
 };

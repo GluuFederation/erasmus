@@ -8,21 +8,18 @@
   function registerService($http, urls) {
 
     var service = {
-      isUserAlreadyExist: isUserAlreadyExist,
+      validateRegistrationDetail: validateRegistrationDetail,
       registerDetail: registerDetail
     };
 
-    function isUserAlreadyExist(personInfo, onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/isUserAlreadyExist", {
-        params: {username: personInfo.username, email: personInfo.email}
-      }).then(onSuccess).catch(onError);
+    function validateRegistrationDetail(providerInfo, onSuccess, onError) {
+      return $http.post(urls.BASE_API + "/validateRegistrationDetail", providerInfo).then(onSuccess).catch(onError);
     }
 
-    function registerDetail(personInfo, organizationInfo, providerInfo, onSuccess, onError) {
+    function registerDetail(providerInfo, clientInfo, onSuccess, onError) {
       return $http.post(urls.BASE_API + "/registerDetail", {
-        personInfo: personInfo,
-        organizationInfo: organizationInfo,
-        providerInfo: providerInfo
+        providerInfo: providerInfo,
+        clientInfo: clientInfo
       }).then(onSuccess).catch(onError);
     }
 

@@ -1,6 +1,7 @@
 'use strict';
 
 angular.module('FidesWebApplication', [
+  'angular-loading-bar',
   'ngAnimate',
   'ngStorage',
   'ui.bootstrap',

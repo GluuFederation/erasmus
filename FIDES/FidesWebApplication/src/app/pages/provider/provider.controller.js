@@ -181,7 +181,7 @@
         vm.isInEditMode = true;
         vm.modalProvider._id = providerData._id;
         vm.modalProvider.name = providerData.name;
-        vm.modalProvider.url = providerData.url;
+        vm.modalProvider.discoveryUrl = providerData.discoveryUrl;
         vm.modalProvider.clientId = providerData.clientId;
         vm.modalProvider.clientSecret = providerData.clientSecret;
         // vm.modalProvider.responseType = providerData.responseType;

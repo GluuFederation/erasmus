@@ -49,6 +49,8 @@ let authenticateUser = (req, done) => {
 let createUser = (req, done) => {
     if (req.username)
         req.username = req.username.toLowerCase();
+    if (req.email)
+        req.email = req.email.toLowerCase();
 
     process.nextTick(() => {
         User.findOne({
@@ -68,7 +70,7 @@ let createUser = (req, done) => {
 
                 newUser.username = req.username;
                 newUser.email = req.email;
-                newUser.password = newUser.generateHash(req.password);
+                //newUser.password = newUser.generateHash(req.password);
                 newUser.firstName = req.firstName;
                 newUser.lastName = req.lastName;
                 newUser.role = req.roleId;
@@ -99,6 +101,8 @@ let createUser = (req, done) => {
 let updateUser = (req, done) => {
     if (req.username)
         req.username = req.username.toLowerCase();
+    if (req.email)
+        req.email = req.email.toLowerCase();
 
     process.nextTick(() => {
         User.findOne({
@@ -145,12 +149,9 @@ let updateUser = (req, done) => {
  * @param {requestCallback} done - Callback function that returns error, object or info
  */
 let updatePassword = (req, done) => {
-    if (req.username)
-        req.username = req.username.toLowerCase();
-
     process.nextTick(() => {
         User.findOne({
-            $or: [{'username': req.username}, {'email': req.username}]
+            '_id': req.id
         }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);
@@ -181,14 +182,14 @@ let updatePassword = (req, done) => {
 
 /**
  * Update SCIM ID of user after adding user to SCIM.
- * @param {string} username - Username of user
+ * @param {string} userId - Id of user
  * @param {String} scimId - SCIM ID of user, returned after adding user to server using SCIM 2.0.
  * @param {requestCallback} done - Callback function that returns error, object or info
  */
-let updateScimId = (username, scimId, done) => {
+let updateScimId = (userId, scimId, done) => {
     process.nextTick(() => {
         User.findOne({
-            $or: [{'username': username}, {'email': username}]
+            '_id': userId
         }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);
@@ -213,16 +214,13 @@ let updateScimId = (username, scimId, done) => {
 
 /**
  * Remove user. (TODO: update detail to SCIM)
- * @param {string} username - Username of user
+ * @param {string} id - id of user
  * @param {requestCallback} done - Callback function that returns error, object or info
  */
-let removeUser = (username, done) => {
-    if (username)
-        username = username.toLowerCase();
-
+let removeUser = (id, done) => {
     process.nextTick(() => {
         User.findOne({
-            'username': username
+            '_id': id
         }, (err, user) => {
             if (err)
                 return done(err);
@@ -246,7 +244,7 @@ let removeUser = (username, done) => {
 
 /**
  * Get user detail.
- * @param {object} req - Request json object
+ * @param {object} email - Request json object
  * @param {requestCallback} done - Callback function that returns error, object or info
  */
 let getUser = (req, done) => {
@@ -257,7 +255,7 @@ let getUser = (req, done) => {
 
     process.nextTick(() => {
         User.findOne({
-            $or: [{'username': req.username}, {'email': req.email}]
+            $or: [{'username': req.username}, {'email': req.email}, {'_id': req.id}]
         }).populate('role organization').exec(function (err, user) {
             if (err)
                 return done(err);

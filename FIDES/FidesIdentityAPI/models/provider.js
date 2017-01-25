@@ -9,7 +9,7 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    url: {
+    discoveryUrl: {
         type: String,
         required: true,
         unique: true
@@ -24,11 +24,11 @@ const providerSchema = mongoose.Schema({
     },
     clientId: {
         type: String,
-        required: true
+        required: false
     },
     clientSecret: {
         type: String,
-        required: true
+        required: false
     },
     responseType: {
         type: String,

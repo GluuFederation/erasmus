@@ -5,81 +5,63 @@
     .controller('RegisterController', RegisterController);
 
   /** @ngInject */
-  function RegisterController($scope, $window, $timeout, $uibModal, toastr, urls, registerService, userService) {
+  function RegisterController($scope, $window, $location, $localStorage, $uibModal, toastr, urls, registerService) {
     var vm = this;
-
-    vm.personInfo = {};
-    vm.organizationInfo = {};
     vm.providerInfo = {};
-    vm.organizations = {};
+    vm.params = $location.search();
 
-    getAllOrganizations();
-
-    function getAllOrganizations() {
-      userService.getAllOrganizations(onSuccess, onError);
-      function onSuccess(response) {
-        if (response.data && response.data.length > 0) {
-          vm.organizations = response.data;
+    if(vm.params && vm.params.state && $localStorage.provider) {
+      if(vm.params.state === $localStorage.provider.client.state) {
+        vm.providerInfo = $localStorage.provider.providerInfo;
+        if (vm.params.error) {
+          toastr.error(vm.params.error_description, 'Sign Up', {});
+        } else {
+          $localStorage.provider.client.code = vm.params.code;
+          registerService.registerDetail($localStorage.provider.providerInfo, $localStorage.provider.client, onSuccess, onError);
         }
       }
 
-      function onError(error) {
-        console.log(JSON.stringify(error));
-        toastr.error(error.data.message, 'Organizations', {})
-      }
+      delete $localStorage.provider;
     }
 
-    vm.onIndexChange = function (lastIndex, index) {
-      if (!(vm.personInfo.confirmPassword && vm.personInfo.password === vm.personInfo.confirmPassword)) {
-        toastr.error('Passwords should match.', 'Sign Up', {});
+    vm.register = function (isFormValid) {
+      if(!isFormValid) {
         return false;
       }
 
-      if (lastIndex === 0) {
-        registerService.isUserAlreadyExist(vm.personInfo, onSuccess, onError);
-      } else if (lastIndex === 1) {
-        if(vm.organizationInfo.organizationName){
-          var ind = _.findIndex(vm.organizations, function(o) { return o.name.toLowerCase() == vm.organizationInfo.organizationName.toLowerCase(); });
-          if (ind >= 0) {
-            toastr.error('Organization already exists.', 'Sign Up', {});
-            return false;
-          }
-        }
-      }
+      vm.providerInfo.redirectUrl = urls.BASE.concat('/register.html');
+      registerService.validateRegistrationDetail(vm.providerInfo, onSuccess, onError);
 
       function onSuccess(response) {
-        if (response.data && response.data.isExists === true) {
-          toastr.error('Username or email already exists.', 'Sign Up', {});
-          $timeout(function () {
-            angular.element('#btnPrevious').triggerHandler('click');
-          }, 0);
+        if (response.data) {
+          vm.state = response.data.state;
+          $localStorage.provider = {client: response.data, providerInfo: vm.providerInfo};
+          $window.location = response.data.authEndpoint;
+          event.preventDefault();
         }
       }
 
       function onError(error) {
         toastr.error(error.data.message, 'Sign Up', {});
-        $timeout(function () {
-          angular.element('#btnPrevious').triggerHandler('click');
-        }, 0);
       }
 
-      return true;
+      return false;
     };
 
     vm.pushDetail = function () {
-      var progressModal = $uibModal.open({
+      /*var progressModal = $uibModal.open({
         animation: true,
         backdrop: false,
         keyboard: false,
         scope: $scope,
         size: 'sm',
         templateUrl: 'app/theme/template/progressModal.html'
-      });
+      });*/
 
-      registerService.registerDetail(vm.personInfo, vm.organizationInfo, vm.providerInfo, onSuccess, onError);
+      registerService.registerDetail(vm.providerInfo, vm.personInfo, onSuccess, onError);
 
       function onSuccess(response) {
-        progressModal.close();
+        //progressModal.close();
 
         $scope.message = "Your information has been saved successfully!";
         $scope.buttonCaption = "Sign In now!";
@@ -98,7 +80,7 @@
       }
 
       function onError(error) {
-        progressModal.close();
+        //progressModal.close();
 
         $scope.message = "The server encountered an internal error and was unable to complete your request. Please contact administrator.";
         if(error.data && error.data.message) {
@@ -114,5 +96,39 @@
         return true;
       }
     };
+
+    function onSuccess(response) {
+      $scope.message = "Your information has been saved successfully!";
+      $scope.buttonCaption = "Sign In now!";
+
+      $uibModal.open({
+        animation: true,
+        templateUrl: 'app/theme/template/successModal.html',
+        scope: $scope
+      }).result.then(function (result) {
+        $window.location = urls.AUTH_URL;
+      }).catch(function (reason) {
+        $window.location = urls.AUTH_URL;
+      });
+
+      return true;
+    }
+
+    function onError(error) {
+      //progressModal.close();
+
+      $scope.message = "The server encountered an internal error and was unable to complete your request. Please contact administrator.";
+      if(error.data && error.data.message) {
+        $scope.message = error.data.message;
+      }
+
+      $uibModal.open({
+        animation: true,
+        templateUrl: 'app/theme/template/errorModal.html',
+        scope: $scope
+      });
+
+      return true;
+    }
   }
 })();

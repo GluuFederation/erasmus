@@ -2,6 +2,8 @@
   'use strict';
 
   angular.module('FidesWebApplication.pages.login', [
+    'angular-loading-bar',
+    'ngAnimate',
     'ui.bootstrap',
     'ngStorage',
     'toastr'

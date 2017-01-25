@@ -50,8 +50,15 @@ app.use(swagger.init(app, {
 // Logger
 app.use(morgan('dev'));
 
-// JWT token
-app.use(expressJwt({secret: process.env.APP_SECRET}).unless({path: ['/login', '/registerDetail', '/isUserAlreadyExist', '/getAllOrganizations']}));
+// JWT token {path: ['/login', '/registerDetail', '/isUserAlreadyExist/**/', '/getAllOrganizations']}
+let filter = function(req) {
+    if(['/login', '/validateRegistrationDetail', '/registerDetail', '/getAllOrganizations'].indexOf(req.path) >= 0) {
+        return true;
+    } else if(req.path.startsWith('/isUserAlreadyExist')) {
+        return true;
+    }
+};
+app.use(expressJwt({secret: process.env.APP_SECRET}).unless(filter));
 
 // Validate each call before route
 app.use('/', function (err, req, res, next) {

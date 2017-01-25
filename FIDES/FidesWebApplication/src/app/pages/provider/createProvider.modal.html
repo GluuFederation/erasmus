@@ -18,14 +18,14 @@
         </div>
         <div class="col-md-6">
           <div class="form-group"
-               ng-class="{'has-error': vm.createProviderForm.url.$invalid && (vm.createProviderForm.url.$dirty || vm.createProviderForm.$submitted)}">
-            <label for="url">URL</label>
-            <input type="text" class="form-control" id="url" name="url" title="URL"
-                   placeholder="URL" ng-model="vm.modalProvider.url" ng-required="true"/>
+               ng-class="{'has-error': vm.createProviderForm.discoveryUrl.$invalid && (vm.createProviderForm.discoveryUrl.$dirty || vm.createProviderForm.$submitted)}">
+            <label for="discoveryUrl">Discovery URL</label>
+            <input type="text" class="form-control" id="discoveryUrl" name="discoveryUrl" title="Discovery URL"
+                   placeholder="URL" ng-model="vm.modalProvider.discoveryUrl" ng-required="true"/>
           </div>
         </div>
       </div>
-      <div class="row">
+      <!--<div class="row">
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.createProviderForm.clientId.$invalid && (vm.createProviderForm.clientId.$dirty || vm.createProviderForm.$submitted)}">
@@ -42,7 +42,7 @@
                    placeholder="Client Secret" ng-model="vm.modalProvider.clientSecret" ng-required="true"/>
           </div>
         </div>
-      </div>
+      </div>-->
       <!--<div class="row">
         <div class="col-md-6">
           <div class="form-group">

@@ -19,8 +19,8 @@
       return $http.get(urls.BASE_API + "/getAllUsers").then(onSuccess).catch(onError);
     }
 
-    function removeUser(username, onSuccess, onError) {
-      return $http.delete(urls.BASE_API + "/removeUser/" + username).then(onSuccess).catch(onError);
+    function removeUser(id, onSuccess, onError) {
+      return $http.delete(urls.BASE_API + "/removeUser/" + id).then(onSuccess).catch(onError);
     }
 
     function createUser(formData, onSuccess, onError) {

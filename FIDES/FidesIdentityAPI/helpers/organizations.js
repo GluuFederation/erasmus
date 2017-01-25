@@ -62,6 +62,26 @@ let getOrganizationById = (orgId, done) => {
     });
 };
 
+let getOrganizationByName = (orgName, done) => {
+    let query = Organization.findOne({
+        name: new RegExp('^' + orgName + '$', "i")
+    });
+
+    query.exec((err, organization) => {
+        if (err)
+            return done(err);
+        else {
+            if (!organization) {
+                return done(null, null, {
+                    message: 'Organization not found'
+                });
+            } else {
+                return done(null, organization);
+            }
+        }
+    });
+};
+
 /**
  * Add organization
  * @param {object} req - Request json object
@@ -211,6 +231,7 @@ let approveOrganization = (orgId, ottoId, done) => {
 module.exports = {
     getAllOrganizations,
     getOrganizationById,
+    getOrganizationByName,
     addOrganization,
     updateOrganization,
     removeOrganization,

@@ -11,7 +11,7 @@
           <tr class="sortable">
             <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
             <th st-sort="name">Name</th>
-            <th st-sort="url">URL</th>
+            <th st-sort="discoveryUrl">Discovery URL</th>
             <th st-sort="clientId" style="max-width: 250px;">Client ID</th>
             <th st-sort="organization.name">Organization</th>
             <th></th>
@@ -29,8 +29,8 @@
             <td>
               {{provider.name}}
             </td>
-            <td>
-              {{provider.url}}
+            <td class="ellipis" style="max-width: 250px;" title="{{provider.discoveryUrl}}">
+              {{provider.discoveryUrl}}
             </td>
             <td class="ellipis" style="max-width: 250px;" title="{{provider.clientId}}">
               {{provider.clientId}}
