@@ -24,9 +24,9 @@ angular.module('FidesWebApplication', [
     rewriteLinks: true
   });
 }).constant('urls', {
-  BASE: 'http://192.168.200.70:3000',
-  AUTH_URL: 'http://192.168.200.70:3000/login.html',
-  BASE_API: 'http://192.168.200.70:8000',
+  BASE: 'http://192.168.200.95:3000',
+  AUTH_URL: 'http://192.168.200.95:3000/login.html',
+  BASE_API: 'http://192.168.200.95:8000',
   USER_PROFILE: 'assets/img/theme/no-photo.png'
 }).run(function ($rootScope, $localStorage, $http, $window, $state, urls, toastr) {
   if ($window.location.pathname == "/login.html" || $window.location.pathname == "/register.html") {

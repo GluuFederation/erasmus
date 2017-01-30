@@ -9,7 +9,8 @@
     'FidesWebApplication.pages.organization',
     'FidesWebApplication.pages.provider',
     'FidesWebApplication.pages.login',
-    'FidesWebApplication.pages.register'
+    'FidesWebApplication.pages.register',
+    'FidesWebApplication.pages.federation'
   ]).config(routeConfig);
 
   /** @ngInject */
