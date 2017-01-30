@@ -14,5 +14,6 @@ router.use('/', require('./users'));
 router.use('/', require('./providers'));
 router.use('/', require('./roles'));
 router.use('/', require('./organizations'));
+router.use('/', require('./federations'));
 
 module.exports = router;
