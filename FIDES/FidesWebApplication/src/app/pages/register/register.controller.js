@@ -29,7 +29,7 @@
         return false;
       }
 
-      vm.providerInfo.redirectUrl = urls.BASE.concat('/register.html');
+      vm.providerInfo.redirectUrls = [urls.BASE.concat('/register.html'), urls.BASE.concat('/login.html')];
       registerService.validateRegistrationDetail(vm.providerInfo, onSuccess, onError);
 
       function onSuccess(response) {

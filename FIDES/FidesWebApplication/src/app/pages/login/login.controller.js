@@ -5,7 +5,7 @@
     .controller('LoginController', LoginController);
 
   /** @ngInject */
-  function LoginController($http, $localStorage, $window, loginService, toastr, urls, $uibModal) {
+  function LoginController($http, $localStorage, $window, $location, loginService, toastr, urls, $uibModal) {
     var vm = this;
     vm.login = login;
     vm.logout = logout;
@@ -13,22 +13,54 @@
     vm.openChangePasswordModal = openChangePasswordModal;
     vm.userProfilePic = userProfilePic;
 
+    vm.params = $location.search();
+    if(vm.params && vm.params.state && $localStorage.authDetail) {
+      if(vm.params.state === $localStorage.authDetail.state) {
+        vm.email = $localStorage.authDetail.email;
+        if (vm.params.error) {
+          toastr.error(vm.params.error_description, 'Sign Up', {});
+        } else {
+          loginService.login(vm.email, onSuccess, onError);
+        }
+      }
+
+      delete $localStorage.authDetail;
+    }
+
+    function onSuccess(response) {
+      // login successful if there's a token in the response
+      if (response.token) {
+        // store username and token in local storage to keep user logged in between page refreshes
+        $localStorage.currentUser = {user: response.user, role: response.role, token: response.token};
+        $window.location = urls.BASE;
+      } else {
+        // execute callback with false to indicate failed login
+        toastr.error(response.info.message, 'Login failed.', {})
+      }
+
+      return true;
+    }
+
+    function onError(error) {
+      console.log(error);
+      toastr.error(error.data.message, 'FIDES');
+
+      return true;
+    }
+
     function login(isFormValid) {
       if(!isFormValid) {
         return;
       }
 
-      loginService.login(vm.username, vm.password, onSuccess, onError);
+      loginService.validateEmail(vm.email, onSuccess, onError);
 
       function onSuccess(response) {
-        // login successful if there's a token in the response
-        if (response.token) {
-          // store username and token in local storage to keep user logged in between page refreshes
-          $localStorage.currentUser = {user: response.user, role: response.role, token: response.token};
-          $window.location = urls.BASE;
-        } else {
-          // execute callback with false to indicate failed login
-          toastr.error(response.info.message, 'Login failed.', {})
+        if (response) {
+          $localStorage.authDetail = response;
+          vm.state = response.state;
+          $window.location = response.authEndpoint;
+          event.preventDefault();
         }
       }
 

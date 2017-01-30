@@ -19,28 +19,64 @@ const express = require('express'),
     Providers = require('../helpers/providers');
 
 /**
- * Authenticate user for login. (TODO: Authenticate using SCIM 2.0)
+ * Validate user email before login.
  */
-router.post('/login', (req, res, next) => {
-
-    if (!req.body.username) {
+router.post('/validateEmail', (req, res, next) => {
+    if (!req.body.email) {
         return res.status(406).send({
-            'message': 'Please provide username.'
+            'message': 'Please provide email.'
         });
     }
 
-    if (!req.body.password) {
-        return res.status(406).send({
-            'message': 'Please provide password.'
-        });
-    }
-
-    Users.authenticateUser(req.body, (err, user, info) => {
+    Users.getUser(req.body, (err, user) => {
         if (err) {
             return next(err);
         }
+
         if (!user) {
-            return res.status(406).send(info);
+            return res.status(406).send({
+                'message': 'User not found with this email.'
+            });
+        }
+
+        if (!user.provider) {
+            return res.status(406).send({
+                'message': 'There is no provider associated with the user.'
+            });
+        }
+
+        let provider = user.provider;
+        let state = generateString(16);
+        let redirectUri = JSON.parse(provider.redirectUris)[1];
+        let responseType = JSON.parse(provider.responseTypes)[0];
+        let authEndpoint = provider.authorizationEndpoint.concat('?redirect_uri=').concat(redirectUri).concat('&client_id=').concat(provider.clientId).concat('&response_type=').concat(responseType).concat('&state=').concat(state).concat('&scope=').concat('openid');
+        return res.status(200).send({
+            authEndpoint: authEndpoint,
+            email: req.body.email,
+            state: state
+        });
+    });
+});
+
+/**
+ * Authenticate user for login. (TODO: Compare entered email and OP login email)
+ */
+router.post('/login', (req, res, next) => {
+    if (!req.body.email) {
+        return res.status(406).send({
+            'message': 'Please provide email.'
+        });
+    }
+
+    Users.getUser(req.body, (err, user) => {
+        if (err) {
+            return next(err);
+        }
+
+        if (!user) {
+            return res.status(406).send({
+                'message': 'User not found with this email.'
+            });
         }
 
         //Creating a JWT token for user session which is valid for 24 hrs.
@@ -51,9 +87,8 @@ router.post('/login', (req, res, next) => {
         return res.status(200).send({
             user: user.safeModel(),
             role: user.role.name,
-            token
+            token: token
         });
-
     });
 });
 
@@ -204,6 +239,35 @@ router.get('/getAllUsers', (req, res, next) => {
 });
 
 /**
+ * Get all providers. Accepts userId as parameter if user is organization admin.
+ */
+router.get('/getAllProviders/:userId', (req, res, next) => {
+    if (req.params.userId && req.params.userId != 'undefined') {
+        Users.getUserProvider(req.params.userId, (err, providers, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!providers) {
+                return res.status(200).send(info);
+            }
+
+            return res.status(200).send(providers);
+        });
+    } else {
+        Providers.getAllProviders((err, providers, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!providers) {
+                return res.status(200).send(info);
+            }
+
+            return res.status(200).send(providers);
+        });
+    }
+});
+
+/**
  * Get user detail.
  */
 router.post('/getUser', (req, res, next) => {
@@ -270,9 +334,9 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
             'message': 'Please provide valid discovery URL.'
         });
     }
-    if (!providerInfo.redirectUrl) {
+    if (!providerInfo.redirectUrls) {
         return res.status(406).send({
-            'message': 'Please provide valid redirect URL.'
+            'message': 'Please provide valid redirect URLs.'
         });
     }
 
@@ -337,7 +401,7 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
                     }
 
                     var client = {
-                        redirect_uris: [providerInfo.redirectUrl],
+                        redirect_uris: providerInfo.redirectUrls,
                         application_type: "native",
                         client_name: providerInfo.organizationName,
                         token_endpoint_auth_method: "client_secret_basic",
@@ -374,14 +438,7 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
                             });
                         }
 
-                        var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-                        var string_length = 16;
-                        var state = '';
-                        for (let i = 0; i < string_length; i++) {
-                            let rnum = Math.floor(Math.random() * chars.length);
-                            state += chars.substring(rnum, rnum + 1);
-                        }
-
+                        var state = generateString(16);
                         var authEndpoint = discoveryJson.authorization_endpoint.concat('?redirect_uri=').concat(clientJson.redirect_uris[0]).concat('&client_id=').concat(clientJson.client_id).concat('&response_type=').concat(clientJson.response_types[0]).concat('&state=').concat(state).concat('&scope=').concat('profile%20email%20openid');
                         return res.status(200).send({
                             authEndpoint: authEndpoint,
@@ -608,28 +665,31 @@ router.post('/registerDetail', (req, res, next) => {
                             data.providerInfo.discoveryUrl = providerInfo.discoveryUrl;
                             data.providerInfo.clientId = clientMetadata.client_id;
                             data.providerInfo.clientSecret = clientMetadata.client_secret;
+                            data.providerInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
+                            data.providerInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
+                            data.providerInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
                             data.providerInfo.isApproved = false;
 
-                            return AddUserAndProvider(data, res);
+                            return AddProviderAndUser(data, res);
                         });
                     });
 
-                    function AddUserAndProvider(data, res) {
-                        // Add user
-                        data.personInfo.organizationId = data.organizationId;
-                        Users.createUser(data.personInfo, (err, user, info) => {
+                    function AddProviderAndUser(data, res) {
+                        // Add provider
+                        data.providerInfo.organizationId = data.organizationId;
+                        Providers.addProvider(data.providerInfo, (err, provider, info) => {
                             if (err || info) {
                                 console.log(err || info);
                                 return deleteOrganization(data.organizationId, res);
                             }
 
-                            // Add provider
-                            data.providerInfo.createdBy = user._id;
-                            data.providerInfo.organizationId = data.organizationId;
-                            Providers.addProvider(data.providerInfo, (err, provider, info) => {
+                            // Add user
+                            data.personInfo.providerId = provider._id;
+                            data.personInfo.organizationId = data.organizationId;
+                            Users.createUser(data.personInfo, (err, user, info) => {
                                 if (err || info) {
                                     console.log(err || info);
-                                    return deleteUserAndOrg(user._id, data.organizationId, res);
+                                    return deleteProviderAndOrg(provider._id, data.organizationId, res);
                                 }
 
                                 // region Adding user to SCIM.
@@ -669,10 +729,10 @@ router.post('/registerDetail', (req, res, next) => {
                                     };
 
                                 scim.addUser(userDetail).then(function (data) {
-                                    return updateScimId(data.id, provider._id, user._id, data.organizationId, res);
+                                    return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
                                 }).catch(function (error) {
                                     console.log(error);
-                                    return deleteProviderUserAndOrg(provider._id, user._id, data.organizationId, res);
+                                    return deleteUserProviderAndOrg(user._id, provider._id, data.organizationId, res);
                                 });
                                 // endregion
                             });
@@ -691,8 +751,8 @@ router.post('/registerDetail', (req, res, next) => {
                         });
                     }
 
-                    function deleteUserAndOrg(userId, orgId, res) {
-                        Users.removeUser(userId, (err, emptyUser, info) => {
+                    function deleteProviderAndOrg(providerId, orgId, res) {
+                        Providers.removeProvider(providerId, (err, emptyProvider, info) => {
                             if (err || info) {
                                 console.log(err || info);
                                 return res.status(500).send({
@@ -704,8 +764,8 @@ router.post('/registerDetail', (req, res, next) => {
                         });
                     }
 
-                    function deleteProviderUserAndOrg(providerId, userId, orgId, res) {
-                        Providers.removeProvider(providerId, (err, emptyProvider, info) => {
+                    function deleteUserProviderAndOrg(userId, providerId, orgId, res) {
+                        Users.removeUser(userId, (err, emptyUser, info) => {
                             if (err || info) {
                                 console.log(err || info);
                                 return res.status(500).send({
@@ -713,14 +773,14 @@ router.post('/registerDetail', (req, res, next) => {
                                 });
                             }
 
-                            return deleteUserAndOrg(userId, orgId, res);
+                            return deleteProviderAndOrg(providerId, orgId, res);
                         });
                     }
 
-                    function updateScimId(scimId, providerId, userId, orgId, res) {
+                    function updateScimId(scimId, userId, providerId, orgId, res) {
                         Users.updateScimId(userId, scimId, (err, user, info) => {
                             if (err || info) {
-                                return deleteProviderUserAndOrg(providerId, userId, orgId, res);
+                                return deleteUserProviderAndOrg(userId, providerId, orgId, res);
                             }
 
                             return res.status(200).send(user);
@@ -731,5 +791,16 @@ router.post('/registerDetail', (req, res, next) => {
         });
     });
 });
+
+function generateString(length) {
+    var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+    var str = '';
+    for (let i = 0; i < length; i++) {
+        let rnum = Math.floor(Math.random() * chars.length);
+        str += chars.substring(rnum, rnum + 1);
+    }
+
+    return str;
+}
 
 module.exports = router;

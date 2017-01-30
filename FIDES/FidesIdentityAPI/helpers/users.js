@@ -21,7 +21,7 @@ let authenticateUser = (req, done) => {
     process.nextTick(() => {
         User.findOne({
             $or: [{'username': req.username}, {'email': req.username}]
-        }).populate('role organization').exec(function (err, user) {
+        }).populate('role organization provider').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -75,6 +75,7 @@ let createUser = (req, done) => {
                 newUser.lastName = req.lastName;
                 newUser.role = req.roleId;
                 newUser.organization = req.organizationId;
+                newUser.provider = req.providerId;
                 newUser.isActive = req.isActive || false;
 
                 newUser.save(err => {
@@ -107,7 +108,7 @@ let updateUser = (req, done) => {
     process.nextTick(() => {
         User.findOne({
             $or: [{'username': req.username}, {'email': req.email}]
-        }).populate('role organization').exec(function (err, user) {
+        }).populate('role organization provider').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -125,13 +126,14 @@ let updateUser = (req, done) => {
                 user.lastName = req.lastName;
                 user.role = req.roleId;
                 user.organization = req.organizationId;
+                newUser.provider = req.providerId;
                 user.isActive = req.isActive;
 
                 user.save(err => {
                     if (err)
                         return done(err);
 
-                    User.populate(user, 'role organization', function (err, user) {
+                    User.populate(user, 'role organization provider', function (err, user) {
                         if (err)
                             return done(err);
 
@@ -152,7 +154,7 @@ let updatePassword = (req, done) => {
     process.nextTick(() => {
         User.findOne({
             '_id': req.id
-        }).populate('role organization').exec(function (err, user) {
+        }).populate('role organization provider').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -190,7 +192,7 @@ let updateScimId = (userId, scimId, done) => {
     process.nextTick(() => {
         User.findOne({
             '_id': userId
-        }).populate('role organization').exec(function (err, user) {
+        }).populate('role organization provider').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -256,7 +258,7 @@ let getUser = (req, done) => {
     process.nextTick(() => {
         User.findOne({
             $or: [{'username': req.username}, {'email': req.email}, {'_id': req.id}]
-        }).populate('role organization').exec(function (err, user) {
+        }).populate('role organization provider').exec(function (err, user) {
             if (err)
                 return done(err);
 
@@ -280,7 +282,7 @@ let getAllUsers = (done) => {
     process.nextTick(() => {
         User.find().sort({
             firstName: 1
-        }).select('-password').populate('role organization')
+        }).select('-password').populate('role organization provider')
             .exec(function (err, users) {
                 if (err) {
                     done(err);
@@ -293,11 +295,36 @@ let getAllUsers = (done) => {
     });
 };
 
+/**
+ * Retrieves all providers.
+ * @param {ObjectId} userId - Org admin user id.
+ * @param {requestCallback} done - Callback function that returns error, object or info.
+ */
+let getUserProvider = (userId, done) => {
+    User.findOne({
+        '_id': userId
+    }).populate('provider').sort({name: 'asc'}).exec(function (err, user) {
+        if (err)
+            return done(err);
+
+        if (!user) {
+            return done(null, false, {
+                'message': 'There is no provider associated with the user.'
+            });
+        } else {
+            var providers = [];
+            providers.push(user.provider);
+            return done(null, providers);
+        }
+    });
+};
+
 module.exports = {
     createUser,
     authenticateUser,
     getUser,
     getAllUsers,
+    getUserProvider,
     updateUser,
     updatePassword,
     updateScimId,

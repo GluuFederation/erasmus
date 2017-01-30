@@ -48,6 +48,10 @@ const userSchema = mongoose.Schema({
     role: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role'
+    },
+    provider: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Provider'
     }
 });
 
@@ -73,7 +77,8 @@ userSchema.methods.safeModel = function() {
         createdOn: this.createdOn,
         scimId: this.scimId,
         organization: this.organization,
-        role: this.role
+        role: this.role,
+        provider: this.provider
     }
 };
 

@@ -9,13 +9,19 @@
 
     var service = {
       login: login,
+      validateEmail: validateEmail,
       updatePassword: updatePassword
     };
 
-    function login(username, password, onSuccess, onError) {
+    function login(email, onSuccess, onError) {
       return $http.post(urls.BASE_API + "/login", {
-        username: username,
-        password: password
+        email: email
+      }).success(onSuccess).catch(onError);
+    }
+
+    function validateEmail(email, onSuccess, onError) {
+      return $http.post(urls.BASE_API + "/validateEmail", {
+        email: email
       }).success(onSuccess).catch(onError);
     }
 

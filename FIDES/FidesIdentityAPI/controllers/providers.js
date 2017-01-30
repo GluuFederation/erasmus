@@ -7,22 +7,6 @@ const express = require('express'),
     Providers = require('../helpers/providers');
 
 /**
- * Get all providers. Accepts userId as parameter if user is organization admin.
- */
-router.get('/getAllProviders/:userId', (req, res, next) => {
-    Providers.getAllProviders(req.params.userId, (err, provider, info) => {
-        if (err) {
-            return next(err);
-        }
-        if (!provider) {
-            return res.status(200).send(info);
-        }
-
-        return res.status(200).send(provider);
-    });
-});
-
-/**
  * Add provider.
  */
 router.post('/createProvider', (req, res, next) => {

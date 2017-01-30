@@ -30,19 +30,11 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: false
     },
-    responseType: {
-        type: String,
-        required: false //true
-    },
     scope: {
         type: String,
         required: false
     },
     state: {
-        type: String,
-        required: false //true
-    },
-    redirectUri: {
         type: String,
         required: false //true
     },
@@ -90,6 +82,18 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: false
     },
+    authorizationEndpoint: {
+        type: String,
+        required: false
+    },
+    redirectUris: {
+        type: String,
+        required: false
+    },
+    responseTypes: {
+        type: String,
+        required: false
+    },
     organization: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization'
@@ -109,10 +113,6 @@ const providerSchema = mongoose.Schema({
     createdOn: {
         type: Date,
         default: new Date()
-    },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
     }
 });
 

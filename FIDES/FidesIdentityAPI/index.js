@@ -52,7 +52,7 @@ app.use(morgan('dev'));
 
 // JWT token {path: ['/login', '/registerDetail', '/isUserAlreadyExist/**/', '/getAllOrganizations']}
 let filter = function(req) {
-    if(['/login', '/validateRegistrationDetail', '/registerDetail', '/getAllOrganizations'].indexOf(req.path) >= 0) {
+    if(['/validateEmail', '/login', '/validateRegistrationDetail', '/registerDetail', '/getAllOrganizations'].indexOf(req.path) >= 0) {
         return true;
     } else if(req.path.startsWith('/isUserAlreadyExist')) {
         return true;

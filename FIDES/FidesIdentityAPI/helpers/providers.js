@@ -12,16 +12,10 @@ const Provider = require('../models/provider');
 
 /**
  * Retrieves all providers.
- * @param {ObjectId} userId - Org admin user id, pass undefined if user is admin.
  * @param {requestCallback} done - Callback function that returns error, object or info.
  */
-let getAllProviders = (userId, done) => {
-    let queryCondition = {};
-    if(userId && userId != 'undefined') {
-        queryCondition['createdBy'] = userId;
-    }
-
-    let query = Provider.find(queryCondition).populate('createdBy organization');
+let getAllProviders = (done) => {
+    let query = Provider.find({}).populate('createdBy organization');
     query.sort({
         name: 'asc'
     });
@@ -134,6 +128,9 @@ let addProvider = (req, done) => {
                 // objProvider.username = req.username;
                 // objProvider.password = req.password;
                 // objProvider.refreshToken = req.refreshToken;
+                objProvider.authorizationEndpoint = req.authorizationEndpoint;
+                objProvider.redirectUris = req.redirectUris;
+                objProvider.responseTypes = req.responseTypes;
                 objProvider.organization = req.organizationId;
                 objProvider.createdBy = req.createdBy;
                 objProvider.isApproved = false;
