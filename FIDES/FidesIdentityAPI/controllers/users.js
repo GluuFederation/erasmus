@@ -49,10 +49,11 @@ router.post('/validateEmail', (req, res, next) => {
         let state = generateString(16);
         let redirectUri = JSON.parse(provider.redirectUris)[1];
         let responseType = JSON.parse(provider.responseTypes)[0];
-        let authEndpoint = provider.authorizationEndpoint.concat('?redirect_uri=').concat(redirectUri).concat('&client_id=').concat(provider.clientId).concat('&response_type=').concat(responseType).concat('&state=').concat(state).concat('&scope=').concat('openid');
+        let authEndpoint = provider.authorizationEndpoint.concat('?redirect_uri=').concat(redirectUri).concat('&client_id=').concat(provider.clientId).concat('&response_type=').concat(responseType).concat('&state=').concat(state).concat('&scope=').concat('openid email');
         return res.status(200).send({
             authEndpoint: authEndpoint,
             email: req.body.email,
+            redirectUri: redirectUri,
             state: state
         });
     });
@@ -79,15 +80,73 @@ router.post('/login', (req, res, next) => {
             });
         }
 
-        //Creating a JWT token for user session which is valid for 24 hrs.
-        let token = jwt.sign(user, process.env.APP_SECRET, {
-            expiresIn: process.env.JWT_EXPIRES_IN
-        });
+        if (!user.provider) {
+            return res.status(406).send({
+                'message': 'There is no provider associated with the user.'
+            });
+        }
 
-        return res.status(200).send({
-            user: user.safeModel(),
-            role: user.role.name,
-            token: token
+        request.get(user.provider.discoveryUrl, function (error, response, body) {
+            if (error) {
+                console.log(error);
+                return res.status(406).send({
+                    'message': 'Unable to fetch metadata from Discovery URL. Please check Discovery URL.'
+                });
+            }
+
+            if (!response) {
+                return res.status(406).send({
+                    'message': 'Metadata not found from Discovery URL. Please check Discovery URL.'
+                });
+            }
+
+            let discoveryMetadata = {};
+            try {
+                discoveryMetadata = JSON.parse(body);
+            } catch (exception) {
+                console.log(exception.toString());
+                return res.status(406).send({
+                    'message': 'Discovery URL is invalid. Please check and correct it.'
+                });
+            }
+
+            let data = {};
+            data.discoveryMetadata = discoveryMetadata;
+            data.client_id = user.provider.clientId;
+            data.client_secret = user.provider.clientSecret;
+            data.redirect_uri = req.body.redirectUri;
+            data.code = req.body.code;
+            getUserClaims(data, res, function (error, userInfo) {
+                if (error) {
+                    console.log(error);
+                    return res.status(406).send({
+                        'message': 'Unable to fetch metadata from Discovery URL. Please check Discovery URL.'
+                    });
+                }
+
+                if (!userInfo) {
+                    return res.status(500).send({
+                        'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    });
+                }
+
+                if (!userInfo.email || userInfo.email.toLowerCase() !== req.body.email.toLowerCase()) {
+                    return res.status(500).send({
+                        'message': 'Email did not matched. Please check email address or logout from provider first and try again.'
+                    });
+                }
+
+                //Creating a JWT token for user session which is valid for 24 hrs.
+                let token = jwt.sign(user, process.env.APP_SECRET, {
+                    expiresIn: process.env.JWT_EXPIRES_IN
+                });
+
+                return res.status(200).send({
+                    user: user.safeModel(),
+                    role: user.role.name,
+                    token: token
+                });
+            });
         });
     });
 });
@@ -223,6 +282,22 @@ router.post('/updateUser', (req, res, next) => {
 });
 
 /**
+ * Get list of all the organizations.
+ */
+router.get('/getAllOrganizations', (req, res, next) => {
+    Users.getAllOrganizations((err, organizations, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (info) {
+            return res.status(200).send(info);
+        }
+
+        return res.status(200).send(organizations);
+    });
+});
+
+/**
  * Get list of all the users.
  */
 router.get('/getAllUsers', (req, res, next) => {
@@ -242,29 +317,16 @@ router.get('/getAllUsers', (req, res, next) => {
  * Get all providers. Accepts userId as parameter if user is organization admin.
  */
 router.get('/getAllProviders/:userId', (req, res, next) => {
-    if (req.params.userId && req.params.userId != 'undefined') {
-        Users.getUserProvider(req.params.userId, (err, providers, info) => {
-            if (err) {
-                return next(err);
-            }
-            if (!providers) {
-                return res.status(200).send(info);
-            }
+    Users.getAllProviders(req.params.userId, (err, providers, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (info) {
+            return res.status(200).send(info);
+        }
 
-            return res.status(200).send(providers);
-        });
-    } else {
-        Providers.getAllProviders((err, providers, info) => {
-            if (err) {
-                return next(err);
-            }
-            if (!providers) {
-                return res.status(200).send(info);
-            }
-
-            return res.status(200).send(providers);
-        });
-    }
+        return res.status(200).send(providers);
+    });
 });
 
 /**
@@ -560,78 +622,39 @@ router.post('/registerDetail', (req, res, next) => {
                 });
             }
 
-            let authToken = new Buffer(clientMetadata.client_id + ":" + clientMetadata.client_secret).toString("base64");
-            let tokenRequestOptions = {
-                method: 'POST',
-                url: discoveryMetadata.token_endpoint,
-                headers: {
-                    'authorization': 'Basic ' + authToken,
-                    'content-type': 'application/x-www-form-urlencoded'
-                },
-                form: {
-                    grant_type: 'authorization_code',
-                    code: clientInfo.code,
-                    redirect_uri: clientMetadata.redirect_uris[0]
-                }
-            };
-
-            request(tokenRequestOptions, function (error, response, body) {
-                if (error || !response) {
+            let data = {};
+            data.discoveryMetadata = discoveryMetadata;
+            data.client_id = clientMetadata.client_id;
+            data.client_secret = clientMetadata.client_secret;
+            data.redirect_uri = clientMetadata.redirect_uris[0];
+            data.code = clientInfo.code;
+            getUserClaims(data, res, function (error, userInfo) {
+                if (error) {
                     console.log(error);
+                    return res.status(406).send({
+                        'message': 'Unable to fetch metadata from Discovery URL. Please check Discovery URL.'
+                    });
+                }
+
+                if (!userInfo) {
                     return res.status(500).send({
                         'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                     });
                 }
 
-                let tokenMetadata = {};
-                try {
-                    tokenMetadata = JSON.parse(body);
-                } catch (exception) {
-                    console.log(exception.toString());
-                    return res.status(500).send({
-                        'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                    });
-                }
-
-                if (tokenMetadata.error) {
-                    return res.status(500).send({
-                        'message': tokenMetadata.error_description
-                    });
-                }
-
-                let userInfoOptions = {
-                    method: 'GET',
-                    url: discoveryMetadata.userinfo_endpoint,
-                    headers: {
-                        authorization: 'Bearer ' + tokenMetadata.access_token
-                    }
-                };
-
-                request(userInfoOptions, function (error, response, body) {
-                    if (error || !response) {
-                        console.log(error);
+                Roles.getRoleByName('orgadmin', (err, role, info) => {
+                    if (err || info) {
+                        console.log(err || info);
                         return res.status(500).send({
                             'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                         });
                     }
 
-                    let userInfo = {};
-                    try {
-                        userInfo = JSON.parse(body);
-                    } catch (exception) {
-                        console.log(exception.toString());
-                        return res.status(500).send({
-                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                        });
-                    }
-
-                    if (userInfo.error) {
-                        return res.status(500).send({
-                            'message': userInfo.error_description
-                        });
-                    }
-
-                    Roles.getRoleByName('orgadmin', (err, role, info) => {
+                    // Add organization if user not selected existing one.
+                    let organizationInfo = {};
+                    organizationInfo.isApproved = false;
+                    organizationInfo.name = providerInfo.organizationName;
+                    Organizations.addOrganization(organizationInfo, (err, organization, info) => {
                         if (err || info) {
                             console.log(err || info);
                             return res.status(500).send({
@@ -639,158 +662,222 @@ router.post('/registerDetail', (req, res, next) => {
                             });
                         }
 
-                        // Add organization if user not selected existing one.
-                        let organizationInfo = {};
-                        organizationInfo.isApproved = false;
-                        organizationInfo.name = providerInfo.organizationName;
-                        Organizations.addOrganization(organizationInfo, (err, organization, info) => {
+                        let data = {};
+                        data.organizationId = organization._id;
+                        data.personInfo = {};
+                        data.personInfo.email = providerInfo.email;
+                        data.personInfo.username = userInfo.username || providerInfo.email;
+                        data.personInfo.firstName = userInfo.given_name;
+                        data.personInfo.lastName = userInfo.family_name;
+                        data.personInfo.roleId = role._id;
+                        data.personInfo.isActive = true;
+                        data.providerInfo = {};
+                        data.providerInfo.name = providerInfo.organizationName;
+                        data.providerInfo.discoveryUrl = providerInfo.discoveryUrl;
+                        data.providerInfo.clientId = clientMetadata.client_id;
+                        data.providerInfo.clientSecret = clientMetadata.client_secret;
+                        data.providerInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
+                        data.providerInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
+                        data.providerInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
+                        data.providerInfo.isApproved = false;
+
+                        return addProviderAndUser(data, res);
+                    });
+                });
+
+                function addProviderAndUser(data, res) {
+                    // Add provider
+                    data.providerInfo.organizationId = data.organizationId;
+                    Providers.addProvider(data.providerInfo, (err, provider, info) => {
+                        if (err || info) {
+                            console.log(err || info);
+                            return deleteOrganization(data.organizationId, res);
+                        }
+
+                        // Add user
+                        data.personInfo.providerId = provider._id;
+                        data.personInfo.organizationId = data.organizationId;
+                        Users.createUser(data.personInfo, (err, user, info) => {
                             if (err || info) {
                                 console.log(err || info);
-                                return res.status(500).send({
-                                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                                });
+                                return deleteProviderAndOrg(provider._id, data.organizationId, res);
                             }
 
-                            let data = {};
-                            data.organizationId = organization._id;
-                            data.personInfo = {};
-                            data.personInfo.email = providerInfo.email;
-                            data.personInfo.username = userInfo.username || providerInfo.email;
-                            data.personInfo.firstName = userInfo.given_name;
-                            data.personInfo.lastName = userInfo.family_name;
-                            data.personInfo.roleId = role._id;
-                            data.personInfo.isActive = true;
-                            data.providerInfo = {};
-                            data.providerInfo.name = providerInfo.organizationName;
-                            data.providerInfo.discoveryUrl = providerInfo.discoveryUrl;
-                            data.providerInfo.clientId = clientMetadata.client_id;
-                            data.providerInfo.clientSecret = clientMetadata.client_secret;
-                            data.providerInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
-                            data.providerInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
-                            data.providerInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
-                            data.providerInfo.isApproved = false;
+                            // region Adding user to SCIM.
+                            let userDetail =
+                                {
+                                    'externalId': user._id,
+                                    'userName': user.username,
+                                    'name': {
+                                        'givenName': user.firstName,
+                                        'familyName': user.lastName
+                                    },
+                                    'displayName': user.firstName.concat(' ' + user.lastName).trim(),
+                                    'emails': [{
+                                        'value': user.email.toLowerCase(),
+                                        'type': 'work',
+                                        'primary': 'true'
+                                    }
+                                    ],
+                                    'userType': 'OrgAdmin',
+                                    'title': 'Organization Admin',
+                                    'active': 'true',
+                                    //'password': data.personInfo.password,
+                                    'roles': [{
+                                        'value': 'orgadmin'
+                                    }
+                                    ],
+                                    'entitlements': [{
+                                        'value': 'Access to manage organization and provider added by user.'
+                                    }
+                                    ],
+                                    'meta': {
+                                        'created': user.createdOn,
+                                        'lastModified': user.createdOn,
+                                        'version': user.__v,
+                                        'location': ''
+                                    }
+                                };
 
-                            return AddProviderAndUser(data, res);
+                            scim.addUser(userDetail).then(function (data) {
+                                return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
+                            }).catch(function (error) {
+                                console.log(error);
+                                return deleteUserProviderAndOrg(user._id, provider._id, data.organizationId, res);
+                            });
+                            // endregion
                         });
                     });
+                }
 
-                    function AddProviderAndUser(data, res) {
-                        // Add provider
-                        data.providerInfo.organizationId = data.organizationId;
-                        Providers.addProvider(data.providerInfo, (err, provider, info) => {
-                            if (err || info) {
-                                console.log(err || info);
-                                return deleteOrganization(data.organizationId, res);
-                            }
+                function deleteOrganization(orgId, res) {
+                    Organizations.removeOrganization(orgId, (err, organization, info) => {
+                        if (err || info) {
+                            console.log(err || info);
+                        }
 
-                            // Add user
-                            data.personInfo.providerId = provider._id;
-                            data.personInfo.organizationId = data.organizationId;
-                            Users.createUser(data.personInfo, (err, user, info) => {
-                                if (err || info) {
-                                    console.log(err || info);
-                                    return deleteProviderAndOrg(provider._id, data.organizationId, res);
-                                }
-
-                                // region Adding user to SCIM.
-                                let userDetail =
-                                    {
-                                        'externalId': user._id,
-                                        'userName': user.username,
-                                        'name': {
-                                            'givenName': user.firstName,
-                                            'familyName': user.lastName
-                                        },
-                                        'displayName': user.firstName.concat(' ' + user.lastName).trim(),
-                                        'emails': [{
-                                            'value': user.email.toLowerCase(),
-                                            'type': 'work',
-                                            'primary': 'true'
-                                        }
-                                        ],
-                                        'userType': 'OrgAdmin',
-                                        'title': 'Organization Admin',
-                                        'active': 'true',
-                                        //'password': data.personInfo.password,
-                                        'roles': [{
-                                            'value': 'orgadmin'
-                                        }
-                                        ],
-                                        'entitlements': [{
-                                            'value': 'Access to manage organization and provider added by user.'
-                                        }
-                                        ],
-                                        'meta': {
-                                            'created': user.createdOn,
-                                            'lastModified': user.createdOn,
-                                            'version': user.__v,
-                                            'location': ''
-                                        }
-                                    };
-
-                                scim.addUser(userDetail).then(function (data) {
-                                    return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
-                                }).catch(function (error) {
-                                    console.log(error);
-                                    return deleteUserProviderAndOrg(user._id, provider._id, data.organizationId, res);
-                                });
-                                // endregion
-                            });
+                        return res.status(500).send({
+                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                         });
-                    }
+                    });
+                }
 
-                    function deleteOrganization(orgId, res) {
-                        Organizations.removeOrganization(orgId, (err, organization, info) => {
-                            if (err || info) {
-                                console.log(err || info);
-                            }
-
+                function deleteProviderAndOrg(providerId, orgId, res) {
+                    Providers.removeProvider(providerId, (err, emptyProvider, info) => {
+                        if (err || info) {
+                            console.log(err || info);
                             return res.status(500).send({
                                 'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                             });
-                        });
-                    }
+                        }
 
-                    function deleteProviderAndOrg(providerId, orgId, res) {
-                        Providers.removeProvider(providerId, (err, emptyProvider, info) => {
-                            if (err || info) {
-                                console.log(err || info);
-                                return res.status(500).send({
-                                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                                });
-                            }
+                        return deleteOrganization(orgId, res);
+                    });
+                }
 
-                            return deleteOrganization(orgId, res);
-                        });
-                    }
+                function deleteUserProviderAndOrg(userId, providerId, orgId, res) {
+                    Users.removeUser(userId, (err, emptyUser, info) => {
+                        if (err || info) {
+                            console.log(err || info);
+                            return res.status(500).send({
+                                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                            });
+                        }
 
-                    function deleteUserProviderAndOrg(userId, providerId, orgId, res) {
-                        Users.removeUser(userId, (err, emptyUser, info) => {
-                            if (err || info) {
-                                console.log(err || info);
-                                return res.status(500).send({
-                                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                                });
-                            }
+                        return deleteProviderAndOrg(providerId, orgId, res);
+                    });
+                }
 
-                            return deleteProviderAndOrg(providerId, orgId, res);
-                        });
-                    }
+                function updateScimId(scimId, userId, providerId, orgId, res) {
+                    Users.updateScimId(userId, scimId, (err, user, info) => {
+                        if (err || info) {
+                            return deleteUserProviderAndOrg(userId, providerId, orgId, res);
+                        }
 
-                    function updateScimId(scimId, userId, providerId, orgId, res) {
-                        Users.updateScimId(userId, scimId, (err, user, info) => {
-                            if (err || info) {
-                                return deleteUserProviderAndOrg(userId, providerId, orgId, res);
-                            }
-
-                            return res.status(200).send(user);
-                        });
-                    }
-                });
+                        return res.status(200).send(user);
+                    });
+                }
             });
         });
     });
 });
+
+function getUserClaims(data, res, callback) {
+    let authToken = new Buffer(data.client_id + ":" + data.client_secret).toString("base64");
+    let tokenRequestOptions = {
+        method: 'POST',
+        url: data.discoveryMetadata.token_endpoint,
+        headers: {
+            'authorization': 'Basic ' + authToken,
+            'content-type': 'application/x-www-form-urlencoded'
+        },
+        form: {
+            grant_type: 'authorization_code',
+            code: data.code,
+            redirect_uri: data.redirect_uri
+        }
+    };
+
+    request(tokenRequestOptions, function (error, response, body) {
+        if (error || !response) {
+            console.log(error);
+            return res.status(500).send({
+                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+            });
+        }
+
+        let tokenMetadata = {};
+        try {
+            tokenMetadata = JSON.parse(body);
+        } catch (exception) {
+            console.log(exception.toString());
+            return res.status(500).send({
+                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+            });
+        }
+
+        if (tokenMetadata.error) {
+            return res.status(500).send({
+                'message': tokenMetadata.error_description
+            });
+        }
+
+        let userInfoOptions = {
+            method: 'GET',
+            url: data.discoveryMetadata.userinfo_endpoint,
+            headers: {
+                authorization: 'Bearer ' + tokenMetadata.access_token
+            }
+        };
+
+        request(userInfoOptions, function (error, response, body) {
+            if (error || !response) {
+                console.log(error);
+                return res.status(500).send({
+                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            let userInfo = {};
+            try {
+                userInfo = JSON.parse(body);
+            } catch (exception) {
+                console.log(exception.toString());
+                return res.status(500).send({
+                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            if (userInfo.error) {
+                return res.status(500).send({
+                    'message': userInfo.error_description
+                });
+            }
+
+            return callback(error, userInfo);
+        });
+    });
+}
 
 function generateString(length) {
     var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";

@@ -1,6 +1,7 @@
 "use strict";
 
-const User = require('../models/user');
+const User = require('../models/user'),
+    Roles = require('../helpers/roles');
 
 /**
  * Callback function for all the export functions.
@@ -174,7 +175,7 @@ let updatePassword = (req, done) => {
                         if (err)
                             return done(err);
 
-                         return done(null, user);
+                        return done(null, user);
                     });
                 }
             }
@@ -246,7 +247,7 @@ let removeUser = (id, done) => {
 
 /**
  * Get user detail.
- * @param {object} email - Request json object
+ * @param {object} req - Request json object
  * @param {requestCallback} done - Callback function that returns error, object or info
  */
 let getUser = (req, done) => {
@@ -280,18 +281,59 @@ let getUser = (req, done) => {
  */
 let getAllUsers = (done) => {
     process.nextTick(() => {
-        User.find().sort({
-            firstName: 1
-        }).select('-password').populate('role organization provider')
-            .exec(function (err, users) {
-                if (err) {
-                    done(err);
-                } else if (users.length) {
-                    done(null, users);
-                } else {
-                    done(null, null, 'No records found');
-                }
-            });
+        Roles.getRoleByName('admin', (err, role, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!role) {
+                return res.status(200).send(JSON.stringify({data: [], message: info}));
+            }
+
+            User.find({role: {$ne: role._id}})
+                .populate('role organization provider')
+                .exec(function (err, users) {
+                    if (err) {
+                        return done(err);
+                    }
+                    if (users.length) {
+                        return done(null, users);
+                    }
+                    return done(null, null, 'No records found');
+                });
+        });
+    });
+};
+
+/**
+ * Get list of all the organizations.
+ * @param {requestCallback} done - Callback function that returns error, object or info
+ */
+let getAllOrganizations = (done) => {
+    process.nextTick(() => {
+        Roles.getRoleByName('admin', (err, role, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!role) {
+                return res.status(200).send(JSON.stringify({data: [], message: info}));
+            }
+
+            User.find({role: {$ne: role._id}}, 'organization')
+                .populate('organization')
+                .exec(function (err, users) {
+                    if (err) {
+                        return done(err);
+                    }
+                    if (users.length) {
+                        let organizations = [];
+                        users.forEach(function (user) {
+                            organizations.push(user.organization);
+                        });
+                        return done(null, organizations);
+                    }
+                    return done(null, null, 'No records found');
+                });
+        });
     });
 };
 
@@ -300,22 +342,38 @@ let getAllUsers = (done) => {
  * @param {ObjectId} userId - Org admin user id.
  * @param {requestCallback} done - Callback function that returns error, object or info.
  */
-let getUserProvider = (userId, done) => {
-    User.findOne({
-        '_id': userId
-    }).populate('provider').sort({name: 'asc'}).exec(function (err, user) {
-        if (err)
-            return done(err);
-
-        if (!user) {
-            return done(null, false, {
-                'message': 'There is no provider associated with the user.'
-            });
-        } else {
-            var providers = [];
-            providers.push(user.provider);
-            return done(null, providers);
+let getAllProviders = (userId, done) => {
+    Roles.getRoleByName('admin', (err, role, info) => {
+        if (err) {
+            return next(err);
         }
+        if (!role) {
+            return res.status(200).send(JSON.stringify({data: [], message: info}));
+        }
+        let queryCondition = {};
+
+        queryCondition['role'] = {$ne: role._id};
+        if (userId && userId !== 'undefined') {
+            queryCondition['_id'] = userId;
+        }
+
+        User.find(queryCondition, 'provider organization')
+            .populate('provider organization')
+            .exec(function (err, users) {
+                if (err) {
+                    return done(err);
+                }
+                if (users.length) {
+                    let providers = [];
+                    users.forEach(function (user) {
+                        let provider = user.provider;
+                        provider.organization = user.organization;
+                        providers.push(provider);
+                    });
+                    return done(null, providers);
+                }
+                return done(null, null, 'No records found');
+            });
     });
 };
 
@@ -324,7 +382,8 @@ module.exports = {
     authenticateUser,
     getUser,
     getAllUsers,
-    getUserProvider,
+    getAllOrganizations,
+    getAllProviders,
     updateUser,
     updatePassword,
     updateScimId,

@@ -6,24 +6,6 @@ const express = require('express'),
     Organizations = require('../helpers/organizations');
 
 /**
- * Get all active organizations
- */
-router.get('/getAllOrganizations', (req, res, next) => {
-    Organizations.getAllOrganizations((err, organization, info) => {
-        if (err) {
-            return res.status(500).send({
-                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-            });
-        }
-        if (!organization) {
-            return res.status(200).send(info);
-        }
-
-        return res.status(200).send(organization);
-    });
-});
-
-/**
  * Update organization
  */
  router.post('/updateOrganization', (req, res, next) => {

@@ -13,10 +13,8 @@
       updatePassword: updatePassword
     };
 
-    function login(email, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/login", {
-        email: email
-      }).success(onSuccess).catch(onError);
+    function login(authDetail, onSuccess, onError) {
+      return $http.post(urls.BASE_API + "/login", authDetail).success(onSuccess).catch(onError);
     }
 
     function validateEmail(email, onSuccess, onError) {

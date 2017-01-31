@@ -20,7 +20,8 @@
         if (vm.params.error) {
           toastr.error(vm.params.error_description, 'Sign Up', {});
         } else {
-          loginService.login(vm.email, onSuccess, onError);
+          $localStorage.authDetail.code = vm.params.code;
+          loginService.login($localStorage.authDetail, onSuccess, onError);
         }
       }
 
