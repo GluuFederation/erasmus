@@ -26,21 +26,25 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="federation in vm.displayedCollection track by $index" class="editable-row">
+                    <tr ng-repeat="federation in vm.displayedCollection" class="editable-row">
                         <td style="display: none;"></td>
                         <td class="col-lg-6">
-                <span editable-text="federation.name" e-name="name" e-form="federationForm"
-                      onbeforesave="vm.validateName($data)"
-                      e-required>{{federation.name}}</span>
+                            <span editable-text="federation.name" e-name="name" e-form="federationForm"
+                                  onbeforesave="vm.validateName($data)" e-required>
+                                {{federation.name}}
+                            </span>
                         </td>
                         <td>
-                            <input type="checkbox" title="Is Active" disabled ng-checked="federation.isActive"/>
+                            <span editable-checkbox="federation.isActive" e-name="isActive" e-form="federationForm">
+                                <span class="fa fa-check" ng-if="federation.isActive"></span>
+                                <span class="fa fa-close" ng-if="!federation.isActive"></span>
+                            </span>
                         </td>
                         <td>
                             <form editable-form name="federationForm" ng-show="federationForm.$visible"
-                                  onbeforesave="vm.updateFederation($data, federation)"
+                                  onbeforesave="vm.saveFederation($data, federation)"
                                   class="form-buttons form-inline"
-                                  shown="inserted == federation">
+                                  shown="vm.inserted == federation">
                                 <button type="submit" style="margin: 0px 5px;" ng-disabled="federationForm.$waiting"
                                         class="btn btn-success btn-icon" title="Save">
                                     <i class="ion-ios-checkmark-outline"></i>
