@@ -27,6 +27,7 @@ router.get('/getAllFederations', (req, res, next) => {
  * Create federation
  */
 router.post('/addFederation', (req, res, next) => {
+
     Federations.addFederation(req.body, (err, federation, info) => {
         if (err) {
             if(err.code === 11000) {
@@ -44,7 +45,36 @@ router.post('/addFederation', (req, res, next) => {
             return res.status(406).send(info);
         }
 
-        return res.status(200).send(federation);
+        const options = {
+            method: 'POST',
+            url: process.env.OTTO_BASE_URL + '/federations',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: {name: req.body.name},
+            json: true
+        };
+
+        request(options, (error, response, body) => {
+            if (error) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            if (!response) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            let resValues = body['@id'].split('/');
+            let ottoId = resValues[resValues.length - 1];
+            federation.ottoId = ottoId;
+            return federation.save()
+                .then((savedFederation) => res.status(200).send(federation))
+                .catch(() => res.status(500).send({ 'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'}));
+        });
     });
 });
 
@@ -64,7 +94,7 @@ router.post('/addFederation', (req, res, next) => {
                 return res.status(406).send({
                     'message': 'Federation with same name is already exists. Please try different name.'
                 });
-            } else{
+            } else {
                 return res.status(500).send({
                     'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                 })
@@ -75,7 +105,31 @@ router.post('/addFederation', (req, res, next) => {
             return res.status(406).send(info);
         }
 
-        return res.status(200).send(federation);
+        const options = {
+            method: 'PUT',
+            url: process.env.OTTO_BASE_URL + '/federations/' + federation.ottoId,
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: {name: req.body.name},
+            json: true
+        };
+
+        request(options, (error, response, body) => {
+            if (error) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            if (!response) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            return res.status(200).send(federation);
+        });
     });
 });
 
@@ -98,8 +152,30 @@ router.delete('/removeFederation/:federationId', (req, res, next) => {
         if (!federation) {
             return res.status(406).send(info);
         }
+        const options = {
+            method: 'DELETE',
+            url: process.env.OTTO_BASE_URL + '/federations/' + federation.ottoId,
+            headers: {
+                'content-type': 'application/json'
+            },
+            json: true
+        };
 
-        return res.status(200).send(federation);
+        request(options, (error, response, body) => {
+            if (error) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            if (!response) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            return res.status(200).send(federation);
+        });
     });
 });
 

@@ -16,11 +16,6 @@
         }
 
         function removeFederation(fedData) {
-            if (fedData.isActive === true) {
-                toastr.error('You can not remove already approved federation.', 'Federation', {});
-                return null;
-            }
-
             var deleteFederation = confirm('Are you sure you want to remove this federation?');
             if (!deleteFederation) {
                 return null;
@@ -68,21 +63,21 @@
         }
 
         function loadAddForm() {
-            vm.nFederation = {
+            vm.inserted = {
                 name: '',
                 isActive: true
-            }
-            vm.federations.push(vm.nFederation);
+            };
+            vm.federations.push(vm.inserted);
+            vm.displayedCollection = angular.copy(vm.federations);
         }
 
-        function updateFederation(data, fedData) {
-            if (fedData.isActive === true) {
-                toastr.error('You can not modify data of already approved federation.', 'Federation', {});
-                return null;
+        function saveFederation(data, fedData) {
+            if (fedData._id == null) {
+                federationService.addFederation(data, onSuccess, onError);
+            } else {
+                angular.extend(data, {_id: fedData._id});
+                federationService.updateFederation(data, onSuccess, onError);
             }
-
-            angular.extend(data, {_id: fedData._id});
-            federationService.updateFederation(data, onSuccess, onError);
 
             function onSuccess(response) {
                 toastr.success('Saved successfully', 'Federation', {});
@@ -94,12 +89,16 @@
             }
         }
 
+        /*editableOptions.theme = 'bs3';
+        editableThemes['bs3'].submitTpl = '<button type="submit" class="btn btn-primary btn-with-icon"><i class="ion-checkmark-round"></i></button>';
+        editableThemes['bs3'].cancelTpl = '<button type="button" ng-click="$form.$cancel()" class="btn btn-default btn-with-icon"><i class="ion-close-round"></i></button>';*/
+
         //Export the modules for view.
         vm.validateName = validateName;
         vm.addFederation = addFederation;
         vm.removeFederation = removeFederation;
         vm.getAllFederations = getAllFederations;
-        vm.updateFederation = updateFederation;
+        vm.saveFederation = saveFederation;
         vm.loadAddForm = loadAddForm;
         vm.getAllFederations();
     }

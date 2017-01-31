@@ -16,7 +16,7 @@
         roles: ['admin'],
         authenticate: true,
         sidebarMeta: {
-          icon: 'fa fa-users',
+          icon: 'fa fa-building',
           order: 2
         }
       });

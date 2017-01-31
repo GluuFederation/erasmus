@@ -9,6 +9,9 @@ const federationSchema = mongoose.Schema({
         required: true,
         unique: true
     },
+    ottoId: {
+        type: mongoose.Schema.Types.ObjectId
+    },
     isActive: {
         type: Boolean,
         default: false

@@ -39,17 +39,42 @@ router.get('/getAllOrganizations', (req, res, next) => {
                 return res.status(406).send({
                     'message': 'Organization with same name is already exists. Please try different name.'
                 });
-            } else{
+            } else {
                 return res.status(500).send({
                     'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                 })
             }
         }
+
         if (!organization) {
             return res.status(406).send(info);
         }
 
-        return res.status(200).send(organization);
+        const options = {
+            method: 'PUT',
+            url: process.env.OTTO_BASE_URL + '/organization/' + organization.ottoId,
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: {name: req.body.name},
+            json: true
+        };
+
+        request(options, (error, response, body) => {
+            if (error) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            if (!response) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            return res.status(200).send(organization);
+        });
     });
 });
 
@@ -73,7 +98,30 @@ router.delete('/removeOrganization/:organizationId', (req, res, next) => {
             return res.status(406).send(info);
         }
 
-        return res.status(200).send(organization);
+        const options = {
+            method: 'DELETE',
+            url: process.env.OTTO_BASE_URL + '/organization/' + organization.ottoId,
+            headers: {
+                'content-type': 'application/json'
+            },
+            json: true
+        };
+
+        request(options, (error, response, body) => {
+            if (error) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            if (!response) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            return res.status(200).send(organization);
+        });
     });
 });
 
