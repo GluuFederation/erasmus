@@ -21,8 +21,8 @@
       return $http.post(urls.BASE_API + "/updateOrganization", formData).then(onSuccess).catch(onError);
     }
 
-    function approveOrganization(orgId, onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/approveOrganization/" + orgId).then(onSuccess).catch(onError);
+    function approveOrganization(formData, onSuccess, onError) {
+      return $http.post(urls.BASE_API + "/approveOrganization", formData).then(onSuccess).catch(onError);
     }
 
     function getAllOrganizations(onSuccess, onError) {

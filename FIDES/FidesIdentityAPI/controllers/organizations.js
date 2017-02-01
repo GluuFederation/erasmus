@@ -21,17 +21,42 @@ const express = require('express'),
                 return res.status(406).send({
                     'message': 'Organization with same name is already exists. Please try different name.'
                 });
-            } else{
+            } else {
                 return res.status(500).send({
                     'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                 })
             }
         }
+
         if (!organization) {
             return res.status(406).send(info);
         }
 
-        return res.status(200).send(organization);
+        const options = {
+            method: 'PUT',
+            url: process.env.OTTO_BASE_URL + '/organization/' + organization.ottoId,
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: {name: req.body.name},
+            json: true
+        };
+
+        request(options, (error, response, body) => {
+            if (error) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            if (!response) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            return res.status(200).send(organization);
+        });
     });
 });
 
@@ -55,21 +80,44 @@ router.delete('/removeOrganization/:organizationId', (req, res, next) => {
             return res.status(406).send(info);
         }
 
-        return res.status(200).send(organization);
+        const options = {
+            method: 'DELETE',
+            url: process.env.OTTO_BASE_URL + '/organization/' + organization.ottoId,
+            headers: {
+                'content-type': 'application/json'
+            },
+            json: true
+        };
+
+        request(options, (error, response, body) => {
+            if (error) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            if (!response) {
+                return res.status(500).send({
+                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                });
+            }
+
+            return res.status(200).send(organization);
+        });
     });
 });
 
 /**
  * Approve organization
  */
-router.get('/approveOrganization/:organizationId', (req, res, next) => {
-    if (!req.params.organizationId) {
+router.post('/approveOrganization', (req, res, next) => {
+    if (!req.body.organizationId) {
         return res.status(406).send({
             'message': 'Please provide id.'
         });
     }
 
-    Organizations.getOrganizationById(req.params.organizationId, (err, organization, info) => {
+    Organizations.getOrganizationById(req.body.organizationId, (err, organization, info) => {
         if (err) {
             return res.status(500).send({
                 'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
@@ -89,7 +137,7 @@ router.get('/approveOrganization/:organizationId', (req, res, next) => {
             "name": organization.name
         };
 
-        var options = {
+        let options = {
             method: 'POST',
             url: process.env.OTTO_BASE_URL + "/organization",
             headers: {
@@ -113,19 +161,45 @@ router.get('/approveOrganization/:organizationId', (req, res, next) => {
             }
 
             let resValues = body['@id'].split('/');
-            let ottoId = resValues[resValues.length - 1];
+            let organizationOttoId = resValues[resValues.length - 1];
+            let federationOttoId = req.body.federationOttoId;
 
-            Organizations.approveOrganization(req.params.organizationId, ottoId, (err, organization, info) => {
-                if (err) {
+            // link organization with federation
+            options = {
+                method: 'POST',
+                url: process.env.OTTO_BASE_URL + "/organization/" + organizationOttoId + "/federation/" + federationOttoId,
+                headers: {
+                    'content-type': 'application/json'
+                },
+                json: true
+            };
+
+            request(options, function (error, response, body) {
+                if (error) {
                     return res.status(500).send({
                         'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                     });
                 }
-                if (!organization) {
-                    return res.status(406).send(info);
+
+                if (!response) {
+                    return res.status(500).send({
+                        'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    });
                 }
 
-                return res.status(200).send(organization);
+                Organizations.approveOrganization(req.body.organizationId, organizationOttoId, req.body.federationId , (err, organization, info) => {
+                    if (err) {
+                        return res.status(500).send({
+                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                        });
+                    }
+
+                    if (!organization) {
+                        return res.status(406).send(info);
+                    }
+
+                    return res.status(200).send(organization);
+                });
             });
         });
     });

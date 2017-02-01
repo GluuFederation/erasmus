@@ -14,6 +14,10 @@ const organizationSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: false,
     },
+    federationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Federation"
+    },
     isApproved: {
         type: Boolean,
         default: false
@@ -27,6 +31,15 @@ const organizationSchema = mongoose.Schema({
         default: new Date()
     }
 });
+
+organizationSchema.pre('findOne', populateFederation);
+organizationSchema.pre('findById', populateFederation);
+organizationSchema.pre('find', populateFederation);
+
+function populateFederation() {
+    this.populate('federationId');
+    return this;
+}
 
 // create the model for organizations and expose it to our app
 module.exports = mongoose.model('Organization', organizationSchema);

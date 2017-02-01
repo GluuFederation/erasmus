@@ -1,0 +1,79 @@
+<div class="widgets">
+    <div class="row">
+        <div class="col-lg-8 col-md-8">
+            <div ba-panel ba-panel-class="with-scroll">
+                <div class="add-row-editable-table">
+                    <button class="btn btn-primary" ng-click="vm.loadAddForm()">Add</button>
+                </div>
+                <table st-safe-src="vm.federations" st-table="vm.displayedCollection"
+                       class="table table-hover table-condensed">
+                    <thead>
+                    <tr class="sortable">
+                        <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
+                        <th class="col-lg-6" st-sort="name">Name</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                    <tr>
+                        <th style="display: none;"></th>
+                        <th colspan="3" ng-show="vm.federations">
+                            <input st-search="name" placeholder="Search"
+                                   class="input-sm form-control search-input col-lg-6"
+                                   type="search"/></th>
+                        <th colspan="3" ng-show="!vm.federations" style="color: #e85656;">There are no records to
+                            display.
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="federation in vm.displayedCollection" class="editable-row">
+                        <td style="display: none;"></td>
+                        <td class="col-lg-6">
+                            <span editable-text="federation.name" e-name="name" e-form="federationForm"
+                                  onbeforesave="vm.validateName($data)" e-required>
+                                {{federation.name}}
+                            </span>
+                        </td>
+                        <td>
+                            <span editable-checkbox="federation.isActive" e-name="isActive" e-form="federationForm">
+                                <span class="fa fa-check" ng-if="federation.isActive"></span>
+                                <span class="fa fa-close" ng-if="!federation.isActive"></span>
+                            </span>
+                        </td>
+                        <td>
+                            <form editable-form name="federationForm" ng-show="federationForm.$visible"
+                                  onbeforesave="vm.saveFederation($data, federation)"
+                                  class="form-buttons form-inline"
+                                  shown="vm.inserted == federation">
+                                <button type="submit" style="margin: 0px 5px;" ng-disabled="federationForm.$waiting"
+                                        class="btn btn-success btn-icon" title="Save">
+                                    <i class="ion-ios-checkmark-outline"></i>
+                                </button>
+                                <button type="button" style="margin: 0px 5px;" ng-disabled="federationForm.$waiting"
+                                        ng-click="federationForm.$cancel()"
+                                        class="btn btn-default btn-icon" title="Cancel">
+                                    <i class="ion-ios-close-outline"></i>
+                                </button>
+                            </form>
+                            <div class="buttons" ng-show="!federationForm.$visible">
+                                <button style="margin: 0px 5px;" class="btn btn-primary btn-icon"
+                                        ng-click="federationForm.$show()" title="Edit"><i class="ion-edit"></i></button>
+                                <button style="margin: 0px 5px;" class="btn btn-danger btn-icon"
+                                        ng-click="vm.removeFederation(federation)" title="Delete"><i
+                                        class="ion-android-delete"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

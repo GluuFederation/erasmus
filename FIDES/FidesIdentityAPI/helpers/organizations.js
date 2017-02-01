@@ -195,7 +195,7 @@ let removeOrganization = (orgId, done) => {
  * @param {requestCallback} done - Callback function that returns error, object or info
  * @returns {Object} info - Object with information message.
  */
-let approveOrganization = (orgId, ottoId, done) => {
+let approveOrganization = (orgId, ottoId, fedId, done) => {
     if(!ottoId){
         return done(null, false, {
             'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
@@ -216,6 +216,7 @@ let approveOrganization = (orgId, ottoId, done) => {
                 });
             } else {
                 objOrganization.ottoId = ottoId;
+                objOrganization.federationId = fedId;
                 objOrganization.isApproved = true;
                 objOrganization.save(err => {
                     if (err)

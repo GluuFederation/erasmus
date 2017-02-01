@@ -6,6 +6,7 @@
 
     'FidesWebApplication.pages.home',
     'FidesWebApplication.pages.user',
+    'FidesWebApplication.pages.federation',
     'FidesWebApplication.pages.organization',
     'FidesWebApplication.pages.provider',
     'FidesWebApplication.pages.login',
