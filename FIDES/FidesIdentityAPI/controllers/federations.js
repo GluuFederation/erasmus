@@ -2,86 +2,80 @@
 
 const express = require('express'),
     router = express.Router(),
-    request = require('request'),
+    request = require('request-promise'),
+    common = require('../helpers/common'),
+    httpStatus = require('http-status'),
     Federations = require('../helpers/federations');
 
 /**
  * Get all active federations
  */
 router.get('/getAllFederations', (req, res, next) => {
-    Federations.getAllFederations((err, federation, info) => {
-        if (err) {
-            return res.status(500).send({
-                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-            });
-        }
-        if (!federation) {
-            return res.status(200).send(info);
-        }
-
-        return res.status(200).send(federation);
-    });
+    Federations.getAllFederations()
+        .then((federation) => {
+            if (!federation) {
+                return res.status(200).send({message: common.message.INTERNAL_SERVER_ERROR});
+            }
+            return res.status(200).send(federation);
+        })
+        .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+            err: err,
+            message: common.message.INTERNAL_SERVER_ERROR
+        }));
 });
 
 /**
  * Create federation
  */
 router.post('/addFederation', (req, res, next) => {
+    Federations.addFederation(req.body)
+        .then((federation) => {
+            const options = {
+                method: 'POST',
+                uri: process.env.OTTO_BASE_URL + '/federations',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: {name: req.body.name},
+                json: true,
+                resolveWithFullResponse: true
+            };
 
-    Federations.addFederation(req.body, (err, federation, info) => {
-        if (err) {
-            if(err.code === 11000) {
-                return res.status(406).send({
-                    'message': 'Federation with same name is already exists. Please try different name.'
-                });
-            } else{
-                return res.status(500).send({
-                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+            request(options)
+                .then((response) => {
+                    if (!response) {
+                        return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+                            message: common.message.INTERNAL_SERVER_ERROR
+                        });
+                    }
+
+                    let resValues = response.body['@id'].split('/');
+                    let ottoId = resValues[resValues.length - 1];
+                    federation.ottoId = ottoId;
+                    return federation.save()
+                        .then((savedFederation) => res.status(httpStatus.OK).send(federation))
+                        .catch(() => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: common.message.INTERNAL_SERVER_ERROR}));
                 })
+                .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+                    err: err,
+                    message: common.message.INTERNAL_SERVER_ERROR
+                }));
+        })
+        .catch((err) => {
+            if (err.code === 11000) {
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE});
             }
-        }
-
-        if (!federation) {
-            return res.status(406).send(info);
-        }
-
-        const options = {
-            method: 'POST',
-            url: process.env.OTTO_BASE_URL + '/federations',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: {name: req.body.name},
-            json: true
-        };
-
-        request(options, (error, response, body) => {
-            if (error) {
-                return res.status(500).send({
-                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                });
-            }
-
-            if (!response) {
-                return res.status(500).send({
-                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                });
-            }
-
-            let resValues = body['@id'].split('/');
-            let ottoId = resValues[resValues.length - 1];
-            federation.ottoId = ottoId;
-            return federation.save()
-                .then((savedFederation) => res.status(200).send(federation))
-                .catch(() => res.status(500).send({ 'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'}));
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+                err: err,
+                message: common.message.INTERNAL_SERVER_ERROR
+            });
         });
-    });
 });
 
 /**
  * Update federation
  */
- router.put('/updateFederation', (req, res, next) => {
+router.put('/updateFederation', (req, res, next) => {
     if (!req.body._id) {
         return res.status(406).send({
             'message': 'Please provide id.'
@@ -90,7 +84,7 @@ router.post('/addFederation', (req, res, next) => {
 
     Federations.updateFederation(req.body, (err, federation, info) => {
         if (err) {
-            if(err.code === 11000) {
+            if (err.code === 11000) {
                 return res.status(406).send({
                     'message': 'Federation with same name is already exists. Please try different name.'
                 });

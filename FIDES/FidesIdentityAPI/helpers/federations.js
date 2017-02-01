@@ -3,31 +3,16 @@
 const Federation = require('../models/federation');
 
 /**
- * Callback function for all the export functions.
- * @callback requestCallback
- * @param {Error} error - Error information from base function.
- * @param {Object} [data] - Data from base function.
- * @param {Object} [info] - Message from base function if object not found.
- */
-
-/**
  * Get all active federations
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {federations} - return all federations
+ * @return {err} - return error
  */
-let getAllFederations = (done) => {
+let getAllFederations = () => {
     return Federation
         .find({})
         .sort({name: 1})
-        .exec((err, federations) => {
-            if (err)
-                return done(err);
-            else {
-                if (federations.length) {
-                    return done(null, federations);
-                }
-                return done(null, null, {message: 'No records found'});
-            }
-        });
+        .exec((federations) => federations)
+        .catch((err) => err);
 };
 
 /**
@@ -73,34 +58,16 @@ let getFederationByName = (orgName, done) => {
 /**
  * Add federation
  * @param {object} req - Request json object
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {}
  */
-let addFederation = (req, done) => {
-    return Federation
-        .findOne({name: req.name})
-        .exec((err, federation) => {
-            if (err)
-                return done(err);
+let addFederation = (req) => {
+    let oFederation = new Federation();
+    oFederation.name = req.name;
+    oFederation.isActive = req.isActive || false;
 
-            // check if already exists or not
-            if (federation != null) {
-                return done(null, false, {
-                    'message': 'Federation is already exists and may not be approved yet.'
-                });
-            } else {
-                let objFederation = new Federation();
-
-                objFederation.name = req.name;
-                objFederation.isActive = req.isActive || false;
-
-                objFederation.save(err => {
-                    if (err)
-                        return done(err);
-
-                    return done(null, objFederation);
-                });
-            }
-        });
+    return oFederation.save()
+        .then(federation => federation)
+        .catch(err => err);
 };
 
 /**

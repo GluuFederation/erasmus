@@ -49,19 +49,6 @@
             }
         }
 
-        function addFederation(data, fedData) {
-            federationService.addFederation(data, onSuccess, onError);
-
-            function onSuccess(response) {
-                toastr.success('Saved successfully', 'Federation', {});
-            }
-
-            function onError(error) {
-                fedData.name = name;
-                toastr.error(error.data.message, 'Federation', {})
-            }
-        }
-
         function loadAddForm() {
             if(!vm.federations){
               vm.federations = [];
@@ -84,6 +71,7 @@
             }
 
             function onSuccess(response) {
+                vm.inserted._id = response.data._id;
                 toastr.success('Saved successfully', 'Federation', {});
             }
 
@@ -93,17 +81,23 @@
             }
         }
 
+        function cancelForm(federationForm) {
+            vm.federations.pop();
+            vm.displayedCollection = angular.copy(vm.federations);
+            federationForm.$cancel();
+        }
         /*editableOptions.theme = 'bs3';
         editableThemes['bs3'].submitTpl = '<button type="submit" class="btn btn-primary btn-with-icon"><i class="ion-checkmark-round"></i></button>';
         editableThemes['bs3'].cancelTpl = '<button type="button" ng-click="$form.$cancel()" class="btn btn-default btn-with-icon"><i class="ion-close-round"></i></button>';*/
 
         //Export the modules for view.
         vm.validateName = validateName;
-        vm.addFederation = addFederation;
         vm.removeFederation = removeFederation;
         vm.getAllFederations = getAllFederations;
         vm.saveFederation = saveFederation;
         vm.loadAddForm = loadAddForm;
+        vm.cancelForm = cancelForm;
+
         vm.getAllFederations();
     }
 })();
