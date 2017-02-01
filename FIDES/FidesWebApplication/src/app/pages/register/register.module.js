@@ -19,8 +19,8 @@
       rewriteLinks: true
     });
   }).constant('urls', {
-      BASE: 'http://192.168.200.70:3000',
-      AUTH_URL: 'http://192.168.200.70:3000/login.html',
-      BASE_API: 'http://192.168.200.70:8000'
+      BASE: 'http://localhost:3000',
+      AUTH_URL: 'http://localhost:3000/login.html',
+      BASE_API: 'http://localhost:8000'
     });
 })();
