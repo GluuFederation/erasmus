@@ -402,117 +402,115 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
         });
     }
 
-    Organizations.getOrganizationByName(providerInfo.organizationName, (err, organization) => {
-        if (err) {
-            return next(err);
-        }
+    Organizations.getOrganizationByName(providerInfo.organizationName)
+        .then((organization) => {
 
-        let isExists = !!organization;
-        if (isExists) {
-            return res.status(406).send({
-                'message': 'Organization is already exists.'
-            });
-        }
-
-        Users.getUser({email: providerInfo.email}, (err, user) => {
-            if (err) {
-                return next(err);
-            }
-
-            let isExists = !!user;
+            let isExists = !!organization;
             if (isExists) {
                 return res.status(406).send({
-                    'message': 'Email is already exists.'
+                    'message': 'Organization is already exists.'
                 });
             }
 
-            Providers.getProviderByUrl(providerInfo.discoveryUrl, (err, provider) => {
+            Users.getUser({email: providerInfo.email}, (err, user) => {
                 if (err) {
                     return next(err);
                 }
 
-                let isExists = !!provider;
+                let isExists = !!user;
                 if (isExists) {
                     return res.status(406).send({
-                        'message': 'Provider is already exists.'
+                        'message': 'Email is already exists.'
                     });
                 }
 
-                request.get(providerInfo.discoveryUrl, function (error, response, body) {
-                    if (error) {
-                        console.log(error);
+                Providers.getProviderByUrl(providerInfo.discoveryUrl, (err, provider) => {
+                    if (err) {
+                        return next(err);
+                    }
+
+                    let isExists = !!provider;
+                    if (isExists) {
                         return res.status(406).send({
-                            'message': 'Unable to fetch metadata from Discovery URL. Please check Discovery URL.'
+                            'message': 'Provider is already exists.'
                         });
                     }
 
-                    let discoveryJson = {};
-                    if (!response) {
-                        return res.status(406).send({
-                            'message': 'Metadata not found from Discovery URL. Please check Discovery URL.'
-                        });
-                    }
-
-                    try {
-                        discoveryJson = JSON.parse(body);
-                    } catch (exception) {
-                        console.log(exception.toString());
-                        return res.status(406).send({
-                            'message': 'Discovery URL is invalid. Please check and correct it.'
-                        });
-                    }
-
-                    var client = {
-                        redirect_uris: providerInfo.redirectUrls,
-                        application_type: "native",
-                        client_name: providerInfo.organizationName,
-                        token_endpoint_auth_method: "client_secret_basic",
-                        scopes: discoveryJson.scopes_supported
-                    };
-
-                    var options = {
-                        method: 'POST',
-                        url: discoveryJson.registration_endpoint,
-                        body: JSON.stringify(client)
-                    };
-
-                    request(options, function (error, response, body) {
-                        if (error || !response) {
+                    request.get(providerInfo.discoveryUrl, function (error, response, body) {
+                        if (error) {
                             console.log(error);
                             return res.status(406).send({
-                                'message': 'Unable to register client. Please try after some time.'
+                                'message': 'Unable to fetch metadata from Discovery URL. Please check Discovery URL.'
                             });
                         }
 
-                        var clientJson = {};
+                        let discoveryJson = {};
+                        if (!response) {
+                            return res.status(406).send({
+                                'message': 'Metadata not found from Discovery URL. Please check Discovery URL.'
+                            });
+                        }
+
                         try {
-                            clientJson = JSON.parse(body);
+                            discoveryJson = JSON.parse(body);
                         } catch (exception) {
                             console.log(exception.toString());
                             return res.status(406).send({
-                                'message': 'Unable to register client due to invalid response. Please try after some time.'
+                                'message': 'Discovery URL is invalid. Please check and correct it.'
                             });
                         }
 
-                        if (clientJson.error) {
-                            return res.status(500).send({
-                                'message': clientJson.error_description
-                            });
-                        }
+                        var client = {
+                            redirect_uris: providerInfo.redirectUrls,
+                            application_type: "native",
+                            client_name: providerInfo.organizationName,
+                            token_endpoint_auth_method: "client_secret_basic",
+                            scopes: discoveryJson.scopes_supported
+                        };
 
-                        var state = generateString(16);
-                        var authEndpoint = discoveryJson.authorization_endpoint.concat('?redirect_uri=').concat(clientJson.redirect_uris[0]).concat('&client_id=').concat(clientJson.client_id).concat('&response_type=').concat(clientJson.response_types[0]).concat('&state=').concat(state).concat('&scope=').concat('profile%20email%20openid');
-                        return res.status(200).send({
-                            authEndpoint: authEndpoint,
-                            state: state,
-                            client_id: clientJson.client_id,
-                            token: clientJson.registration_access_token
+                        var options = {
+                            method: 'POST',
+                            url: discoveryJson.registration_endpoint,
+                            body: JSON.stringify(client)
+                        };
+
+                        request(options, function (error, response, body) {
+                            if (error || !response) {
+                                console.log(error);
+                                return res.status(406).send({
+                                    'message': 'Unable to register client. Please try after some time.'
+                                });
+                            }
+
+                            var clientJson = {};
+                            try {
+                                clientJson = JSON.parse(body);
+                            } catch (exception) {
+                                console.log(exception.toString());
+                                return res.status(406).send({
+                                    'message': 'Unable to register client due to invalid response. Please try after some time.'
+                                });
+                            }
+
+                            if (clientJson.error) {
+                                return res.status(500).send({
+                                    'message': clientJson.error_description
+                                });
+                            }
+
+                            var state = generateString(16);
+                            var authEndpoint = discoveryJson.authorization_endpoint.concat('?redirect_uri=').concat(clientJson.redirect_uris[0]).concat('&client_id=').concat(clientJson.client_id).concat('&response_type=').concat(clientJson.response_types[0]).concat('&state=').concat(state).concat('&scope=').concat('profile%20email%20openid');
+                            return res.status(200).send({
+                                authEndpoint: authEndpoint,
+                                state: state,
+                                client_id: clientJson.client_id,
+                                token: clientJson.registration_access_token
+                            });
                         });
                     });
                 });
             });
         });
-    });
 });
 
 /**
@@ -654,13 +652,8 @@ router.post('/registerDetail', (req, res, next) => {
                     let organizationInfo = {};
                     organizationInfo.isApproved = false;
                     organizationInfo.name = providerInfo.organizationName;
-                    Organizations.addOrganization(organizationInfo, (err, organization, info) => {
-                        if (err || info) {
-                            console.log(err || info);
-                            return res.status(500).send({
-                                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                            });
-                        }
+                    Organizations.addOrganization(organizationInfo)
+                        .then((organization) => {
 
                         let data = {};
                         data.organizationId = organization._id;
@@ -739,6 +732,7 @@ router.post('/registerDetail', (req, res, next) => {
                                     }
                                 };
 
+                            //return res.status(200).send(user);
                             scim.addUser(userDetail).then(function (data) {
                                 return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
                             }).catch(function (error) {
@@ -751,11 +745,8 @@ router.post('/registerDetail', (req, res, next) => {
                 }
 
                 function deleteOrganization(orgId, res) {
-                    Organizations.removeOrganization(orgId, (err, organization, info) => {
-                        if (err || info) {
-                            console.log(err || info);
-                        }
-
+                    Organizations.removeOrganization(orgId)
+                        .then((organization) => {
                         return res.status(500).send({
                             'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
                         });

@@ -11,54 +11,46 @@ let getAllFederations = () => {
     return Federation
         .find({})
         .sort({name: 1})
-        .exec((federations) => federations)
-        .catch((err) => err);
+        .exec()
+        .then((federations) => Promise.resolve(federations))
+        .catch((err) => Promise.reject(err));
 };
 
 /**
  * Get federation by Id
  * @param {ObjectId} id - Federation id
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {federation} - return federation
+ * @return {err} - return error
  */
-let getFederationById = (id, done) => {
+let getFederationById = (id) => {
     return Federation
         .findById(id)
-        .exec((err, federation) => {
-            if (err)
-                return done(err);
-            else {
-                if (!federation) {
-                    return done(null, null, {message: 'Federation not found'});
-                }
-                return done(null, federation);
-            }
-        });
+        .exec()
+        .then((federation) => Promise.resolve(federation))
+        .catch((err) => Promise.reject(err));
 };
 
-let getFederationByName = (orgName, done) => {
+/**
+ * Get federation by name
+ * @param {String} name - Federation name
+ * @return {federations} - return federation
+ * @return {err} - return error
+ */
+let getFederationByName = (name) => {
     return Federation
         .findOne({
-            name: new RegExp('^' + orgName + '$', "i")
+            name: new RegExp('^' + name + '$', "i")
         })
-        .exec((err, federation) => {
-            if (err)
-                return done(err);
-            else {
-                if (!federation) {
-                    return done(null, null, {
-                        message: 'Federation not found'
-                    });
-                } else {
-                    return done(null, federation);
-                }
-            }
-        });
+        .exec()
+        .then((federation) => Promise.resolve(federation))
+        .catch((err) => Promise.reject(err));
 };
 
 /**
  * Add federation
  * @param {object} req - Request json object
- * @return {}
+ * @return {federation} - return federation
+ * @return {err} - return error
  */
 let addFederation = (req) => {
     let oFederation = new Federation();
@@ -66,73 +58,48 @@ let addFederation = (req) => {
     oFederation.isActive = req.isActive || false;
 
     return oFederation.save()
-        .then(federation => federation)
-        .catch(err => err);
+        .then(federation => Promise.resolve(federation))
+        .catch(err => Promise.reject(err));
 };
 
 /**
  * Update federation
  * @param {object} req - Request json object
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {federation} - return federation
+ * @return {err} - return error
  */
-let updateFederation = (req, done) => {
+let updateFederation = (req) => {
     const id = req._id;
     return Federation
         .findById(id)
-        .exec((err, oFederation) => {
-            if (err)
-                return done(err);
-
-            // check to see if there is already exists or not.
-            if (!oFederation) {
-                return done(null, false, {
-                    'message': 'Federation not found.'
-                });
-            }
-
-            if (req.name) {
-                oFederation.name = req.name;
-            }
-            if (req.isActive) {
-                oFederation.isActive = req.isActive;
-            }
-
-            oFederation.save(err => {
-                if (err) {
-                    return done(err);
-                }
-
-                return done(null, oFederation);
-            });
-        });
+        .exec()
+        .then((oFederation) => {
+            oFederation.name = req.name || oFederation.name;
+            oFederation.isActive = req.isActive || oFederation.isActive;
+            return oFederation.save()
+                .then(updatedFederation => Promise.resolve(updatedFederation))
+                .catch(err => Promise.reject(err));
+        })
+        .catch(err => Promise.reject(err));
 };
 
 /**
  * Remove federation by Id
  * @param {ObjectId} id - Federation id
- * @param {requestCallback} [done] - Callback function that returns error, object or info
+ * @return {federation} - return federation
+ * @return {err} - return error
  */
-let removeFederation = (id, done) => {
+let removeFederation = (id) => {
     return Federation
         .findById(id)
-        .exec((err, objFederation) => {
-            if (err)
-                return done(err);
-            else {
-                if (!objFederation) {
-                    return done(null, null, {
-                        message: 'Federation not found'
-                    });
-                } else {
-                    objFederation.remove(err => {
-                        if (err)
-                            return done(err);
-
-                        return done(null, objFederation);
-                    });
-                }
-            }
-        });
+        .exec()
+        .then((oFederation) => {
+            return oFederation
+                .remove()
+                .then((remFed) => Promise.resolve(remFed))
+                .catch(err => Promise.reject(err));
+        })
+        .catch(err => Promise.reject(err));
 };
 
 module.exports = {

@@ -8,6 +8,7 @@
     function FederationController($scope, $filter, $localStorage, toastr, federationService, editableOptions, editableThemes) {
         var vm = this;
         vm.federations = vm.displayedCollection = undefined;
+        vm.isInsert = false;
 
         function validateName(data) {
             if (!data) {
@@ -60,6 +61,7 @@
             };
             vm.federations.push(vm.inserted);
             vm.displayedCollection = angular.copy(vm.federations);
+            vm.isInsert = true;
         }
 
         function saveFederation(data, fedData) {
@@ -71,21 +73,29 @@
             }
 
             function onSuccess(response) {
-                vm.inserted._id = response.data._id;
+                if (fedData._id == null)
+                    vm.inserted._id = response.data._id;
+
                 toastr.success('Saved successfully', 'Federation', {});
             }
 
             function onError(error) {
-                fedData.name = name;
+                vm.federations.pop();
+                vm.displayedCollection = angular.copy(vm.federations);
                 toastr.error(error.data.message, 'Federation', {})
             }
+            vm.isInsert = false;
         }
 
         function cancelForm(federationForm) {
-            vm.federations.pop();
-            vm.displayedCollection = angular.copy(vm.federations);
+            if (vm.isInsert) {
+                vm.federations.pop();
+                vm.displayedCollection = angular.copy(vm.federations);
+                vm.isInsert = false;
+            }
             federationForm.$cancel();
         }
+
         /*editableOptions.theme = 'bs3';
         editableThemes['bs3'].submitTpl = '<button type="submit" class="btn btn-primary btn-with-icon"><i class="ion-checkmark-round"></i></button>';
         editableThemes['bs3'].cancelTpl = '<button type="button" ng-click="$form.$cancel()" class="btn btn-default btn-with-icon"><i class="ion-close-round"></i></button>';*/

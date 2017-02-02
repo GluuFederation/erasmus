@@ -33,10 +33,6 @@ const userSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
-    createdOn: {
-        type: Date,
-        default: new Date()
-    },
     scimId: {
         type: String,
         required: false
@@ -53,6 +49,8 @@ const userSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Provider'
     }
+}, {
+    timestamps: true
 });
 
 // generating a hash

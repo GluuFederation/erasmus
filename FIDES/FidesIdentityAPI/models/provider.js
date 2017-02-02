@@ -109,11 +109,9 @@ const providerSchema = mongoose.Schema({
     ottoId: {
         type: mongoose.Schema.Types.ObjectId,
         required: false,
-    },
-    createdOn: {
-        type: Date,
-        default: new Date()
     }
+}, {
+    timestamps: true
 });
 
 // create the model for openid connect provider and expose it to our app
