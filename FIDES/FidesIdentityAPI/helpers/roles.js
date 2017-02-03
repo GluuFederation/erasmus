@@ -3,64 +3,34 @@
 const Role = require('../models/role');
 
 /**
- * Callback function for all the export functions.
- * @callback requestCallback
- * @param {Error} error - Error information from base function.
- * @param {Object} [data] - Data from base function.
- * @param {Object} [info] - Message from base function if object not found.
- */
-
-/**
  * Get all available roles
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {Roles} - return all Roles
+ * @return {err} - return error
  */
-let getAllRoles = (done) => {
-    let query = Role.find({
-        isActive: true
-    });
-    query.sort({
-        order: 'asc'
-    });
-
-    query.exec((err, roles) => {
-        if (err)
-            done(err);
-        else {
-            if (roles.length) {
-                done(null, roles);
-            } else {
-                done(null, null, {
-                    message: 'No records found'
-                });
-            }
-        }
-    });
+let getAllRoles = () => {
+    return Role
+        .find({isActive: true})
+        .sort({order: 1})
+        .exec()
+        .then((roles) => {
+            return Promise.resolve(roles);
+        })
+        .catch(err => Promise.reject(err));
 };
 
 /**
  * Get role by name string
  * @param {string} name - name or role
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {Role} - return all Role
+ * @return {err} - return error
  */
-let getRoleByName = (name, done) => {
-    let query = Role.findOne({
-        name: name,
-        isActive: true
-    });
-
-    query.exec((err, role) => {
-        if (err)
-            done(err);
-        else {
-            if (!role) {
-                done(null, null, {
-                    message: 'Role not found or not active'
-                });
-            } else {
-                done(null, role);
-            }
-        }
-    });
+let getRoleByName = (name) => {
+    return Role
+        .findOne({ name:name, isActive: true})
+        .sort({order: 1})
+        .exec()
+        .then(role => Promise.resolve(role))
+        .catch(err => Promise.reject(err));
 };
 
 module.exports = {

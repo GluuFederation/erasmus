@@ -75,7 +75,7 @@ router.post('/approveOrganization', (req, res, next) => {
 
             let options = {
                 method: 'POST',
-                url: process.env.OTTO_BASE_URL + '/organization',
+                uri: process.env.OTTO_BASE_URL + '/organization',
                 headers: {
                     'content-type': 'application/json'
                 },
@@ -84,7 +84,7 @@ router.post('/approveOrganization', (req, res, next) => {
                 resolveWithFullResponse: true
             };
 
-            request(options);
+            return request(options);
         })
         .then((response) => {
             let resValues = response.body['@id'].split('/');
@@ -94,13 +94,13 @@ router.post('/approveOrganization', (req, res, next) => {
             // link organization with federation
             const options = {
                 method: 'POST',
-                url: process.env.OTTO_BASE_URL + '/organization/' + organizationOttoId + '/federation/' + federationOttoId,
+                uri: process.env.OTTO_BASE_URL + '/organization/' + organizationOttoId + '/federation/' + federationOttoId,
                 headers: {
                     'content-type': 'application/json'
                 },
                 json: true
             };
-            request(options);
+            return request(options);
         })
         .then((response) => {
             return Organizations.approveOrganization(req.body.organizationId, organizationOttoId, req.body.federationId)

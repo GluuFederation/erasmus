@@ -108,7 +108,6 @@
                     }
                     var obj = _.find(vm.federations, { _id: formData.federationId});
                     vm.organizations[index].federationId = obj;
-                    console.log(vm.organizations);
                     vm.displayedCollection = angular.copy(vm.organizations);
                 }
 

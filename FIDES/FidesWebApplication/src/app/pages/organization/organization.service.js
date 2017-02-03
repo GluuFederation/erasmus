@@ -18,7 +18,7 @@
     }
 
     function updateOrganization(formData, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/updateOrganization", formData).then(onSuccess).catch(onError);
+      return $http.put(urls.BASE_API + "/updateOrganization", formData).then(onSuccess).catch(onError);
     }
 
     function approveOrganization(formData, onSuccess, onError) {

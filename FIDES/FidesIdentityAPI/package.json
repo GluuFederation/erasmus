@@ -18,6 +18,7 @@
     "gulp-swagger": "1.0.0",
     "http-status": "^1.0.0",
     "jsonwebtoken": "7.1.9",
+    "keypair": "^1.0.1",
     "mongoose": "4.5.10",
     "multer": "1.2.0",
     "request": "^2.79.0",

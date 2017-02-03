@@ -3,281 +3,167 @@
 const Provider = require('../models/provider');
 
 /**
- * Callback function for all the export functions.
- * @callback requestCallback
- * @param {Error} error - Error information from base function.
- * @param {Object} [data] - Data from base function.
- * @param {Object} [info] - Message from base function if object not found.
+ * Get all active providers
+ * @return {providers} - return all providers
+ * @return {err} - return error
  */
-
-/**
- * Retrieves all providers.
- * @param {requestCallback} done - Callback function that returns error, object or info.
- */
-let getAllProviders = (done) => {
-    let query = Provider.find({}).populate('createdBy organization');
-    query.sort({
-        name: 'asc'
-    });
-
-    query.exec((err, providers) => {
-        if (err)
-            done(err);
-        else {
-            if (providers.length) {
-                done(null, providers);
-            } else {
-                done(null, null, {
-                    message: 'No records found'
-                });
-            }
-        }
-    });
+let getAllProviders = () => {
+    return Provider
+        .find({})
+        .sort({name: 1})
+        .exec()
+        .then(providers => providers)
+        .catch(err => err);
 };
 
 /**
  * Gets provider detail by provider Id.
- * @param {ObjectId} providerId
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {provider} - return all provider
+ * @return {err} - return error
  */
-let getProviderById = (providerId, done) => {
-    let query = Provider.findOne({
-        _id: providerId
-    }).populate('createdBy organization');
-
-    query.exec((err, provider) => {
-        if (err)
-            return done(err);
-        else {
-            if (!provider) {
-                return done(null, null, {
-                    message: 'Provider not found'
-                });
-            } else {
-                return done(null, provider);
-            }
-        }
-    });
+let getProviderById = (id) => {
+    return Provider.findById(id)
+        .exec()
+        .then(providers => Promise.resolve(providers))
+        .catch(err => Promise.reject(err));
 };
 
 /**
  * Gets provider detail by Discovery URL
- * @param {string} url - Discovery URL of provider
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {provider} - return all provider
+ * @return {err} - return error
  */
 let getProviderByUrl = (url, done) => {
-    let query = Provider.findOne({
-        'discoveryUrl': url
-    }).populate('createdBy organization');
-
-    query.exec((err, provider) => {
-        if (err)
-            return done(err);
-        else {
-            if (!provider) {
-                return done(null, null, {
-                    message: 'Provider not found'
-                });
-            } else {
-                return done(null, provider);
-            }
-        }
-    });
+    return Provider.findOne({ discoveryUrl: url })
+        .exec()
+        .then(providers => Promise.resolve(providers))
+        .catch(err => Promise.reject(err));
 };
 
 /**
  * Add provider
  * @param {object} req - Request json object
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {provider} - return provider
+ * @return {err} - return error
  */
-let addProvider = (req, done) => {
-    process.nextTick(() => {
-        Provider.findOne({
-            'discoveryUrl': req.discoveryUrl
-        }, (err, provider) => {
-            if (err)
-                return done(err);
+let addProvider = (req) => {
+    let oProvider = new Provider();
+    oProvider.name = req.name;
+    oProvider.discoveryUrl = req.discoveryUrl;
+    oProvider.clientId = req.clientId;
+    oProvider.clientSecret = req.clientSecret;
+    // oProvider.keys = req.keys;
+    // oProvider.trustMarks = req.trustMarks;
+    // oProvider.responseType = req.responseType;
+    // oProvider.scope = req.scope;
+    // oProvider.state = req.state;
+    // oProvider.redirectUri = req.redirectUri;
+    // oProvider.error = req.error;
+    // oProvider.errorDescription = req.errorDescription;
+    // oProvider.errorUri = req.errorUri;
+    // oProvider.grantType = req.grantType;
+    // oProvider.code = req.code;
+    // oProvider.accessToken = req.accessToken;
+    // oProvider.tokenType = req.tokenType;
+    // oProvider.expiresIn = req.expiresIn;
+    // oProvider.username = req.username;
+    // oProvider.password = req.password;
+    // oProvider.refreshToken = req.refreshToken;
+    oProvider.authorizationEndpoint = req.authorizationEndpoint;
+    oProvider.redirectUris = req.redirectUris;
+    oProvider.responseTypes = req.responseTypes;
+    oProvider.organization = req.organizationId;
+    oProvider.createdBy = req.createdBy;
+    oProvider.isApproved = false;
+    oProvider.isVerified = false;
 
-            // check if already exists or not
-            if (!!provider) {
-                return done(null, false, {
-                    'message': 'Provider is already exists.'
-                });
-            } else {
-                // Register OpenId Connect
-                let objProvider = new Provider();
-
-                objProvider.name = req.name;
-                objProvider.discoveryUrl = req.discoveryUrl;
-                objProvider.clientId = req.clientId;
-                objProvider.clientSecret = req.clientSecret;
-                // objProvider.keys = req.keys;
-                // objProvider.trustMarks = req.trustMarks;
-                // objProvider.responseType = req.responseType;
-                // objProvider.scope = req.scope;
-                // objProvider.state = req.state;
-                // objProvider.redirectUri = req.redirectUri;
-                // objProvider.error = req.error;
-                // objProvider.errorDescription = req.errorDescription;
-                // objProvider.errorUri = req.errorUri;
-                // objProvider.grantType = req.grantType;
-                // objProvider.code = req.code;
-                // objProvider.accessToken = req.accessToken;
-                // objProvider.tokenType = req.tokenType;
-                // objProvider.expiresIn = req.expiresIn;
-                // objProvider.username = req.username;
-                // objProvider.password = req.password;
-                // objProvider.refreshToken = req.refreshToken;
-                objProvider.authorizationEndpoint = req.authorizationEndpoint;
-                objProvider.redirectUris = req.redirectUris;
-                objProvider.responseTypes = req.responseTypes;
-                objProvider.organization = req.organizationId;
-                objProvider.createdBy = req.createdBy;
-                objProvider.isApproved = false;
-                objProvider.isVerified = false;
-
-                objProvider.save(err => {
-                    if (err)
-                        return done(err);
-
-                    Provider.populate(objProvider, 'organization', function (err, objProvider) {
-                        if (err)
-                            return done(err);
-
-                        return done(null, objProvider);
-                    });
-                });
-            }
-        });
-    });
+    return oProvider.save()
+        .then(provider => Promise.resolve(provider))
+        .catch(err => Promise.reject(err));
 };
 
 /**
- * Update provider
+ * update provider
  * @param {object} req - Request json object
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * @return {provider} - return provider
+ * @return {err} - return error
  */
-let updateProvider = (req, done) => {
-    process.nextTick(() => {
-        Provider.findOne({
-            '_id': req._id
-        }).populate('createdBy organization').exec(function (err, objProvider) {
-            if (err)
-                return done(err);
-
-            // check to see if there is already exists or not.
-            if (!objProvider) {
-                return done(null, false, {
-                    'message': 'Provider not found.'
-                });
-            } else {
-                objProvider.name = req.name;
-                objProvider.discoveryUrl = req.discoveryUrl;
-                objProvider.clientId = req.clientId;
-                objProvider.clientSecret = req.clientSecret;
-                // objProvider.keys = req.keys;
-                // objProvider.trustMarks = req.trustMarks;
-                // objProvider.responseType = req.responseType;
-                // objProvider.scope = req.scope;
-                // objProvider.state = req.state;
-                // objProvider.redirectUri = req.redirectUri;
-                // objProvider.error = req.error;
-                // objProvider.errorDescription = req.errorDescription;
-                // objProvider.errorUri = req.errorUri;
-                // objProvider.grantType = req.grantType;
-                // objProvider.code = req.code;
-                // objProvider.accessToken = req.accessToken;
-                // objProvider.tokenType = req.tokenType;
-                // objProvider.expiresIn = req.expiresIn;
-                // objProvider.username = req.username;
-                // objProvider.password = req.password;
-                // objProvider.refreshToken = req.refreshToken;
-                objProvider.organization = req.organizationId;
-
-                objProvider.save(err => {
-                    if (err)
-                        return done(err);
-
-                    Provider.populate(objProvider, 'organization', function (err, objProvider) {
-                        if (err)
-                            return done(err);
-
-                        return done(null, objProvider);
-                    });
-                });
-            }
-        });
-    });
+let updateProvider = (req) => {
+    return Provider.findById(req._id)
+        .exec()
+        .then((oProvider) => {
+            oProvider.name = req.name;
+            oProvider.discoveryUrl = req.discoveryUrl;
+            oProvider.clientId = req.clientId;
+            oProvider.clientSecret = req.clientSecret;
+            // oProvider.keys = req.keys;
+            // oProvider.trustMarks = req.trustMarks;
+            // oProvider.responseType = req.responseType;
+            // oProvider.scope = req.scope;
+            // oProvider.state = req.state;
+            // oProvider.redirectUri = req.redirectUri;
+            // oProvider.error = req.error;
+            // oProvider.errorDescription = req.errorDescription;
+            // oProvider.errorUri = req.errorUri;
+            // oProvider.grantType = req.grantType;
+            // oProvider.code = req.code;
+            // oProvider.accessToken = req.accessToken;
+            // oProvider.tokenType = req.tokenType;
+            // oProvider.expiresIn = req.expiresIn;
+            // oProvider.username = req.username;
+            // oProvider.password = req.password;
+            // oProvider.refreshToken = req.refreshToken;
+            oProvider.organization = req.organizationId;
+            return oProvider.save();
+        })
+        .then((savedProvider) => {
+            console.log(savedProvider);
+            return Provider.populate(savedProvider, 'organization', function (savedProvider) {
+                console.log(savedProvider);
+                return Promise.resolve(savedProvider);
+            });
+        })
+        .catch(err => Promise.reject(err));
 };
 
 /**
- * Remove provider
- * @param {ObjectId} providerId - Provider id
- * @param {requestCallback} done - Callback function that returns error, object or info
+ * Remove provider by Id
+ * @param {ObjectId} id - provider id
+ * @return {provider} - return provider
+ * @return {err} - return error
  */
-let removeProvider = (providerId, done) => {
-    process.nextTick(() => {
-        Provider.findOne({
-            '_id': providerId
-        }, (err, objProvider) => {
-            if (err)
-                return done(err);
-
-            // check if already exists or not.
-            if (!objProvider) {
-                return done(null, false, {
-                    'message': 'Provider not found.'
-                });
-            } else {
-                objProvider.remove(err => {
-                    if (err)
-                        return done(err);
-
-                    return done(null, objProvider);
-                });
-            }
-        });
-    });
+let removeProvider = (id) => {
+    return Provider
+        .findById(id)
+        .exec()
+        .then((oProvider) => {
+            return oProvider
+                .remove()
+                .then((remProvider) => Promise.resolve(remProvider))
+                .catch(err => Promise.reject(err));
+        })
+        .catch(err => Promise.reject(err));
 };
 
 /**
- *
- * @param {ObjectId} providerId - Provider id
- * @param ottoId
- * @param {requestCallback} done - Callback function that returns error, object or info
- * @returns {Object} info - Object with information message.
+ * Approve Provider by Id
+ * @param {ObjectId} orgId - Provider id
+ * @param {ObjectId} ottoId - Provider otto id
+ * @return {Provider} - return Provider
+ * @return {err} - return error
  */
-let approveProvider = (providerId, ottoId, done) => {
-    if(!ottoId){
-        return done(null, false, {
-            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-        });
-    }
-
-    process.nextTick(() => {
-        Provider.findOne({
-            '_id': providerId
-        }).populate('createdBy organization').exec(function (err, objProvider) {
-            if (err)
-                return done(err);
-
-            // check if already exists or not.
-            if (!objProvider) {
-                return done(null, false, {
-                    'message': 'Provider not found.'
-                });
-            } else {
-                objProvider.ottoId = ottoId;
-                objProvider.isApproved = true;
-                objProvider.save(err => {
-                    if (err)
-                        return done(err);
-
-                    return done(null, objProvider);
-                });
-            }
-        });
-    });
+let approveProvider = (proId, ottoId) => {
+    return Provider
+        .findById(proId)
+        .exec()
+        .then((oProvider) => {
+            oProvider.ottoId = ottoId;
+            oProvider.isApproved = true;
+            return oProvider.save()
+                .then(updatedProvider => Promise.resolve(updatedProvider))
+                .catch(err => Promise.reject(err));
+        })
+        .catch(err => Promise.reject(err));
 };
 
 module.exports = {

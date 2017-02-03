@@ -13,6 +13,8 @@ const express = require('express'),
     router = express.Router(),
     request = require('request'),
     jwt = require('jsonwebtoken'),
+    common = require('../helpers/common'),
+    httpStatus = require('http-status'),
     Users = require('../helpers/users'),
     Roles = require('../helpers/roles'),
     Organizations = require('../helpers/organizations'),
@@ -28,35 +30,36 @@ router.post('/validateEmail', (req, res, next) => {
         });
     }
 
-    Users.getUser(req.body, (err, user) => {
-        if (err) {
-            return next(err);
-        }
+    return Users.getUser(req.body)
+        .then((user) => {
+            if (!user.provider) {
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                    message: 'There is no provider associated with the user.'
+                });
+            }
 
-        if (!user) {
-            return res.status(406).send({
-                'message': 'User not found with this email.'
+            let provider = user.provider;
+            let state = generateString(16);
+            let redirectUri = JSON.parse(provider.redirectUris)[1];
+            let responseType = JSON.parse(provider.responseTypes)[0];
+            let authEndpoint = provider.authorizationEndpoint.concat('?redirect_uri=').concat(redirectUri).concat('&client_id=').concat(provider.clientId).concat('&response_type=').concat(responseType).concat('&state=').concat(state).concat('&scope=').concat('openid email');
+            return res.status(httpStatus.OK).send({
+                authEndpoint: authEndpoint,
+                email: req.body.email,
+                redirectUri: redirectUri,
+                state: state
             });
-        }
-
-        if (!user.provider) {
-            return res.status(406).send({
-                'message': 'There is no provider associated with the user.'
+        })
+        .catch((err) => {
+            if (err == false) {
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                    message: 'User not found with this email.'
+                });
+            }
+            return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                message: common.message.INTERNAL_SERVER_ERROR
             });
-        }
-
-        let provider = user.provider;
-        let state = generateString(16);
-        let redirectUri = JSON.parse(provider.redirectUris)[1];
-        let responseType = JSON.parse(provider.responseTypes)[0];
-        let authEndpoint = provider.authorizationEndpoint.concat('?redirect_uri=').concat(redirectUri).concat('&client_id=').concat(provider.clientId).concat('&response_type=').concat(responseType).concat('&state=').concat(state).concat('&scope=').concat('openid email');
-        return res.status(200).send({
-            authEndpoint: authEndpoint,
-            email: req.body.email,
-            redirectUri: redirectUri,
-            state: state
         });
-    });
 });
 
 /**
@@ -64,59 +67,27 @@ router.post('/validateEmail', (req, res, next) => {
  */
 router.post('/login', (req, res, next) => {
     if (!req.body.email) {
-        return res.status(406).send({
-            'message': 'Please provide email.'
+        return res.status(httpStatus.NOT_ACCEPTABLE).send({
+            message: 'Please provide email.'
         });
     }
 
-    Users.getUser(req.body, (err, user) => {
-        if (err) {
-            return next(err);
-        }
+    return Users.getUser(req.body)
+        .then((user) => {
 
-        if (!user) {
-            return res.status(406).send({
-                'message': 'User not found with this email.'
-            });
-        }
-
-        if (!user.provider) {
-            return res.status(406).send({
-                'message': 'There is no provider associated with the user.'
-            });
-        }
-
-        request.get(user.provider.discoveryUrl, function (error, response, body) {
-            if (error) {
-                console.log(error);
-                return res.status(406).send({
-                    'message': 'Unable to fetch metadata from Discovery URL. Please check Discovery URL.'
+            if (!user) {
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                    message: 'User not found with this email.'
                 });
             }
 
-            if (!response) {
-                return res.status(406).send({
-                    'message': 'Metadata not found from Discovery URL. Please check Discovery URL.'
+            if (!user.provider) {
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                    message: 'There is no provider associated with the user.'
                 });
             }
 
-            let discoveryMetadata = {};
-            try {
-                discoveryMetadata = JSON.parse(body);
-            } catch (exception) {
-                console.log(exception.toString());
-                return res.status(406).send({
-                    'message': 'Discovery URL is invalid. Please check and correct it.'
-                });
-            }
-
-            let data = {};
-            data.discoveryMetadata = discoveryMetadata;
-            data.client_id = user.provider.clientId;
-            data.client_secret = user.provider.clientSecret;
-            data.redirect_uri = req.body.redirectUri;
-            data.code = req.body.code;
-            getUserClaims(data, res, function (error, userInfo) {
+            request.get(user.provider.discoveryUrl, function (error, response, body) {
                 if (error) {
                     console.log(error);
                     return res.status(406).send({
@@ -124,31 +95,72 @@ router.post('/login', (req, res, next) => {
                     });
                 }
 
-                if (!userInfo) {
-                    return res.status(500).send({
-                        'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                if (!response) {
+                    return res.status(406).send({
+                        'message': 'Metadata not found from Discovery URL. Please check Discovery URL.'
                     });
                 }
 
-                if (!userInfo.email || userInfo.email.toLowerCase() !== req.body.email.toLowerCase()) {
-                    return res.status(500).send({
-                        'message': 'Email did not matched. Please check email address or logout from provider first and try again.'
+                let discoveryMetadata = {};
+                try {
+                    discoveryMetadata = JSON.parse(body);
+                } catch (exception) {
+                    console.log(exception.toString());
+                    return res.status(406).send({
+                        'message': 'Discovery URL is invalid. Please check and correct it.'
                     });
                 }
 
-                //Creating a JWT token for user session which is valid for 24 hrs.
-                let token = jwt.sign(user, process.env.APP_SECRET, {
-                    expiresIn: process.env.JWT_EXPIRES_IN
-                });
+                let data = {};
+                data.discoveryMetadata = discoveryMetadata;
+                data.client_id = user.provider.clientId;
+                data.client_secret = user.provider.clientSecret;
+                data.redirect_uri = req.body.redirectUri;
+                data.code = req.body.code;
+                getUserClaims(data, res, function (error, userInfo) {
+                    if (error) {
+                        console.log(error);
+                        return res.status(406).send({
+                            'message': 'Unable to fetch metadata from Discovery URL. Please check Discovery URL.'
+                        });
+                    }
 
-                return res.status(200).send({
-                    user: user.safeModel(),
-                    role: user.role.name,
-                    token: token
+                    if (!userInfo) {
+                        return res.status(500).send({
+                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                        });
+                    }
+
+                    if (!userInfo.email || userInfo.email.toLowerCase() !== req.body.email.toLowerCase()) {
+                        return res.status(500).send({
+                            'message': 'Email did not matched. Please check email address or logout from provider first and try again.'
+                        });
+                    }
+
+                    //Creating a JWT token for user session which is valid for 24 hrs.
+                    let token = jwt.sign(user, process.env.APP_SECRET, {
+                        expiresIn: process.env.JWT_EXPIRES_IN
+                    });
+
+                    return res.status(200).send({
+                        user: user.safeModel(),
+                        role: user.role.name,
+                        token: token
+                    });
                 });
             });
+        })
+        .catch((err) => {
+            if (err == false) {
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                    message: 'User not found'
+                });
+            }
+
+            return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                message: common.message.INTERNAL_SERVER_ERROR
+            });
         });
-    });
 });
 
 /**
@@ -640,43 +652,39 @@ router.post('/registerDetail', (req, res, next) => {
                     });
                 }
 
-                Roles.getRoleByName('orgadmin', (err, role, info) => {
-                    if (err || info) {
-                        console.log(err || info);
-                        return res.status(500).send({
-                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                        });
-                    }
+                return Roles.getRoleByName('orgadmin')
+                    .then((role) => {
+                        // Add organization if user not selected existing one.
+                        let organizationInfo = {};
+                        organizationInfo.isApproved = false;
+                        organizationInfo.name = providerInfo.organizationName;
+                        return Organizations.addOrganization(organizationInfo)
+                            .then((organization) => {
 
-                    // Add organization if user not selected existing one.
-                    let organizationInfo = {};
-                    organizationInfo.isApproved = false;
-                    organizationInfo.name = providerInfo.organizationName;
-                    Organizations.addOrganization(organizationInfo)
-                        .then((organization) => {
+                                let data = {};
+                                data.organizationId = organization._id;
+                                data.personInfo = {};
+                                data.personInfo.email = providerInfo.email;
+                                data.personInfo.username = userInfo.username || providerInfo.email;
+                                data.personInfo.firstName = userInfo.given_name;
+                                data.personInfo.lastName = userInfo.family_name;
+                                data.personInfo.roleId = role._id;
+                                data.personInfo.isActive = true;
+                                data.providerInfo = {};
+                                data.providerInfo.name = providerInfo.organizationName;
+                                data.providerInfo.discoveryUrl = providerInfo.discoveryUrl;
+                                data.providerInfo.clientId = clientMetadata.client_id;
+                                data.providerInfo.clientSecret = clientMetadata.client_secret;
+                                data.providerInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
+                                data.providerInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
+                                data.providerInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
+                                data.providerInfo.isApproved = false;
 
-                        let data = {};
-                        data.organizationId = organization._id;
-                        data.personInfo = {};
-                        data.personInfo.email = providerInfo.email;
-                        data.personInfo.username = userInfo.username || providerInfo.email;
-                        data.personInfo.firstName = userInfo.given_name;
-                        data.personInfo.lastName = userInfo.family_name;
-                        data.personInfo.roleId = role._id;
-                        data.personInfo.isActive = true;
-                        data.providerInfo = {};
-                        data.providerInfo.name = providerInfo.organizationName;
-                        data.providerInfo.discoveryUrl = providerInfo.discoveryUrl;
-                        data.providerInfo.clientId = clientMetadata.client_id;
-                        data.providerInfo.clientSecret = clientMetadata.client_secret;
-                        data.providerInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
-                        data.providerInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
-                        data.providerInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
-                        data.providerInfo.isApproved = false;
-
-                        return addProviderAndUser(data, res);
-                    });
-                });
+                                return addProviderAndUser(data, res);
+                            })
+                            .catch(() => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: common.message.INTERNAL_SERVER_ERROR}));
+                    })
+                    .catch(() => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: common.message.INTERNAL_SERVER_ERROR}));
 
                 function addProviderAndUser(data, res) {
                     // Add provider
@@ -747,10 +755,10 @@ router.post('/registerDetail', (req, res, next) => {
                 function deleteOrganization(orgId, res) {
                     Organizations.removeOrganization(orgId)
                         .then((organization) => {
-                        return res.status(500).send({
-                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                            return res.status(500).send({
+                                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                            });
                         });
-                    });
                 }
 
                 function deleteProviderAndOrg(providerId, orgId, res) {
