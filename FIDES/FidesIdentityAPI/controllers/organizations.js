@@ -94,7 +94,7 @@ router.post('/approveOrganization', (req, res, next) => {
             // link organization with federation
             const options = {
                 method: 'POST',
-                uri: process.env.OTTO_BASE_URL + '/organization/' + organizationOttoId + '/federation/' + federationOttoId,
+                uri: process.env.OTTO_BASE_URL + '/federations/' + federationOttoId + '/organization/' + organizationOttoId,
                 headers: {
                     'content-type': 'application/json'
                 },

@@ -29,6 +29,7 @@ router.get('/getAllFederations', (req, res, next) => {
  */
 router.post('/addFederation', (req, res, next) => {
     let federation = null;
+    let federationOttoId = null;
     Federations.addFederation(req.body)
         .then((savedFederation) => {
             const options = {
@@ -46,8 +47,20 @@ router.post('/addFederation', (req, res, next) => {
         })
         .then((response) => {
             let resValues = response.body['@id'].split('/');
-            let ottoId = resValues[resValues.length - 1];
-            federation.ottoId = ottoId;
+            federationOttoId = resValues[resValues.length - 1];
+            federation.ottoId = federationOttoId;
+            federation.ownerOrganizationOttoId = common.constant.OWNER_ORGANIZATION_ID;
+            const options = {
+                method: 'POST',
+                uri: process.env.OTTO_BASE_URL + '/organization/' + common.constant.OWNER_ORGANIZATION_ID + '/federation/' + federationOttoId,
+                headers: {
+                    'content-type': 'application/json'
+                },
+                json: true
+            };
+            return request(options);
+        })
+        .then((response) => {
             return federation.save()
                 .then((savedFederation) => res.status(httpStatus.OK).send(federation))
                 .catch(() => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: common.message.INTERNAL_SERVER_ERROR}));

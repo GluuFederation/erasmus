@@ -129,10 +129,6 @@
             function onSuccess(response) {
                 if (response.data && response.data.length > 0) {
                     vm.federations = response.data;
-                    _.forEach(vm.organizations, function(value, key) {
-                        if (value.federationId)
-                        _.remove(vm.federations, {_id: value.federationId._id || 0});
-                    });
                 }
             }
 
@@ -158,9 +154,6 @@
         vm.cancelForm = cancelForm;
 
         vm.getAllOrganizations();
-
-        $timeout(function () {
-            vm.getAllFederations();
-        },500);
+        vm.getAllFederations();
     }
 })();

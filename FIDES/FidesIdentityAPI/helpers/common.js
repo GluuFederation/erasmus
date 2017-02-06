@@ -7,6 +7,11 @@ const Message = {
     ALREADY_APPROVE: 'is already approved.'
 };
 
+const Constant = {
+    OWNER_ORGANIZATION_ID: '5898568123a5a1243daae234'
+};
+
 module.exports = {
-    message: Message
+    message: Message,
+    constant: Constant
 }

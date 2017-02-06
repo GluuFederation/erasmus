@@ -12,6 +12,9 @@ const federationSchema = mongoose.Schema({
     ottoId: {
         type: mongoose.Schema.Types.ObjectId
     },
+    ownerOrganizationOttoId: {
+        type: mongoose.Schema.Types.ObjectId
+    },
     isActive: {
         type: Boolean,
         default: false
