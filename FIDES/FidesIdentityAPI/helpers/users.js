@@ -150,7 +150,7 @@ let updatePassword = (req) => {
  */
 let updateScimId = (userId, scimId) => {
     return User
-        .findById({userId})
+        .findById(userId)
         .exec((user) => {
             // check to see if there is already exists or not.
             if (!user) {
@@ -267,7 +267,7 @@ let getAllProviders = (userId) => {
                 queryCondition['_id'] = userId;
             }
 
-            User.find(queryCondition, 'provider organization')
+            return User.find(queryCondition)
                 .exec();
         })
         .then((users) => {
