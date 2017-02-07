@@ -267,13 +267,24 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
             dataJson.client_secret = provider.clientSecret;
             dataJson.keys = keysJson.keys;
 
+            const entityData = {
+                id: dataJson.issuer,
+                name: dataJson.name,
+                metadata_statements: dataJson.metadata_statements || null,
+                metadata_statement_uris: dataJson.metadata_statement_uris || null,
+                signed_jwks_uri: dataJson.signed_jwks_uri,
+                signing_keys: dataJson.signing_key
+                // organization
+                // description
+            };
+
             let options = {
                 method: 'POST',
                 uri: process.env.OTTO_BASE_URL + '/federation_entity',
                 headers: {
                     'content-type': 'application/json'
                 },
-                body: dataJson,
+                body: entityData,
                 json: true,
                 resolveWithFullResponse: true
             };
@@ -311,12 +322,6 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
             return request(options);
         })
         .then((response) => {
-            if (!response) {
-                return res.status(500).send({
-                    message: common.message.INTERNAL_SERVER_ERROR
-                });
-            }
-
             // Update local mongodb with provider's OTTO Id and approve flag.
             Providers.approveProvider(req.params.providerId, ottoId)
                 .then((provider) => {
