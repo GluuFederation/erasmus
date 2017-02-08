@@ -717,6 +717,28 @@ router.post('/registerDetail', (req, res, next) => {
         });
 });
 
+/**
+ * Take private key and data and return signed data
+ * @param {string} privateKey - privateKey for encrypt data
+ * @param {string} data - any string data
+ * @return {string} signed data
+ */
+router.post('/encrypt', (req, res, next) => {
+    try {
+        if (!req.body.data) {
+            return res.status(httpStatus.NOT_ACCEPTABLE).send({ message: 'Please enter data' });
+        }
+        if (!req.body.privateKey) {
+            return res.status(httpStatus.NOT_ACCEPTABLE).send({ message: 'Please enter private key' });
+        }
+
+        let signedData = jwt.sign(req.body.data, pkey, {algorithm: 'RS256'});
+        return res.status(httpStatus.OK).send(signedData);
+    } catch (err) {
+        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Not converted', err: err.message});
+    }
+});
+
 function addProviderAndUser(data, res) {
     // Add provider
     data.providerInfo.organizationId = data.organizationId;
@@ -763,7 +785,7 @@ function addProviderAndUser(data, res) {
                             }
                         };
 
-                    // return res.status(httpStatus.OK).send(user);
+                    //return res.status(httpStatus.OK).send(user);
                     scim.addUser(userDetail).then(function (data) {
                         return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
                     }).catch(function (error) {

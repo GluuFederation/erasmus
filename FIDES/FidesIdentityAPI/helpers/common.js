@@ -8,7 +8,7 @@ const Message = {
 };
 
 const Constant = {
-    OWNER_ORGANIZATION_ID: '5898568123a5a1243daae234'
+    OWNER_ORGANIZATION_ID: '589b07267d85a90393b189be'
 };
 
 module.exports = {

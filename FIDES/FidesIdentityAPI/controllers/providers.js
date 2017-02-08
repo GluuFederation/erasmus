@@ -273,7 +273,8 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
                 metadata_statements: dataJson.metadata_statements || null,
                 metadata_statement_uris: dataJson.metadata_statement_uris || null,
                 signed_jwks_uri: dataJson.signed_jwks_uri,
-                signing_keys: dataJson.signing_key
+                signing_keys: dataJson.signing_key,
+                type: 'openid_provider'
                 // organization
                 // description
             };

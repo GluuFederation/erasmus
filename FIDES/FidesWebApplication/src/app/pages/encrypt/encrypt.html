@@ -1,0 +1,32 @@
+<div class="widgets">
+    <div class="row">
+        <div class="col-md-6">
+            <div ba-panel ba-panel-title="Input" ba-panel-class="with-scroll">
+                <form name="frm" ng-submit="vm.encryptData()">
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="text" name="data" ng-model="vm.oData.data" class="form-control"/>
+                        <!--<textarea name="data" ng-model="vm.oDate.data" class="form-control" required></textarea>-->
+                        <span class="text-danger" ng-show="frm.data.$touched && frm.data.$invalid">Please enter the data</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Private Key</label>
+                        <input type="text" name="privateKey" ng-model="vm.oData.privateKey" class="form-control"/>
+                        <!--<textarea placeholder="Default Input" ng-model="vm.oDate.privateKey" class="form-control" name="privateKey" required></textarea>-->
+                        <span class="text-danger" ng-show="frm.privateKey.$touched && frm.privateKey.$invalid">Please enter the private key</span>
+                    </div>
+                    <button type="submit" class="btn btn-success">Send</button>
+                </form>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div ba-panel ba-panel-title="Output" ba-panel-class="with-scroll">
+                <form>
+                    <div class="form-group">
+                        <textarea ng-readonly="true" style="height:280px;" rows="15" name="output" ng-model="vm.output" class="form-control" required></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
