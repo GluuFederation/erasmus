@@ -731,8 +731,8 @@ router.post('/encrypt', (req, res, next) => {
         if (!req.body.privateKey) {
             return res.status(httpStatus.NOT_ACCEPTABLE).send({ message: 'Please enter private key' });
         }
-
-        let signedData = jwt.sign(req.body.data, pkey, {algorithm: 'RS256'});
+        const key = require('keypair')().private;
+        let signedData = jwt.sign(req.body.data, req.body.privateKey, {algorithm: 'RS256'});
         return res.status(httpStatus.OK).send(signedData);
     } catch (err) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Not converted', err: err.message});
