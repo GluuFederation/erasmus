@@ -17,7 +17,7 @@
         authenticate: true,
         sidebarMeta: {
           icon: 'fa fa-users',
-          order: 2
+          order: 1
         }
       });
   }

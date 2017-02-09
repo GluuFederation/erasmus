@@ -16,7 +16,7 @@ const organizationSchema = mongoose.Schema({
     },
     federationId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Federation"
+      ref: 'Federation'
     },
     isApproved: {
         type: Boolean,
@@ -25,11 +25,9 @@ const organizationSchema = mongoose.Schema({
     isActive: {
         type: Boolean,
         default: false
-    },
-    createdOn: {
-        type: Date,
-        default: new Date()
     }
+}, {
+    timestamps: true
 });
 
 organizationSchema.pre('findOne', populateFederation);

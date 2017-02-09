@@ -22,11 +22,9 @@ const roleSchema = mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
-    },
-    createdOn: {
-        type: Date,
-        default: new Date()
     }
+}, {
+    timestamps: true
 });
 
 // create the model for roles and expose it to our app

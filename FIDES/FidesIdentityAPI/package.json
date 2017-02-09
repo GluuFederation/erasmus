@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
+    "bluebird": "^3.4.7",
     "body-parser": "1.15.2",
     "cookie-parser": "1.4.3",
     "cors": "^2.8.1",
@@ -15,10 +16,13 @@
     "gulp": "3.9.1",
     "gulp-nodemon": "2.1.0",
     "gulp-swagger": "1.0.0",
+    "http-status": "^1.0.0",
     "jsonwebtoken": "7.1.9",
+    "keypair": "^1.0.1",
     "mongoose": "4.5.10",
     "multer": "1.2.0",
     "request": "^2.79.0",
+    "request-promise": "^4.1.1",
     "swagger-express": "1.0.5"
   },
   "repository": {

@@ -2,62 +2,34 @@
 
 const express = require('express'),
     router = express.Router(),
-    request = require('request'),
+    request = require('request-promise'),
+    common = require('../helpers/common'),
+    httpStatus = require('http-status'),
     Organizations = require('../helpers/organizations');
 
 /**
  * Update organization
  */
- router.post('/updateOrganization', (req, res, next) => {
+router.put('/updateOrganization', (req, res, next) => {
     if (!req.body._id) {
-        return res.status(406).send({
-            'message': 'Please provide id.'
+        return res.status(httpStatus.NOT_ACCEPTABLE).send({
+            message: common.message.PROVIDE_ID
         });
     }
 
-    Organizations.updateOrganization(req.body, (err, organization, info) => {
-        if (err) {
-            if(err.code === 11000) {
-                return res.status(406).send({
-                    'message': 'Organization with same name is already exists. Please try different name.'
-                });
-            } else {
-                return res.status(500).send({
-                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                })
+    Organizations.updateOrganization(req.body)
+        .then((updatedFederation) => {
+            return res.status(httpStatus.OK).send(updatedFederation);
+        })
+        .catch((err) => {
+            if (err.code === 11000) {
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE_NAME});
             }
-        }
-
-        if (!organization) {
-            return res.status(406).send(info);
-        }
-
-        const options = {
-            method: 'PUT',
-            url: process.env.OTTO_BASE_URL + '/organization/' + organization.ottoId,
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: {name: req.body.name},
-            json: true
-        };
-
-        request(options, (error, response, body) => {
-            if (error) {
-                return res.status(500).send({
-                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                });
-            }
-
-            if (!response) {
-                return res.status(500).send({
-                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                });
-            }
-
-            return res.status(200).send(organization);
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+                err: err,
+                message: common.message.INTERNAL_SERVER_ERROR
+            });
         });
-    });
 });
 
 /**
@@ -65,46 +37,16 @@ const express = require('express'),
  */
 router.delete('/removeOrganization/:organizationId', (req, res, next) => {
     if (!req.params.organizationId) {
-        return res.status(406).send({
-            'message': 'Please provide id.'
+        return res.status(httpStatus.NOT_ACCEPTABLE).send({
+            message: common.message.PROVIDE_ID
         });
     }
-
-    Organizations.removeOrganization(req.params.organizationId, (err, organization, info) => {
-        if (err) {
-            return res.status(500).send({
-                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-            });
-        }
-        if (!organization) {
-            return res.status(406).send(info);
-        }
-
-        const options = {
-            method: 'DELETE',
-            url: process.env.OTTO_BASE_URL + '/organization/' + organization.ottoId,
-            headers: {
-                'content-type': 'application/json'
-            },
-            json: true
-        };
-
-        request(options, (error, response, body) => {
-            if (error) {
-                return res.status(500).send({
-                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                });
-            }
-
-            if (!response) {
-                return res.status(500).send({
-                    'message': 'The otto server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                });
-            }
-
-            return res.status(200).send(organization);
-        });
-    });
+    Organizations.removeOrganization(req.params.organizationId)
+        .then((removedFederation) => res.status(httpStatus.OK).send(removedFederation))
+        .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+            err: err,
+            message: common.message.INTERNAL_SERVER_ERROR
+        }));
 });
 
 /**
@@ -112,97 +54,66 @@ router.delete('/removeOrganization/:organizationId', (req, res, next) => {
  */
 router.post('/approveOrganization', (req, res, next) => {
     if (!req.body.organizationId) {
-        return res.status(406).send({
-            'message': 'Please provide id.'
+        return res.status(httpStatus.NOT_ACCEPTABLE).send({
+            message: common.message.PROVIDE_ID
         });
     }
+    let organization = null;
+    let organizationOttoId = null;
+    Organizations.getOrganizationById(req.body.organizationId)
+        .then((fOrganization) => {
+            organization = fOrganization;
+            if (!organization) {
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE_ID});
+            }
 
-    Organizations.getOrganizationById(req.body.organizationId, (err, organization, info) => {
-        if (err) {
-            return res.status(500).send({
-                'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-            });
-        }
-        if (!organization) {
-            return res.status(406).send(info);
-        }
-
-        if(organization.isApproved === true) {
-            return res.status(500).send({
-                'message': 'Organization is already approved.'
-            });
-        }
-
-        let dataJson = {
-            "name": organization.name
-        };
-
-        let options = {
-            method: 'POST',
-            url: process.env.OTTO_BASE_URL + "/organization",
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: dataJson,
-            json: true
-        };
-
-        request(options, function (error, response, body) {
-            if (error) {
+            if (organization.isApproved === true) {
                 return res.status(500).send({
-                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    message: 'Organization ' + common.message.ALREADY_APPROVE
                 });
             }
 
-            if (!response) {
-                return res.status(500).send({
-                    'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                });
-            }
+            let options = {
+                method: 'POST',
+                uri: process.env.OTTO_BASE_URL + '/organization',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: { name: organization.name },
+                json: true,
+                resolveWithFullResponse: true
+            };
 
-            let resValues = body['@id'].split('/');
-            let organizationOttoId = resValues[resValues.length - 1];
+            return request(options);
+        })
+        .then((response) => {
+            let resValues = response.body['@id'].split('/');
+            organizationOttoId = resValues[resValues.length - 1];
             let federationOttoId = req.body.federationOttoId;
 
             // link organization with federation
-            options = {
+            const options = {
                 method: 'POST',
-                url: process.env.OTTO_BASE_URL + "/organization/" + organizationOttoId + "/federation/" + federationOttoId,
+                uri: process.env.OTTO_BASE_URL + '/federations/' + federationOttoId + '/organization/' + organizationOttoId,
                 headers: {
                     'content-type': 'application/json'
                 },
                 json: true
             };
-
-            request(options, function (error, response, body) {
-                if (error) {
-                    return res.status(500).send({
-                        'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                    });
-                }
-
-                if (!response) {
-                    return res.status(500).send({
-                        'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                    });
-                }
-
-                Organizations.approveOrganization(req.body.organizationId, organizationOttoId, req.body.federationId , (err, organization, info) => {
-                    if (err) {
-                        return res.status(500).send({
-                            'message': 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
-                        });
-                    }
-
-                    if (!organization) {
-                        return res.status(406).send(info);
-                    }
-
-                    return res.status(200).send(organization);
-                });
-            });
-        });
-    });
+            return request(options);
+        })
+        .then((response) => {
+            return Organizations.approveOrganization(req.body.organizationId, organizationOttoId, req.body.federationId)
+                .then((organization) => res.status(httpStatus.OK).send(organization))
+                .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+                    err: err,
+                    message: common.message.INTERNAL_SERVER_ERROR
+                }));
+        })
+        .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+            err: err,
+            message: common.message.INTERNAL_SERVER_ERROR
+        }));
 });
 
 module.exports = router;

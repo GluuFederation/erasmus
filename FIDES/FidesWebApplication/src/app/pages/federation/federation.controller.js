@@ -8,6 +8,7 @@
     function FederationController($scope, $filter, $localStorage, toastr, federationService, editableOptions, editableThemes) {
         var vm = this;
         vm.federations = vm.displayedCollection = undefined;
+        vm.isInsert = false;
 
         function validateName(data) {
             if (!data) {
@@ -49,19 +50,6 @@
             }
         }
 
-        function addFederation(data, fedData) {
-            federationService.addFederation(data, onSuccess, onError);
-
-            function onSuccess(response) {
-                toastr.success('Saved successfully', 'Federation', {});
-            }
-
-            function onError(error) {
-                fedData.name = name;
-                toastr.error(error.data.message, 'Federation', {})
-            }
-        }
-
         function loadAddForm() {
             if(!vm.federations){
               vm.federations = [];
@@ -73,6 +61,7 @@
             };
             vm.federations.push(vm.inserted);
             vm.displayedCollection = angular.copy(vm.federations);
+            vm.isInsert = true;
         }
 
         function saveFederation(data, fedData) {
@@ -84,13 +73,27 @@
             }
 
             function onSuccess(response) {
+                if (fedData._id == null)
+                    vm.inserted._id = response.data._id;
+
                 toastr.success('Saved successfully', 'Federation', {});
             }
 
             function onError(error) {
-                fedData.name = name;
+                vm.federations.pop();
+                vm.displayedCollection = angular.copy(vm.federations);
                 toastr.error(error.data.message, 'Federation', {})
             }
+            vm.isInsert = false;
+        }
+
+        function cancelForm(federationForm) {
+            if (vm.isInsert) {
+                vm.federations.pop();
+                vm.displayedCollection = angular.copy(vm.federations);
+                vm.isInsert = false;
+            }
+            federationForm.$cancel();
         }
 
         /*editableOptions.theme = 'bs3';
@@ -99,11 +102,12 @@
 
         //Export the modules for view.
         vm.validateName = validateName;
-        vm.addFederation = addFederation;
         vm.removeFederation = removeFederation;
         vm.getAllFederations = getAllFederations;
         vm.saveFederation = saveFederation;
         vm.loadAddForm = loadAddForm;
+        vm.cancelForm = cancelForm;
+
         vm.getAllFederations();
     }
 })();

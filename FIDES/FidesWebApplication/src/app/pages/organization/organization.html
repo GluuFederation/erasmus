@@ -28,7 +28,7 @@
             </td>
             <td>
               <span editable-select="organization.federationId" e-name="federationId" e-form="organizationForm"
-                    e-ng-disabled="!vm.isApproveFormLoad"
+                    e-ng-hide="!vm.isApproveFormLoad"
                     e-ng-options="s as s.name for s in vm.federations">
                 {{organization.federationId.name}}
               </span>

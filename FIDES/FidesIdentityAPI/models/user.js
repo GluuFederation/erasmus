@@ -10,12 +10,14 @@ const userSchema = mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true
     },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        lowercase: true
     },
     password: {
         type: String,
@@ -33,10 +35,6 @@ const userSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
-    createdOn: {
-        type: Date,
-        default: new Date()
-    },
     scimId: {
         type: String,
         required: false
@@ -53,6 +51,8 @@ const userSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Provider'
     }
+}, {
+    timestamps: true
 });
 
 // generating a hash
@@ -82,5 +82,14 @@ userSchema.methods.safeModel = function() {
     }
 };
 
+//populate
+userSchema.pre('findOne', populateMasters);
+userSchema.pre('findById', populateMasters);
+userSchema.pre('find', populateMasters);
+
+function populateMasters() {
+    this.populate('role organization provider');
+    return this;
+}
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);

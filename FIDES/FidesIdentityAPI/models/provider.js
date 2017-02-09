@@ -109,12 +109,17 @@ const providerSchema = mongoose.Schema({
     ottoId: {
         type: mongoose.Schema.Types.ObjectId,
         required: false,
-    },
-    createdOn: {
-        type: Date,
-        default: new Date()
     }
+}, {
+    timestamps: true
 });
 
+providerSchema.pre('findOne', populateOrganization);
+providerSchema.pre('findById', populateOrganization);
+providerSchema.pre('find', populateOrganization);
+
+function populateOrganization() {
+    return this.populate('organization');
+}
 // create the model for openid connect provider and expose it to our app
 module.exports = mongoose.model('Provider', providerSchema);

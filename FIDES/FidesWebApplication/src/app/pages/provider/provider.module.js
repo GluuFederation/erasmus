@@ -17,7 +17,7 @@
         authenticate: true,
         sidebarMeta: {
           icon: 'fa fa-ticket',
-          order: 2
+          order: 4
         }
       });
   }
