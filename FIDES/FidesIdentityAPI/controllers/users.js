@@ -371,7 +371,7 @@ router.post('/getUser', (req, res, next) => {
     Users.getUser(req.body)
         .then((user) => {
             if (!user) {
-                return res.status(httpStatus.NOT_ACCEPTABLE).send(info);
+                return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Users ' + common.message.NOT_FOUND});
             }
 
             return res.status(httpStatus.OK).send(user.safeModel());
@@ -785,7 +785,7 @@ function addProviderAndUser(data, res) {
                             }
                         };
 
-                    //return res.status(httpStatus.OK).send(user);
+                    // return res.status(httpStatus.OK).send(user);
                     scim.addUser(userDetail).then(function (data) {
                         return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
                     }).catch(function (error) {
