@@ -40,13 +40,15 @@ router.post('/validateEmail', (req, res, next) => {
 
             let provider = user.provider;
             let state = generateString(16);
-            let redirectUri = JSON.parse(provider.redirectUris)[1];
+            const loginUrl = JSON.parse(provider.redirectUris).filter(function (value) {
+                return value.indexOf('login.html') > 0
+            });
             let responseType = JSON.parse(provider.responseTypes)[0];
-            let authEndpoint = provider.authorizationEndpoint.concat('?redirect_uri=').concat(redirectUri).concat('&client_id=').concat(provider.clientId).concat('&response_type=').concat(responseType).concat('&state=').concat(state).concat('&scope=').concat('openid email');
+            let authEndpoint = provider.authorizationEndpoint.concat('?redirect_uri=').concat(loginUrl[0]).concat('&client_id=').concat(provider.clientId).concat('&response_type=').concat(responseType).concat('&state=').concat(state).concat('&scope=').concat('openid email');
             return res.status(httpStatus.OK).send({
                 authEndpoint: authEndpoint,
                 email: req.body.email,
-                redirectUri: redirectUri,
+                redirectUri: loginUrl[0],
                 state: state
             });
         })
@@ -532,7 +534,11 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
             }
 
             var state = generateString(16);
-            var authEndpoint = discoveryJson.authorization_endpoint.concat('?redirect_uri=').concat(clientJson.redirect_uris[0]).concat('&client_id=').concat(clientJson.client_id).concat('&response_type=').concat(clientJson.response_types[0]).concat('&state=').concat(state).concat('&scope=').concat('profile%20email%20openid');
+            const registrationUrl = clientJson.redirect_uris.filter(function (value) {
+                return value.indexOf('register.html') > 0
+            });
+
+            var authEndpoint = discoveryJson.authorization_endpoint.concat('?redirect_uri=').concat(registrationUrl[0]).concat('&client_id=').concat(clientJson.client_id).concat('&response_type=').concat(clientJson.response_types[0]).concat('&state=').concat(state).concat('&scope=').concat('profile%20email%20openid');
             return res.status(httpStatus.OK).send({
                 authEndpoint: authEndpoint,
                 state: state,
@@ -726,10 +732,10 @@ router.post('/registerDetail', (req, res, next) => {
 router.post('/encrypt', (req, res, next) => {
     try {
         if (!req.body.data) {
-            return res.status(httpStatus.NOT_ACCEPTABLE).send({ message: 'Please enter data' });
+            return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Please enter data'});
         }
         if (!req.body.privateKey) {
-            return res.status(httpStatus.NOT_ACCEPTABLE).send({ message: 'Please enter private key' });
+            return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Please enter private key'});
         }
         const key = require('keypair')().private;
         let signedData = jwt.sign(req.body.data, req.body.privateKey, {algorithm: 'RS256'});
@@ -785,7 +791,7 @@ function addProviderAndUser(data, res) {
                             }
                         };
 
-                    // return res.status(httpStatus.OK).send(user);
+                    //return res.status(httpStatus.OK).send(user);
                     scim.addUser(userDetail).then(function (data) {
                         return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
                     }).catch(function (error) {
