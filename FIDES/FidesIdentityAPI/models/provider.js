@@ -30,6 +30,10 @@ const providerSchema = mongoose.Schema({
         type: String,
         required: false
     },
+    oxdId: {
+        type: String,
+        required: false
+    },
     scope: {
         type: String,
         required: false

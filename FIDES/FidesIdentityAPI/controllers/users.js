@@ -13,6 +13,7 @@ const express = require('express'),
     router = express.Router(),
     request = require('request-promise'),
     jwt = require('jsonwebtoken'),
+    oxd = require('oxd-node'),
     common = require('../helpers/common'),
     httpStatus = require('http-status'),
     Users = require('../helpers/users'),
@@ -39,17 +40,33 @@ router.post('/validateEmail', (req, res, next) => {
             }
 
             let provider = user.provider;
-            let state = generateString(16);
             const loginUrl = JSON.parse(provider.redirectUris).filter(function (value) {
                 return value.indexOf('login.html') > 0
             });
-            let responseType = JSON.parse(provider.responseTypes)[0];
-            let authEndpoint = provider.authorizationEndpoint.concat('?redirect_uri=').concat(loginUrl[0]).concat('&client_id=').concat(provider.clientId).concat('&response_type=').concat(responseType).concat('&state=').concat(state).concat('&scope=').concat('openid email');
-            return res.status(httpStatus.OK).send({
-                authEndpoint: authEndpoint,
-                email: req.body.email,
-                redirectUri: loginUrl[0],
-                state: state
+
+            oxd.Request = {
+                oxd_id: provider.oxdId,
+                authorization_redirect_uri: loginUrl[0],
+                acr_values: ['basic'],
+                port: process.env.OXD_PORT
+            };
+
+            oxd.get_authorization_url(oxd.Request, (response) => {
+                response = JSON.parse(response);
+                if (response.status != 'ok') {
+                    return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                        message: 'Failed to get authorization url'
+                    });
+                }
+                let url = response.data.authorization_url;
+                const state = url.substring(url.indexOf('state=') + 6, url.indexOf('nonce=') - 1);
+                url = url.replace('register','login');
+                return res.status(httpStatus.OK).send({
+                    authEndpoint: url,
+                    email: req.body.email,
+                    redirectUri: loginUrl[0],
+                    state: state
+                });
             });
         })
         .catch((err) => {
@@ -90,7 +107,7 @@ router.post('/login', (req, res, next) => {
             }
             const option = {
                 method: 'GET',
-                uri: user.provider.discoveryUrl,
+                uri: user.provider.discoveryUrl + '/.well-known/openid-configuration',
                 resolveWithFullResponse: true
             };
             return request(option);
@@ -108,7 +125,7 @@ router.post('/login', (req, res, next) => {
             } catch (exception) {
                 console.log(exception.toString());
                 return res.status(httpStatus.NOT_ACCEPTABLE).send({
-                    'message': 'Discovery URL is invalid. Please check and correct it.'
+                    message: 'Discovery URL is invalid. Please check and correct it.'
                 });
             }
 
@@ -118,16 +135,22 @@ router.post('/login', (req, res, next) => {
             data.client_secret = user.provider.clientSecret;
             data.redirect_uri = req.body.redirectUri;
             data.code = req.body.code;
-            return getUserClaims(data);
+
+            const clientInfo = {
+                oxd_id: user.provider.oxdId,
+                code: data.code,
+                state: req.body.state
+            };
+            return getUserClaims(clientInfo);
         })
         .then((userInfo) => {
             if (!userInfo) {
                 return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-                    message: 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    message: common.message.INTERNAL_SERVER_ERROR
                 });
             }
 
-            if (!userInfo.email || userInfo.email.toLowerCase() !== req.body.email.toLowerCase()) {
+            if (!userInfo.data.claims.email[0] || userInfo.data.claims.email[0].toLowerCase() !== req.body.email.toLowerCase()) {
                 return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
                     message: 'Email did not matched. Please check email address or logout from provider first and try again.'
                 });
@@ -440,6 +463,10 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
         });
     }
     let discoveryJson = {};
+    let clientJson = {};
+    let oxdId = '';
+    let oxdRequest = {};
+    let registreUrl = '';
     return Organizations.getOrganizationByName(providerInfo.organizationName)
         .then((organization) => {
             let isExists = !!organization;
@@ -468,10 +495,9 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
                     message: 'Provider is already exists.'
                 }));
             }
-
             const option = {
                 method: 'GET',
-                uri: providerInfo.discoveryUrl,
+                uri: providerInfo.discoveryUrl + '/.well-known/openid-configuration',
                 resolveWithFullResponse: true
             };
 
@@ -493,15 +519,15 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
                 }));
             }
 
-            var client = {
+            const client = {
                 redirect_uris: providerInfo.redirectUrls,
-                application_type: "native",
+                application_type: 'native',
                 client_name: providerInfo.organizationName,
-                token_endpoint_auth_method: "client_secret_basic",
+                token_endpoint_auth_method: 'client_secret_basic',
                 scopes: discoveryJson.scopes_supported
             };
 
-            var options = {
+            const options = {
                 method: 'POST',
                 uri: discoveryJson.registration_endpoint,
                 body: JSON.stringify(client),
@@ -517,7 +543,6 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
                 }));
             }
 
-            var clientJson = {};
             try {
                 clientJson = JSON.parse(response.body);
             } catch (exception) {
@@ -533,17 +558,64 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
                 }));
             }
 
-            var state = generateString(16);
-            const registrationUrl = clientJson.redirect_uris.filter(function (value) {
+            registreUrl = clientJson.redirect_uris.filter(function (value) {
                 return value.indexOf('register.html') > 0
             });
 
-            var authEndpoint = discoveryJson.authorization_endpoint.concat('?redirect_uri=').concat(registrationUrl[0]).concat('&client_id=').concat(clientJson.client_id).concat('&response_type=').concat(clientJson.response_types[0]).concat('&state=').concat(state).concat('&scope=').concat('profile%20email%20openid');
-            return res.status(httpStatus.OK).send({
-                authEndpoint: authEndpoint,
-                state: state,
+            // register site in oxd
+            oxdRequest = {
+                authorization_redirect_uri: registreUrl[0],
+                op_host: providerInfo.discoveryUrl,
+                redirect_uris: clientJson.redirect_uris,
+                scopes: clientJson.scopes,
+                response_types: clientJson.response_types,
                 client_id: clientJson.client_id,
-                token: clientJson.registration_access_token
+                client_secret: clientJson.client_secret,
+                client_token_endpoint_auth_method: clientJson.client_token_endpoint_auth_method,
+                client_registration_client_uri: clientJson.registration_client_uri,
+                access_token: clientJson.registration_access_token,
+                port: process.env.OXD_PORT
+            };
+            oxd.Request = oxdRequest;
+            return new Promise((resolve, reject) => {
+                oxd.register_site(oxd.Request, (response) => {
+                    response = JSON.parse(response);
+                    if (response.status == 'ok')
+                        return resolve(response);
+
+                    return resolve(null);
+                });
+            });
+        })
+        .then((response) => {
+            if (!response) {
+                return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
+                    message: 'Failed to create oxd client'
+                }));
+            }
+            oxdId = response.data.oxd_id;
+            oxd.Request = {
+                oxd_id: oxdId,
+                acr_values: ['basic'],
+                port: process.env.OXD_PORT
+            };
+
+            oxd.get_authorization_url(oxd.Request, (response) => {
+                response = JSON.parse(response);
+                if (response.status != 'ok') {
+                    return res.status(httpStatus.NOT_ACCEPTABLE).send({
+                        message: 'Failed to get authorization url'
+                    });
+                }
+                const url = response.data.authorization_url;
+                const state = url.substring(url.indexOf('state=') + 6, url.indexOf('nonce=') - 1);
+                return res.status(httpStatus.OK).send({
+                    authEndpoint: url,
+                    state: state,
+                    client_id: oxdRequest.client_id,
+                    oxd_id: oxdId,
+                    token: oxdRequest.access_token
+                });
             });
         })
         .catch((err) => {
@@ -553,6 +625,11 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
                     message: common.message.INTERNAL_SERVER_ERROR
                 });
             }
+
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+                err: err,
+                message: common.message.INTERNAL_SERVER_ERROR
+            });
         });
 });
 
@@ -606,6 +683,11 @@ router.post('/registerDetail', (req, res, next) => {
             message: 'Client token not found. Please try after some time.'
         });
     }
+    if (!clientInfo.oxd_id) {
+        return res.status(httpStatus.NOT_ACCEPTABLE).send({
+            message: 'Please provide oxd Id.'
+        });
+    }
 // endregion
     let discoveryMetadata = {};
     let clientMetadata = {};
@@ -613,7 +695,7 @@ router.post('/registerDetail', (req, res, next) => {
     let role = null;
     const option = {
         method: 'GET',
-        uri: providerInfo.discoveryUrl,
+        uri: providerInfo.discoveryUrl + '/.well-known/openid-configuration',
         resolveWithFullResponse: true
     };
     return request.get(option)
@@ -646,7 +728,7 @@ router.post('/registerDetail', (req, res, next) => {
         .then((response) => {
             if (!response) {
                 return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-                    message: 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    message: common.message.INTERNAL_SERVER_ERROR
                 }));
             }
 
@@ -655,7 +737,7 @@ router.post('/registerDetail', (req, res, next) => {
             } catch (exception) {
                 console.log(exception.toString());
                 return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-                    message: 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    message: common.message.INTERNAL_SERVER_ERROR
                 }));
             }
 
@@ -671,16 +753,24 @@ router.post('/registerDetail', (req, res, next) => {
             data.client_secret = clientMetadata.client_secret;
             data.redirect_uri = clientMetadata.redirect_uris[0];
             data.code = clientInfo.code;
-            return getUserClaims(data);
+
+            // Get access token for fetch user information
+            oxd.Request = {
+                oxd_id: clientInfo.oxd_id,
+                code: clientInfo.code,
+                state: clientInfo.state,
+                port: process.env.OXD_PORT
+            };
+
+            return getUserClaims(clientInfo);
         })
         .then((claimsUserInfo) => {
-            userInfo = claimsUserInfo;
-            if (!userInfo) {
+            if (!claimsUserInfo) {
                 return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-                    message: 'The server encountered an internal error and was unable to complete your request. Please contact administrator.'
+                    message: common.message.INTERNAL_SERVER_ERROR
                 }));
             }
-
+            userInfo = claimsUserInfo.data.claims;
             return Roles.getRoleByName('orgadmin');
         })
         .then((frole) => {
@@ -696,9 +786,9 @@ router.post('/registerDetail', (req, res, next) => {
             data.organizationId = organization._id;
             data.personInfo = {};
             data.personInfo.email = providerInfo.email;
-            data.personInfo.username = userInfo.username || providerInfo.email;
-            data.personInfo.firstName = userInfo.given_name;
-            data.personInfo.lastName = userInfo.family_name;
+            data.personInfo.username = userInfo.email[0];
+            data.personInfo.firstName = userInfo.given_name[0];
+            data.personInfo.lastName = userInfo.family_name[0];
             data.personInfo.roleId = role._id;
             data.personInfo.isActive = true;
             data.providerInfo = {};
@@ -706,6 +796,7 @@ router.post('/registerDetail', (req, res, next) => {
             data.providerInfo.discoveryUrl = providerInfo.discoveryUrl;
             data.providerInfo.clientId = clientMetadata.client_id;
             data.providerInfo.clientSecret = clientMetadata.client_secret;
+            data.providerInfo.oxdId = clientInfo.oxd_id;
             data.providerInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
             data.providerInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
             data.providerInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
@@ -791,13 +882,13 @@ function addProviderAndUser(data, res) {
                             }
                         };
 
-                    //return res.status(httpStatus.OK).send(user);
-                    scim.addUser(userDetail).then(function (data) {
-                        return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
-                    }).catch(function (error) {
-                        console.log(error);
-                        return deleteUserProviderAndOrg(user._id, provider._id, data.organizationId, res);
-                    });
+                    return res.status(httpStatus.OK).send(user);
+                    // scim.addUser(userDetail).then(function (data) {
+                    //     return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
+                    // }).catch(function (error) {
+                    //     console.log(error);
+                    //     return deleteUserProviderAndOrg(user._id, provider._id, data.organizationId, res);
+                    // });
                     // endregion
                 })
                 .catch((err) => {
@@ -865,76 +956,45 @@ function updateScimId(scimId, userId, providerId, orgId, res) {
         });
 }
 
-function getUserClaims(data) {
-    let authToken = new Buffer(data.client_id + ':' + data.client_secret).toString('base64');
-    let tokenRequestOptions = {
-        method: 'POST',
-        uri: data.discoveryMetadata.token_endpoint,
-        headers: {
-            authorization: 'Basic ' + authToken,
-            'content-type': 'application/x-www-form-urlencoded'
-        },
-        form: {
-            grant_type: 'authorization_code',
-            code: data.code,
-            redirect_uri: data.redirect_uri
-        },
-        resolveWithFullResponse: true
+function getUserClaims(clientInfo) {
+    oxd.Request = {
+        oxd_id: clientInfo.oxd_id,
+        code: clientInfo.code,
+        state: clientInfo.state,
+        port: process.env.OXD_PORT
     };
 
-    let tokenMetadata = {};
-    return request(tokenRequestOptions)
-        .then((response) => {
-            if (!response) {
-                return Promise.reject(false);
+    const tokenPromise = new Promise((resolve, reject) => {
+        oxd.get_tokens_by_code(oxd.Request, (response) => {
+            response = JSON.parse(response);
+            if (response.status != 'ok') {
+                resolve(null);
             }
-
-            try {
-                tokenMetadata = JSON.parse(response.body);
-            } catch (exception) {
-                console.log('--tokenMetadata--', exception.toString());
-                return Promise.reject(false);
-            }
-
-            if (tokenMetadata.error) {
-                return Promise.reject(false);
-            }
-
-            let userInfoOptions = {
-                method: 'GET',
-                uri: data.discoveryMetadata.userinfo_endpoint,
-                headers: {
-                    authorization: 'Bearer ' + tokenMetadata.access_token
-                },
-                resolveWithFullResponse: true
-            };
-
-            return request(userInfoOptions);
-        })
-        .then((response) => {
-            if (!response) {
-                return Promise.reject(false);
-            }
-
-            let userInfo = {};
-
-            try {
-                userInfo = JSON.parse(response.body);
-            } catch (exception) {
-                console.log('--userInfo--', exception.toString());
-                return Promise.reject(false);
-            }
-
-            if (userInfo.error) {
-                console.log('--userInfo--', userInfo.error_description);
-                return Promise.reject(false);
-            }
-
-            return Promise.resolve(userInfo);
-        })
-        .catch((err) => {
-            return Promise.reject(err);
+            resolve(response);
         });
+    });
+
+    return tokenPromise.then((response) => {
+        if (!response) {
+            return Promise.resolve(null);
+        }
+
+        oxd.Request = {
+            oxd_id: clientInfo.oxd_id,
+            access_token: response.data.access_token,
+            port: process.env.OXD_PORT
+        };
+
+        return new Promise((resolve, reject) => {
+            oxd.get_user_info(oxd.Request, (response) => {
+                response = JSON.parse(response);
+                if (response.status != 'ok') {
+                    return resolve(null);
+                }
+                return resolve(response);
+            });
+        });
+    });
 }
 
 function generateString(length) {

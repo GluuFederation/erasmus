@@ -52,6 +52,7 @@ let addProvider = (req) => {
     oProvider.discoveryUrl = req.discoveryUrl;
     oProvider.clientId = req.clientId;
     oProvider.clientSecret = req.clientSecret;
+    oProvider.oxdId = req.oxdId;
     // oProvider.keys = req.keys;
     // oProvider.trustMarks = req.trustMarks;
     // oProvider.responseType = req.responseType;

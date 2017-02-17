@@ -24,9 +24,9 @@ angular.module('FidesWebApplication', [
     rewriteLinks: true
   });
 }).constant('urls', {
-  BASE: 'http://localhost:3000',
-  AUTH_URL: 'http://localhost:3000/login.html',
-  BASE_API: 'http://localhost:8000',
+  BASE: 'https://127.0.0.1:3000',
+  AUTH_URL: 'https://127.0.0.1:3000/login.html',
+  BASE_API: 'http://127.0.0.1:8000',
   USER_PROFILE: 'assets/img/theme/no-photo.png'
 }).run(function ($rootScope, $localStorage, $http, $window, $state, urls, toastr) {
   if ($window.location.pathname == "/login.html" || $window.location.pathname == "/register.html") {
@@ -41,7 +41,7 @@ angular.module('FidesWebApplication', [
       s.visible = false;
       var userRole = $localStorage.currentUser.role;
       if (userRole != undefined) {
-        if (s.roles === undefined || s.roles.includes(userRole)) {
+        if (s.roles === undefined || s.roles.indexOf(userRole) >= 0) {
           s.visible = true;
         }
       }
