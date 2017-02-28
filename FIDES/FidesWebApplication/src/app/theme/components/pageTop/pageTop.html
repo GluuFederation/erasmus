@@ -14,9 +14,10 @@
       </a>
       <ul class="top-dropdown-menu profile-dropdown" uib-dropdown-menu>
         <li><i class="dropdown-arr"></i></li>
-        <li><a ng-click="vm.openProfileModal()"><i class="fa fa-user"></i>Profile</a></li>
+        <li><a href ng-click="vm.openProfileModal()"><i class="fa fa-user"></i>Profile</a></li>
         <!--<li><a ng-click="vm.openChangePasswordModal()"><i class="fa fa-key"></i>Change Password</a></li>-->
-        <li><a ng-click="vm.logout()" class="signout"><i class="fa fa-power-off"></i>Sign out</a></li>
+        <li><a href="{{vm.badgeUrl}}" target="_blank"><i class="fa fa-bookmark"></i>Badge</a></li>
+        <li><a href ng-click="vm.logout()" class="signout"><i class="fa fa-power-off"></i>Sign out</a></li>
       </ul>
     </div>
     <!--<msg-center></msg-center>-->

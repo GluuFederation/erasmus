@@ -182,7 +182,7 @@ router.delete('/removeProvider/:providerId', (req, res, next) => {
 });
 
 /**
- * Approve provider. Accepts providerId as parameter.
+ *1 Approve provider. Accepts providerId as parameter.
  */
 router.get('/approveProvider/:providerId', (req, res, next) => {
     if (!req.params.providerId) {

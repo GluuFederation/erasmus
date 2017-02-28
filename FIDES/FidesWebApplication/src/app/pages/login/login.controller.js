@@ -12,8 +12,9 @@
     vm.openProfileModal = openProfileModal;
     vm.openChangePasswordModal = openChangePasswordModal;
     vm.userProfilePic = userProfilePic;
-
+    vm.badgeUrl = urls.BADGE_URL ? encodeURI(urls.BADGE_URL.concat('?email=' + $localStorage.currentUser.user.email)) : '';
     vm.params = $location.search();
+
     if(vm.params && vm.params.state && $localStorage.authDetail) {
       if(vm.params.state === $localStorage.authDetail.state) {
         vm.email = $localStorage.authDetail.email;
@@ -54,7 +55,7 @@
         return;
       }
 
-      loginService.validateEmail(vm.email, onSuccess, onError);
+      loginService.validateEmail(vm.email, false, onSuccess, onError);
 
       function onSuccess(response) {
         if (response) {
@@ -145,7 +146,7 @@
         }
 
         function onError(error) {
-          toastr.error(error.data.message, 'Profile', {})
+          toastr.error(error.data.message, 'Profile', {});
         }
       }
 

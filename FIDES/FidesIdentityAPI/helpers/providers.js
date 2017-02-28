@@ -52,6 +52,7 @@ let addProvider = (req) => {
     oProvider.discoveryUrl = req.discoveryUrl;
     oProvider.clientId = req.clientId;
     oProvider.clientSecret = req.clientSecret;
+    oProvider.oxdId = req.oxdId;
     // oProvider.keys = req.keys;
     // oProvider.trustMarks = req.trustMarks;
     // oProvider.responseType = req.responseType;
@@ -71,8 +72,8 @@ let addProvider = (req) => {
     // oProvider.refreshToken = req.refreshToken;
     oProvider.authorizationEndpoint = req.authorizationEndpoint;
     oProvider.redirectUris = req.redirectUris;
-    oProvider.responseTypes = req.responseTypes;
     oProvider.organization = req.organizationId;
+    oProvider.responseTypes = req.responseTypes;
     oProvider.createdBy = req.createdBy;
     oProvider.isApproved = false;
     oProvider.isVerified = false;

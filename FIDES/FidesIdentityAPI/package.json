@@ -21,6 +21,7 @@
     "keypair": "^1.0.1",
     "mongoose": "4.5.10",
     "multer": "1.2.0",
+    "oxd-node": "^1.1.6",
     "request": "^2.79.0",
     "request-promise": "^4.1.1",
     "swagger-express": "1.0.5"

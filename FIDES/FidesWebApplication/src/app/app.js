@@ -24,10 +24,11 @@ angular.module('FidesWebApplication', [
     rewriteLinks: true
   });
 }).constant('urls', {
-  BASE: 'http://localhost:3000',
-  AUTH_URL: 'http://localhost:3000/login.html',
-  BASE_API: 'http://localhost:8000',
-  USER_PROFILE: 'assets/img/theme/no-photo.png'
+  BASE: 'https://127.0.0.1:3000',
+  AUTH_URL: 'https://127.0.0.1:3000/login.html',
+  BASE_API: 'http://127.0.0.1:8000',
+  USER_PROFILE: 'assets/img/theme/no-photo.png',
+  BADGE_URL: 'https://127.0.0.1:3333/'
 }).run(function ($rootScope, $localStorage, $http, $window, $state, urls, toastr) {
   if ($window.location.pathname == "/login.html" || $window.location.pathname == "/register.html") {
     removeTokenAndRedirect($localStorage, $http, $window, urls);
@@ -37,11 +38,11 @@ angular.module('FidesWebApplication', [
   if (($window.location.href !== urls.AUTH_URL && $localStorage.currentUser == undefined)) {
     removeTokenAndRedirect($localStorage, $http, $window, urls, true);
   } else {
-    angular.forEach($state.get(), function(s) {
+    angular.forEach($state.get(), function (s) {
       s.visible = false;
       var userRole = $localStorage.currentUser.role;
       if (userRole != undefined) {
-        if (s.roles === undefined || s.roles.includes(userRole)) {
+        if (s.roles === undefined || s.roles.indexOf(userRole) >= 0) {
           s.visible = true;
         }
       }
@@ -74,7 +75,7 @@ angular.module('FidesWebApplication', [
     });
 
     //navigate to home page if state is not found.
-    if(!$state.current.name) {
+    if (!$state.current.name) {
       $state.go('home');
     }
   }
@@ -100,7 +101,7 @@ angular.module('FidesWebApplication', [
 }]);
 
 function removeTokenAndRedirect($localStorage, $http, $window, urls, redirectToLogin, message) {
-  if(!message) {
+  if (!message) {
     message = '';
   }
 
