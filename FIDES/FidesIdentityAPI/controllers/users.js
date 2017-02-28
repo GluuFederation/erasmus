@@ -1,26 +1,26 @@
 "use strict";
 
-var scimConfig = {
+const scimConfig = {
     keyAlg: 'RS256',
     domain: 'https://gluu.local.org/',
     privateKey: 'scim-rp-sample.key',
     clientId: '@!FFDB.955F.C09D.E9FB!0001!2A77.8551!0008!C1BA.63D6',
     keyId: '63eed5a0-f1ea-42cb-bd21-5d904b0b894d'
 };
-var scim = require('scim-node')(scimConfig);
+const scim = require('scim-node')(scimConfig);
 
-const express = require('express'),
-    router = express.Router(),
-    request = require('request-promise'),
-    jwt = require('jsonwebtoken'),
-    oxd = require('oxd-node'),
-    common = require('../helpers/common'),
-    httpStatus = require('http-status'),
-    Users = require('../helpers/users'),
-    Roles = require('../helpers/roles'),
-    Organizations = require('../helpers/organizations'),
-    Providers = require('../helpers/providers');
+const express = require('express');
+const request = require('request-promise');
+const jwt = require('jsonwebtoken');
+const oxd = require('oxd-node');
+const common = require('../helpers/common');
+const httpStatus = require('http-status');
+const Users = require('../helpers/users');
+const Roles = require('../helpers/roles');
+const Organizations = require('../helpers/organizations');
+const Providers = require('../helpers/providers');
 
+const router = express.Router();
 /**
  * Validate user email before login.
  */
@@ -40,13 +40,12 @@ router.post('/validateEmail', (req, res, next) => {
             }
 
             let provider = user.provider;
-            const loginUrl = JSON.parse(provider.redirectUris).filter(function (value) {
-                return value.indexOf('login.html') > 0
-            });
+            const loginUrl = JSON.parse(provider.redirectUris).find(x => x.indexOf('login.html') > 0);
+            const registerUrl = JSON.parse(provider.redirectUris).find(x => x.indexOf('register.html') > 0);
+            const authUrl = JSON.parse(provider.redirectUris).find(x => x.indexOf('auth.html') > 0);
 
             oxd.Request = {
                 oxd_id: provider.oxdId,
-                authorization_redirect_uri: loginUrl[0],
                 acr_values: ['basic'],
                 port: process.env.OXD_PORT
             };
@@ -60,7 +59,7 @@ router.post('/validateEmail', (req, res, next) => {
                 }
                 let url = response.data.authorization_url;
                 const state = url.substring(url.indexOf('state=') + 6, url.indexOf('nonce=') - 1);
-                url = url.replace('register','login');
+                url = url.replace(registerUrl, (req.body.isBadge ? authUrl : loginUrl));
                 return res.status(httpStatus.OK).send({
                     authEndpoint: url,
                     email: req.body.email,
@@ -518,7 +517,6 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
                     message: 'Discovery URL is invalid. Please check and correct it.'
                 }));
             }
-
             const client = {
                 redirect_uris: providerInfo.redirectUrls,
                 application_type: 'native',
@@ -765,7 +763,7 @@ router.post('/registerDetail', (req, res, next) => {
             return getUserClaims(clientInfo);
         })
         .then((claimsUserInfo) => {
-            if (!claimsUserInfo) {
+            if (!claimsUserInfo || !claimsUserInfo.data.claims.email) {
                 return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
                     message: common.message.INTERNAL_SERVER_ERROR
                 }));
@@ -866,7 +864,7 @@ function addProviderAndUser(data, res) {
                             'title': 'Organization Admin',
                             'active': 'true',
                             //'password': data.personInfo.password,
-                            'roles': [{
+                            'role': [{
                                 'value': 'orgadmin'
                             }
                             ],

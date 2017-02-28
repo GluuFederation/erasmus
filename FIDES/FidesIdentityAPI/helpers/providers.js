@@ -72,8 +72,8 @@ let addProvider = (req) => {
     // oProvider.refreshToken = req.refreshToken;
     oProvider.authorizationEndpoint = req.authorizationEndpoint;
     oProvider.redirectUris = req.redirectUris;
-    oProvider.responseTypes = req.responseTypes;
     oProvider.organization = req.organizationId;
+    oProvider.responseTypes = req.responseTypes;
     oProvider.createdBy = req.createdBy;
     oProvider.isApproved = false;
     oProvider.isVerified = false;

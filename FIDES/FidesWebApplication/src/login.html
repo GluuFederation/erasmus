@@ -31,7 +31,7 @@
   <div class="auth-block" ng-controller="LoginController as vm">
     <h1>Sign in to FIDES Application</h1>
     <a href="register.html" target="_self" class="auth-link">New to FIDES? Sign up!</a>
-    <form name="vm.loginForm" novalidate>
+    <form name="vm.loginForm" novalidate class="form-horizontal">
       <div class="form-horizontal">
         <div class="form-group"
              ng-class="{'has-error': vm.loginForm.email.$invalid && (vm.loginForm.email.$dirty || vm.loginForm.$submitted)}">
@@ -41,10 +41,12 @@
                    placeholder="Email" required>
           </div>
         </div>
-        <div class="button-wrapper">
-          <button type="submit" id="signIn" ng-click="vm.login(vm.loginForm.$valid)" class="btn btn-default btn-auth">
-            Sign in
-          </button>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" id="signIn" ng-click="vm.login(vm.loginForm.$valid)" class="btn btn-default btn-auth">
+              Sign in
+            </button>
+          </div>
         </div>
       </div>
     </form>

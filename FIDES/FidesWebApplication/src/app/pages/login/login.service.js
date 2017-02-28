@@ -17,9 +17,10 @@
       return $http.post(urls.BASE_API + "/login", authDetail).success(onSuccess).catch(onError);
     }
 
-    function validateEmail(email, onSuccess, onError) {
+    function validateEmail(email, isBadge, onSuccess, onError) {
       return $http.post(urls.BASE_API + "/validateEmail", {
-        email: email
+        email: email,
+        isBadge: isBadge
       }).success(onSuccess).catch(onError);
     }
 
