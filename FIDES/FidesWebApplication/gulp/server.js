@@ -40,8 +40,7 @@ function browserSyncInit(baseDir, browser) {
     server: server,
     browser: browser,
     ghostMode: false,
-    https: true,
-      open:false
+    https: true
   });
 }
 
