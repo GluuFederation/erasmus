@@ -1,30 +1,30 @@
 "use strict";
 
 const mongoose = require('mongoose'),
-    bcrypt = require('bcrypt-nodejs');
+  bcrypt = require('bcrypt-nodejs');
 
 // define the schema for user role
 const roleSchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    nameSlug: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    order: {
-        type: Number,
-        required: true,
-    },
-    isActive: {
-        type: Boolean,
-        default: true
-    }
+  name: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  nameSlug: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  order: {
+    type: Number,
+    required: true,
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  }
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 // create the model for roles and expose it to our app

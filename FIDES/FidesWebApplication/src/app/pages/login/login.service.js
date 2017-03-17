@@ -10,7 +10,8 @@
     var service = {
       login: login,
       validateEmail: validateEmail,
-      updatePassword: updatePassword
+      updatePassword: updatePassword,
+      getUSStateCity: getUSStateCity
     };
 
     function login(authDetail, onSuccess, onError) {
@@ -26,6 +27,10 @@
 
     function updatePassword(formData, onSuccess, onError) {
       return $http.post(urls.BASE_API + "/updatePassword", formData).then(onSuccess).catch(onError);
+    }
+
+    function getUSStateCity() {
+      return $http.get('us_states_cities.json');
     }
 
     return service;

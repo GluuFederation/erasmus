@@ -14,19 +14,49 @@
             <th st-sort="firstName">First Name</th>
             <th st-sort="lastName">Last Name</th>
             <th st-sort="email">Email</th>
+            <th st-sort="phoneNo">Phone no</th>
+            <th st-sort="state">state</th>
+            <th st-sort="city">city</th>
             <th st-sort="role.nameSlug">Role</th>
             <th st-sort="organization.name">Organization</th>
             <th>Actions</th>
           </tr>
           <tr>
             <th style="display: none;"></th>
-            <th colspan="7" ng-show="vm.users"><input st-search="" placeholder="Search" class="input-sm form-control search-input" type="search"/></th>
+            <th ng-show="vm.users"><input st-search="username" placeholder="Search username"
+                                          class="input-sm form-control search-input col-lg-3" type="search"/></th>
+            <th ng-show="vm.users"><input st-search="firstName" placeholder="Search firstName"
+                                          class="input-sm form-control search-input col-lg-3" type="search"/></th>
+            <th ng-show="vm.users"><input st-search="lastName" placeholder="Search lastName"
+                                          class="input-sm form-control search-input col-lg-3" type="search"/></th>
+            <th ng-show="vm.users"><input st-search="email" placeholder="Search email"
+                                          class="input-sm form-control search-input col-lg-3" type="search"/></th>
+            <th ng-show="vm.users"><input st-search="phoneNo" placeholder="Search phone no"
+                                          class="input-sm form-control search-input col-lg-3" type="search"/></th>
+            <th ng-show="vm.users">
+              <select st-search="state" class="input-sm form-control search-input col-lg-3" type="search">
+                <option value="">All</option>
+                <option ng-repeat="row in vm.users | unique:'state'" value="{{row.state}}">{{row.state}}
+                </option>
+              </select>
+            </th>
+            <th ng-show="vm.users">
+              <select st-search="city" class="input-sm form-control search-input col-lg-3" type="search">
+                <option value="">All</option>
+                <option ng-repeat="row in vm.users | unique:'city'" value="{{row.city}}">{{row.city}}</option>
+              </select>
+            </th>
+            <th ng-show="vm.users"><input st-search="role.nameSlug" placeholder="Search role"
+                                          class="input-sm form-control search-input col-lg-3" type="search"/></th>
+            <th ng-show="vm.users"><input st-search="organization.name" placeholder="Search organization"
+                                          class="input-sm form-control search-input col-lg-3" type="search"/></th>
+            <th></th>
             <th colspan="7" ng-show="!vm.users" style="color: #e85656;">There are no records to display.</th>
           </tr>
           </thead>
           <tbody>
           <tr ng-repeat="user in vm.displayedCollection track by $index">
-            <td  style="display: none;"></td>
+            <td style="display: none;"></td>
             <td>
               {{user.username}}
             </td>
@@ -39,6 +69,9 @@
             <td>
               {{user.email}}
             </td>
+            <td>{{user.phoneNo}}</td>
+            <td>{{user.state}}</td>
+            <td>{{user.city}}</td>
             <td>
               {{user.role.nameSlug}}
             </td>
@@ -57,7 +90,7 @@
           </tbody>
           <tfoot>
           <tr>
-            <td colspan="7" class="text-center">
+            <td colspan="10" class="text-center">
               <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
             </td>
           </tr>

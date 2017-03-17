@@ -98,7 +98,24 @@ angular.module('FidesWebApplication', [
 }]).config(['$httpProvider', function ($httpProvider) {
   //Http Interceptor to check auth failures for xhr requests
   $httpProvider.interceptors.push('authHttpResponseInterceptor');
-}]);
+}]).factory('stateCityService',['$http', function ($http) {
+  return $http.get('us_states_cities.json');
+}]).filter('myStrictFilter', function($filter){
+  return function(input, predicate){
+    return $filter('filter')(input, predicate, true);
+  }
+}).filter('unique', function() {
+  return function (arr, field) {
+    var o = {}, i, l = !!arr ? arr.length : 0, r = [];
+    for(i=0; i<l;i+=1) {
+      o[arr[i][field]] = arr[i];
+    }
+    for(i in o) {
+      r.push(o[i]);
+    }
+    return r;
+  };
+});
 
 function removeTokenAndRedirect($localStorage, $http, $window, urls, redirectToLogin, message) {
   if (!message) {

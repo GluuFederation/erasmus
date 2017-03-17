@@ -2,4 +2,55 @@
   <div class="panel-content">
     <h3 class="with-line">ERASMUS: Emergency Responder Authentication System for Mobile Users</h3>
   </div>
+  <div class="panel-body" ng-if="vm.isShow">
+    <div class="alert bg-danger" ng-if="!vm.organization.isApproved">
+      <strong><i class="ion-android-cancel"></i> Organization is not approved</strong>
+    </div>
+    <div class="alert bg-info" ng-if="vm.organization.isApproved">
+      <strong><i class="ion-android-checkbox"></i> Organization is approve</strong>
+    </div>
+    <div class="add-row-editable-table pull-right">
+      <button class="btn btn-primary" ng-click="vm.openOranizationModal()">Edit</button>
+    </div>
+    <table class="table table-bordered">
+      <tbody>
+        <tr>
+          <td width="10%"><strong>Name</strong></td>
+          <td>{{vm.organization.name}}</td>
+        </tr>
+        <tr>
+          <td><strong>Federation</strong></td>
+          <td>{{vm.organization.federationId.name}}</td>
+        </tr>
+        <tr>
+          <td><strong>Phone No</strong></td>
+          <td>{{vm.organization.phoneNo}}</td>
+        </tr>
+        <tr>
+          <td><strong>Address</strong></td>
+          <td>{{vm.organization.address}}</td>
+        </tr>
+        <tr>
+          <td><strong>Zipcode</strong></td>
+          <td>{{vm.organization.zipcode}}</td>
+        </tr>
+        <tr>
+          <td><strong>State</strong></td>
+          <td>{{vm.organization.state}}</td>
+        </tr>
+        <tr>
+          <td><strong>City</strong></td>
+          <td>{{vm.organization.city}}</td>
+        </tr>
+        <tr>
+          <td><strong>Type</strong></td>
+          <td>{{vm.organization.type}}</td>
+        </tr>
+        <tr>
+          <td><strong>Approved</strong></td>
+          <td>{{vm.organization.isApproved ? 'Yes' : 'No'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

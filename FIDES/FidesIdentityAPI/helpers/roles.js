@@ -8,14 +8,14 @@ const Role = require('../models/role');
  * @return {err} - return error
  */
 let getAllRoles = () => {
-    return Role
-        .find({isActive: true})
-        .sort({order: 1})
-        .exec()
-        .then((roles) => {
-            return Promise.resolve(roles);
-        })
-        .catch(err => Promise.reject(err));
+  return Role
+    .find({isActive: true})
+    .sort({order: 1})
+    .exec()
+    .then((roles) => {
+      return Promise.resolve(roles);
+    })
+    .catch(err => Promise.reject(err));
 };
 
 /**
@@ -25,15 +25,15 @@ let getAllRoles = () => {
  * @return {err} - return error
  */
 let getRoleByName = (name) => {
-    return Role
-        .findOne({ name:name, isActive: true})
-        .sort({order: 1})
-        .exec()
-        .then(role => Promise.resolve(role))
-        .catch(err => Promise.reject(err));
+  return Role
+    .findOne({name: name, isActive: true})
+    .sort({order: 1})
+    .exec()
+    .then(role => Promise.resolve(role))
+    .catch(err => Promise.reject(err));
 };
 
 module.exports = {
-    getAllRoles,
-    getRoleByName
+  getAllRoles,
+  getRoleByName
 };

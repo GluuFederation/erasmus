@@ -7,8 +7,8 @@
   <title>Fides Web Application | Sign up</title>
 
   <link
-      href='https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900&subset=latin,greek,greek-ext,vietnamese,cyrillic-ext,latin-ext,cyrillic'
-      rel='stylesheet' type='text/css'>
+    href='https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900italic,900&subset=latin,greek,greek-ext,vietnamese,cyrillic-ext,latin-ext,cyrillic'
+    rel='stylesheet' type='text/css'>
 
   <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
@@ -29,44 +29,137 @@
 <body class="auth">
 <div class="body-bg"></div>
 <main ng-if="$pageFinishedLoading" class="auth-main" ng-controller="RegisterController as vm">
-  <div class="auth-block">
+  <div class="auth-block" style="width: 70% !important;">
     <h1>Sign up to FIDES Application</h1>
     <a href="login.html" target="_self" class="auth-link">Already have an account? Sign in!</a>
-    <form name="vm.registerForm" novalidate>
-      <div class="form-horizontal">
+    <div class="widgets">
+      <div class="row">
         <div class="col-md-12">
-          <div class="form-group"
-               ng-class="{'has-error': vm.registerForm.email.$invalid && (vm.registerForm.email.$dirty || vm.registerForm.$submitted)}">
-            <label class="control-label" for="userEmail">Email</label>
-            <input type="email" class="form-control" id="userEmail" name="email"
-                   title="Email required and must be valid email address."
-                   placeholder="Email" ng-model="vm.providerInfo.email" ng-required="true"/>
+          <div>
+            <ba-wizard on-index-change="vm.onIndexChange(lastIndex, index)" on-finish="vm.register()">
+              <ba-wizard-step title="Person" form="vm.personForm">
+                <form name="vm.personForm" novalidate>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.personForm.email.$invalid && (vm.personForm.email.$dirty || vm.personForm.$submitted)}">
+                        <label class="control-label" for="userEmail">Email</label>
+                        <input autofocus type="email" class="form-control" id="userEmail" name="email"
+                               title="Email required and must be valid email address."
+                               placeholder="Email" ng-model="vm.providerInfo.email" ng-required="true"/>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </ba-wizard-step>
+              <ba-wizard-step title="Organization" form="vm.organizationForm">
+                <form name="vm.organizationForm" novalidate>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.organizationForm.organizationName.$invalid && (vm.organizationForm.organizationName.$dirty || vm.organizationForm.$submitted)}">
+                        <label class="control-label" for="orgName">Name</label>
+                        <input autofocus type="text" class="form-control" id="orgName" name="organizationName" title="Please enter the organization name."
+                               placeholder="organization name" ng-model="vm.providerInfo.organizationName" ng-required="true"/>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.organizationForm.phoneNo.$invalid && (vm.organizationForm.phoneNo.$dirty || vm.organizationForm.$submitted)}">
+                        <label class="control-label" for="orgPhoneNo">Phone No</label>
+                        <input type="text" class="form-control" id="orgPhoneNo" name="phoneNo"
+                               title="Please enter the phone no."
+                               placeholder="phone no" ng-model="vm.providerInfo.phoneNo" ng-required="true" ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.organizationForm.address.$invalid && (vm.organizationForm.address.$dirty || vm.organizationForm.$submitted)}">
+                        <label class="control-label" for="orgAddress">Address</label>
+                        <input type="text" class="form-control" id="orgAddress" name="address"
+                               title="Please enter the Address"
+                               placeholder="Address" ng-model="vm.providerInfo.address" ng-required="true"/>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.organizationForm.zipcode.$invalid && (vm.organizationForm.zipcode.$dirty || vm.organizationForm.$submitted)}">
+                        <label class="control-label" for="orgZipcode">zipcode</label>
+                        <input type="text" class="form-control" id="orgZipcode" name="zipcode"
+                               title="Please enter the zipcode"
+                               placeholder="zipcode" ng-model="vm.providerInfo.zipcode" ng-required="true" ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/"/>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.organizationForm.state.$invalid && (vm.organizationForm.state.$dirty || vm.organizationForm.$submitted)}">
+                        <label class="control-label" for="orgState">State</label>
+                        <select name="state" class="form-control" id="orgState" title="Select State" ng-change="vm.stateChanged()"
+                                selectpicker required
+                                ng-model="vm.providerInfo.state"
+                                ng-options="state as state for state in vm.states">
+                          <option value="">--- Select State ---</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.organizationForm.city.$invalid && (vm.organizationForm.city.$dirty || vm.organizationForm.$submitted)}">
+                        <label class="control-label" for="orgCity">City</label>
+                        <select name="city" class="form-control" id="orgCity" title="Select City" selectpicker required
+                                ng-model="vm.providerInfo.city"
+                                ng-options="city as city for city in vm.cities">
+                          <option value="">--- Select City ---</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.organizationForm.type.$invalid && (vm.organizationForm.type.$dirty || vm.organizationForm.$submitted)}">
+                        <label class="control-label" for="orgType">Type</label>
+                        <input type="text" class="form-control" id="orgType" name="type"
+                               title="Please enter the type of organization"
+                               placeholder="type" ng-model="vm.providerInfo.type" ng-required="true"/>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.organizationForm.description.$invalid && (vm.organizationForm.description.$dirty || vm.organizationForm.$submitted)}">
+                        <label class="control-label" for="orgDesc">Description</label>
+                        <input type="text" class="form-control" id="orgDesc" name="description" title="Please enter description"
+                               placeholder="description" ng-model="vm.providerInfo.description"/>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </ba-wizard-step>
+              <ba-wizard-step title="Provider" form="vm.providerForm">
+                <form name="vm.providerForm" novalidate>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group"
+                           ng-class="{'has-error': vm.providerForm.discoveryUrl.$invalid && (vm.providerForm.discoveryUrl.$dirty || vm.providerForm.$submitted)}">
+                        <label class="control-label" for="discoveryUrl">URL</label>
+                        <input type="url" class="form-control" id="discoveryUrl" name="discoveryUrl"
+                               title="URL required and must be valid URL."
+                               placeholder="https://...." ng-model="vm.providerInfo.discoveryUrl"
+                               ng-required="true"/>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </ba-wizard-step>
+            </ba-wizard>
           </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group"
-               ng-class="{'has-error': vm.registerForm.organizationName.$invalid && (vm.registerForm.organizationName.$dirty || vm.registerForm.$submitted)}">
-            <label class="control-label" for="organizationName">Organization Name</label>
-            <input id="organizationName" type="text" class="form-control" name="organizationName"
-                   ng-required="true" placeholder="Organization Name" title="Organization name required!"
-                   ng-model="vm.providerInfo.organizationName"/>
-          </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group"
-               ng-class="{'has-error': vm.registerForm.discoveryUrl.$invalid && (vm.registerForm.discoveryUrl.$dirty || vm.registerForm.$submitted)}">
-            <label class="control-label" for="discoveryUrl">Discovery URL</label>
-            <input type="url" class="form-control" id="discoveryUrl" name="discoveryUrl"
-                   title="Discovery URL required and must be valid URL."
-                   placeholder="URL" ng-model="vm.providerInfo.discoveryUrl"
-                   ng-required="true"/>
-          </div>
-        </div>
-        <div class="button-wrapper">
-          <button type="submit" id="btnRegister" ng-click="vm.register(vm.registerForm.$valid)" class="btn btn-default btn-auth">Sign up!</button>
         </div>
       </div>
-    </form>
+    </div>
   </div>
 </main>
 
