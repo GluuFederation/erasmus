@@ -5,11 +5,11 @@
     .config(routeConfig);
 
   /** @ngInject */
-  function routeConfig($stateProvider) {
+  function routeConfig($stateProvider, $localStorageProvider) {
     $stateProvider
       .state('home', {
         url: '/home',
-        title: 'Home',
+        title: $localStorageProvider.get("currentUser").role === 'orgadmin' ? 'Organization' : 'Home',
         templateUrl: 'app/pages/home/home.html',
         controller: 'HomeController',
         controllerAs: "vm",

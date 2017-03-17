@@ -1,13 +1,13 @@
 "use strict";
 
 const express = require('express'),
-    router = express.Router();
+  router = express.Router();
 
 /**
  * Default route.
  */
 router.get('/loggedIn', (req, res) => res.status(200).send({
-    "message": "User logged in."
+  "message": "User logged in."
 }));
 
 router.use('/', require('./users'));

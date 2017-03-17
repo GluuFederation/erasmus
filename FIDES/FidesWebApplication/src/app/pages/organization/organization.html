@@ -1,6 +1,6 @@
 <div class="widgets">
   <div class="row">
-    <div class="col-lg-8 col-md-8">
+    <div class="col-lg-12 col-md-8">
       <div ba-panel ba-panel-class="with-scroll">
         <table st-safe-src="vm.organizations" st-table="vm.displayedCollection"
                class="table table-hover table-condensed">
@@ -9,66 +9,90 @@
             <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
             <th class="col-lg-3" st-sort="name">Name</th>
             <th st-sort="federationId.name">Federation</th>
+            <th st-sort="phoneNo">Phone no</th>
+            <th st-sort="address">Address</th>
+            <th st-sort="zipcode">Zipcode</th>
+            <th st-sort="state">state</th>
+            <th st-sort="city">city</th>
+            <th st-sort="type">type</th>
             <th>Approved</th>
             <th>Actions</th>
           </tr>
           <tr>
             <th style="display: none;"></th>
-            <th colspan="4" ng-show="vm.organizations"><input st-search="name" placeholder="Search" class="input-sm form-control search-input col-lg-6" type="search"/></th>
-            <th colspan="4" ng-show="!vm.organizations" style="color: #e85656;">There are no records to display.</th>
+            <th ng-show="vm.organizations"><input st-search="name" placeholder="Search name"
+                                                  class="input-sm form-control search-input col-lg-3" type="search"/>
+            </th>
+            <th ng-show="vm.organizations"><input st-search="federationId.name" placeholder="Search federation"
+                                                  class="input-sm form-control search-input col-lg-3" type="search"/>
+            </th>
+            <th ng-show="vm.organizations"><input st-search="phoneNo" placeholder="Search phone no"
+                                                  class="input-sm form-control search-input col-lg-3" type="search"/>
+            </th>
+            <th ng-show="vm.organizations"><input st-search="address" placeholder="Search address"
+                                                  class="input-sm form-control search-input col-lg-3" type="search"/>
+            </th>
+            <th ng-show="vm.organizations"><input st-search="zipcode" placeholder="Search zipcode"
+                                                  class="input-sm form-control search-input col-lg-3" type="search"/>
+            </th>
+            <th ng-show="vm.organizations">
+              <select st-search="state" class="input-sm form-control search-input col-lg-3" type="search">
+                <option value="">All</option>
+                <option ng-repeat="row in vm.organizations | unique:'state'" value="{{row.state}}">{{row.state}}
+                </option>
+              </select>
+            </th>
+            <th ng-show="vm.organizations">
+              <select st-search="city" class="input-sm form-control search-input col-lg-3" type="search">
+                <option value="">All</option>
+                <option ng-repeat="row in vm.organizations | unique:'city'" value="{{row.city}}">{{row.city}}</option>
+              </select>
+            </th>
+            <th ng-show="vm.organizations"><input st-search="type" placeholder="Search type"
+                                                  class="input-sm form-control search-input col-lg-3" type="search"/>
+            </th>
+            <th ng-show="vm.organizations">
+              <select st-search="isApproved" class="input-sm form-control search-input col-lg-3" type="search">
+                <option value="">All</option>
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </th>
+            <th ng-show="vm.organizations"></th>
+            <th colspan="9" ng-show="!vm.organizations" style="color: #e85656;">There are no records to display.</th>
           </tr>
           </thead>
           <tbody>
-          <tr ng-repeat="organization in vm.displayedCollection track by $index" class="editable-row">
+          <tr ng-repeat="organization in vm.displayedCollection track by $index">
             <td style="display: none;"></td>
-            <td class="col-lg-3">
-                <span editable-text="organization.name" e-name="name" e-form="organizationForm"
-                      onbeforesave="vm.validateName($data)"
-                      e-required e-ng-disabled="vm.isApproveFormLoad">{{organization.name}}</span>
-            </td>
-            <td>
-              <span editable-select="organization.federationId" e-name="federationId" e-form="organizationForm"
-                    e-ng-hide="!vm.isApproveFormLoad"
-                    e-ng-options="s as s.name for s in vm.federations">
-                {{organization.federationId.name}}
-              </span>
-            </td>
+            <td>{{organization.name}}</td>
+            <td>{{organization.federationId.name}}</td>
+            <td>{{organization.phoneNo}}</td>
+            <td class="col-lg-4">{{organization.address}}</td>
+            <td>{{organization.zipcode}}</td>
+            <td>{{organization.state}}</td>
+            <td>{{organization.city}}</td>
+            <td>{{organization.type}}</td>
             <td>
               <input type="checkbox" title="Is Approved" disabled ng-checked="organization.isApproved"/>
             </td>
-            <td>
-              <form editable-form name="organizationForm" ng-show="organizationForm.$visible"
-                    onbeforesave="vm.pushOrganization($data, organization)"
-                    class="form-buttons form-inline"
-                    shown="inserted == organization">
-                <button type="submit" style="margin: 0px 5px;" ng-disabled="organizationForm.$waiting"
-                        class="btn btn-success btn-icon" title="Save">
-                  <i class="ion-ios-checkmark-outline"></i>
-                </button>
-                <button type="button" style="margin: 0px 5px;" ng-disabled="organizationForm.$waiting"
-                        ng-click="vm.cancelForm(organizationForm)"
-                        class="btn btn-default btn-icon" title="Cancel">
-                  <i class="ion-ios-close-outline"></i>
-                </button>
-              </form>
-              <div class="buttons" ng-show="!organizationForm.$visible">
-                <button style="margin: 0px 5px;" class="btn btn-primary btn-icon"
-                        ng-disabled="organization.isApproved"
-                        ng-click="organizationForm.$show()" title="Edit"><i class="ion-edit"></i></button>
-                <button style="margin: 0px 5px;" class="btn btn-danger btn-icon"
-                        ng-disabled="organization.isApproved"
-                        ng-click="vm.removeOrganization(organization)" title="Delete"><i
-                    class="ion-android-delete"></i></button>
-                <button style="margin: 0px 5px;" class="btn btn-success btn-icon" ng-show="!organization.isApproved"
-                        ng-click="vm.loadFormApprove(organizationForm)" title="Approve"><i
-                    class="ion-android-checkmark-circle"></i></button>
-              </div>
+            <td class="col-lg-4">
+              <button class="btn btn-primary btn-icon"
+                      ng-disabled="organization.isApproved"
+                      ng-click="vm.openOranizationModal(organization, false)" title="Edit"><i class="ion-edit"></i></button>
+              <button class="btn btn-danger btn-icon"
+                      ng-disabled="organization.isApproved"
+                      ng-click="vm.removeOrganization(organization)" title="Delete"><i class="ion-android-delete"></i>
+              </button>
+              <button class="btn btn-success btn-icon" ng-show="!organization.isApproved"
+                      ng-click="vm.openOranizationModal(organization, true)" title="Approve"><i
+                class="ion-android-checkmark-circle"></i></button>
             </td>
           </tr>
           </tbody>
           <tfoot>
           <tr>
-            <td colspan="7" class="text-center">
+            <td colspan="12" class="text-center">
               <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
             </td>
           </tr>

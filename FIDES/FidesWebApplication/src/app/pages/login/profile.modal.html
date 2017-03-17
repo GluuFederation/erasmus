@@ -1,5 +1,5 @@
 <div class="modal-content">
-  <form name="vm.profileForm" novalidate>
+  <form name="vm.createUserForm" novalidate>
     <div class="modal-header">
       <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
         <em class="ion-ios-close-empty sn-link-close"></em>
@@ -8,7 +8,7 @@
     </div>
     <div class="modal-body">
       <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
           <div class="form-group">
             <label for="userFirstName">Username</label>
             <input id="userUsername" type="text" class="form-control" ng-disabled="true"
@@ -16,29 +16,7 @@
             </input>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="userFirstName">First Name</label>
-            <input id="userFirstName" type="text" class="form-control"
-                   placeholder="First Name" ng-model="vm.modalUser.firstName">
-            </input>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <label for="userLastName">Last Name</label>
-            <input id="userLastName" type="text" class="form-control"
-                   placeholder="Last Name" ng-model="vm.modalUser.lastName">
-            </input>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
           <div class="form-group">
             <label for="userEmail">Email</label>
             <input id="userEmail" type="text" class="form-control" ng-disabled="true"
@@ -47,10 +25,94 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.firstName.$invalid && (vm.createUserForm.firstName.$dirty || vm.createUserForm.$submitted)}">
+            <label for="userFirstName">First Name</label>
+            <input id="userFirstName" type="text" class="form-control" name="firstName"
+                   placeholder="First Name" ng-model="vm.modalUser.firstName">
+            </input>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.lastName.$invalid && (vm.createUserForm.lastName.$dirty || vm.createUserForm.$submitted)}">
+            <label for="userLastName">Last Name</label>
+            <input id="userLastName" type="text" class="form-control" name="lastName"
+                   placeholder="Last Name" ng-model="vm.modalUser.lastName">
+            </input>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.address.$invalid && (vm.createUserForm.address.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgAddress">Address</label>
+            <input type="text" class="form-control" id="orgAddress" name="address"
+                   title="Please enter the Address"
+                   placeholder="Address" ng-model="vm.modalUser.address" ng-required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.zipcode.$invalid && (vm.createUserForm.zipcode.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgZipcode">zipcode</label>
+            <input type="text" class="form-control" id="orgZipcode" name="zipcode"
+                   title="Please enter the zipcode"
+                   placeholder="zipcode" ng-model="vm.modalUser.zipcode" ng-required="true" ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.state.$invalid && (vm.createUserForm.state.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgState">State</label>
+            <select name="state" class="form-control" id="orgState" title="Select State" ng-change="vm.stateChanged()"
+                    selectpicker required
+                    ng-model="vm.modalUser.state"
+                    ng-options="state as state for state in vm.states">
+              <option value="">--- Select State ---</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.city.$invalid && (vm.createUserForm.city.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgCity">City</label>
+            <select name="city" class="form-control" id="orgCity" title="Select City" selectpicker required
+                    ng-model="vm.modalUser.city"
+                    ng-options="city as city for city in vm.cities">
+              <option value="">--- Select City ---</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.phoneNo.$invalid && (vm.createUserForm.phoneNo.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgPhoneNo">Phone No</label>
+            <input type="text" class="form-control" id="orgPhoneNo" name="phoneNo"
+                   title="Please enter the phone no."
+                   placeholder="phone no" ng-model="vm.modalUser.phoneNo" ng-required="true" ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.description.$invalid && (vm.createUserForm.description.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgDesc">Description</label>
+            <input type="text" class="form-control" id="orgDesc" name="description" title="Please enter description"
+                   placeholder="description" ng-model="vm.modalUser.description"/>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
-      <button type="submit" class="btn btn-primary" ng-click="vm.updateProfile(vm.profileForm.$valid)">Save</button>
+      <button type="submit" class="btn btn-primary" ng-click="vm.updateProfile(vm.createUserForm.$valid)">Save</button>
     </div>
   </form>
 </div>

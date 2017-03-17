@@ -8,12 +8,12 @@ const Federation = require('../models/federation');
  * @return {err} - return error
  */
 let getAllFederations = () => {
-    return Federation
-        .find({})
-        .sort({name: 1})
-        .exec()
-        .then((federations) => Promise.resolve(federations))
-        .catch((err) => Promise.reject(err));
+  return Federation
+    .find({})
+    .sort({name: 1})
+    .exec()
+    .then((federations) => Promise.resolve(federations))
+    .catch((err) => Promise.reject(err));
 };
 
 /**
@@ -23,11 +23,11 @@ let getAllFederations = () => {
  * @return {err} - return error
  */
 let getFederationById = (id) => {
-    return Federation
-        .findById(id)
-        .exec()
-        .then((federation) => Promise.resolve(federation))
-        .catch((err) => Promise.reject(err));
+  return Federation
+    .findById(id)
+    .exec()
+    .then((federation) => Promise.resolve(federation))
+    .catch((err) => Promise.reject(err));
 };
 
 /**
@@ -37,13 +37,13 @@ let getFederationById = (id) => {
  * @return {err} - return error
  */
 let getFederationByName = (name) => {
-    return Federation
-        .findOne({
-            name: new RegExp('^' + name + '$', "i")
-        })
-        .exec()
-        .then((federation) => Promise.resolve(federation))
-        .catch((err) => Promise.reject(err));
+  return Federation
+    .findOne({
+      name: new RegExp('^' + name + '$', "i")
+    })
+    .exec()
+    .then((federation) => Promise.resolve(federation))
+    .catch((err) => Promise.reject(err));
 };
 
 /**
@@ -53,13 +53,13 @@ let getFederationByName = (name) => {
  * @return {err} - return error
  */
 let addFederation = (req) => {
-    let oFederation = new Federation();
-    oFederation.name = req.name;
-    oFederation.isActive = req.isActive || false;
+  let oFederation = new Federation();
+  oFederation.name = req.name;
+  oFederation.isActive = req.isActive || false;
 
-    return oFederation.save()
-        .then(federation => Promise.resolve(federation))
-        .catch(err => Promise.reject(err));
+  return oFederation.save()
+    .then(federation => Promise.resolve(federation))
+    .catch(err => Promise.reject(err));
 };
 
 /**
@@ -69,18 +69,18 @@ let addFederation = (req) => {
  * @return {err} - return error
  */
 let updateFederation = (req) => {
-    const id = req._id;
-    return Federation
-        .findById(id)
-        .exec()
-        .then((oFederation) => {
-            oFederation.name = req.name || oFederation.name;
-            oFederation.isActive = req.isActive || oFederation.isActive;
-            return oFederation.save()
-                .then(updatedFederation => Promise.resolve(updatedFederation))
-                .catch(err => Promise.reject(err));
-        })
+  const id = req._id;
+  return Federation
+    .findById(id)
+    .exec()
+    .then((oFederation) => {
+      oFederation.name = req.name || oFederation.name;
+      oFederation.isActive = req.isActive || oFederation.isActive;
+      return oFederation.save()
+        .then(updatedFederation => Promise.resolve(updatedFederation))
         .catch(err => Promise.reject(err));
+    })
+    .catch(err => Promise.reject(err));
 };
 
 /**
@@ -90,23 +90,23 @@ let updateFederation = (req) => {
  * @return {err} - return error
  */
 let removeFederation = (id) => {
-    return Federation
-        .findById(id)
-        .exec()
-        .then((oFederation) => {
-            return oFederation
-                .remove()
-                .then((remFed) => Promise.resolve(remFed))
-                .catch(err => Promise.reject(err));
-        })
+  return Federation
+    .findById(id)
+    .exec()
+    .then((oFederation) => {
+      return oFederation
+        .remove()
+        .then((remFed) => Promise.resolve(remFed))
         .catch(err => Promise.reject(err));
+    })
+    .catch(err => Promise.reject(err));
 };
 
 module.exports = {
-    getAllFederations,
-    getFederationById,
-    getFederationByName,
-    addFederation,
-    updateFederation,
-    removeFederation
+  getAllFederations,
+  getFederationById,
+  getFederationByName,
+  addFederation,
+  updateFederation,
+  removeFederation
 };

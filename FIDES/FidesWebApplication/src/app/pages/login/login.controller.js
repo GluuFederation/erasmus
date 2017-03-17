@@ -119,6 +119,8 @@
     function profileInfoController($uibModalInstance, userData, userService) {
       var vm = this;
       vm.modalUser = {};
+      vm.stateCityList = {};
+      vm.states = [];
 
       if (userData) {
         vm.modalUser.username = userData.username;
@@ -127,6 +129,12 @@
         vm.modalUser.lastName = userData.lastName;
         vm.modalUser.email = userData.email;
         vm.modalUser.roleId = userData.role._id;
+        vm.modalUser.phoneNo = userData.phoneNo;
+        vm.modalUser.address = userData.address;
+        vm.modalUser.zipcode = userData.zipcode;
+        vm.modalUser.state = userData.state;
+        vm.modalUser.city = userData.city;
+        vm.modalUser.description = userData.description;
       }
 
       function updateProfile(isFormValid) {
@@ -150,6 +158,20 @@
         }
       }
 
+      function getStateCity() {
+        loginService.getUSStateCity().then(function (response) {
+          vm.stateCityList = response.data;
+          vm.states = Object.keys(response.data);
+          (!!vm.modalUser.state) ? vm.cities = vm.stateCityList[vm.modalUser.state] :'';
+        });
+      }
+
+      function stateChanged() {
+        vm.cities = vm.stateCityList[vm.modalUser.state];
+      }
+
+      getStateCity();
+      vm.stateChanged = stateChanged;
       vm.updateProfile = updateProfile;
     }
 

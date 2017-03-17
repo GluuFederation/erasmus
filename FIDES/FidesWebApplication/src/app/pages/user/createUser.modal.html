@@ -62,10 +62,74 @@
             <label for="userOrg">Organization</label>
             <select class="form-control" id="userOrg" name="organization" title="Select Organization" selectpicker
                     ng-required="vm.selectedRole === 'orgadmin'"
-                    ng-model="vm.modalUser.organizationId"
+                    ng-model="vm.modalUser.organization"
                     ng-options="organization._id as organization.name for organization in vm.organizations">
               <option value="">Select Organization</option>
             </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.address.$invalid && (vm.createUserForm.address.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgAddress">Address</label>
+            <input type="text" class="form-control" id="orgAddress" name="address"
+                   title="Please enter the Address"
+                   placeholder="Address" ng-model="vm.modalUser.address" ng-required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.zipcode.$invalid && (vm.createUserForm.zipcode.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgZipcode">zipcode</label>
+            <input type="text" class="form-control" id="orgZipcode" name="zipcode"
+                   title="Please enter the zipcode"
+                   placeholder="zipcode" ng-model="vm.modalUser.zipcode" ng-required="true" ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/" />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.state.$invalid && (vm.createUserForm.state.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgState">State</label>
+            <select name="state" class="form-control" id="orgState" title="Select State" ng-change="vm.stateChanged()"
+                    selectpicker required
+                    ng-model="vm.modalUser.state"
+                    ng-options="state as state for state in vm.states">
+              <option value="">--- Select State ---</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.city.$invalid && (vm.createUserForm.city.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgCity">City</label>
+            <select name="city" class="form-control" id="orgCity" title="Select City" selectpicker required
+                    ng-model="vm.modalUser.city"
+                    ng-options="city as city for city in vm.cities">
+              <option value="">--- Select City ---</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.phoneNo.$invalid && (vm.createUserForm.phoneNo.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgPhoneNo">Phone No</label>
+            <input type="text" class="form-control" id="orgPhoneNo" name="phoneNo"
+                   title="Please enter the phone no."
+                   placeholder="phone no" ng-model="vm.modalUser.phoneNo" ng-required="true" ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/" />
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createUserForm.description.$invalid && (vm.createUserForm.description.$dirty || vm.createUserForm.$submitted)}">
+            <label class="control-label" for="orgDesc">Description</label>
+            <input type="text" class="form-control" id="orgDesc" name="description" title="Please enter description"
+                   placeholder="description" ng-model="vm.modalUser.description"/>
           </div>
         </div>
       </div>

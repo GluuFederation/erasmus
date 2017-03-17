@@ -5,7 +5,7 @@
     .controller('UserController', UserController);
 
   /** @ngInject */
-  function UserController($scope, $filter, $localStorage, $uibModal, toastr, userService) {
+  function UserController($scope, $filter, $localStorage, $uibModal, toastr, userService, stateCityService) {
     var vm = this;
     vm.users = vm.displayedCollection = undefined;
 
@@ -85,9 +85,12 @@
       vm.selectedRole='admin';
       vm.roles = {};
       vm.organizations = {};
+      vm.stateCityList = {};
+      vm.states = [];
 
       getAllRoles();
       getAllOrganizations();
+      getStateCity();
 
       if (userData) {
         vm.isInEditMode = true;
@@ -97,8 +100,15 @@
         vm.modalUser.email = userData.email;
         vm.modalUser.roleId = userData.role._id;
         vm.selectedRole = userData.role.name;
+        vm.modalUser.phoneNo = userData.phoneNo;
+        vm.modalUser.address = userData.address;
+        vm.modalUser.zipcode = userData.zipcode;
+        vm.modalUser.state = userData.state;
+        vm.modalUser.city = userData.city;
+        vm.modalUser.description = userData.description;
+
         if(userData.organization) {
-          vm.modalUser.organizationId = userData.organization._id;
+          vm.modalUser.organization = userData.organization._id;
         }
       }
 
@@ -142,6 +152,14 @@
         }
       }
 
+      function getStateCity() {
+        stateCityService.then(function (response) {
+          vm.stateCityList = response.data;
+          vm.states = Object.keys(response.data);
+          (!!vm.modalUser.state) ? vm.cities = vm.stateCityList[vm.modalUser.state] :'';
+        });
+      }
+
       function pushUser(isFormValid) {
         if (!isFormValid) {
           return false;
@@ -155,12 +173,12 @@
         // }
 
         if(vm.selectedRole === 'orgadmin'){
-          if(!vm.modalUser.organizationId){
+          if(!vm.modalUser.organization){
             toastr.error("Please select organization.", "Update User", {});
             return false;
           }
         } else {
-          vm.modalUser.organizationId = undefined;
+          vm.modalUser.organization = undefined;
         }
 
         if (vm.isInEditMode) {
@@ -185,8 +203,13 @@
         }
       }
 
+      function stateChanged() {
+        vm.cities = vm.stateCityList[vm.modalUser.state];
+      }
+
       vm.roleChanged = roleChanged;
       vm.pushUser = pushUser;
+      vm.stateChanged = stateChanged;
     }
   }
 })();
