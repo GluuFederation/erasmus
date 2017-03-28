@@ -91,6 +91,8 @@ let updateOrganization = (req) => {
       oOrganization.city = req.city || oOrganization.city;
       oOrganization.type = req.type || oOrganization.type;
       oOrganization.description = req.description || oOrganization.description;
+      oOrganization.trustMarkFile = req.trustMarkFile || oOrganization.trustMarkFile;
+
       return oOrganization.save();
     })
     .then((updateOrganization) => Organization.populate(updateOrganization, 'federationId'))
@@ -125,17 +127,16 @@ let removeOrganization = (id) => {
  * @return {organization} - return organization
  * @return {err} - return error
  */
-let approveOrganization = (orgId, ottoId, fedId) => {
+let approveOrganization = (orgId, fedId) => {
   return Organization
     .findById(orgId)
     .exec()
     .then((oOrganization) => {
-      oOrganization.ottoId = ottoId;
-      oOrganization.federationId = fedId;
+      oOrganization.federation = fedId;
       oOrganization.isApproved = true;
       return oOrganization.save();
     })
-    .then((updateOrganization) => Organization.populate(updateOrganization, 'federationId'))
+    .then((updateOrganization) => Organization.populate(updateOrganization, 'federation'))
     .then((oOrganization) => Promise.resolve(oOrganization))
     .catch(err => Promise.reject(err));
 };

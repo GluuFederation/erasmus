@@ -5,9 +5,10 @@
     .controller('OrganizationController', OrganizationController);
 
   /** @ngInject */
-  function OrganizationController($scope, $filter, $localStorage, toastr, organizationService, stateCityService, $uibModal) {
+  function OrganizationController($scope, $filter, $localStorage, toastr, organizationService, stateCityService, $uibModal, urls) {
     var vm = this;
     vm.organizations = vm.displayedCollection = undefined;
+    vm.BASE_API = urls.BASE_API;
 
     function removeOrganization(orgData) {
       if (orgData.isApproved === true) {

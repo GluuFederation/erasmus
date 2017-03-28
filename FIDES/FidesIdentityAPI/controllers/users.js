@@ -18,6 +18,7 @@ const Users = require('../helpers/users');
 const Roles = require('../helpers/roles');
 const Organizations = require('../helpers/organizations');
 const Providers = require('../helpers/providers');
+const Message = require('../helpers/message');
 
 const router = express.Router();
 /**
@@ -488,11 +489,11 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
     })
     .then((provider) => {
       let isExists = !!provider;
-      if (isExists) {
+      /*if (isExists) {
         return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
           message: 'Provider is already exists.'
         }));
-      }
+      }*/
       const option = {
         method: 'GET',
         uri: providerInfo.discoveryUrl + '/.well-known/openid-configuration',
@@ -886,13 +887,23 @@ function addProviderAndUser(data, res) {
               }
             };
 
-          // return res.status(httpStatus.OK).send(user);
-          scim.addUser(userDetail).then(function (data) {
-              return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
-          }).catch(function (error) {
-              console.log(error);
-              return deleteUserProviderAndOrg(user._id, provider._id, data.organizationId, res);
-          });
+          // send email
+          const mailOption = {
+            from: common.smtpConfig.auth.user, // sender address
+            to: user.email.toLowerCase(), // list of receivers
+            subject: 'Registration : Gluu Federation', // Subject line
+            html: common.registrationEmailTemplate.format(user.name, data.providerInfo.clientId) // html body
+          };
+
+          //Message.sendEmail(mailOption);
+
+          return res.status(httpStatus.OK).send(user);
+          // scim.addUser(userDetail).then(function (data) {
+          //     return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
+          // }).catch(function (error) {
+          //     console.log(error);
+          //     return deleteUserProviderAndOrg(user._id, provider._id, data.organizationId, res);
+          // });
           // endregion
         })
         .catch((err) => {
@@ -1001,15 +1012,14 @@ function getUserClaims(clientInfo) {
   });
 }
 
-function generateString(length) {
-  var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-  var str = '';
-  for (let i = 0; i < length; i++) {
-    let rnum = Math.floor(Math.random() * chars.length);
-    str += chars.substring(rnum, rnum + 1);
+//string format prototype
+String.prototype.format = function () {
+  var formatted = this;
+  for (var i = 0; i < arguments.length; i++) {
+    var regexp = new RegExp('\\{{' + i + '\\}}', 'gi');
+    formatted = formatted.replace(regexp, arguments[i]);
   }
-
-  return str;
-}
+  return formatted;
+};
 
 module.exports = router;

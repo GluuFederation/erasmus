@@ -8,9 +8,9 @@
           <tr class="sortable">
             <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
             <th class="col-lg-3" st-sort="name">Name</th>
-            <th st-sort="federationId.name">Federation</th>
+            <th class="col-lg-3" st-sort="federationId.name">Federation</th>
             <th st-sort="phoneNo">Phone no</th>
-            <th st-sort="address">Address</th>
+            <!--<th st-sort="address">Address</th>-->
             <th st-sort="zipcode">Zipcode</th>
             <th st-sort="state">state</th>
             <th st-sort="city">city</th>
@@ -29,9 +29,9 @@
             <th ng-show="vm.organizations"><input st-search="phoneNo" placeholder="Search phone no"
                                                   class="input-sm form-control search-input col-lg-3" type="search"/>
             </th>
-            <th ng-show="vm.organizations"><input st-search="address" placeholder="Search address"
-                                                  class="input-sm form-control search-input col-lg-3" type="search"/>
-            </th>
+            <!--<th ng-show="vm.organizations"><input st-search="address" placeholder="Search address"-->
+                                                  <!--class="input-sm form-control search-input col-lg-3" type="search"/>-->
+            <!--</th>-->
             <th ng-show="vm.organizations"><input st-search="zipcode" placeholder="Search zipcode"
                                                   class="input-sm form-control search-input col-lg-3" type="search"/>
             </th>
@@ -59,16 +59,16 @@
               </select>
             </th>
             <th ng-show="vm.organizations"></th>
-            <th colspan="9" ng-show="!vm.organizations" style="color: #e85656;">There are no records to display.</th>
+            <th colspan="8" ng-show="!vm.organizations" style="color: #e85656;">There are no records to display.</th>
           </tr>
           </thead>
           <tbody>
-          <tr ng-repeat="organization in vm.displayedCollection track by $index">
+          <tr ng-repeat="organization in vm.displayedCollection track by $index" style="background: {{organization.isApproved ? '#fff' : '#ffcdd2'}}">
             <td style="display: none;"></td>
             <td>{{organization.name}}</td>
-            <td>{{organization.federationId.name}}</td>
+            <td>{{organization.federation.name}}</td>
             <td>{{organization.phoneNo}}</td>
-            <td class="col-lg-4">{{organization.address}}</td>
+            <!--<td class="col-lg-4">{{organization.address}}</td>-->
             <td>{{organization.zipcode}}</td>
             <td>{{organization.state}}</td>
             <td>{{organization.city}}</td>
@@ -87,12 +87,15 @@
               <button class="btn btn-success btn-icon" ng-show="!organization.isApproved"
                       ng-click="vm.openOranizationModal(organization, true)" title="Approve"><i
                 class="ion-android-checkmark-circle"></i></button>
+              <a ng-if="(organization.trustMarkFile ? true : false)" href="{{vm.BASE_API}}/images/trustmark/{{organization.trustMarkFile}}" target="_blank" class="btn btn-success btn-icon" title="Trust mark file">
+                <i class="ion-ios-book"></i>
+              </a>
             </td>
           </tr>
           </tbody>
           <tfoot>
           <tr>
-            <td colspan="12" class="text-center">
+            <td colspan="11" class="text-center">
               <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
             </td>
           </tr>

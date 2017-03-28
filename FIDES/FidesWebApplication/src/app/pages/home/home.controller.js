@@ -5,10 +5,12 @@
     .controller('HomeController', HomeController);
 
   /** @ngInject */
-  function HomeController($http, toastr, urls, $localStorage, $uibModal) {
+  function HomeController($http, toastr, urls, $localStorage, $uibModal, $timeout) {
     var vm = this;
-    vm.organization = $localStorage.currentUser.user.organization;
-    vm.isShow = $localStorage.currentUser.role === 'orgadmin';
+    vm.organization = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.organization : null;
+    vm.isShow = (!!$localStorage.currentUser) ? $localStorage.currentUser.role === 'orgadmin' : false;
+    var file = '';
+    vm.BASE_API = urls.BASE_API;
 
     vm.openOranizationModal = openOranizationModal;
 
@@ -27,7 +29,7 @@
     function openOranizationModal() {
       vm.organizationModal = $uibModal.open({
         animation: true,
-        templateUrl: 'app/pages/organization/manageOrganization.modal.html',
+        templateUrl: 'app/pages/home/manageOrganization.modal.html',
         size: 'lg',
         controller: ['$uibModalInstance', 'organizationData', 'stateCityService', 'organizationService', createOrganizationController],
         controllerAs: 'vm',
@@ -51,6 +53,8 @@
       vm.states = [];
       vm.organizations = {};
       vm.federations = null;
+      var file = '';
+
       if (organizationData) {
         vm.modalOrganization._id = organizationData._id;
         vm.modalOrganization.name = organizationData.name;
@@ -62,13 +66,21 @@
         vm.modalOrganization.type = organizationData.type;
         vm.modalOrganization.isApproved = organizationData.isApproved;
         vm.modalOrganization.description = organizationData.description;
+        vm.modalOrganization.trustMarkFile = organizationData.trustMarkFile;
+        vm.modalOrganization.oldtrustMarkFile = organizationData.trustMarkFile;
       }
 
       function pushOrganization(isFormValid) {
         if (!isFormValid) {
           return false;
         }
-        organizationService.updateOrganization(JSON.stringify(vm.modalOrganization), onSuccess, onError);
+        vm.modalOrganization.trustMarkFile = file;
+        var fd = new FormData();
+        for (var key in vm.modalOrganization) {
+          fd.append(key, vm.modalOrganization[key]);
+        }
+
+        organizationService.updateOrganizationWithFile(fd, onSuccess, onError);
 
         function onSuccess(response) {
           toastr.success('Saved successfully', 'Organization', {});
@@ -79,7 +91,7 @@
         }
 
         function onError(error) {
-          toastr.error(error.data.message, 'Organization', {})
+          toastr.error(error.data.message, 'Organization', {});
         }
       }
 
@@ -95,8 +107,31 @@
         vm.cities = vm.stateCityList[vm.modalOrganization.state];
       }
 
+      //set file function
+      function photoChanged(files) {
+        if (files != null) {
+          file = files[0];
+          $timeout(function () {
+            var fileReader = new FileReader();
+            fileReader.readAsText(file);
+            fileReader.onload = function (e) {
+              $timeout(function () {
+                try {
+                  JSON.parse(fileReader.result);
+                  $("#btnApproveOrganization").show();
+                } catch (e) {
+                  toastr.error('Please select valid json file', 'Organization', {});
+                  $("#btnApproveOrganization").hide();
+                }
+              });
+            }
+          });
+        }
+      }
+
       vm.pushOrganization = pushOrganization;
       vm.stateChanged = stateChanged;
+      vm.photoChanged = photoChanged;
       initLoads();
     }
   }

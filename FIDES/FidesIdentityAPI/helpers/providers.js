@@ -76,7 +76,6 @@ let addProvider = (req) => {
   oProvider.responseTypes = req.responseTypes;
   oProvider.createdBy = req.createdBy;
   oProvider.isApproved = false;
-  oProvider.isVerified = false;
 
   return oProvider.save()
     .then(provider => Promise.resolve(provider))
@@ -93,10 +92,10 @@ let updateProvider = (req) => {
   return Provider.findById(req._id)
     .exec()
     .then((oProvider) => {
-      oProvider.name = req.name;
-      oProvider.discoveryUrl = req.discoveryUrl;
-      oProvider.clientId = req.clientId;
-      oProvider.clientSecret = req.clientSecret;
+      oProvider.name = req.name || oProvider.name;
+      oProvider.discoveryUrl = req.discoveryUrl || oProvider.discoveryUrl;
+      oProvider.clientId = req.clientId || oProvider.clientId;
+      oProvider.clientSecret = req.clientSecret || oProvider.clientSecret;
       // oProvider.keys = req.keys;
       // oProvider.trustMarks = req.trustMarks;
       // oProvider.responseType = req.responseType;
@@ -114,16 +113,12 @@ let updateProvider = (req) => {
       // oProvider.username = req.username;
       // oProvider.password = req.password;
       // oProvider.refreshToken = req.refreshToken;
-      oProvider.organization = req.organizationId;
+      oProvider.organization = req.organizationId || oProvider.organization;
+
       return oProvider.save();
     })
-    .then((savedProvider) => {
-      console.log(savedProvider);
-      return Provider.populate(savedProvider, 'organization', function (savedProvider) {
-        console.log(savedProvider);
-        return Promise.resolve(savedProvider);
-      });
-    })
+    .then((savedProvider) => Provider.populate(savedProvider, 'organization'))
+    .then((savedProvider) => Promise.resolve(savedProvider))
     .catch(err => Promise.reject(err));
 };
 
@@ -153,17 +148,15 @@ let removeProvider = (id) => {
  * @return {Provider} - return Provider
  * @return {err} - return error
  */
-let approveProvider = (proId, ottoId) => {
+let approveProvider = (id) => {
   return Provider
-    .findById(proId)
+    .findById(id)
     .exec()
     .then((oProvider) => {
-      oProvider.ottoId = ottoId;
       oProvider.isApproved = true;
-      return oProvider.save()
-        .then(updatedProvider => Promise.resolve(updatedProvider))
-        .catch(err => Promise.reject(err));
+      return oProvider.save();
     })
+    .then(updatedProvider => Promise.resolve(updatedProvider))
     .catch(err => Promise.reject(err));
 };
 

@@ -10,7 +10,8 @@
       removeOrganization: removeOrganization,
       updateOrganization: updateOrganization,
       approveOrganization: approveOrganization,
-      getAllOrganizations: getAllOrganizations
+      getAllOrganizations: getAllOrganizations,
+      updateOrganizationWithFile: updateOrganizationWithFile
     };
 
     function removeOrganization(orgId, onSuccess, onError) {
@@ -27,6 +28,13 @@
 
     function getAllOrganizations(onSuccess, onError) {
       return $http.get(urls.BASE_API + "/getAllOrganizations").then(onSuccess).catch(onError);
+    }
+
+    function updateOrganizationWithFile(formData, onSuccess, onError) {
+      return $http.put(urls.BASE_API + "/updateOrganization", formData, {
+        headers: {'Content-Type': undefined },
+        transformRequest: angular.identity
+      }).then(onSuccess).catch(onError);
     }
 
     return service;

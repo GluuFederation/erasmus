@@ -1,0 +1,130 @@
+<div class="modal-content">
+  <form name="vm.organizationForm" novalidate>
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
+        <em class="ion-ios-close-empty sn-link-close"></em>
+      </button>
+      <h4 class="modal-title" id="createProviderLabel">{{vm.modalOrganization.isBtnApprove ? 'Approve' : 'Edit'}}
+        Organization</h4>
+    </div>
+    <div ng-if="vm.modalOrganization.isBtnApprove" class="modal-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.federationId.$invalid && (vm.organizationForm.federationId.$dirty || vm.organizationForm.$submitted)}">
+            <label for="orgFed">Federation</label>
+            <select class="form-control" id="orgFed" name="federationId" title="Select Federation" selectpicker
+                    ng-model="vm.modalOrganization.federationId"
+                    ng-options="federation as federation.name for federation in vm.federations" required>
+              <option value="">Select Federation</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div ng-if="!vm.modalOrganization.isBtnApprove" class="modal-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.organizationName.$invalid && (vm.organizationForm.organizationName.$dirty || vm.organizationForm.$submitted)}">
+            <label class="control-label" for="orgName">Name</label>
+            <input autofocus type="text" class="form-control" id="orgName" name="organizationName"
+                   title="Please enter the organization name."
+                   placeholder="organization name" ng-model="vm.modalOrganization.name" ng-required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.phoneNo.$invalid && (vm.organizationForm.phoneNo.$dirty || vm.organizationForm.$submitted)}">
+            <label class="control-label" for="orgPhoneNo">Phone No</label>
+            <input type="text" class="form-control" id="orgPhoneNo" name="phoneNo"
+                   title="Please enter the phone no."
+                   placeholder="phone no" ng-model="vm.modalOrganization.phoneNo" ng-required="true"
+                   ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/"/>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.address.$invalid && (vm.organizationForm.address.$dirty || vm.organizationForm.$submitted)}">
+            <label class="control-label" for="orgAddress">Address</label>
+            <input type="text" class="form-control" id="orgAddress" name="address"
+                   title="Please enter the Address"
+                   placeholder="Address" ng-model="vm.modalOrganization.address" ng-required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.zipcode.$invalid && (vm.organizationForm.zipcode.$dirty || vm.organizationForm.$submitted)}">
+            <label class="control-label" for="orgZipcode">zipcode</label>
+            <input type="text" class="form-control" id="orgZipcode" name="zipcode"
+                   title="Please enter the zipcode"
+                   placeholder="zipcode" ng-model="vm.modalOrganization.zipcode" ng-required="true"
+                   ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/"/>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.state.$invalid && (vm.organizationForm.state.$dirty || vm.organizationForm.$submitted)}">
+            <label class="control-label" for="orgState">State</label>
+            <select name="state" class="form-control" id="orgState" title="Select State" ng-change="vm.stateChanged()"
+                    selectpicker required
+                    ng-model="vm.modalOrganization.state"
+                    ng-options="state as state for state in vm.states">
+              <option value="">--- Select State ---</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.city.$invalid && (vm.organizationForm.city.$dirty || vm.organizationForm.$submitted)}">
+            <label class="control-label" for="orgCity">City</label>
+            <select name="city" class="form-control" id="orgCity" title="Select City" selectpicker required
+                    ng-model="vm.modalOrganization.city"
+                    ng-options="city as city for city in vm.cities">
+              <option value="">--- Select City ---</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.type.$invalid && (vm.organizationForm.type.$dirty || vm.organizationForm.$submitted)}">
+            <label class="control-label" for="orgType">Type</label>
+            <input type="text" class="form-control" id="orgType" name="type"
+                   title="Please enter the type of organization"
+                   placeholder="type" ng-model="vm.modalOrganization.type" ng-required="true"/>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.organizationForm.description.$invalid && (vm.organizationForm.description.$dirty || vm.organizationForm.$submitted)}">
+            <label class="control-label" for="orgDesc">Description</label>
+            <input type="text" class="form-control" id="orgDesc" name="description" title="Please enter description"
+                   placeholder="description" ng-model="vm.modalOrganization.description"/>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="orgFile" class="btn">Trust mark</label>
+            <input type="file" id="orgFile" name="orgFile" ng-model="vm.modalOrganization.trustMarkFile"
+                   onchange="angular.element(this).scope().vm.photoChanged(this.files)" accept=".json,.jsonld">
+            {{vm.modalOrganization.trustMarkFile}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+      <button type="submit" class="btn btn-primary" ng-click="vm.pushOrganization(vm.organizationForm.$valid)" id="btnApproveOrganization">
+        {{vm.modalOrganization.isBtnApprove ? 'Approve' : 'Update'}}
+      </button>
+    </div>
+  </form>
+</div>
