@@ -29,30 +29,13 @@ router.get('/getAllFederations', (req, res, next) => {
  */
 router.post('/addFederation', (req, res, next) => {
   let federation = null;
-  let federationOttoId = null;
-  Federations.addFederation(req.body)
+  return Federations.addFederation(req.body)
+    .then((savedFederation) => Promise.resolve(savedFederation))
     .then((savedFederation) => {
-      const options = {
-        method: 'POST',
-        uri: process.env.OTTO_BASE_URL + '/federations',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: {name: req.body.name},
-        json: true,
-        resolveWithFullResponse: true
-      };
       federation = savedFederation;
-      return request(options);
-    })
-    .then((response) => {
-      let resValues = response.body['@id'].split('/');
-      federationOttoId = resValues[resValues.length - 1];
-      federation.ottoId = federationOttoId;
-      federation.ownerOrganizationOttoId = common.constant.OWNER_ORGANIZATION_ID;
       const options = {
         method: 'POST',
-        uri: process.env.OTTO_BASE_URL + '/organization/' + common.constant.OWNER_ORGANIZATION_ID + '/federation/' + federationOttoId,
+        uri: process.env.OTTO_BASE_URL + '/organization/' + common.constant.OWNER_ORGANIZATION_ID + '/federation/' + federation._id,
         headers: {
           'content-type': 'application/json'
         },
@@ -60,11 +43,7 @@ router.post('/addFederation', (req, res, next) => {
       };
       return request(options);
     })
-    .then((response) => {
-      return federation.save()
-        .then((savedFederation) => res.status(httpStatus.OK).send(federation))
-        .catch(() => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: common.message.INTERNAL_SERVER_ERROR}));
-    })
+    .then((response) => res.status(httpStatus.OK).send(federation))
     .catch((err) => {
       if (err.code === 11000) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE_NAME});
@@ -89,25 +68,9 @@ router.put('/updateFederation', (req, res, next) => {
       message: common.message.PROVIDE_ID
     });
   }
-  let federation = null;
-  Federations.updateFederation(req.body)
-    .then((updatedFederation) => {
-      federation = updatedFederation;
-      const options = {
-        method: 'PUT',
-        uri: process.env.OTTO_BASE_URL + '/federations/' + updatedFederation.ottoId,
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: {name: req.body.name},
-        json: true,
-        resolveWithFullResponse: true
-      };
-      request(options);
-    })
-    .then((response) => {
-      return res.status(httpStatus.OK).send(federation);
-    })
+
+  return Federations.updateFederation(req.body)
+    .then((federation) => res.status(httpStatus.OK).send(federation))
     .catch((err) => {
       if (err.code === 11000) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE_NAME});
@@ -122,37 +85,15 @@ router.put('/updateFederation', (req, res, next) => {
 /**
  * Remove federation
  */
-router.delete('/removeFederation/:federationId', (req, res, next) => {
-  if (!req.params.federationId) {
+router.delete('/removeFederation/:id', (req, res, next) => {
+  if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
     });
   }
-  let federation = null;
-  Federations.removeFederation(req.params.federationId)
-    .then((removedFederation) => {
-      federation = removedFederation;
-      if (!federation) {
-        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE_ID});
-      }
-      const options = {
-        method: 'DELETE',
-        uri: process.env.OTTO_BASE_URL + '/federations/' + federation.ottoId,
-        headers: {
-          'content-type': 'application/json'
-        },
-        json: true,
-        resolveWithFullResponse: true
-      };
-      request(options);
-    })
-    .then((response) => {
-      return res.status(httpStatus.OK).send(federation);
-    })
-    .catch((err) => {
-      return federation.save()
-        .then(() => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: common.message.INTERNAL_SERVER_ERROR}));
-    });
+  return Federations.removeFederation(req.params.id)
+    .then((federation) => res.status(httpStatus.OK).send(federation))
+    .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({err: err, message: common.message.INTERNAL_SERVER_ERROR}));
 });
 
 module.exports = router;

@@ -4,13 +4,13 @@
   </div>
   <div class="panel-body" ng-if="vm.isShow">
     <div class="alert bg-danger" ng-if="!vm.organization.isApproved">
-      <strong><i class="ion-android-cancel"></i> Organization is not approved</strong>
+      <strong><i class="ion-android-cancel"></i> Organization waiting for approval.</strong>
     </div>
     <div class="alert bg-info" ng-if="vm.organization.isApproved">
-      <strong><i class="ion-android-checkbox"></i> Organization is approve</strong>
+      <strong><i class="ion-android-checkbox"></i> Organization is approved.</strong>
     </div>
     <div class="add-row-editable-table pull-right">
-      <button class="btn btn-primary" ng-click="vm.openOranizationModal()">Edit</button>
+      <button class="btn btn-primary" ng-click="vm.openOranizationModal()" ng-if="!vm.organization.isApproved">Edit</button>
     </div>
     <table class="table table-bordered">
       <tbody>
@@ -49,6 +49,10 @@
         <tr>
           <td><strong>Approved</strong></td>
           <td>{{vm.organization.isApproved ? 'Yes' : 'No'}}</td>
+        </tr>
+        <tr>
+          <td><strong>Trust mark</strong></td>
+          <td><a href="{{vm.BASE_API}}/images/trustmark/{{vm.organization.trustMarkFile}}" target="_blank">{{vm.organization.trustMarkFile ? 'file' : '-'}}</a></td>
         </tr>
       </tbody>
     </table>

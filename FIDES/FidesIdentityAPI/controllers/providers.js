@@ -23,41 +23,6 @@ router.post('/createProvider', (req, res, next) => {
       message: 'Please provide discovery URL.'
     });
   }
-  /*if (!req.body.clientId) {
-   return res.status(406).send({
-   'message': 'Please provide client id.'
-   });
-   }
-   if (!req.body.clientSecret) {
-   return res.status(406).send({
-   'message': 'Please provide client secret.'
-   });
-   }*/
-  /*if (!req.body.redirectUri) {
-   return res.status(406).send({
-   'message': 'Please provide redirect uri.'
-   });
-   }
-   if (!req.body.responseType) {
-   return res.status(406).send({
-   'message': 'Please provide response type.'
-   });
-   }
-   if (!req.body.state) {
-   return res.status(406).send({
-   'message': 'Please provide state.'
-   });
-   }
-   if (!req.body.grantType) {
-   return res.status(406).send({
-   'message': 'Please provide grant type.'
-   });
-   }
-   if (!req.body.code) {
-   return res.status(406).send({
-   'message': 'Please provide code.'
-   });
-   }*/
   if (!req.body.organizationId) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide organization.'
@@ -100,42 +65,6 @@ router.post('/updateProvider', (req, res, next) => {
       message: 'Please provide discovery URL.'
     });
   }
-  /*if (!req.body.clientId) {
-   return res.status(406).send({
-   'message': 'Please provide client id.'
-   });
-   }
-   if (!req.body.clientSecret) {
-   return res.status(406).send({
-   'message': 'Please provide client secret.'
-   });
-   }*/
-  /*if (!req.body.redirectUri) {
-   return res.status(406).send({
-   'message': 'Please provide redirect uri.'
-   });
-   }
-   if (!req.body.responseType) {
-   return res.status(406).send({
-   'message': 'Please provide response type.'
-   });
-   }
-   if (!req.body.state) {
-   return res.status(406).send({
-   'message': 'Please provide state.'
-   });
-   }
-
-   if (!req.body.grantType) {
-   return res.status(406).send({
-   'message': 'Please provide grant type.'
-   });
-   }
-   if (!req.body.code) {
-   return res.status(406).send({
-   'message': 'Please provide code.'
-   });
-   }*/
   if (!req.body.organizationId) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide organization.'
@@ -195,7 +124,7 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
   let ottoId = null;
   // Get provider details.
   // Get provider details.
-  Providers.getProviderById(req.params.providerId)
+  return Providers.getProviderById(req.params.providerId)
     .then((fProvider) => {
       provider = fProvider;
       if (provider.isApproved) {
@@ -213,7 +142,7 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
       // Get provider configuration using discovery URL.
       const option = {
         method: 'GET',
-        uri: provider.discoveryUrl,
+        uri: provider.discoveryUrl + '/.well-known/openid-configuration',
         resolveWithFullResponse: true
       };
 
@@ -225,9 +154,9 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
           dataJson = JSON.parse(response.body);
         } catch (exception) {
           console.log(exception.toString());
-          return res.status(httpStatus.NOT_ACCEPTABLE).send({
+          return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
             message: 'Discovery URL is invalid. Please check and correct it.'
-          });
+          }));
         }
       }
 
@@ -235,10 +164,8 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
       let keypair = require('keypair');
       let pair = keypair();
       let signedUrl = jwt.sign(dataJson.jwks_uri, pair.private, {algorithm: 'RS256'});
-
       dataJson.signed_jwks_uri = signedUrl;
       dataJson.signing_key = pair.public;
-
       dataJson.jwks_uri = jwt.verify(dataJson.signed_jwks_uri, dataJson.signing_key);
 
       const option = {
@@ -246,7 +173,6 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
         uri: dataJson.jwks_uri,
         resolveWithFullResponse: true
       };
-
       return request(option);
     })
     .then((response) => {
@@ -256,9 +182,9 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
           keysJson = JSON.parse(response.body);
         } catch (exception) {
           console.log(exception.toString());
-          return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+          return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
             message: common.message.INTERNAL_SERVER_ERROR
-          });
+          }));
         }
       }
 
@@ -268,51 +194,20 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
       dataJson.client_secret = provider.clientSecret;
       dataJson.keys = keysJson.keys;
 
-      const entityData = {
-        id: dataJson.issuer,
-        name: dataJson.name,
-        metadata_statements: dataJson.metadata_statements || null,
-        metadata_statement_uris: dataJson.metadata_statement_uris || null,
-        signed_jwks_uri: dataJson.signed_jwks_uri,
-        signing_keys: dataJson.signing_key,
-        type: 'openid_provider'
-        // organization
-        // description
-      };
+      provider.id = dataJson.issuer;
+      provider.name = dataJson.name;
+      provider.metadataStatements = dataJson.metadata_statements || null;
+      provider.metadataStatementUris = dataJson.metadata_statement_uris || null;
+      provider.signedJwksUri = dataJson.signed_jwks_uri;
+      provider.signingKeys = dataJson.signing_key;
+      provider.type = 'openid_provider';
 
-      let options = {
-        method: 'POST',
-        uri: process.env.OTTO_BASE_URL + '/federation_entity',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: entityData,
-        json: true,
-        resolveWithFullResponse: true
-      };
-
-      // Add provider (federation entity) to OTTO
-      return request(options);
+      return provider.save();
     })
-    .then((response) => {
-      if (!response) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-          message: common.message.INTERNAL_SERVER_ERROR
-        });
-      }
-
-      if (!response.body['@id']) {
-        return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-          message: common.message.INTERNAL_SERVER_ERROR
-        });
-      }
-
-      let resValues = response.body['@id'].split('/');
-      ottoId = resValues[resValues.length - 1];
-
+    .then((updatedProvider) => {
       let options = {
         method: 'POST',
-        url: process.env.OTTO_BASE_URL + '/organization/' + provider.organization.ottoId + '/federation_entity/' + ottoId,
+        url: process.env.OTTO_BASE_URL + '/organization/' + updatedProvider.organization._id + '/federation_entity/' + updatedProvider._id,
         headers: {
           'content-type': 'application/json'
         },
@@ -325,22 +220,17 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
     })
     .then((response) => {
       // Update local mongodb with provider's OTTO Id and approve flag.
-      Providers.approveProvider(req.params.providerId, ottoId)
-        .then((provider) => {
-          if (!provider) {
-            return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Provider ' + common.message.NOT_ACCEPTABLE_ID});
-          }
-
-          return res.status(200).send(provider);
-        })
-        .catch((err) => {
-          return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-            err: err,
-            message: common.message.INTERNAL_SERVER_ERROR
-          });
-        });
+      return Providers.approveProvider(req.params.providerId);
     })
+    .then((provider) => res.status(200).send(provider))
     .catch((err) => {
+      if (!err.statusCode) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+          err: err,
+          message: common.message.INTERNAL_SERVER_ERROR
+        });
+      }
+
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
         err: err,
         message: common.message.INTERNAL_SERVER_ERROR

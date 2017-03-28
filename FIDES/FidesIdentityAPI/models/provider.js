@@ -3,6 +3,8 @@
 const mongoose = require('mongoose'),
   bcrypt = require('bcrypt-nodejs');
 
+const common = require('../helpers/common');
+
 // define the schema for openid connect provider
 const providerSchema = mongoose.Schema({
   name: {
@@ -10,9 +12,8 @@ const providerSchema = mongoose.Schema({
     required: true
   },
   discoveryUrl: {
-    type: String,
-    required: true,
-    unique: true
+    type: String
+    //unique: true
   },
   keys: {
     type: String,
@@ -102,28 +103,57 @@ const providerSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization'
   },
-  isVerified: {
-    type: Boolean,
-    required: false
-  },
   isApproved: {
     type: Boolean,
     required: false
   },
-  ottoId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: false,
+  '@context': {
+    type: String
+  },
+  '@id': {
+    type: String
+  },
+  type : {
+    type: String
+  },
+  category : {
+    type: String
+  },
+  issuer: {
+    type: String
+  },
+  metadataStatements: {
+    type: mongoose.Schema.Types.Mixed
+  },
+  metadataStatementUris: {
+    type: mongoose.Schema.Types.Mixed
+  },
+  signedJwksUri: {
+    type: String
+  },
+  signing_keys: {
+    type: String
   }
 }, {
   timestamps: true
+}, {
+  strict:false
 });
 
 providerSchema.pre('findOne', populateOrganization);
 providerSchema.pre('findById', populateOrganization);
 providerSchema.pre('find', populateOrganization);
+providerSchema.pre('save', setUrl);
 
 function populateOrganization() {
   return this.populate('organization');
 }
+
+function setUrl(next, done) {
+  this['@id'] = common.constant.OTTO_BASE_URL + common.constant.OTTO_PROVIDER_URL + '/' + this._id;
+  this['@context'] = common.constant.CONTEXT_SCHEMA_URL + common.constant.PROVIDER_CONTEXT;
+  next();
+}
+
 // create the model for openid connect provider and expose it to our app
 module.exports = mongoose.model('Provider', providerSchema);

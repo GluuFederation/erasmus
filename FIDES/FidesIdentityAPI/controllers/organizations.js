@@ -3,23 +3,43 @@
 const express = require('express'),
   router = express.Router(),
   request = require('request-promise'),
-  common = require('../helpers/common'),
+  simpleRequest = require('request'),
   httpStatus = require('http-status'),
+  multer = require('multer'),
+  fs = require('fs'),
+  common = require('../helpers/common'),
   Organizations = require('../helpers/organizations');
 
+const storage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, common.constant.trustMarkFilePath);
+  },
+  filename: function (req, file, callback) {
+    callback(null, common.func.getFileName(req.body._id, file.originalname));
+  }
+});
+
+const upload = multer({storage: storage}).any();
 /**
  * Update organization
  */
-router.put('/updateOrganization', (req, res, next) => {
+router.put('/updateOrganization', upload, (req, res, next) => {
   if (!req.body._id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
     });
   }
+  req.body.trustMarkFile = (!!req.files[0]) ? req.files[0].filename : null;
+  if (req.body.trustMarkFile && (req.body.trustMarkFile != req.body.oldtrustMarkFile)) {
+    try {
+      fs.unlinkSync(common.constant.trustMarkFilePath + req.body.oldtrustMarkFile);
+    } catch (e) {
+    }
+  }
 
   Organizations.updateOrganization(req.body)
-    .then((updatedFederation) => {
-      return res.status(httpStatus.OK).send(updatedFederation);
+    .then((updatedOrganization) => {
+      return res.status(httpStatus.OK).send(updatedOrganization);
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -59,42 +79,12 @@ router.post('/approveOrganization', (req, res, next) => {
     });
   }
   let organization = null;
-  let organizationOttoId = null;
   Organizations.getOrganizationById(req.body.organizationId)
-    .then((fOrganization) => {
-      organization = fOrganization;
-      if (!organization) {
-        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE_ID});
-      }
-
-      if (organization.isApproved === true) {
-        return res.status(500).send({
-          message: 'Organization ' + common.message.ALREADY_APPROVE
-        });
-      }
-
-      let options = {
-        method: 'POST',
-        uri: process.env.OTTO_BASE_URL + '/organization',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: {name: organization.name},
-        json: true,
-        resolveWithFullResponse: true
-      };
-
-      return request(options);
-    })
     .then((response) => {
-      let resValues = response.body['@id'].split('/');
-      organizationOttoId = resValues[resValues.length - 1];
-      let federationOttoId = req.body.federationOttoId;
-
       // link organization with federation
       const options = {
         method: 'POST',
-        uri: process.env.OTTO_BASE_URL + '/federations/' + federationOttoId + '/organization/' + organizationOttoId,
+        uri: process.env.OTTO_BASE_URL + '/federations/' + req.body.federationId + '/organization/' + req.body.organizationId,
         headers: {
           'content-type': 'application/json'
         },
@@ -102,14 +92,8 @@ router.post('/approveOrganization', (req, res, next) => {
       };
       return request(options);
     })
-    .then((response) => {
-      return Organizations.approveOrganization(req.body.organizationId, organizationOttoId, req.body.federationId)
-        .then((organization) => res.status(httpStatus.OK).send(organization))
-        .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-          err: err,
-          message: common.message.INTERNAL_SERVER_ERROR
-        }));
-    })
+    .then((response) => Organizations.approveOrganization(req.body.organizationId, req.body.federationId))
+    .then((organization) => res.status(httpStatus.OK).send(organization))
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,
       message: common.message.INTERNAL_SERVER_ERROR
