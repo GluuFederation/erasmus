@@ -131,7 +131,7 @@ const providerSchema = mongoose.Schema({
   signedJwksUri: {
     type: String
   },
-  signing_keys: {
+  signingKeys: {
     type: String
   }
 }, {
