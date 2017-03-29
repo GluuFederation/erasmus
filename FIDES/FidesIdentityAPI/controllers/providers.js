@@ -6,7 +6,8 @@ const express = require('express'),
   jwt = require('jsonwebtoken'),
   common = require('../helpers/common'),
   httpStatus = require('http-status'),
-  Providers = require('../helpers/providers');
+  Providers = require('../helpers/providers'),
+  Organization = require('../helpers/organizations');
 
 /**
  * Add provider.
@@ -121,8 +122,6 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
   }
   let provider = null;
   let dataJson = {};
-  let ottoId = null;
-  // Get provider details.
   // Get provider details.
   return Providers.getProviderById(req.params.providerId)
     .then((fProvider) => {
@@ -204,24 +203,8 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
 
       return provider.save();
     })
-    .then((updatedProvider) => {
-      let options = {
-        method: 'POST',
-        url: process.env.OTTO_BASE_URL + '/organization/' + updatedProvider.organization._id + '/federation_entity/' + updatedProvider._id,
-        headers: {
-          'content-type': 'application/json'
-        },
-        json: true,
-        resolveWithFullResponse: true
-      };
-
-      // Link provider (federation entity) and organization in OTTO
-      return request(options);
-    })
-    .then((response) => {
-      // Update local mongodb with provider's OTTO Id and approve flag.
-      return Providers.approveProvider(req.params.providerId);
-    })
+    .then((updatedProvider) => Organization.linkOrganizationAndEntity(updatedProvider.organization._id, updatedProvider._id))
+    .then((response) => Providers.approveProvider(req.params.providerId))
     .then((provider) => res.status(200).send(provider))
     .catch((err) => {
       if (!err.statusCode) {
