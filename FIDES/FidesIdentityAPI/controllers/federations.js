@@ -5,7 +5,8 @@ const express = require('express'),
   request = require('request-promise'),
   common = require('../helpers/common'),
   httpStatus = require('http-status'),
-  Federations = require('../helpers/federations');
+  Federations = require('../helpers/federations'),
+  Organization = require('../helpers/organizations');
 
 /**
  * Get all active federations
@@ -32,16 +33,8 @@ router.post('/addFederation', (req, res, next) => {
   return Federations.addFederation(req.body)
     .then((savedFederation) => Promise.resolve(savedFederation))
     .then((savedFederation) => {
-      federation = savedFederation;
-      const options = {
-        method: 'POST',
-        uri: process.env.OTTO_BASE_URL + '/organization/' + common.constant.OWNER_ORGANIZATION_ID + '/federation/' + federation._id,
-        headers: {
-          'content-type': 'application/json'
-        },
-        json: true
-      };
-      return request(options);
+      // Set Owner Organization
+      return Organization.setOwnerOrganization(common.constant.OWNER_ORGANIZATION_ID, savedFederation._id);
     })
     .then((response) => res.status(httpStatus.OK).send(federation))
     .catch((err) => {

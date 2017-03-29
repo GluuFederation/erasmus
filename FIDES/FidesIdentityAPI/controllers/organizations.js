@@ -8,7 +8,8 @@ const express = require('express'),
   multer = require('multer'),
   fs = require('fs'),
   common = require('../helpers/common'),
-  Organizations = require('../helpers/organizations');
+  Organizations = require('../helpers/organizations'),
+  Federation = require('../helpers/federations');
 
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -20,6 +21,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({storage: storage}).any();
+
 /**
  * Update organization
  */
@@ -78,19 +80,10 @@ router.post('/approveOrganization', (req, res, next) => {
       message: common.message.PROVIDE_ID
     });
   }
-  let organization = null;
   Organizations.getOrganizationById(req.body.organizationId)
     .then((response) => {
       // link organization with federation
-      const options = {
-        method: 'POST',
-        uri: process.env.OTTO_BASE_URL + '/federations/' + req.body.federationId + '/organization/' + req.body.organizationId,
-        headers: {
-          'content-type': 'application/json'
-        },
-        json: true
-      };
-      return request(options);
+      return Federation.addParticipant(req.body.federationId, req.body.organizationId);
     })
     .then((response) => Organizations.approveOrganization(req.body.organizationId, req.body.federationId))
     .then((organization) => res.status(httpStatus.OK).send(organization))

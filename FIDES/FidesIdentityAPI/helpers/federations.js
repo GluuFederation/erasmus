@@ -102,11 +102,33 @@ let removeFederation = (id) => {
     .catch(err => Promise.reject(err));
 };
 
+/**
+ * Add Organization in Federation as Participant
+ * @param {ObjectId} id - Federation id
+ * @return {ObjectId} id - Organization id
+ * @return {err} - return error
+ */
+let addParticipant = (fid, oid) => {
+  return Federation
+    .findById(fid)
+    .exec()
+    .then((oFederation) => {
+      if (oFederation.participants.indexOf(oid) > -1) {
+        return Promise.reject({error: 'Organization already exist'});
+      }
+      oFederation.participants.push(oid);
+      return oFederation.save();
+    })
+    .then((oFederation) => Promise.resolve(oFederation))
+    .catch(err => Promise.reject(err));
+};
+
 module.exports = {
   getAllFederations,
   getFederationById,
   getFederationByName,
   addFederation,
   updateFederation,
-  removeFederation
+  removeFederation,
+  addParticipant
 };

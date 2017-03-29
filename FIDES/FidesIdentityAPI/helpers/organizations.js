@@ -1,6 +1,8 @@
 "use strict";
 
 const Organization = require('../models/organization');
+const Provider = require('../models/provider');
+const Federation = require('../models/federation');
 
 /**
  * Get all active organizations
@@ -141,6 +143,64 @@ let approveOrganization = (orgId, fedId) => {
     .catch(err => Promise.reject(err));
 };
 
+/**
+ * Join organization and Entity
+ * @param {ObjectId} oid - Organization id
+ * @param {ObjectId} pid - Provider id
+ * @return {Object} - return Provider
+ * @return {err} - return error
+ */
+let linkOrganizationAndEntity = (oid, pid) => {
+  return Organization
+    .findById(oid)
+    .exec()
+    .then((oOrganization) => {
+      if (oOrganization.entities.indexOf(pid) > -1) {
+        return Promise.reject({ error: 'Federation Entity already exist'});
+      }
+      oOrganization.entities.push(pid);
+      return oOrganization.save();
+    })
+    .then((oOrganization) => {
+      return Provider.findById(pid).exec()
+    })
+    .then((oProvider) => {
+      oProvider.organization = oid;
+      return oProvider.save();
+    })
+    .then((oProvider) => Promise.resolve(oProvider))
+    .catch(err => Promise.reject(err));
+};
+
+/**
+ * Set owner organization for federation
+ * @param {ObjectId} oid - Organization id
+ * @param {ObjectId} fid - Federation id
+ * @return {Object} - return Federation
+ * @return {err} - return error
+ */
+let setOwnerOrganization = (oid, fid) => {
+  return Organization
+    .findById(oid)
+    .exec()
+    .then((oOrganization) => {
+      if (oOrganization.federations.indexOf(fid) > -1) {
+        return Promise.reject({ error: 'Federation already exist'});
+      }
+      oOrganization.federations.push(fid);
+      return oOrganization.save();
+    })
+    .then((oOrganization) => {
+      return Federation.findById(fid).exec()
+    })
+    .then((oFederation) => {
+      oFederation.organization = oid;
+      return oFederation.save();
+    })
+    .then((oFederation) => Promise.resolve(oFederation))
+    .catch(err => Promise.reject(err));
+};
+
 module.exports = {
   getAllOrganizations,
   getOrganizationById,
@@ -148,5 +208,7 @@ module.exports = {
   addOrganization,
   updateOrganization,
   removeOrganization,
-  approveOrganization
+  approveOrganization,
+  linkOrganizationAndEntity,
+  setOwnerOrganization
 };
