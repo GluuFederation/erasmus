@@ -201,6 +201,22 @@ let setOwnerOrganization = (oid, fid) => {
     .catch(err => Promise.reject(err));
 };
 
+/**
+ * Set owner organization for federation
+ * @param {ObjectId} oid - Organization id
+ * @param {ObjectId} fid - Federation id
+ * @return {Object} - return Federation
+ * @return {err} - return error
+ */
+let getBadgeByOrganization = (oid) => {
+  return Organization
+    .findById(oid)
+    .exec()
+    .then(oOrganization => Organization.populate(oOrganization, 'approvedBadges pendingBadges'))
+    .then(oOrganization => Promise.resolve(oOrganization))
+    .catch(err => Promise.reject(err));
+};
+
 module.exports = {
   getAllOrganizations,
   getOrganizationById,
@@ -210,5 +226,6 @@ module.exports = {
   removeOrganization,
   approveOrganization,
   linkOrganizationAndEntity,
-  setOwnerOrganization
+  setOwnerOrganization,
+  getBadgeByOrganization
 };

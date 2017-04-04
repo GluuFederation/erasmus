@@ -240,13 +240,14 @@ let getAllUsers = () => {
 let getAllOrganizations = () => {
   return Roles.getRoleByName('admin')
     .then((role) => {
-      return User.find({role: {$ne: role._id}}, 'organization')
+      return User.find({role: {$ne: role._id}}, 'organization provider')
         .exec();
     })
     .then((users) => {
       if (users.length) {
         let organizations = [];
         users.forEach(function (user) {
+          user.organization._doc.provider = user.provider.discoveryUrl;
           organizations.push(user.organization);
         });
         return Promise.resolve(organizations);

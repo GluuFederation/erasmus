@@ -62,7 +62,15 @@ const organizationSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Federation'
   }],
-  trustMark: String
+  trustMark: String,
+  pendingBadges: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Badge'
+  }],
+  approvedBadges: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Badge'
+  }]
 }, {
   timestamps: true
 }, {

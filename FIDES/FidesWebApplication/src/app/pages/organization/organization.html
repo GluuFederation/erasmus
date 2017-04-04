@@ -87,6 +87,9 @@
               <button class="btn btn-success btn-icon" ng-show="!organization.isApproved"
                       ng-click="vm.openOranizationModal(organization, true)" title="Approve"><i
                 class="ion-android-checkmark-circle"></i></button>
+              <button class="btn btn-success btn-icon" ng-show="organization.approvedBadges.length > 0"
+                      ng-click="vm.openApproveBadges(organization)" title="Approved Badges"><i
+                class="fa fa-bookmark"></i></button>
               <a ng-if="(organization.trustMarkFile ? true : false)" href="{{organization.trustMarkFile}}" target="_blank" class="btn btn-success btn-icon" title="Trust mark file">
                 <i class="ion-ios-book"></i>
               </a>

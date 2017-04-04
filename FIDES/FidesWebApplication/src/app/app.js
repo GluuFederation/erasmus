@@ -14,7 +14,7 @@ angular.module('FidesWebApplication', [
   'ui.slimscroll',
   'ngJsTree',
   'angular-progress-button-styles',
-
+  'checklist-model',
   'FidesWebApplication.theme',
   'FidesWebApplication.pages'
 ]).config(function ($locationProvider) {

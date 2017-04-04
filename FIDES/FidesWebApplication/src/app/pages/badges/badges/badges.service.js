@@ -1,39 +1,43 @@
 (function () {
-    'use strict';
+  'use strict';
 
-    angular.module('FidesWebApplication.pages.badges.badges')
-        .factory('badgesService', badgesService);
+  angular.module('FidesWebApplication.pages.badges.badges')
+    .factory('badgesService', badgesService);
 
-    /** @ngInject */
-    function badgesService($http, urls) {
+  /** @ngInject */
+  function badgesService($http, urls) {
 
-        var service = {
-            getBadges: getBadges,
-            removeBadge: removeBadge,
-            updateBadge: updateBadge,
-            createBadge: createBadge
-        };
+    var service = {
+      getBadges: getBadges,
+      removeBadge: removeBadge,
+      updateBadge: updateBadge,
+      createBadge: createBadge,
+      getBadgeByOrganization: getBadgeByOrganization
+    };
 
-        function getBadges() {
-            $http.defaults.headers.common.Authorization = '';
-            return $http.get(urls.BADGE_URL + "/badges");
-        }
-
-        function removeBadge(inum) {
-            return $http.delete(urls.BADGE_URL + "/badges/" + inum);
-        }
-
-        function updateBadge(inum, badge) {
-            return $http.post(urls.BADGE_URL + "/badges/update/" + inum, badge);
-        }
-
-        function createBadge(formData) {
-            return $http.post(urls.BADGE_URL + "/badges", formData, {
-                transformRequest: angular.identity,
-                headers: {'Content-Type': undefined}
-            });
-        }
-        return service;
+    function getBadges() {
+      return $http.get(urls.BASE_API + '/badges');
     }
 
+    function removeBadge(id) {
+      return $http.delete(urls.BASE_API + '/badges/' + id);
+    }
+
+    function updateBadge(id, formData) {
+      return $http.put(urls.BASE_API + '/badges/' + id, formData);
+    }
+
+    function createBadge(formData) {
+      return $http.post(urls.BASE_API + '/badges', formData, {
+        transformRequest: angular.identity,
+        headers: {'Content-Type': undefined}
+      });
+    }
+
+    function getBadgeByOrganization(id, status) {
+      return $http.get(urls.BASE_API + '/getBadgeByOrganization/' + id + '/' + status);
+    }
+
+    return service;
+  }
 })();

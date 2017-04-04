@@ -523,9 +523,8 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
         application_type: 'native',
         client_name: providerInfo.organizationName,
         token_endpoint_auth_method: 'client_secret_basic',
-        scopes: discoveryJson.scopes_supported,
-        sector_identifier_uri: process.env.BASE_URL + '/images/trustmark/url.json',
-        default_max_age: 6000
+        scopes: discoveryJson.scopes_supported
+        //sector_identifier_uri: process.env.BASE_URL + '/images/trustmark/url.json'
       };
 
       const options = {

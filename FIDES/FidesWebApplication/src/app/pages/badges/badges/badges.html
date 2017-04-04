@@ -1,10 +1,70 @@
 <div class="widgets">
-
-    <div class="row">
-        <div class="col-lg-12 col-md-12">
-            <div ba-panel ba-panel-title="Badges List" ba-panel-class="with-scroll">
-                <div include-with-scope="app/pages/badges/widgets/listBadges.html"></div>
-            </div>
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      <div ba-panel ba-panel-class="with-scroll">
+        <div class="add-row-editable-table">
+          <button class="btn btn-primary" ng-if="vm.isShow" ng-click="vm.openBadgeModal({})">Add</button>
+          <button class="btn btn-primary" ng-if="!vm.isShow" ui-sref="badges.badgeRequest">Request for Badge</button>
         </div>
+
+        <table class="table table-hover table-condensed" st-safe-src="vm.safeBadges" st-table="vm.badges">
+          <thead>
+          <tr class="sortable">
+            <th st-sort="name">Badge</th>
+            <!--<th st-sort="description">Description</th>-->
+            <th st-sort="narrative">Criteria</th>
+            <th st-sort="category.name">Category</th>
+            <th st-sort="active">{{vm.isShow ? 'Active?' : 'Approved?'}}</th>
+            <th ng-if="vm.isShow">Actions</th>
+          </tr>
+          <tr>
+            <th><input st-search="name" class="form-control input-sm" placeholder="Search Badge" type="text"/></th>
+            <th></th>
+            <th>
+              <select st-search="category.name" class="form-control col-sm-4" id="category" name="category" title="Select category"
+                      ng-model="vm.category">
+                <option value="">--- All ---</option>
+                <option ng-repeat="o in vm.categories" value="{{o.name}}">{{o.name}}</option>
+              </select>
+            </th>
+            <th></th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-show="vm.badges.length <= 0">
+            <th colspan="5" style="color: #e85656;">There are no records to display.</th>
+          </tr>
+          <tr ng-repeat="badge in vm.badges" class="editable-row" style="background: {{(badge.isApproved==false?'#ffcdd2':'#fff')}}">
+            <td>{{badge.name}}</td>
+            <!--<td class="ellipis" style="max-width: 250px;" title="{{ badge.description }}">-->
+              <!--{{ badge.description }}-->
+            <!--</td>-->
+            <td class="ellipis" style="max-width: 250px;" title="{{ badge.narrative }}">
+              {{ badge.narrative }}
+            </td>
+            <td>{{badge.category.name}}</td>
+            <td>{{vm.isShow ? (badge.isActive ? 'Yes' : 'No') : (badge.isApproved ? 'Yes' : 'No')}}</td>
+            <td ng-if="vm.isShow">
+              <button class="btn btn-primary btn-icon"
+                      ng-click="vm.openBadgeModal(badge)" title="Edit"><i class="ion-edit"></i></button>
+              <button class="btn btn-danger btn-icon"
+                      ng-click="vm.removeBadge(badge._id)" title="Delete"><i class="ion-android-delete"></i>
+              </button>
+            </td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <td colspan="6" class="text-center">
+              <div st-pagination="" st-items-by-page="vm.tablePageSize" st-displayed-pages="5"></div>
+            </td>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
+
     </div>
+  </div>
+</div>
 </div>

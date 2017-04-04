@@ -12,10 +12,10 @@
                 templateUrl: 'app/pages/badges/badges/badges.html',
                 controller: 'BadgesCtrl',
                 controllerAs: 'vm',
-                roles: ['admin', 'issuer', 'user', 'orgadmin'],
+                roles: ['admin', 'orgadmin'],
                 title: 'Badges',
                 sidebarMeta: {
-                    order: 0
+                    order: 1
                 }
             });
     }

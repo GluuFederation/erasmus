@@ -1,0 +1,34 @@
+<div class="modal-content">
+  <form name="vm.createBadgeCategoryForm" novalidate>
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
+        <em class="ion-ios-close-empty sn-link-close"></em>
+      </button>
+      <h4 class="modal-title" id="createBadgeLabel">Create Badge Category</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group has-feedback"
+               ng-class="{'has-error': vm.createBadgeCategoryForm.name.$invalid && (vm.createBadgeCategoryForm.name.$dirty || vm.createBadgeCategoryForm.$submitted)}">
+            <label for="name">Category</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Category Name"
+                   ng-model="vm.modalBadgeCategory.name" required>
+            <span class="help-block error-block basic-block">This field is required!</span>
+          </div>
+          <div class="form-group">
+            <label for="badgeDescription">Description</label>
+            <input type="text" class="form-control" id="badgeDescription" name="description"
+                   placeholder="Description" ng-model="vm.modalBadgeCategory.description">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+      <button type="submit" class="btn btn-primary" ng-click="vm.createBadgeCategory(vm.createBadgeCategoryForm.$valid)">
+        Save
+      </button>
+    </div>
+  </form>
+</div>
