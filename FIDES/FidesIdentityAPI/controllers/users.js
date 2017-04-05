@@ -517,12 +517,14 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
           message: 'Discovery URL is invalid. Please check and correct it.'
         }));
       }
+      
       const client = {
         redirect_uris: providerInfo.redirectUrls,
         application_type: 'native',
         client_name: providerInfo.organizationName,
         token_endpoint_auth_method: 'client_secret_basic',
         scopes: discoveryJson.scopes_supported
+        //sector_identifier_uri: process.env.BASE_URL + '/images/trustmark/url.json'
       };
 
       const options = {

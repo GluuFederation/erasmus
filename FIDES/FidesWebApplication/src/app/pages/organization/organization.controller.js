@@ -162,7 +162,7 @@
         }
 
         function onError(error) {
-          toastr.error(error.data.message, 'Federations', {})
+          toastr.error(error.data.message, 'Federations', {});
         }
       }
 
@@ -175,10 +175,42 @@
       initLoads();
     }
 
+    function openApproveBadges(organizationData) {
+      vm.organizationModal = $uibModal.open({
+        animation: true,
+        templateUrl: 'app/pages/organization/approvedBadge.modal.html',
+        size: 'lg',
+        controller: ['$uibModalInstance', 'organizationData', 'badgesService', badgeDetailCtrl],
+        controllerAs: 'vm',
+        resolve: {
+          organizationData: function () {
+            return organizationData;
+          }
+        }
+      });
+    }
+
+    function badgeDetailCtrl($uibModalInstance, organizationData, badgesService) {
+      var vm = this;
+      vm.badges = [];
+      vm.organization = organizationData;
+
+      badgesService.getBadgeByOrganization(organizationData._id, 'approved').then(onSuccess).catch(onError);
+
+      function onSuccess(response) {
+        vm.badges = response.data;
+      }
+
+      function onError() {
+        vm.badges = [];
+      }
+    }
+
     //Export the modules for view.
     vm.removeOrganization = removeOrganization;
     vm.getAllOrganizations = getAllOrganizations;
     vm.openOranizationModal = openOranizationModal;
+    vm.openApproveBadges = openApproveBadges;
     // init
     vm.getAllOrganizations();
   }

@@ -1,0 +1,44 @@
+<div class="widgets">
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      <div ba-panel ba-panel-class="with-scroll">
+        <div class="panel-body">
+          <form name="frm" class="form-horizontal">
+            <div class="form-group">
+              <label for="category" class="col-sm-1 control-label">category</label>
+              <div class="col-sm-4">
+                <select id="category" class="form-control" id="category" name="category" title="Select category"
+                        selectpicker
+                        ng-model="vm.category" ng-change="vm.filterBadge()"
+                        ng-options="category._id as category.name for category in vm.categories" required>
+                  <option value="">--- All ---</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-offset-1 col-sm-4" ng-repeat="o in vm.allBadges">
+                <div class="checkbox">
+                  <label class="custom-checkbox">
+                    <input type="checkbox" id="inlineCheckbox{{o._id}}" checklist-model="vm.selectedBadges"
+                           checklist-value="o._id">
+                    <span><a href ng-click="vm.openModalBadgeDetail(o)" style="font-weight: 600">{{o.name}}</a></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-offset-1 col-sm-10">
+                <button type="submit" class="btn btn-primary" ng-click="vm.badgeRequest()"><i class="fa fa-check"></i>&nbsp;Request
+                </button>
+                <label> {{vm.selectedBadges.length > 0 ? 'Selected Badge ' + vm.selectedBadges.length : '' }} </label>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

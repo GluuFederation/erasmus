@@ -21,3 +21,4 @@ jspm_packages
 scim-rp-sample.key
 privkey.pem
 cert.pem
+public/images

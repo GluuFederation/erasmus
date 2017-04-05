@@ -11,7 +11,8 @@
     'FidesWebApplication.pages.provider',
     'FidesWebApplication.pages.login',
     'FidesWebApplication.pages.register',
-    'FidesWebApplication.pages.encrypt'
+    'FidesWebApplication.pages.encrypt',
+    'FidesWebApplication.pages.badges'
   ]).config(routeConfig);
 
   /** @ngInject */

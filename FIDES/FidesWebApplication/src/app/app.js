@@ -14,7 +14,7 @@ angular.module('FidesWebApplication', [
   'ui.slimscroll',
   'ngJsTree',
   'angular-progress-button-styles',
-
+  'checklist-model',
   'FidesWebApplication.theme',
   'FidesWebApplication.pages'
 ]).config(function ($locationProvider) {
@@ -28,7 +28,7 @@ angular.module('FidesWebApplication', [
   AUTH_URL: 'https://127.0.0.1:3000/login.html',
   BASE_API: 'http://127.0.0.1:8000',
   USER_PROFILE: 'assets/img/theme/no-photo.png',
-  BADGE_URL: 'https://127.0.0.1:3333/'
+  BADGE_URL: 'https://badge.local.org:9001'
 }).run(function ($rootScope, $localStorage, $http, $window, $state, urls, toastr) {
   if ($window.location.pathname == "/login.html" || $window.location.pathname == "/register.html") {
     removeTokenAndRedirect($localStorage, $http, $window, urls);

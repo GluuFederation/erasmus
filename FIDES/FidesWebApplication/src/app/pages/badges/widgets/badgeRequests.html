@@ -1,0 +1,86 @@
+<div class="add-row-editable-table">
+    <button class="btn btn-primary" ng-click="vm.openBadgeRequestModal()">Create Badge Request</button>
+</div>
+<table style="width: 100%">
+    <tr ng-repeat="(key, value) in vm.badgeRequests">
+        <td ng-show="vm.badgeRequests[key].length">
+            <table class="table table-bordered table-hover table-condensed">
+                <tr>
+                    <td>
+                        {{key}}
+                    </td>
+                </tr>
+            </table>
+            <table class="table table-bordered table-hover table-condensed">
+                <tr>
+                    <td class="table-id" style="display: none;">#</td>
+                    <td>Logo</td>
+                    <td>Badge Name</td>
+                    <td>Description</td>
+                    <td>Requester Name</td>
+                    <td>Requester Email</td>
+                    <td>Status</td>
+                    <td>Actions</td>
+                </tr>
+                <tr ng-repeat="badge in value">
+                    <td style="display: none;">
+                        {{badge.inum}}
+                    </td>
+                    <td>
+                        <span>
+                            <img ng-src="{{ badge.badgeDetails.picture || 'empty' }}"
+                                 class="img-rounded" height="20px"
+                                 width="20px"/>
+                        </span>
+                    </td>
+                    <td>
+                        <span>
+                            <a target="_blank" ng-href="{{badge.hostedURL}}">
+                                {{ badge.badgeDetails.displayName|| 'empty'}}
+                            </a>
+                        </span>
+                    </td>
+                    <td>
+                          <span>
+                              {{ badge.badgeDetails.description|| 'empty' }}
+                          </span>
+                    </td>
+                    <td>
+                        <span>
+                            {{ badge.gluuBadgeRequesterDetail.displayName|| 'empty' }}
+                        </span>
+                    </td>
+                    <td>
+                        <a class="email-link" ng-href="mailto:{{badge.gluuBadgeRequesterDetail.email}}">
+                            {{badge.gluuBadgeRequesterDetail.email}}
+                        </a>
+                    </td>
+                    <td class="select-td">
+                        <span editable-select="badge.active" e-name="active" e-form="rowform" e-selectpicker
+                              e-ng-options="s.value as s.text for s in vm.statuses">
+                          {{ vm.showStatus(badge) }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="buttons" ng-show="!rowform.$visible">
+                            <ul class="btn-list clearfix">
+                                <li>
+                                    <button type="button" class="btn btn-primary btn-icon"
+                                            title="Approve" ng-click="vm.approveBadgeRequest(badge.inum, key)">
+                                        <i class="ion-checkmark-round"></i>
+                                    </button>
+                                </li>
+                                <li>
+                                    <button type="button" class="btn btn-danger btn-icon"
+                                            title="Deny" ng-click="vm.openConfirmationDialog(badge.inum, key)">
+                                        <i class="ion-close-round"></i>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

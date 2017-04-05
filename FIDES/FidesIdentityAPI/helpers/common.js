@@ -1,3 +1,5 @@
+const uuid = require('node-uuid');
+
 const message = {
   INTERNAL_SERVER_ERROR: 'The server encountered an internal error and was unable to complete your request. Please contact administrator.',
   NOT_FOUND: 'not found',
@@ -9,7 +11,8 @@ const message = {
 
 const constant = {
   OWNER_ORGANIZATION_ID: '58d8b139987e8419d0a3c1cc',
-  trustMarkFilePath:'./public/images/trustmark/',
+  TRUST_MARK_FILEPATH: '/public/images/trustmark',
+  BADGE_IMAGE_PATH: '/public/images/badges',
   OTTO_BASE_URL: 'http://localhost:5053,',
   CONTEXT_SCHEMA_URL: 'https://raw.githubusercontent.com/KantaraInitiative/wg-otto/master/schema',
   ORGANIZATION_CONTEXT: '/otto/organization.jsonld',
@@ -32,8 +35,8 @@ function getExtension(filename) {
   return (i < 0) ? '' : phrase.substr(i);
 }
 
-function getFileName(id, filename) {
-  return id + '' + getExtension(filename);
+function getFileName(filename) {
+  return uuid.v4() + '' + getExtension(filename);
 }
 
 function generateString(length) {

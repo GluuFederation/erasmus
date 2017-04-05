@@ -1,0 +1,31 @@
+<div class="modal-content">
+  <form name="vm.createBadgeForm" novalidate>
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
+        <em class="ion-ios-close-empty sn-link-close"></em>
+      </button>
+      <h4 class="modal-title" id="createBadgeLabel">Approved Badge List</h4>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="o in vm.badges">
+              <td><strong>{{o.name}}</strong></td>
+              <td>{{o.description}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+    </div>
+  </form>
+</div>

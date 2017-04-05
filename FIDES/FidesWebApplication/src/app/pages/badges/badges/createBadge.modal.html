@@ -1,0 +1,119 @@
+<div class="modal-content">
+  <form name="vm.createBadgeForm" novalidate>
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
+        <em class="ion-ios-close-empty sn-link-close"></em>
+      </button>
+      <h4 class="modal-title" id="createBadgeLabel">Create Badge</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-6 organization_box">
+          <div class="form-group has-feedback"
+               ng-class="{'has-error': vm.createBadgeForm.name.$invalid && (vm.createBadgeForm.name.$dirty || vm.createBadgeForm.$submitted)}">
+            <label for="badgeName">Badge Name</label>
+            <input type="text" class="form-control" id="badgeName" name="name" placeholder="Badge Name"
+                   ng-model="vm.modalBadge.data.name" required>
+            <span class="help-block error-block basic-block">This field is required!</span>
+          </div>
+          <div class="form-group"
+               ng-class="{'has-error': vm.createBadgeForm.description.$invalid && (vm.createBadgeForm.description.$dirty || vm.createBadgeForm.$submitted)}">
+            <label for="description">Description</label>
+            <input type="text" class="form-control" id="description" name="description"
+                   placeholder="Description" ng-model="vm.modalBadge.data.description" required>
+            <span class="help-block error-block basic-block">This field is required!</span>
+          </div>
+          <div class="form-group"
+               ng-class="{'has-error': vm.createBadgeForm.narrative.$invalid && (vm.createBadgeForm.narrative.$dirty || vm.createBadgeForm.$submitted)}">
+            <label for="narrative">Narrative</label>
+            <input type="text" class="form-control" id="narrative" name="narrative"
+                   placeholder="Criteria" ng-model="vm.modalBadge.data.narrative" required>
+            <span class="help-block error-block basic-block">This field is required!</span>
+          </div>
+          <div class="form-group"
+               ng-class="{'has-error': vm.createBadgeForm.federationId.$invalid && (vm.createBadgeForm.federationId.$dirty || vm.createBadgeForm.$submitted)}">
+            <label for="category">Category</label>
+            <select class="form-control" id="category" name="category" title="Select category" selectpicker
+                    ng-model="vm.modalBadge.data.category"
+                    ng-options="category._id as category.name for category in vm.badgeCategories" required>
+              <option value="">--- Select ---</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="badgeLogo">Logo</label>
+            <div id="organizationLogo" id="badgeLogo">
+              <div class="userpic"
+                   ng-class="{'has-error': vm.modalBadge.noPicture && vm.createBadgeForm.$submitted}">
+                <div class="userpic-wrapper">
+                  <img ng-src="{{ vm.imgSrc }}" ng-click="vm.uploadPicture()">
+                </div>
+                <i class="ion-ios-close-outline" ng-click="vm.removePicture()"
+                   ng-if="!vm.modalBadge.noPicture"></i>
+                <a href class="change-userpic" ng-click="vm.uploadPicture()">Change Badge Logo</a>
+                <input type="file" accept="image/*" name="badgePicture" ng-show="ture"
+                       ng-model="vm.modalBadge.noPicture" id="badgePicture"
+                       onchange="angular.element(this).scope().vm.onFileSelect(this.files)" required>
+                <span class="help-block basic-block"
+                      ng-show="vm.modalBadge.noPicture && vm.createBadgeForm.$submitted">This field is required!</span>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group row">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6"></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-md-6">
+          <div class="modal-header">
+            <h6 class="modal-title" id="createBadgeLogoLabel">Create Badge Logo</h6>
+          </div>
+          <div class="modal-body">
+            <div class="form-group"
+                 ng-class="{'has-error': vm.createOrganizationLogoForm.bannerText.$invalid && (vm.createOrganizationLogoForm.bannerText.$dirty || vm.createOrganizationLogoForm.$submitted)}">
+              <label for="bannerText">Banner Text</label>
+              <input type="text" class="form-control" id="bannerText" name="bannerText"
+                     placeholder="Banner Text" ng-model="vm.modalBadge.logo.bannerText"
+                     ng-change="vm.drawBadgeLogo()">
+              <span class="help-block error-block basic-block">This field is required!</span>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group"
+                   ng-class="{'has-error': vm.createOrganizationLogoForm.bannerColor.$invalid && (vm.createOrganizationLogoForm.bannerColor.$dirty || vm.createOrganizationLogoForm.$submitted)}">
+                <label for="bannerText">Background Color</label>
+                <input type="color" class="form-control" id="bannerColor" name="bannerColor"
+                       ng-model="vm.modalBadge.logo.bannerColor"
+                       ng-change="vm.drawBadgeLogo()">
+                <span class="help-block error-block basic-block">This field is required!</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group"
+                   ng-class="{'has-error': vm.createOrganizationLogoForm.bannerTextColor.$invalid && (vm.createOrganizationLogoForm.bannerTextColor.$dirty || vm.createOrganizationLogoForm.$submitted)}">
+                <label for="bannerTextColor">Text Color</label>
+                <input type="color" class="form-control" id="bannerTextColor"
+                       name="bannerText0Color" ng-model="vm.modalBadge.logo.bannerTextColor"
+                       ng-change="vm.drawBadgeLogo()">
+                <span class="help-block error-block basic-block">This field is required!</span>
+              </div>
+            </div>
+            <canvas id="badgeLogoCanvas" width=400 height=100></canvas>
+            <br />
+            <div>
+              <a id="downloadLogo" download="Logo.png" ng-click="vm.downloadBadgeLogo()" href="{{vm.logoDownloadURL}}"><button>Download Logo</button></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+      <button type="submit" class="btn btn-primary" ng-click="vm.createBadge(vm.createBadgeForm.$valid)">
+        Create
+      </button>
+    </div>
+  </form>
+</div>
