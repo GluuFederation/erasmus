@@ -1,42 +1,47 @@
 <div class="modal-content">
-  <form name="vm.createBadgeForm" novalidate>
-    <div class="modal-header">
-      <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
-        <em class="ion-ios-close-empty sn-link-close"></em>
-      </button>
-      <h4 class="modal-title" id="createBadgeLabel">Approve Badges of organization {{::organization.name}} </h4>
-    </div>
-    <div class="modal-body">
-      <div class="row">
-        <div class="col-lg-12 col-md-12">
-          <select class="form-control col-sm-4" id="category" name="category" title="Select category" selectpicker
-                  ng-model="vm.category" ng-change="vm.filterBadge()"
-                  ng-options="category._id as category.name for category in vm.categories" required>
-            <option value="">--- All ---</option>
-          </select>
-
-          <form name="frm" class="form-horizontal">
-            <div class="form-group">
-              <div class="col-sm-4" ng-repeat="o in vm.badges">
-                <input type="checkbox" checklist-model="vm.selectedBadges" checklist-value="o._id"> &nbsp;
-                {{o.name}}
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
+      <em class="ion-ios-close-empty sn-link-close"></em>
+    </button>
+    <h4 class="modal-title" id="createBadgeLabel">Approve Badges of organization {{::vm.organization.name}} </h4>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-lg-12 col-md-12">
+        <form name="frm" class="form-horizontal">
+          <div class="form-group">
+            <label for="category" class="col-sm-1 control-label">category</label>
+            <div class="col-sm-4">
+              <select class="form-control col-sm-4" id="category" name="category" title="Select category" selectpicker
+                      ng-model="vm.category" ng-change="vm.filterBadge()"
+                      ng-options="category._id as category.name for category in vm.categories">
+                <option value="">--- All ---</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-4" ng-repeat="o in vm.badges">
+              <div class="checkbox">
+                <label class="custom-checkbox">
+                  <input type="checkbox" id="inlineCheckbox{{o._id}}" checklist-model="vm.selectedBadges"
+                         checklist-value="o._id">
+                  <span style="font-weight: 600">{{o.name}}</span>
+                </label>
               </div>
             </div>
-            <hr/>
-            <div class="form-group">
-              <div class="col-sm-10">
-                <button type="submit" class="btn btn-primary" ng-click="vm.badgeApprove()"><i
-                  class="fa fa-check"></i>&nbsp;Approve
-                </button>
-                <span> {{vm.selectedBadges.length > 0 ? 'Selected Badge ' + vm.selectedBadges.length : '' }} </span>
-              </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-offset-1 col-sm-10">
+              <button type="submit" class="btn btn-primary" ng-click="vm.badgeApprove()"><i class="fa fa-check"></i>&nbsp;Approve
+              </button>
+              <span> {{vm.selectedBadges.length > 0 ? 'Selected Badge ' + vm.selectedBadges.length : '' }} </span>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
-    </div>
-  </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+  </div>
 </div>

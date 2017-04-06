@@ -15,7 +15,7 @@
                 roles: ['admin', 'orgadmin'],
                 title: 'Badges',
                 sidebarMeta: {
-                    order: 1
+                    order: 2
                 }
             });
     }

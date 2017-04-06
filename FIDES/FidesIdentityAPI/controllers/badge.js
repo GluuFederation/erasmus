@@ -60,7 +60,8 @@ router.post('/badges', upload, (req, res, next) => {
  * Update badges
  */
 router.put('/badges/:id', upload, (req, res, next) => {
-  req.body.image = (!!req.files[0]) ? process.env.BASE_URL + common.constant.BADGE_IMAGE_PATH + '/' + req.files[0].filename : null;
+  const filePath = common.constant.BADGE_IMAGE_PATH;
+  req.body.image = (!!req.files[0]) ? process.env.BASE_URL + filePath.substr(7, filePath.length) + '/' + req.files[0].filename : null;
   if (req.body.image && (req.body.image != req.body.oldImage)) {
     try {
       fs.unlinkSync(common.constant.BADGE_IMAGE_PATH + req.body.oldImage);

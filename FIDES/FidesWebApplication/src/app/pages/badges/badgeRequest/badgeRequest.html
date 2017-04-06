@@ -10,18 +10,18 @@
                 <select id="category" class="form-control" id="category" name="category" title="Select category"
                         selectpicker
                         ng-model="vm.category" ng-change="vm.filterBadge()"
-                        ng-options="category._id as category.name for category in vm.categories" required>
+                        ng-options="category._id as category.name for category in vm.categories">
                   <option value="">--- All ---</option>
                 </select>
               </div>
             </div>
 
             <div class="form-group">
-              <div class="col-sm-offset-1 col-sm-4" ng-repeat="o in vm.allBadges">
+              <div class="col-sm-offset-1 col-sm-4" ng-repeat="o in vm.allBadges" style="background:{{ o.isPending == true ? '#ffcdd2' : '' }}{{ o.isApproved == true ? '#bbdefb' : '' }}" title="{{ o.isPending == true ? 'Badge request is in pending' : '' }}{{ o.isApproved == true ? 'Already Approved Badge' : '' }}">
                 <div class="checkbox">
                   <label class="custom-checkbox">
                     <input type="checkbox" id="inlineCheckbox{{o._id}}" checklist-model="vm.selectedBadges"
-                           checklist-value="o._id">
+                           checklist-value="o._id" ng-disabled="o.isPending || o.isApproved">
                     <span><a href ng-click="vm.openModalBadgeDetail(o)" style="font-weight: 600">{{o.name}}</a></span>
                   </label>
                 </div>

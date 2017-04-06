@@ -32,8 +32,11 @@
 
         function onSuccess(response) {
           vm.reqBadge = _.union(response.data.pendingBadges, response.data.approvedBadges) || [];
-          vm.allBadges = vm.allBadges.filter(function (item) {
-            return vm.reqBadge.indexOf(item._id) == -1;
+          vm.selectedBadges = angular.copy(vm.reqBadge);
+          vm.allBadges = vm.allBadges.map(function (item) {
+            (response.data.pendingBadges.indexOf(item._id) > -1) ? item.isPending = true : '';
+            (response.data.approvedBadges.indexOf(item._id) > -1) ? item.isApproved = true : '';
+            return item;
           });
           vm.allSafeBadges = vm.allBadges;
         }
@@ -65,6 +68,14 @@
         toastr.error('Organization is not approved. Please contact to admin', 'Badge Request', {});
         return;
       }
+      if (vm.selectedBadges.length <= 0) {
+        toastr.error('Please select at least one badge', 'Badge Request', {});
+        return;
+      }
+      vm.selectedBadges = vm.selectedBadges.filter(function (item) {
+        return vm.reqBadge.indexOf(item) <= -1;
+      });
+
       var formData = {
         oid: vm.organization._id,
         bids: vm.selectedBadges
@@ -77,7 +88,7 @@
       }
 
       function onError(error) {
-        toastr.error('Please select one', 'Badges', {})
+        toastr.error('Internal server error', 'Badges', {})
       }
     }
 

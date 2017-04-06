@@ -69,7 +69,7 @@
     function openBadgeCategoryModal(badgeCategory) {
       $uibModal.open({
         animation: true,
-        templateUrl: '/app/pages/badges/badgeCategory/createBadgeCategory.modal.html',
+        templateUrl: 'app/pages/badges/badgeCategory/createBadgeCategory.modal.html',
         size: 'lg',
         controller: 'badgeCategoryModalCtrl',
         controllerAs: 'vm',

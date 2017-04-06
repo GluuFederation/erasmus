@@ -78,7 +78,7 @@
     function openBadgeModal(badge) {
       $uibModal.open({
         animation: true,
-        templateUrl: '/app/pages/badges/badges/createBadge.modal.html',
+        templateUrl: 'app/pages/badges/badges/createBadge.modal.html',
         size: 'lg',
         controller: 'BadgeModalCtrl',
         controllerAs: 'vm',
@@ -88,8 +88,16 @@
           }
         }
       }).result.then(function (badge) {
-        vm.badges.push(badge);
-        vm.safeBadges.push(badge);
+        var index = _.findIndex(vm.badges, {_id: badge._id});
+        if (index >= 0) {
+          vm.badges[index] = badge;
+        } else {
+          if (vm.badges === undefined) {
+            vm.badges = vm.safeBadges = [];
+          }
+          vm.badges.push(badge);
+        }
+        vm.safeBadges = angular.copy(vm.badges);
       });
     }
 
