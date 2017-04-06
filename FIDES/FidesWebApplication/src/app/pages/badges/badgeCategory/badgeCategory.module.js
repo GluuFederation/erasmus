@@ -15,7 +15,7 @@
                 roles: ['admin'],
                 title: 'Badge Category',
                 sidebarMeta: {
-                    order: 2
+                    order: 1
                 }
             });
     }

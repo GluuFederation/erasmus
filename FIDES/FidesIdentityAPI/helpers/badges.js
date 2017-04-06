@@ -90,10 +90,11 @@ let updateBadge = (req, id) => {
       oBadge.isActive = req.isActive || oBadge.isActive;
       oBadge.category = req.category || oBadge.category;
 
-      return oBadge.save()
-        .then(updatedBadge => Promise.resolve(updatedBadge))
-        .catch(err => Promise.reject(err));
+      return oBadge.save();
     })
+    .then(badge => Promise.resolve(badge))
+    .then(badge => Badge.populate(badge, 'category'))
+    .then(badge => Promise.resolve(badge))
     .catch(err => Promise.reject(err));
 };
 
@@ -150,8 +151,10 @@ let badgeApprove = (oid, bids) => {
     .findById(oid)
     .exec()
     .then((oOrg) => {
-      oOrg.approvedBadges = bids;
-      oOrg.pendingBadges = oOrg.pendingBadges.filter(function(item){ return bids.indexOf(String(item)) == -1; });
+      bids.forEach((item) => {
+        oOrg.approvedBadges.push(item);
+      });
+      oOrg.pendingBadges = oOrg.pendingBadges.filter(function(item){ return oOrg.approvedBadges.indexOf(String(item)) == -1; });
       return oOrg.save();
     })
     .then((organization) => Promise.resolve(organization))

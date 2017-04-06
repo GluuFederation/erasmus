@@ -102,6 +102,11 @@
           return;
         }
 
+        if (vm.selectedBadges.length <= 0) {
+          toastr.error('Please select at least one badge', 'Badge Request', {});
+          return;
+        }
+
         var formData = {
           oid: vm.organization._id,
           bids: vm.selectedBadges
@@ -114,7 +119,7 @@
         }
 
         function onError(error) {
-          toastr.error('Please select one', 'Badges', {})
+          toastr.error('Internal server error', 'Badges', {})
         }
       }
 

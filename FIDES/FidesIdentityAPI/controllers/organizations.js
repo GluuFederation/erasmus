@@ -78,7 +78,7 @@ router.put('/updateOrganization', upload, (req, res, next) => {
   req.body.trustMarkFile = (!!req.files[0]) ? process.env.BASE_URL + filePath.substr(7, filePath.length) + '/' + req.files[0].filename : null;
   if (req.body.trustMarkFile && (req.body.trustMarkFile != req.body.oldtrustMarkFile)) {
     try {
-      fs.unlinkSync(common.constant.trustMarkFilePath + req.body.oldtrustMarkFile);
+      fs.unlinkSync(common.constant.TRUST_MARK_FILEPATH + req.body.oldtrustMarkFile);
     } catch (e) {
     }
   }

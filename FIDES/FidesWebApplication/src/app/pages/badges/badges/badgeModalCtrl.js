@@ -10,6 +10,9 @@
     vm.modalBadge = {};
     vm.modalBadge.noPicture = true;
     vm.modalBadge.data = badge;
+    (!!badge._id) ? vm.modalBadge.data.category = badge.category._id : '';
+    (!!badge.image) ? vm.modalBadge.data.oldImage = badge.image : '';
+
     vm.modalBadge.logo = {};
     vm.badgeCategories = [];
     vm.imgSrc = '';
@@ -31,14 +34,17 @@
       for (var key in vm.modalBadge.data) {
         fd.append(key, vm.modalBadge.data[key]);
       }
-
-      badgesService.createBadge(fd).then(onSuccess).catch(onError);
+      if (!!badge._id) {
+        badgesService.updateBadge(badge._id, fd).then(onSuccess).catch(onError);
+      } else {
+        badgesService.createBadge(fd).then(onSuccess).catch(onError);
+      }
 
       function onSuccess(response) {
         if (response.data.name) {
           $uibModalInstance.close(response.data);
         }
-        toastr.success('Badge created successfully', 'Badges', {});
+        toastr.success('Badge saved successfully', 'Badges', {});
       }
 
       function onError(error) {

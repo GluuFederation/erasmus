@@ -24,7 +24,10 @@
     }
 
     function updateBadge(id, formData) {
-      return $http.put(urls.BASE_API + '/badges/' + id, formData);
+      return $http.put(urls.BASE_API + '/badges/' + id, formData, {
+        transformRequest: angular.identity,
+        headers: {'Content-Type': undefined}
+      });
     }
 
     function createBadge(formData) {
