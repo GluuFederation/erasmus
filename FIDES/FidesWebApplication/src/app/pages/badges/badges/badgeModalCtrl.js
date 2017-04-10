@@ -30,6 +30,7 @@
       }
       vm.modalBadge.data.type = 'BadgeClasses';
       vm.modalBadge.data.image = vm.modalBadge.file;
+      vm.modalBadge.data.isActive = true;
       var fd = new FormData();
       for (var key in vm.modalBadge.data) {
         fd.append(key, vm.modalBadge.data[key]);

@@ -1,0 +1,97 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: ECS API
+  description: ECS mobiel app API
+  version: "1.0.0"
+
+# array of all schemes that your API supports
+schemes:
+  - http
+# will be prefixed to all paths
+basePath: /
+resourcePath: /Federations
+description: All about openid connect provider
+apis: 
+
+- path: /getAllFederations
+  operations:
+    - httpMethod: GET
+      summary: Get all federation
+      notes: Get all federation
+      nickname: getAllFederations
+      consume:
+        - application/json
+      parameters:
+        - name: Authorization
+          dataType: string
+          paramType: header
+          required: true
+          description: authorization token
+
+- path: /addFederation
+  operations:
+    - httpMethod: POST
+      summary: add federation
+      notes: Returns a new federation
+      nickname: addFederation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          dataType: string
+          paramType: header
+          required: true
+          description: authorization token
+        - name: name
+          dataType: string
+          paramType: formData
+          required: true
+          description: federation name
+
+- path: /updateFederation
+  operations:
+    - httpMethod: PUT
+      summary: update provider
+      notes: Returns a updated provider
+      nickname: updateFederation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: Authorization
+          dataType: string
+          paramType: header
+          required: true
+          description: authorization token
+        - name: name
+          dataType: string
+          paramType: formData
+          required: true
+          description: federation name
+
+- path: /removeFederation/{fid}
+  operations:
+    - httpMethod: DELETE
+      summary: remove organization
+      notes: Returns a deleted provider
+      nickname: getOrganizationById
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+      - name: Authorization
+        dataType: string
+        paramType: header
+        required: true
+        description: authorization token
+      - name: fid
+        dataType: string
+        paramType: path
+        required: true
+        description: federation unique id

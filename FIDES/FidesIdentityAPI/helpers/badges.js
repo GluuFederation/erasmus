@@ -2,6 +2,8 @@
 
 const Badge = require('../models/badge');
 const Organization = require('../models/organization');
+const Provider = require('../models/provider');
+const User = require('../models/user');
 
 /**
  * Get all active badges
@@ -161,6 +163,26 @@ let badgeApprove = (oid, bids) => {
     .catch(err => Promise.reject(err));
 };
 
+/**
+ * Get federation by name
+ * @param {String} name - Federation name
+ * @return {federations} - return federation
+ * @return {err} - return error
+ */
+let getBadgeByIssuer = (discoveryUrl) => {
+  return Provider
+    .findOne({
+      discoveryUrl: new RegExp('^' + discoveryUrl + '$', 'i')
+    })
+    .then((oProvider) => {
+      return User.findOne({ provider: oProvider._id });
+    })
+    .then((oUser) => {
+      return Organization.findById(oUser.organization).populate('approvedBadges');
+    })
+    .catch((err) => Promise.reject(err));
+};
+
 module.exports = {
   getAllBadges,
   getBadgeById,
@@ -169,5 +191,6 @@ module.exports = {
   updateBadge,
   removeBadge,
   badgeRequest,
-  badgeApprove
+  badgeApprove,
+  getBadgeByIssuer
 };

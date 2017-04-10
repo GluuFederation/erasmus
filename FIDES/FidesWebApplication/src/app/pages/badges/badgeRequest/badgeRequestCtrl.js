@@ -68,17 +68,19 @@
         toastr.error('Organization is not approved. Please contact to admin', 'Badge Request', {});
         return;
       }
-      if (vm.selectedBadges.length <= 0) {
-        toastr.error('Please select at least one badge', 'Badge Request', {});
-        return;
-      }
-      vm.selectedBadges = vm.selectedBadges.filter(function (item) {
+
+      var bids = vm.selectedBadges.filter(function (item) {
         return vm.reqBadge.indexOf(item) <= -1;
       });
 
+      if (bids.length <= 0) {
+        toastr.error('Please select at least one badge', 'Badge Request', {});
+        return;
+      }
+
       var formData = {
         oid: vm.organization._id,
-        bids: vm.selectedBadges
+        bids: bids
       };
       badgeRequestService.badgeRequest(formData).then(onSuccess).catch(onError);
 
