@@ -12,7 +12,7 @@ schemes:
   - http
 # will be prefixed to all paths
 basePath: /
-resourcePath: /Providers
+resourcePath: /BadgeCategory
 description: All about openid connect provider
 apis: 
 
@@ -71,12 +71,12 @@ apis:
           required: true
           description: unique organization id
 
-- path: /approveProvider/{pid}
+- path: /approveProvider
   operations:
-    - httpMethod: GET
-      summary: approve provider
-      notes: Returns a approved provider
-      nickname: approveProvider
+    - httpMethod: POST
+      summary: approve organization
+      notes: Returns a organization based on organization id
+      nickname: getOrganizationById
       consumes:
         - application/json
       parameters:
@@ -85,11 +85,16 @@ apis:
         paramType: header
         required: true
         description: authorization token
-      - name: providerId
+      - name: organizationId
         dataType: string
         paramType: formData
         required: true
-        description: provider id
+        description: organization id
+      - name: federationId
+        dataType: string
+        paramType: formData
+        required: true
+        description: federation id
 
 - path: /removeProvider/{pid}
   operations:

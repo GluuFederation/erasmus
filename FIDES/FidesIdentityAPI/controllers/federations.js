@@ -36,7 +36,7 @@ router.post('/addFederation', (req, res, next) => {
       // Set Owner Organization
       return Organization.setOwnerOrganization(common.constant.OWNER_ORGANIZATION_ID, savedFederation._id);
     })
-    .then((response) => res.status(httpStatus.OK).send(federation))
+    .then((federation) => res.status(httpStatus.OK).send(federation))
     .catch((err) => {
       if (err.code === 11000) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE_NAME});

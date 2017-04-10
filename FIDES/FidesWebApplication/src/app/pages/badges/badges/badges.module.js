@@ -5,7 +5,7 @@
         .config(routeConfig);
 
     /** @ngInject */
-    function routeConfig($stateProvider) {
+    function routeConfig($stateProvider, $localStorageProvider) {
         $stateProvider
             .state('badges.badges', {
                 url: '/badges',
@@ -13,7 +13,7 @@
                 controller: 'BadgesCtrl',
                 controllerAs: 'vm',
                 roles: ['admin', 'orgadmin'],
-                title: 'Badges',
+                title: ((!!$localStorageProvider.get("currentUser")) && $localStorageProvider.get("currentUser").role === 'orgadmin') ? 'Badge Admin' : 'Badges',
                 sidebarMeta: {
                     order: 2
                 }

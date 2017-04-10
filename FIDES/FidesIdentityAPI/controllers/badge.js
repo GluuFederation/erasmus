@@ -36,6 +36,21 @@ router.get('/badges', upload, (req, res, next) => {
     }));
 });
 
+
+/**
+ * get approved Badge By issuer
+ */
+router.post('/getBadgeByIssuer', (req, res, next) => {
+  Badges.getBadgeByIssuer(req.body.issuer)
+    .then((org) => {
+        return res.status(httpStatus.OK).send(org.approvedBadges);
+    })
+    .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+      err: err,
+      message: common.message.INTERNAL_SERVER_ERROR
+    }));
+});
+
 /**
  * Create badges
  */

@@ -1,0 +1,131 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: ECS API
+  description: ECS mobiel app API
+  version: "1.0.0"
+# the domain of the service
+host: localhost:8000
+# array of all schemes that your API supports
+schemes:
+  - http
+# will be prefixed to all paths
+basePath: /
+resourcePath: /Organizations
+description: All about users Organization
+apis:
+
+- path: /getAllOrganizations
+  operations:
+    - httpMethod: GET
+      summary: Get all organization
+      notes: Fetch all organization
+      nickname: getAllOrganizations
+      consume:
+        - application/json
+
+- path: /getOrganizationById/{oid}
+  operations:
+    - httpMethod: GET
+      summary: Get organization by id
+      notes: Returns a organization based on organization id
+      nickname: getOrganizationById
+      consumes:
+        - application/json
+      parameters:
+        - name: Authorization
+          dataType: string
+          paramType: header
+          required: true
+          description: authorization token
+        - name: oid
+          dataType: string
+          paramType: path
+          required: true
+          description: organization id
+
+- path: /updateOrganization
+  operations:
+    - httpMethod: PUT
+      summary: update organization
+      notes: Returns a updated organization
+      nickname: updateOrganization
+      consumes:
+        - multipart/form-data
+      parameters:
+      - name: Authorization
+        dataType: string
+        paramType: header
+        required: true
+        description: authorization token
+      - name: name
+        dataType: string
+        paramType: formData
+        required: true
+        description: organization name
+      - name: phoneNo
+        dataType: string
+        paramType: formData
+        required: true
+        description: organization phone No
+      - name: address
+        dataType: string
+        paramType: formData
+        required: true
+        description: organization address
+      - name: zipcode
+        dataType: string
+        paramType: formData
+        required: true
+        description: organization address
+      - name: trustMarkFile
+        dataType: file
+        paramType: formData
+        required: true
+        description: trustmark file of organization
+
+- path: /approveOrganization
+  operations:
+    - httpMethod: POST
+      summary: approved organization
+      notes: Returns a approved organization
+      nickname: approveOrganization
+      consumes:
+        - application/json
+      parameters:
+        - name: Authorization
+          dataType: string
+          paramType: header
+          required: true
+          description: authorization token
+        - name: organizationId
+          dataType: string
+          paramType: formData
+          required: true
+          description: organization id
+        - name: federationId
+          dataType: string
+          paramType: formData
+          required: true
+          description: federation id
+
+- path: /removeOrganization/{oid}
+  operations:
+    - httpMethod: DELETE
+      summary: remove organization
+      notes: Returns a removed organization
+      nickname: removeOrganization
+      consumes:
+        - application/json
+      parameters:
+        - name: Authorization
+          dataType: string
+          paramType: header
+          required: true
+          description: authorization token
+        - name: oid
+          dataType: string
+          paramType: path
+          required: true
+          description: organization id

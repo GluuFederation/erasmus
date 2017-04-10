@@ -6,7 +6,7 @@ info:
   description: ECS mobiel app API
   version: "1.0.0"
 # the domain of the service
-host: localhost:8080
+host: process.env.BASE_URL
 # array of all schemes that your API supports
 schemes:
   - http
@@ -16,14 +16,12 @@ resourcePath: /Users
 description: All about users API
 apis:
 
-- path: /login
+- path: /validateEmail
   operations:
-
   - httpMethod: POST
-    summary: Login with email and password
+    summary: Validate email and get authorized url
     notes: Returns a user based on email
-    responseClass: User
-    nickname: login
+    nickname: validate email
     consumes:
       - application/json
     parameters:
@@ -34,24 +32,42 @@ apis:
       required: true
       description: Your username
 
-    - name: password
+- path: /login
+  operations:
+  - httpMethod: POST
+    summary: Login with email and password
+    notes: Returns a user based on email
+    nickname: login
+    consumes:
+      - application/json
+    parameters:
+    - name: email
       dataType: string
       paramType: formData
       required: true
-      description: Your password
+      description: Your username
+
+    - name: code
+      dataType: string
+      paramType: formData
+      required: true
+      description: Code given by authorized endpoint
+
+    - name: state
+      dataType: string
+      paramType: formData
+      required: true
+      description: state from authorized url
 
 - path: /signup
   operations:
-
   - httpMethod: POST
     summary: Registers a user
     notes: Registers and returns a user after successful registrations
-    responseClass: User
     nickname: signup
     consumes:
       - application/json
     parameters:
-
     - name: email
       dataType: string
       paramType: formData
@@ -76,30 +92,17 @@ apis:
       required: false
       description: Your last name
 
-- path: /profile
+- path: /getAllUsers
   operations:
-
   - httpMethod: GET
-    summary: Retrives current logged in user details
-    notes: Returns a user based on session
-    responseClass: User
-    nickname: profile
-    consumes:
+    summary: Get all users
+    notes: Fetch all registered users
+    nickname: getAllUsers
+    consume:
       - application/json
-
-models:
-    User:
-      id: User
-      properties:
-        email:
-          type: String
-          required: true
-        password:
-          type: String
-          required: true
-        firstname:
-            type: String
-            required: false
-        lastName:
-            type: String
-            required: false
+    parameters:
+      - name: Authorization
+        dataType: string
+        paramType: header
+        required: true
+        description: authorization token
