@@ -2,26 +2,24 @@
 # as a demonstration of an API spec in YAML
 swagger: '2.0'
 info:
-  title: ECS API
-  description: ECS mobiel app API
+  title: FIDES API
+  description: FIDES web app API
   version: "1.0.0"
-# the domain of the service
-host: localhost:8000
 # array of all schemes that your API supports
 schemes:
   - http
 # will be prefixed to all paths
 basePath: /
 resourcePath: /BadgeCategory
-description: All about openid connect provider
+description: Manage the badge category
 apis: 
 
-- path: /getAllProviders/{userId}
+- path: /badgeCategory
   operations:
     - httpMethod: GET
-      summary: Get Providers by user
-      notes: Fetch all providers by user
-      nickname: getAllProviders
+      summary: Get badge category
+      notes: Fetch all categories
+      nickname: badgeCategory
       consume:
         - application/json
       parameters:
@@ -31,17 +29,12 @@ apis:
           required: true
           description: authorization token
 
-        - name: userId
-          dataType: string
-          paramType: path
-          description: unique id of user
-
-- path: /updateProvider
+- path: /badgeCategory
   operations:
-    - httpMethod: PUT
-      summary: update provider
-      notes: Returns a updated provider
-      nickname: updateProvider
+    - httpMethod: POST
+      summary: add badge category
+      notes: Returns a saved category
+      nickname: badgeCategory
       consumes:
         - application/json
       parameters:
@@ -54,54 +47,49 @@ apis:
           dataType: string
           paramType: formData
           required: true
-          description: organization name
-        - name: discoveryUrl
+          description: category title
+        - name: description
           dataType: string
           paramType: formData
           required: true
-          description: Discovery Url
-        - name: address
-          dataType: string
-          paramType: formData
-          required: true
-          description: organization address
-        - name: organizationId
-          dataType: string
-          paramType: formData
-          required: true
-          description: unique organization id
+          description: category description
 
-- path: /approveProvider
+- path: /badgeCategory/{cid}
   operations:
-    - httpMethod: POST
-      summary: approve organization
-      notes: Returns a organization based on organization id
-      nickname: getOrganizationById
+    - httpMethod: PUT
+      summary: update badge category
+      notes: Returns a updated category
+      nickname: badgeCategory
       consumes:
         - application/json
       parameters:
-      - name: Authorization
-        dataType: string
-        paramType: header
-        required: true
-        description: authorization token
-      - name: organizationId
-        dataType: string
-        paramType: formData
-        required: true
-        description: organization id
-      - name: federationId
-        dataType: string
-        paramType: formData
-        required: true
-        description: federation id
+        - name: Authorization
+          dataType: string
+          paramType: header
+          required: true
+          description: authorization token
+        - name: cid
+          dataType: string
+          paramType: path
+          required: true
+          description: category unique id
+        - name: name
+          dataType: string
+          paramType: formData
+          required: true
+          description: category title
+        - name: description
+          dataType: string
+          paramType: formData
+          required: true
+          description: category description
 
-- path: /removeProvider/{pid}
+- path: /badgeCategory/{cid}
   operations:
     - httpMethod: DELETE
-      summary: remove organization
-      notes: Returns a deleted provider
-      nickname: getOrganizationById
+      summary: remove category
+      notes: Returns a deleted category
+      nickname: badgeCategory
       consumes:
         - application/json
       parameters:
@@ -110,8 +98,8 @@ apis:
         paramType: header
         required: true
         description: authorization token
-      - name: pid
+      - name: cid
         dataType: string
         paramType: path
         required: true
-        description: provider unique id
+        description: category unique id

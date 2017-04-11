@@ -41,9 +41,32 @@ router.get('/badges', upload, (req, res, next) => {
  * get approved Badge By issuer
  */
 router.post('/getBadgeByIssuer', (req, res, next) => {
+  if (!req.body.issuer) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: 'Issuer ' + common.message.NOT_FOUND});
+  }
+  if (!req.body.type) {
+    return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: 'Type ' + common.message.NOT_FOUND});
+  }
+
   Badges.getBadgeByIssuer(req.body.issuer)
     .then((org) => {
-        return res.status(httpStatus.OK).send(org.approvedBadges);
+      const cat = [];
+      org.approvedBadges.forEach(function (item) {
+        if (cat.indexOf(item.category.name) <= -1 && (req.body.type == item.category.name || req.body.type == 'all'))
+          cat.push(item.category.name);
+      });
+
+      const arr2 = {};
+      cat.forEach(function (ocat) {
+        arr2[ocat] = [];
+        org.approvedBadges.forEach(function (item) {
+          if (item.category.name == ocat) {
+            arr2[ocat].push(item);
+          }
+        });
+      });
+
+      return res.status(httpStatus.OK).send(arr2);
     })
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,
@@ -118,7 +141,7 @@ router.delete('/badges/:id', (req, res, next) => {
         try {
           let badgeImage = badges.image;
           badgeImage = badgeImage.substr(badgeImage.lastIndexOf('/') + 1, badgeImage.length);
-          fs.unlinkSync('.'+common.constant.BADGE_IMAGE_PATH + '/' + badgeImage);
+          fs.unlinkSync('.' + common.constant.BADGE_IMAGE_PATH + '/' + badgeImage);
         } catch (e) {
         }
       }

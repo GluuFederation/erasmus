@@ -44,7 +44,7 @@ app.use(swagger.init(app, {
     swaggerURL: '/swagger',
     swaggerJSON: '/api-docs.json',
     swaggerUI: './public/swagger/',
-    apis: ['./swagger/users.yml', './swagger/federations.yml', './swagger/organizations.yml', './swagger/providers.yml']
+    apis: ['./swagger/users.yml', './swagger/federations.yml', './swagger/organizations.yml', './swagger/providers.yml', './swagger/badgecategory.yml']
 }));
 
 // Logger
