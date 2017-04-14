@@ -9,10 +9,10 @@
     $stateProvider
       .state('organization', {
         url: '/organization',
-        title: 'Organizations',
+        title: 'Participants',
         templateUrl: 'app/pages/organization/organization.html',
         controller: 'OrganizationController',
-        controllerAs: "vm",
+        controllerAs: 'vm',
         roles: ['admin'],
         authenticate: true,
         sidebarMeta: {

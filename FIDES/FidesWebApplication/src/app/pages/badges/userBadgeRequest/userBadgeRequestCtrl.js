@@ -1,154 +1,92 @@
 (function () {
   'use strict';
 
-  angular.module('FidesWebApplication.pages.badges.badgeApprove')
+  angular.module('FidesWebApplication.pages.badges.userBadgeRequest')
     .controller('userBadgeRequestCtrl', userBadgeRequestCtrl);
 
   /** @ngInject */
-  function userBadgeRequestCtrl($state, toastr, $uibModal, organizationService) {
+  function userBadgeRequestCtrl(toastr, $uibModal, userBadgeRequestService, $localStorage) {
     var vm = this;
     vm.tablePageSize = 10;
-    vm.organizations = [{"provider":"https://ce-dev2.gluu.org","_id":"58e5ed3a96d2046408a7359d","@context":"https://raw.githubusercontent.com/KantaraInitiative/wg-otto/master/schema/otto/organization.jsonld","@id":"http://localhost:5053,/otto/organization/58e5ed3a96d2046408a7359d","updatedAt":"2017-04-06T12:39:41.186Z","createdAt":"2017-04-06T07:24:42.213Z","name":"Local Org","phoneNo":"22221333366","address":"c123","zipcode":"21415","state":"Arizona","city":"Cochise","type":"service","description":"service","__v":2,"federation":{"_id":"58db728c6e98661975a9fae0","@context":"https://raw.githubusercontent.com/KantaraInitiative/wg-otto/master/schema/otto/federation.jsonld","@id":"http://localhost:5053,/otto/federations/58db728c6e98661975a9fae0","updatedAt":"2017-04-06T07:28:17.869Z","createdAt":"2017-03-29T08:38:36.602Z","name":"fed1","__v":5,"organization":"58d8b139987e8419d0a3c1cc","participants":["58db5e5d07f1b22d72deb271","58db5f1d07f1b22d72deb274","58e33b29d72d0f9e1e544e07","58e38ee573c84fe04e123b54","58e5ed3a96d2046408a7359d"],"entities":[],"keys":[],"isActive":true},"approvedBadges":[],"pendingBadges":["58dfa0d7a016c8832d9b7eab","58e236537e3a8d1121233123"],"federations":[],"entities":[],"isActive":false,"isApproved":true}];
+    //vm.badges = [{"provider":"https://ce-dev2.gluu.org","_id":"58e5ed3a96d2046408a7359d","@context":"https://raw.githubusercontent.com/KantaraInitiative/wg-otto/master/schema/otto/organization.jsonld","@id":"http://localhost:5053,/otto/organization/58e5ed3a96d2046408a7359d","updatedAt":"2017-04-06T12:39:41.186Z","createdAt":"2017-04-06T07:24:42.213Z","name":"Local Org","phoneNo":"22221333366","address":"c123","zipcode":"21415","state":"Arizona","city":"Cochise","type":"service","description":"service","__v":2,"federation":{"_id":"58db728c6e98661975a9fae0","@context":"https://raw.githubusercontent.com/KantaraInitiative/wg-otto/master/schema/otto/federation.jsonld","@id":"http://localhost:5053,/otto/federations/58db728c6e98661975a9fae0","updatedAt":"2017-04-06T07:28:17.869Z","createdAt":"2017-03-29T08:38:36.602Z","name":"fed1","__v":5,"organization":"58d8b139987e8419d0a3c1cc","participants":["58db5e5d07f1b22d72deb271","58db5f1d07f1b22d72deb274","58e33b29d72d0f9e1e544e07","58e38ee573c84fe04e123b54","58e5ed3a96d2046408a7359d"],"entities":[],"keys":[],"isActive":true},"approvedBadges":[],"pendingBadges":["58dfa0d7a016c8832d9b7eab","58e236537e3a8d1121233123"],"federations":[],"entities":[],"isActive":false,"isApproved":true}];
+    vm.badges = [];
     vm.displayedCollection = [];
     vm.category = 0;
+    vm.organization = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.organization : null;
 
     vm.activate = activate;
     vm.openBadgeApproveModel = openBadgeApproveModel;
-    vm.getAllPendingOrganization = getAllPendingOrganization;
+    vm.getPendingBadges = getPendingBadges;
     vm.activate();
 
-    function openBadgeApproveModel(organization) {
-      vm.organizationModal = $uibModal.open({
+    function openBadgeApproveModel(badge) {
+      vm.badgeModal = $uibModal.open({
         animation: true,
-        templateUrl: 'app/pages/badges/badgeApprove/badgeApprove.modal.html',
+        templateUrl: 'app/pages/badges/userBadgeRequest/userBadgeRequest.modal.html',
         size: 'lg',
-        controller: ['$uibModalInstance', 'organization', 'badgesService', 'badgeRequestService', 'badgeCategoryService', badgeApproveCtrl],
+        controller: ['$uibModalInstance', 'badge', 'userBadgeRequestService', badgeApproveCtrl],
         controllerAs: 'vm',
         resolve: {
-          organization: function () {
-            return organization;
+          badge: function () {
+            return badge;
           }
         }
       });
 
-      vm.organizationModal.result.then(function (newOrganization) {
-        return;
-        var index = _.findIndex(vm.organizations, {_id: newOrganization._id});
-        if (index >= 0) {
-          vm.organizations[index] = newOrganization;
-        } else {
-          if (vm.organizations === undefined) {
-            vm.organizations = vm.displayedCollection = [];
-          }
-
-          vm.organizations.push(newOrganization);
-        }
-
-        vm.displayedCollection = angular.copy(vm.organizations);
+      vm.badgeModal.result.then(function (newBadgeModal) {
+        if (!newBadgeModal) return;
+        vm.badges = vm.badges.filter(function (item) {
+          return item.inum != newBadgeModal.inum;
+        });
+        vm.displayedCollection = angular.copy(vm.badges);
       });
     }
 
-    function badgeApproveCtrl($uibModalInstance, organization, badgesService, badgeRequestService, badgeCategoryService) {
+    function badgeApproveCtrl($uibModalInstance, badge, userBadgeRequestService) {
       var vm = this;
-      vm.getPendingBadges = getPendingBadges;
-      vm.getCategory = getCategory;
-      vm.filterBadge = filterBadge;
       vm.badgeApprove = badgeApprove;
-      vm.categories = [];
-      vm.organization = organization;
-      vm.badges = [];
-      vm.safeBadges = [];
-      vm.selectedBadges = [];
-
-      function getPendingBadges() {
-        badgesService.getBadgeByOrganization(vm.organization._id, 'pending').then(onSuccess).catch(onError);
-
-        function onSuccess(response) {
-          vm.badges = response.data;
-          vm.safeBadges = response.data;
-        }
-
-        function onError() {
-          vm.badges = [];
-          vm.safeBadges = [];
-        }
-      }
-
-      function getCategory() {
-        badgeCategoryService.getAllBadgeCategory().then(onSuccess).catch(onError);
-
-        function onSuccess(response) {
-          vm.categories = response.data;
-        }
-
-        function onError(error) {
-          vm.categories = [];
-        }
-      }
-
-      function filterBadge() {
-        if (!vm.category) {
-          vm.badges = vm.safeBadges;
-          return;
-        }
-
-        vm.badges = vm.safeBadges.filter(function (item) {
-          return item.category._id === vm.category;
-        });
-      }
+      vm.badge = badge;
+      vm.validity = 0;
 
       function badgeApprove() {
-        toastr.success('Badges approved successfully', 'Badges', {});
-        $uibModalInstance.close({});
-        return;
-        if (!vm.organization.isApproved) {
-          toastr.error('Organization is not approved. Please contact to admin', 'Badge Request', {});
-          return;
-        }
-
-        if (vm.selectedBadges.length <= 0) {
-          toastr.error('Please select at least one badge', 'Badge Request', {});
+        if (vm.validity < 1 || vm.validity > 10) {
+          toastr.error('Please enter days between 1 to 10', 'Badge', {});
           return;
         }
 
         var formData = {
-          oid: vm.organization._id,
-          bids: vm.selectedBadges
+          inum: badge.inum,
+          validity: vm.days
         };
-        badgeRequestService.badgeApprove(formData).then(onSuccess).catch(onError);
+        userBadgeRequestService.badgeApprove(formData).then(onSuccess).catch(onError);
 
         function onSuccess(response) {
           toastr.success('Badges approved successfully', 'Badges', {});
-          $uibModalInstance.close(response.data);
+          $uibModalInstance.close(badge);
         }
 
         function onError(error) {
-          toastr.error('Internal server error', 'Badges', {})
+          toastr.error('Internal server error', 'Badges', {});
+          $uibModalInstance.close(null);
         }
       }
-
-      //init
-      vm.getPendingBadges();
-      vm.getCategory();
     }
 
-    function getAllPendingOrganization() {
-      organizationService.getAllOrganizations().then(onSuccess).catch(onError);
+    function getPendingBadges() {
+      userBadgeRequestService.getPendingBadges(vm.organization._id).then(onSuccess).catch(onError);
       function onSuccess(response) {
-        vm.organizations = response.data.filter(function (item) {
-          return (!!item.pendingBadges && item.pendingBadges.length);
-        });
-        vm.displayedCollection = angular.copy(vm.organizations);
+        vm.badges = response.data.badgeRequests;
+        vm.displayedCollection = angular.copy(vm.badges);
       }
 
       function onError(error) {
-        vm.organization = [];
+        vm.badges = [];
         vm.displayedCollection = [];
       }
     }
 
     function activate() {
-      //vm.getAllPendingOrganization();
+      vm.getPendingBadges();
     }
   }
 })();

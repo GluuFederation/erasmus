@@ -36,11 +36,27 @@ router.get('/badges', upload, (req, res, next) => {
     }));
 });
 
+/**
+ * Get badge by id
+ */
+router.get('/templateBadgeById/:id', upload, (req, res, next) => {
+  Badges.getBadgeById(req.params.id)
+    .then((badges) => {
+      if (!badges) {
+        return res.status(httpStatus.OK).send({message: 'Badge ' + common.message.NOT_FOUND});
+      }
+      return res.status(httpStatus.OK).send(badges);
+    })
+    .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+      err: err,
+      message: 'Badge ' + common.message.NOT_FOUND
+    }));
+});
 
 /**
  * get approved Badge By issuer
  */
-router.post('/getBadgeByIssuer', (req, res, next) => {
+router.post('/getBadgeTemplatesByIssuer', (req, res, next) => {
   if (!req.body.issuer) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: 'Issuer ' + common.message.NOT_FOUND});
   }
@@ -60,6 +76,7 @@ router.post('/getBadgeByIssuer', (req, res, next) => {
       cat.forEach(function (ocat) {
         arr2[ocat] = [];
         org.approvedBadges.forEach(function (item) {
+          item._doc.participant = org._id;
           if (item.category.name == ocat) {
             arr2[ocat].push(item);
           }
@@ -203,6 +220,5 @@ router.post('/badgeApprove', (req, res, next) => {
       message: common.message.INTERNAL_SERVER_ERROR
     }));
 });
-
 
 module.exports = router;
