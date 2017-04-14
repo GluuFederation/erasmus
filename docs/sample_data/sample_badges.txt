@@ -1,0 +1,118 @@
+EXAMPLE 1: EMT-Basic
+
+"badge": {
+    "type": "BadgeClass",
+    "id": "https://example.org/badges/5",
+    "name": "Emergency Medical Technician-Basic",
+    "description": "EMT-Basic training requires about 100 hours of instruction, including practice in a hospital or ambulance",
+    "image": "https://example.org/badges/5/image",
+    "criteria": {
+      "narrative": "EMT-Basic students must pass an exam testing the ability to assess patient condition, handle trauma or cardiac emergencies and clear blocked airways. They also learn to immobilize injured patients and give oxygen. "
+    },
+    "issuer": {
+      "id": "https://example.org/issuer",
+      "type": "Profile",
+      "name": "National Registry of Emergency Medical Technicians-state specific",
+      "url": "https://example.org",
+      "email": "contact@example.org",
+      "verification": {
+         "allowedOrigins": "example.org"
+      }
+    }
+  }
+
+EXAMPLE 2: EMT-Paramedic
+
+"badge": {
+    "type": "BadgeClass",
+    "id": "https://example.org/badges/5",
+    "name": "EMT-Paramedic",
+    "description": "Certification programs typically require at least 1,300 hours of training in advanced medical skills, such as stitching wounds or giving intravenous medications",
+    "image": "https://example.org/badges/5/image",
+    "criteria": {
+      "narrative": "Firefighters learning paramedic practices usually perform hospital rotations that emphasize emergency-department skills and train them to provide advanced life support to patients. Aspiring firefighters learn to defibrillate patients, insert breathing tubes and catheterize major veins and arteries to monitor blood pressure and take blood sample "
+    },
+    "issuer": {
+      "id": "https://example.org/issuer",
+      "type": "Profile",
+      "name": "National Registry of Emergency Medical Technicians-state specific",
+      "url": "https://example.org",
+      "email": "contact@example.org",
+      "verification": {
+         "allowedOrigins": "example.org"
+      }
+    }
+  }
+
+
+EXAMPLE 3: Entry-level Firefighter 
+
+"badge": {
+    "type": "BadgeClass",
+    "id": "https://example.org/badges/5",
+    "name": "Entry-Level Firefighter",
+    "description": " Instruction lasts several weeks and teaches building codes, emergency medical procedures and prevention techniques. Plus, programs train students to fight fires with standard equipment, such as fire extinguishers, ladders, axes and chainsaws",
+    "image": "https://example.org/badges/5/image",
+    "criteria": {
+      "narrative": " After academy training, firefighters need to complete an apprenticeship of up to four years. Some fire departments send students for additional education with the National Fire Academy, where they learn disaster preparedness, public education and how to handle hazardous materials"
+    },
+    "issuer": {
+      "id": "https://example.org/issuer",
+      "type": "Profile",
+      "name": "State or local fire academy",
+      "url": "https://example.org",
+      "email": "contact@example.org",
+      "verification": {
+         "allowedOrigins": "example.org"
+      }
+    }
+  }
+
+EXAMPLE 4: State Certified Firefighter (slightly different state to state)
+
+"badge": {
+    "type": "BadgeClass",
+    "id": "https://example.org/badges/5",
+    "name": "State Certified Firefighter",
+    "description": " After finishing medical and fire-academy training, most firefighters must earn state certification. In Florida, for example, paid firefighters must complete the state's 398-hour Firefighter Minimum Standards Course and pass written and practical exams",
+    "image": "https://example.org/badges/5/image",
+    "criteria": {
+      "narrative": " Most states adopt certification criteria established by the National Fire Protection Association"
+    },
+    "issuer": {
+      "id": "https://example.org/issuer",
+      "type": "Profile",
+      "name": "State or National Fire Protection Association (NFPA)",
+      "url": "https://example.org",
+      "email": "contact@example.org",
+      "verification": {
+         "allowedOrigins": "example.org"
+      }
+    }
+  }
+
+
+EXAMPLE 5: Hazardous Materials (HAZMAT) technician certified
+
+"badge": {
+    "type": "BadgeClass",
+    "id": "https://example.org/badges/5",
+    "name": "HAZMAT Technician",
+    "description": " Must attend an NFPA 472, 40 hour course designed for personnel who respond to emergencies involving Hazardous Materials (HazMat)/Weapons of Mass Destruction (WMD) for the purpose of analyzing the incident, selecting appropriate PPE and decontamination procedures, and implementing action options to mitigate the incident",
+    "image": "https://example.org/badges/5/image",
+    "criteria": {
+      "narrative": " Upon completion of this course you must successfully pass the National Board on Fire Service Professional Qualifications (Pro Board) written exam and skills testing for NFPA 472 Chapter 7,
+    "issuer": {
+      "id": "https://example.org/issuer",
+      "type": "Profile",
+      "name": "Pro-Board Certification",
+      "url": "https://example.org",
+      "email": "contact@example.org",
+      "verification": {
+         "allowedOrigins": "example.org"
+      }
+    }
+  }
+
+
+

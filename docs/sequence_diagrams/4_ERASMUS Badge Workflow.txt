@@ -1,0 +1,16 @@
+title ERASMUS Badge Workflow
+Federation Admin->Fides: Define badge
+Org Admin->Fides: Apply for badges
+Federation Admin->Fides: Approve badges for Org Admin
+Credential Asserter->Badge Manager: See what badges are available for org
+Badge Manager->Fides: Return active badges
+Credential Asserter->Badge Manager: Apply for badge
+Badge Manager->Org Admin: Notify pending badge
+Org Admin->Fides: Approve badge
+Fides->Badge Manager: Notify
+Badge Manager->Credential Asserter: Notify
+Credential Asserter->Badge Manager: Request permanent URL for Badge
+Badge Manager->Credential Asserter: Respond with URL
+Credential Asserter->Credential Verifier: Present badge (req. temporary URL)
+Credential Verifier->Badge Manager: Verify badge
+Badge Manager->Credential Verifier: Send badge info

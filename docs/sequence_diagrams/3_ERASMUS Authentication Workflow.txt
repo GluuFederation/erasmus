@@ -1,0 +1,18 @@
+title ERASMUS Authentication Workflow
+Mobile->Erasmus OP: Authn Request (specify issuer)
+Erasmus OP->Mobile: Redirect to Home OP
+Mobile->Home OP: Login
+Home OP->Home OP: Enter Creds (username / pw)
+Home OP->Erasmus OP: return code
+Erasmus OP->Home OP: Get access token, id_token
+Home OP->Erasmus OP: access token 1
+Erasmus OP->Home OP: Get UserInfo
+Home OP->Erasmus OP: JSON with user claims
+Erasmus OP->LDAP: Create User Entry with user claims + iss from id_token
+LDAP->Erasmus OP: ok
+Erasmus OP->Mobile: return code
+Mobile->Erasmus OP: get tokens
+Erasmus OP->Mobile: access_token, refresh_token, id_token
+Mobile->Badge Manager: call API (send access_token)
+Badge Manager->Erasmus OP: get UserInfo
+Erasmus OP->Badge Manager: uesr claims + iss
