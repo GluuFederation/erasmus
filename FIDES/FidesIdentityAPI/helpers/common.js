@@ -13,7 +13,7 @@ const constant = {
   OWNER_ORGANIZATION_ID: '58d8b139987e8419d0a3c1cc',
   TRUST_MARK_FILEPATH: '/public/images/trustmark',
   BADGE_IMAGE_PATH: '/public/images/badges',
-  OTTO_BASE_URL: 'http://localhost:5053,',
+  OTTO_BASE_URL: 'http://localhost:5053',
   CONTEXT_SCHEMA_URL: 'https://raw.githubusercontent.com/KantaraInitiative/wg-otto/master/schema',
   ORGANIZATION_CONTEXT: '/otto/organization.jsonld',
   FEDERATION_CONTEXT: '/otto/federation.jsonld',

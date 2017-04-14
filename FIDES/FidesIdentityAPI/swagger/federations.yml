@@ -2,10 +2,9 @@
 # as a demonstration of an API spec in YAML
 swagger: '2.0'
 info:
-  title: ECS API
-  description: ECS mobiel app API
+  title: FIDES API
+  description: FIDES web app API
   version: "1.0.0"
-
 # array of all schemes that your API supports
 schemes:
   - http
@@ -33,7 +32,7 @@ apis:
 - path: /addFederation
   operations:
     - httpMethod: POST
-      summary: add federation
+      summary: Add federation
       notes: Returns a new federation
       nickname: addFederation
       consumes:
@@ -55,7 +54,7 @@ apis:
 - path: /updateFederation
   operations:
     - httpMethod: PUT
-      summary: update provider
+      summary: Update provider
       notes: Returns a updated provider
       nickname: updateFederation
       consumes:
@@ -77,7 +76,7 @@ apis:
 - path: /removeFederation/{fid}
   operations:
     - httpMethod: DELETE
-      summary: remove organization
+      summary: Remove organization
       notes: Returns a deleted provider
       nickname: getOrganizationById
       consumes:

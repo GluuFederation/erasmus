@@ -2,11 +2,9 @@
 # as a demonstration of an API spec in YAML
 swagger: '2.0'
 info:
-  title: ECS API
-  description: ECS mobiel app API
+  title: FIDES API
+  description: FIDES web app API
   version: "1.0.0"
-# the domain of the service
-host: process.env.BASE_URL
 # array of all schemes that your API supports
 schemes:
   - http

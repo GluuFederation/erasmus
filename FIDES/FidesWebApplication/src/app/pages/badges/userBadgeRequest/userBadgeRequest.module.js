@@ -10,7 +10,7 @@
             .state('badges.userBadgeRequest', {
                 url: '/userBadgeRequest',
                 templateUrl: 'app/pages/badges/userBadgeRequest/userBadgeRequest.html',
-                controller: 'BadgeApproveCtrl',
+                controller: 'userBadgeRequestCtrl',
                 controllerAs: 'vm',
                 roles: ['orgadmin'],
                 title: 'Badge Review',

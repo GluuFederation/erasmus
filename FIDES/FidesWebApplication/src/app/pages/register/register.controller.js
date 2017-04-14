@@ -69,7 +69,7 @@
     }
 
     function register() {
-      vm.providerInfo.redirectUrls = [urls.BASE.concat('/login.html'), urls.BASE.concat('/register.html'), urls.BADGE_URL];
+      vm.providerInfo.redirectUrls = [urls.BASE.concat('/login.html'), urls.BASE.concat('/register.html')];
       registerService.validateRegistrationDetail(vm.providerInfo, onSuccess, onError);
 
       function onSuccess(response) {

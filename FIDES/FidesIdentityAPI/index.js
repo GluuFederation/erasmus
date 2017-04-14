@@ -44,7 +44,7 @@ app.use(swagger.init(app, {
     swaggerURL: '/swagger',
     swaggerJSON: '/api-docs.json',
     swaggerUI: './public/swagger/',
-    apis: ['./swagger/users.yml', './swagger/federations.yml', './swagger/organizations.yml', './swagger/providers.yml']
+    apis: ['./swagger/users.yml', './swagger/federations.yml', './swagger/organizations.yml', './swagger/providers.yml', './swagger/badgecategory.yml']
 }));
 
 // Logger
@@ -54,7 +54,7 @@ app.use(morgan('dev'));
 let filter = function(req) {
     if(['/validateEmail', '/login', '/validateRegistrationDetail', '/registerDetail', '/getAllOrganizations'].indexOf(req.path) >= 0) {
         return true;
-    } else if(req.path.startsWith('/isUserAlreadyExist') || req.path.startsWith('/images/trustmark/') || req.path.startsWith('/images/badges/') || req.path.startsWith('/getBadgeByOrganization') || req.path.startsWith('/getBadgeByIssuer')) {
+    } else if(req.path.startsWith('/isUserAlreadyExist') || req.path.startsWith('/images/trustmark/') || req.path.startsWith('/images/badges/') || req.path.startsWith('/getBadgeByOrganization') || req.path.startsWith('/getBadgeTemplatesByIssuer') || req.path.startsWith('/templateBadgeById')) {
         return true;
     }
 };
