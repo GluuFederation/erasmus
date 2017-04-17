@@ -43,13 +43,7 @@ import static org.xdi.oxd.badgemanager.qrcode.decorator.ImageOverlay.addImageOve
 @RequestMapping("/badges/request")
 public class BadgeRequestController {
 
-    //    private final StorageService storageService;
     private final ServletContext context;
-//
-//    @Autowired
-//    public BadgeRequestController(StorageService storageService) {
-//        this.storageService = storageService;
-//    }
 
     @Autowired
     public BadgeRequestController(ServletContext context) {
@@ -317,11 +311,11 @@ public class BadgeRequestController {
                     objBadgeInstance.setDescription(jObjResponse.get("description").getAsString());
                     objBadgeInstance.setBadgeRequestInum(objBadgeRequest.getInum());
 
-//                    if (createQrCode(objBadgeInstance, jObjResponse.get("image").getAsString(), 250, "png")) {
-//                        System.out.print("QR Code generated successfully");
-//                    } else {
-//                        System.out.print("Failed to generate QR Code");
-//                    }
+                    if (generateQrCode(objBadgeInstance, jObjResponse.get("image").getAsString(), 250, "png")) {
+                        System.out.print("QR Code generated successfully");
+                    } else {
+                        System.out.print("Failed to generate QR Code");
+                    }
 
                     return BadgeInstancesCommands.createNewBadgeInstances(ldapEntryManager, objBadgeInstance);
                 }
@@ -347,41 +341,30 @@ public class BadgeRequestController {
      * @throws Exception If an Exception occur during the create of the QR-code or
      *                   while writing the data into the OutputStream.
      */
-    private boolean createQrCode(BadgeInstances badge, String logoFileName, int qrCodeSize, String imageFormat) {
+    private boolean generateQrCode(BadgeInstances badge, String logoFileURL, int qrCodeSize, String imageFormat) {
         try {
 
             float TRANSPARENCY = 0.75f;
             float OVERLAY_RATIO = 0.25f;
 
             System.out.print("Context real path: " + context.getRealPath(""));
-            System.out.print("WEB-INF img path: " + context.getRealPath("/WEB-INF/classes/img/"));
 
-//            String location = new StorageProperties().getLocation();
-            String location = context.getRealPath("/WEB-INF/classes/img/");
+            String location = context.getRealPath("");
 
-            String fileName = location + File.separator + "badges" +
-                    File.separator + "qrcodes" + File.separator + System.currentTimeMillis() + ".png";
+            String fileName = location + File.separator + System.currentTimeMillis() + ".png";
 
-//            String logoFileName = "src/main/resources" + badge.getPicture();
-//            File logoFile = new File(logoFileName);
-//            FileInputStream in = new FileInputStream(logoFile);
-//            byte[] content = new byte[(int) logoFile.length()];
-//            in.read(content);
-
-//            if (!logoFile.exists()) {
-//                return false;
-//            }
+//            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
 
             QRCBuilder<BufferedImage> qrCodeBuilder = new ZXingQRCodeBuilder();
 
             qrCodeBuilder.newQRCode()
                     .withSize(qrCodeSize, qrCodeSize)
                     .and()
-                    .withData(badge.getDescription())
+                    .withData(badge.getName())
                     .and()
                     .decorate(colorizeQRCode(new Color(51, 102, 153)))
                     .and()
-                    .decorate(addImageOverlay(ImageIO.read(new URL(logoFileName)), TRANSPARENCY, OVERLAY_RATIO))
+                    .decorate(addImageOverlay(ImageIO.read(new URL(logoFileURL).openStream()), TRANSPARENCY, OVERLAY_RATIO))
                     .and()
                     .doVerify(true)
                     .toFile(fileName, imageFormat);
