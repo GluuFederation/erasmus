@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.xdi</groupId>
+    <artifactId>oxd-badge-manager</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <name>oxd-badge-manager</name>
+    <description>BadgeManager server</description>
+
+    <repositories>
+        <repository>
+            <id>gluu</id>
+            <name>Gluu repository</name>
+            <url>http://ox.gluu.org/maven</url>
+        </repository>
+    </repositories>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.2.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <org.mapstruct.version>1.1.0.Beta1</org.mapstruct.version>
+        <com.jayway.jsonpath.version>2.2.0</com.jayway.jsonpath.version>
+        <liquibase.version>3.4.2</liquibase.version>
+        <liquibase-slf4j.version>1.2.1</liquibase-slf4j.version>
+        <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
+        <jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jetty</artifactId>
+            <!--<scope>provided</scope>-->
+        </dependency>
+
+        <!--Test-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
+        <!--Gson-->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+
+        <!--Ldap-->
+        <dependency>
+            <groupId>org.xdi</groupId>
+            <artifactId>oxLdap</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xdi</groupId>
+            <artifactId>oxLdap-annotations</artifactId>
+            <version>2.4.4</version>
+        </dependency>
+
+        <!-- Data base -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+
+        <!--Security-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!--Uncomment this dependency while run in local only-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-data-jpa</artifactId>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-thymeleaf</artifactId>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-devtools</artifactId>-->
+        <!--<optional>true</optional>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-configuration-processor</artifactId>-->
+        <!--<optional>true</optional>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>commons-fileupload</groupId>-->
+        <!--<artifactId>commons-fileupload</artifactId>-->
+        <!--<version>1.2.2</version>-->
+        <!--</dependency>-->
+
+        <!--&lt;!&ndash; Inject &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--<groupId>javax.inject</groupId>-->
+        <!--<artifactId>javax.inject</artifactId>-->
+        <!--<version>1</version>-->
+        <!--</dependency>-->
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>2.2.1.GA</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+        </dependency>
+
+        <!--zxing for generating qrCode-->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>2.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>2.2</version>
+        </dependency>
+
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
