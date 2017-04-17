@@ -7,12 +7,12 @@
   /** @ngInject */
   function HomeController($http, toastr, urls, $localStorage, $uibModal, $timeout) {
     var vm = this;
-    vm.organization = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.organization : null;
+    vm.participant = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.participant : null;
     vm.isShow = (!!$localStorage.currentUser) ? $localStorage.currentUser.role === 'orgadmin' : false;
     var file = '';
     vm.BASE_API = urls.BASE_API;
 
-    vm.openOranizationModal = openOranizationModal;
+    vm.openParticipantModal = openParticipantModal;
 
     $http.get(urls.BASE_API + "/loggedIn").then(onSuccess).catch(onError);
 
@@ -25,65 +25,65 @@
       toastr.error(error.data.message, 'FIDES', {})
     }
 
-    // organization edit model
-    function openOranizationModal() {
-      vm.organizationModal = $uibModal.open({
+    // participant edit model
+    function openParticipantModal() {
+      vm.participantModal = $uibModal.open({
         animation: true,
-        templateUrl: 'app/pages/home/manageOrganization.modal.html',
+        templateUrl: 'app/pages/home/manageParticipant.modal.html',
         size: 'lg',
-        controller: ['$uibModalInstance', 'organizationData', 'stateCityService', 'organizationService', createOrganizationController],
+        controller: ['$uibModalInstance', 'participantData', 'stateCityService', 'participantService', createParticipantController],
         controllerAs: 'vm',
         resolve: {
-          organizationData: function () {
-            return vm.organization;
+          participantData: function () {
+            return vm.participant;
           }
         }
       });
 
-      vm.organizationModal.result.then(function (newOrganization) {
-        $localStorage.currentUser.user.organization = newOrganization;
-        vm.organization = newOrganization;
+      vm.participantModal.result.then(function (newParticipant) {
+        $localStorage.currentUser.user.participant = newParticipant;
+        vm.participant = newParticipant;
       });
     }
 
-    function createOrganizationController($uibModalInstance, organizationData, stateCityService, organizationService) {
+    function createParticipantController($uibModalInstance, participantData, stateCityService, participantService) {
       var vm = this;
-      vm.modalOrganization = {};
+      vm.modalParticipant = {};
       vm.stateCityList = {};
       vm.states = [];
-      vm.organizations = {};
+      vm.participants = {};
       vm.federations = null;
       var file = '';
 
-      if (organizationData) {
-        vm.modalOrganization._id = organizationData._id;
-        vm.modalOrganization.name = organizationData.name;
-        vm.modalOrganization.phoneNo = organizationData.phoneNo;
-        vm.modalOrganization.address = organizationData.address;
-        vm.modalOrganization.zipcode = organizationData.zipcode;
-        vm.modalOrganization.state = organizationData.state;
-        vm.modalOrganization.city = organizationData.city;
-        vm.modalOrganization.type = organizationData.type;
-        vm.modalOrganization.isApproved = organizationData.isApproved;
-        vm.modalOrganization.description = organizationData.description;
-        vm.modalOrganization.trustMarkFile = organizationData.trustMarkFile;
-        vm.modalOrganization.oldtrustMarkFile = organizationData.trustMarkFile;
+      if (participantData) {
+        vm.modalParticipant._id = participantData._id;
+        vm.modalParticipant.name = participantData.name;
+        vm.modalParticipant.phoneNo = participantData.phoneNo;
+        vm.modalParticipant.address = participantData.address;
+        vm.modalParticipant.zipcode = participantData.zipcode;
+        vm.modalParticipant.state = participantData.state;
+        vm.modalParticipant.city = participantData.city;
+        vm.modalParticipant.type = participantData.type;
+        vm.modalParticipant.isApproved = participantData.isApproved;
+        vm.modalParticipant.description = participantData.description;
+        vm.modalParticipant.trustMarkFile = participantData.trustMarkFile;
+        vm.modalParticipant.oldtrustMarkFile = participantData.trustMarkFile;
       }
 
-      function pushOrganization(isFormValid) {
+      function pushParticipant(isFormValid) {
         if (!isFormValid) {
           return false;
         }
-        vm.modalOrganization.trustMarkFile = file;
+        vm.modalParticipant.trustMarkFile = file;
         var fd = new FormData();
-        for (var key in vm.modalOrganization) {
-          fd.append(key, vm.modalOrganization[key]);
+        for (var key in vm.modalParticipant) {
+          fd.append(key, vm.modalParticipant[key]);
         }
 
-        organizationService.updateOrganizationWithFile(fd, onSuccess, onError);
+        participantService.updateParticipantWithFile(fd, onSuccess, onError);
 
         function onSuccess(response) {
-          toastr.success('Saved successfully', 'Organization', {});
+          toastr.success('Saved successfully', 'Participant', {});
 
           if (response.data) {
             $uibModalInstance.close(response.data);
@@ -91,7 +91,7 @@
         }
 
         function onError(error) {
-          toastr.error(error.data.message, 'Organization', {});
+          toastr.error(error.data.message, 'Participant', {});
         }
       }
 
@@ -99,12 +99,12 @@
         stateCityService.then(function (response) {
           vm.stateCityList = response.data;
           vm.states = Object.keys(response.data);
-          vm.cities = vm.stateCityList[vm.modalOrganization.state];
+          vm.cities = vm.stateCityList[vm.modalParticipant.state];
         });
       }
 
       function stateChanged() {
-        vm.cities = vm.stateCityList[vm.modalOrganization.state];
+        vm.cities = vm.stateCityList[vm.modalParticipant.state];
       }
 
       //set file function
@@ -118,10 +118,10 @@
               $timeout(function () {
                 try {
                   JSON.parse(fileReader.result);
-                  $("#btnApproveOrganization").show();
+                  $("#btnApproveParticipant").show();
                 } catch (e) {
-                  toastr.error('Please select valid json file', 'Organization', {});
-                  $("#btnApproveOrganization").hide();
+                  toastr.error('Please select valid json file', 'Participant', {});
+                  $("#btnApproveParticipant").hide();
                 }
               });
             }
@@ -129,7 +129,7 @@
         }
       }
 
-      vm.pushOrganization = pushOrganization;
+      vm.pushParticipant = pushParticipant;
       vm.stateChanged = stateChanged;
       vm.photoChanged = photoChanged;
       initLoads();

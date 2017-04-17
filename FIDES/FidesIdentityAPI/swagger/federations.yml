@@ -11,7 +11,7 @@ schemes:
 # will be prefixed to all paths
 basePath: /
 resourcePath: /Federations
-description: All about openid connect provider
+description: All about openid connect entity
 apis: 
 
 - path: /getAllFederations
@@ -54,8 +54,8 @@ apis:
 - path: /updateFederation
   operations:
     - httpMethod: PUT
-      summary: Update provider
-      notes: Returns a updated provider
+      summary: Update entity
+      notes: Returns a updated entity
       nickname: updateFederation
       consumes:
         - application/json
@@ -76,9 +76,9 @@ apis:
 - path: /removeFederation/{fid}
   operations:
     - httpMethod: DELETE
-      summary: Remove organization
-      notes: Returns a deleted provider
-      nickname: getOrganizationById
+      summary: Remove participant
+      notes: Returns a deleted entity
+      nickname: getParticipantById
       consumes:
         - application/json
       produces:

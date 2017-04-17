@@ -5,39 +5,64 @@ const common = require('../helpers/common');
 
 // define the schema for our role
 const federationSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  isActive: {
-    type: Boolean,
-    default: false
-  },
-  keys: [{
-    privatekey: String,
-    publickey: String,
-    keyguid: String,
-    alg: String
-  }],
   '@context': {
     type: String
   },
   '@id': {
     type: String
   },
-  entities: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Provider'
-  }],
-  organization: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Organization'
+  name: {
+    type: String,
+    required: true,
+    unique: true
   },
-  participants: [{
+  description: {
+    type: String
+  },
+  url: {
+    type: String
+  },
+  operates: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Organization'
-  }]
+    ref: 'Entity'
+  },
+  registeredBy: {
+    type: String
+  },
+  member: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Participant'
+  }],
+  federates: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Entity'
+  }],
+  sponsor: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Participant'
+  }],
+  technicalContact: [{
+    type: mongoose.Schema.Types.Mixed
+  }],
+  executiveContact: [{
+    type: mongoose.Schema.Types.Mixed
+  }],
+  securityContact: [{
+    type: mongoose.Schema.Types.Mixed
+  }],
+  dataProtectionCodeOfConduct: {
+    type: String
+  },
+  federationAgreement: {
+    type: String
+  },
+  federationPolicy: {
+    type: String
+  },
+  isActive: {
+    type: Boolean,
+    default: false
+  }
 }, {
   timestamps: true
 }, {

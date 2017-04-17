@@ -14,13 +14,13 @@
       getUSStateCity: getUSStateCity
     };
 
-    function validateRegistrationDetail(providerInfo, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/validateRegistrationDetail", providerInfo).then(onSuccess).catch(onError);
+    function validateRegistrationDetail(entityInfo, onSuccess, onError) {
+      return $http.post(urls.BASE_API + "/validateRegistrationDetail", entityInfo).then(onSuccess).catch(onError);
     }
 
-    function registerDetail(providerInfo, clientInfo, onSuccess, onError) {
+    function registerDetail(entityInfo, clientInfo, onSuccess, onError) {
       return $http.post(urls.BASE_API + "/registerDetail", {
-        providerInfo: providerInfo,
+        entityInfo: entityInfo,
         clientInfo: clientInfo
       }).then(onSuccess).catch(onError);
     }

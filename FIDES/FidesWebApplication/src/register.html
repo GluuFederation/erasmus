@@ -46,61 +46,61 @@
                         <label class="control-label" for="userEmail">Email</label>
                         <input autofocus type="email" class="form-control" id="userEmail" name="email"
                                title="Email required and must be valid email address."
-                               placeholder="Email" ng-model="vm.providerInfo.email" ng-required="true"/>
+                               placeholder="Email" ng-model="vm.entityInfo.email" ng-required="true"/>
                       </div>
                     </div>
                   </div>
                 </form>
               </ba-wizard-step>
-              <ba-wizard-step title="Organization" form="vm.organizationForm">
-                <form name="vm.organizationForm" novalidate>
+              <ba-wizard-step title="Participant" form="vm.participantForm">
+                <form name="vm.participantForm" novalidate>
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group"
-                           ng-class="{'has-error': vm.organizationForm.organizationName.$invalid && (vm.organizationForm.organizationName.$dirty || vm.organizationForm.$submitted)}">
+                           ng-class="{'has-error': vm.participantForm.participantName.$invalid && (vm.participantForm.participantName.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgName">Name</label>
-                        <input autofocus type="text" class="form-control" id="orgName" name="organizationName" title="Please enter the organization name."
-                               placeholder="organization name" ng-model="vm.providerInfo.organizationName" ng-required="true"/>
+                        <input autofocus type="text" class="form-control" id="orgName" name="participantName" title="Please enter the participant name."
+                               placeholder="participant name" ng-model="vm.entityInfo.participantName" ng-required="true"/>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group"
-                           ng-class="{'has-error': vm.organizationForm.phoneNo.$invalid && (vm.organizationForm.phoneNo.$dirty || vm.organizationForm.$submitted)}">
+                           ng-class="{'has-error': vm.participantForm.phoneNo.$invalid && (vm.participantForm.phoneNo.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgPhoneNo">Phone No</label>
                         <input type="text" class="form-control" id="orgPhoneNo" name="phoneNo"
                                title="Please enter the phone no."
-                               placeholder="phone no" ng-model="vm.providerInfo.phoneNo" ng-required="true" ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/"/>
+                               placeholder="phone no" ng-model="vm.entityInfo.phoneNo" ng-required="true" ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/"/>
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group"
-                           ng-class="{'has-error': vm.organizationForm.address.$invalid && (vm.organizationForm.address.$dirty || vm.organizationForm.$submitted)}">
+                           ng-class="{'has-error': vm.participantForm.address.$invalid && (vm.participantForm.address.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgAddress">Address</label>
                         <input type="text" class="form-control" id="orgAddress" name="address"
                                title="Please enter the Address"
-                               placeholder="Address" ng-model="vm.providerInfo.address" ng-required="true"/>
+                               placeholder="Address" ng-model="vm.entityInfo.address" ng-required="true"/>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group"
-                           ng-class="{'has-error': vm.organizationForm.zipcode.$invalid && (vm.organizationForm.zipcode.$dirty || vm.organizationForm.$submitted)}">
+                           ng-class="{'has-error': vm.participantForm.zipcode.$invalid && (vm.participantForm.zipcode.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgZipcode">zipcode</label>
                         <input type="text" class="form-control" id="orgZipcode" name="zipcode"
                                title="Please enter the zipcode"
-                               placeholder="zipcode" ng-model="vm.providerInfo.zipcode" ng-required="true" ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/"/>
+                               placeholder="zipcode" ng-model="vm.entityInfo.zipcode" ng-required="true" ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/"/>
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group"
-                           ng-class="{'has-error': vm.organizationForm.state.$invalid && (vm.organizationForm.state.$dirty || vm.organizationForm.$submitted)}">
+                           ng-class="{'has-error': vm.participantForm.state.$invalid && (vm.participantForm.state.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgState">State</label>
                         <select name="state" class="form-control" id="orgState" title="Select State" ng-change="vm.stateChanged()"
                                 selectpicker required
-                                ng-model="vm.providerInfo.state"
+                                ng-model="vm.entityInfo.state"
                                 ng-options="state as state for state in vm.states">
                           <option value="">--- Select State ---</option>
                         </select>
@@ -108,10 +108,10 @@
                     </div>
                     <div class="col-md-6">
                       <div class="form-group"
-                           ng-class="{'has-error': vm.organizationForm.city.$invalid && (vm.organizationForm.city.$dirty || vm.organizationForm.$submitted)}">
+                           ng-class="{'has-error': vm.participantForm.city.$invalid && (vm.participantForm.city.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgCity">City</label>
                         <select name="city" class="form-control" id="orgCity" title="Select City" selectpicker required
-                                ng-model="vm.providerInfo.city"
+                                ng-model="vm.entityInfo.city"
                                 ng-options="city as city for city in vm.cities">
                           <option value="">--- Select City ---</option>
                         </select>
@@ -121,19 +121,19 @@
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group"
-                           ng-class="{'has-error': vm.organizationForm.type.$invalid && (vm.organizationForm.type.$dirty || vm.organizationForm.$submitted)}">
+                           ng-class="{'has-error': vm.participantForm.type.$invalid && (vm.participantForm.type.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgType">Type</label>
                         <input type="text" class="form-control" id="orgType" name="type"
-                               title="Please enter the type of organization"
-                               placeholder="type" ng-model="vm.providerInfo.type" ng-required="true"/>
+                               title="Please enter the type of participant"
+                               placeholder="type" ng-model="vm.entityInfo.type" ng-required="true"/>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group"
-                           ng-class="{'has-error': vm.organizationForm.description.$invalid && (vm.organizationForm.description.$dirty || vm.organizationForm.$submitted)}">
+                           ng-class="{'has-error': vm.participantForm.description.$invalid && (vm.participantForm.description.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgDesc">Description</label>
                         <input type="text" class="form-control" id="orgDesc" name="description" title="Please enter description"
-                               placeholder="description" ng-model="vm.providerInfo.description"/>
+                               placeholder="description" ng-model="vm.entityInfo.description"/>
                       </div>
                     </div>
                   </div>
@@ -148,7 +148,7 @@
                         <label class="control-label" for="discoveryUrl">URL</label>
                         <input type="url" class="form-control" id="discoveryUrl" name="discoveryUrl"
                                title="URL required and must be valid URL."
-                               placeholder="https://...." ng-model="vm.providerInfo.discoveryUrl"
+                               placeholder="https://...." ng-model="vm.entityInfo.discoveryUrl"
                                ng-required="true"/>
                       </div>
                     </div>

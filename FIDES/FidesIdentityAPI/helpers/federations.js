@@ -56,7 +56,7 @@ let addFederation = (req) => {
   let oFederation = new Federation();
   oFederation.name = req.name;
   oFederation.isActive = req.isActive || false;
-
+  oFederation.sponsor.push(req.sponsor || null);
   return oFederation.save()
     .then(federation => Promise.resolve(federation))
     .catch(err => Promise.reject(err));
@@ -103,9 +103,9 @@ let removeFederation = (id) => {
 };
 
 /**
- * Add Organization in Federation as Participant
+ * Add Participant in Federation as Participant
  * @param {ObjectId} id - Federation id
- * @return {ObjectId} id - Organization id
+ * @return {ObjectId} id - Participant id
  * @return {err} - return error
  */
 let addParticipant = (fid, oid) => {
@@ -113,10 +113,10 @@ let addParticipant = (fid, oid) => {
     .findById(fid)
     .exec()
     .then((oFederation) => {
-      if (oFederation.participants.indexOf(oid) > -1) {
-        return Promise.reject({error: 'Organization already exist'});
+      if (oFederation.member.indexOf(oid) > -1) {
+        return Promise.reject({error: 'Participant already exist'});
       }
-      oFederation.participants.push(oid);
+      oFederation.member.push(oid);
       return oFederation.save();
     })
     .then((oFederation) => Promise.resolve(oFederation))

@@ -16,8 +16,8 @@ const common = require('../helpers/common');
 const httpStatus = require('http-status');
 const Users = require('../helpers/users');
 const Roles = require('../helpers/roles');
-const Organizations = require('../helpers/organizations');
-const Providers = require('../helpers/providers');
+const Participants = require('../helpers/participants');
+const Entities = require('../helpers/entities');
 const Message = require('../helpers/message');
 
 const router = express.Router();
@@ -33,19 +33,19 @@ router.post('/validateEmail', (req, res, next) => {
 
   return Users.getUser(req.body)
     .then((user) => {
-      if (!user.provider) {
+      if (!user.entity) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'There is no provider associated with the user.'
+          message: 'There is no entity associated with the user.'
         });
       }
 
-      let provider = user.provider;
-      const loginUrl = JSON.parse(provider.redirectUris).find(x => x.indexOf('login.html') > 0);
-      const registerUrl = JSON.parse(provider.redirectUris).find(x => x.indexOf('register.html') > 0);
-      const authUrl = JSON.parse(provider.redirectUris).find(x => x.indexOf('auth.html') > 0);
+      let entity = user.entity;
+      const loginUrl = JSON.parse(entity.redirectUris).find(x => x.indexOf('login.html') > 0);
+      const registerUrl = JSON.parse(entity.redirectUris).find(x => x.indexOf('register.html') > 0);
+      const authUrl = JSON.parse(entity.redirectUris).find(x => x.indexOf('auth.html') > 0);
 
       oxd.Request = {
-        oxd_id: provider.oxdId,
+        oxd_id: entity.oxdId,
         acr_values: ['basic'],
         port: process.env.OXD_PORT
       };
@@ -99,14 +99,14 @@ router.post('/login', (req, res, next) => {
         });
       }
 
-      if (!user.provider) {
+      if (!user.entity) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'There is no provider associated with the user.'
+          message: 'There is no entity associated with the user.'
         });
       }
       const option = {
         method: 'GET',
-        uri: user.provider.discoveryUrl + '/.well-known/openid-configuration',
+        uri: user.entity.discoveryUrl + '/.well-known/openid-configuration',
         resolveWithFullResponse: true
       };
       return request(option);
@@ -130,13 +130,13 @@ router.post('/login', (req, res, next) => {
 
       let data = {};
       data.discoveryMetadata = discoveryMetadata;
-      data.client_id = user.provider.clientId;
-      data.client_secret = user.provider.clientSecret;
+      data.client_id = user.entity.clientId;
+      data.client_secret = user.entity.clientSecret;
       data.redirect_uri = req.body.redirectUri;
       data.code = req.body.code;
 
       const clientInfo = {
-        oxd_id: user.provider.oxdId,
+        oxd_id: user.entity.oxdId,
         code: data.code,
         state: req.body.state
       };
@@ -151,7 +151,7 @@ router.post('/login', (req, res, next) => {
 
       if (!userInfo.data.claims.email[0] || userInfo.data.claims.email[0].toLowerCase() !== req.body.email.toLowerCase()) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-          message: 'Email did not matched. Please check email address or logout from provider first and try again.'
+          message: 'Email did not matched. Please check email address or logout from entity first and try again.'
         });
       }
 
@@ -326,15 +326,15 @@ router.post('/updateUser', (req, res, next) => {
 });
 
 /**
- * Get list of all the organizations.
+ * Get list of all the participants.
  */
-router.get('/getAllOrganizations', (req, res, next) => {
-  Users.getAllOrganizations()
-    .then((organizations) => {
-      if (!organizations) {
-        return res.status(httpStatus.OK).send({message: 'Organization ' + common.message.NOT_FOUND});
+router.get('/getAllParticipants', (req, res, next) => {
+  Users.getAllParticipants()
+    .then((participants) => {
+      if (!participants) {
+        return res.status(httpStatus.OK).send({message: 'Participant ' + common.message.NOT_FOUND});
       }
-      return res.status(httpStatus.OK).send(organizations);
+      return res.status(httpStatus.OK).send(participants);
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -364,15 +364,15 @@ router.get('/getAllUsers', (req, res, next) => {
 });
 
 /**
- * Get all providers. Accepts userId as parameter if user is organization admin.
+ * Get all entitys. Accepts userId as parameter if user is participant admin.
  */
-router.get('/getAllProviders/:userId', (req, res, next) => {
-  Users.getAllProviders(req.params.userId)
-    .then((providers) => {
-      if (!providers) {
+router.get('/getAllEntities/:userId', (req, res, next) => {
+  Users.getAllEntities(req.params.userId)
+    .then((entitys) => {
+      if (!entitys) {
         return res.status(httpStatus.OK).send({message: 'Users ' + common.message.NOT_FOUND});
       }
-      return res.status(httpStatus.OK).send(providers);
+      return res.status(httpStatus.OK).send(entitys);
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -440,23 +440,23 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
     });
   }
 
-  let providerInfo = req.body;
-  if (!providerInfo.email) {
+  let entityInfo = req.body;
+  if (!entityInfo.email) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide valid email.'
     });
   }
-  if (!providerInfo.organizationName) {
+  if (!entityInfo.participantName) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide valid organization name.'
+      message: 'Please provide valid participant name.'
     });
   }
-  if (!providerInfo.discoveryUrl) {
+  if (!entityInfo.discoveryUrl) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide valid discovery URL.'
     });
   }
-  if (!providerInfo.redirectUrls) {
+  if (!entityInfo.redirectUrls) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide valid redirect URLs.'
     });
@@ -466,16 +466,16 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
   let oxdId = '';
   let oxdRequest = {};
   let registreUrl = '';
-  return Organizations.getOrganizationByName(providerInfo.organizationName)
-    .then((organization) => {
-      let isExists = !!organization;
+  return Participants.getParticipantByName(entityInfo.participantName)
+    .then((participant) => {
+      let isExists = !!participant;
       if (isExists) {
         return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Organization is already exists.'
+          message: 'Participant is already exists.'
         }));
       }
 
-      return Users.getUser({email: providerInfo.email});
+      return Users.getUser({email: entityInfo.email});
     })
     .then((user) => {
       let isExists = !!user;
@@ -485,18 +485,18 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
         }));
       }
 
-      return Providers.getProviderByUrl(providerInfo.discoveryUrl);
+      return Entities.getEntityByUrl(entityInfo.discoveryUrl);
     })
-    .then((provider) => {
-      let isExists = !!provider;
+    .then((entity) => {
+      let isExists = !!entity;
       /*if (isExists) {
         return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Provider is already exists.'
+          message: 'Entity is already exists.'
         }));
       }*/
       const option = {
         method: 'GET',
-        uri: providerInfo.discoveryUrl + '/.well-known/openid-configuration',
+        uri: entityInfo.discoveryUrl + '/.well-known/openid-configuration',
         resolveWithFullResponse: true
       };
 
@@ -519,9 +519,9 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
       }
       
       const client = {
-        redirect_uris: providerInfo.redirectUrls,
+        redirect_uris: entityInfo.redirectUrls,
         application_type: 'native',
-        client_name: providerInfo.organizationName,
+        client_name: entityInfo.participantName,
         token_endpoint_auth_method: 'client_secret_basic',
         scopes: discoveryJson.scopes_supported
         //sector_identifier_uri: process.env.BASE_URL + '/images/trustmark/url.json'
@@ -565,7 +565,7 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
       // register site in oxd
       oxdRequest = {
         authorization_redirect_uri: registreUrl[0],
-        op_host: providerInfo.discoveryUrl,
+        op_host: entityInfo.discoveryUrl,
         redirect_uris: clientJson.redirect_uris,
         scopes: clientJson.scopes,
         response_types: clientJson.response_types,
@@ -634,29 +634,29 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
 });
 
 /**
- * Register user, organization and provider. Adds user to gluu server using SCOM 2.0.
+ * Register user, participant and entity. Adds user to gluu server using SCOM 2.0.
  */
 router.post('/registerDetail', (req, res, next) => {
-  // region Provider detail validation
-  let providerInfo = req.body.providerInfo;
-  if (!providerInfo) {
+  // region Entity detail validation
+  let entityInfo = req.body.entityInfo;
+  if (!entityInfo) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide provider information.'
+      message: 'Please provide entity information.'
     });
   }
-  if (!providerInfo.email) {
+  if (!entityInfo.email) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide email.'
     });
   }
-  if (!providerInfo.organizationName) {
+  if (!entityInfo.participantName) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide organization name.'
+      message: 'Please provide participant name.'
     });
   }
-  if (!providerInfo.discoveryUrl) {
+  if (!entityInfo.discoveryUrl) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide provider name.'
+      message: 'Please provide entity name.'
     });
   }
 // endregion
@@ -695,7 +695,7 @@ router.post('/registerDetail', (req, res, next) => {
   let role = null;
   const option = {
     method: 'GET',
-    uri: providerInfo.discoveryUrl + '/.well-known/openid-configuration',
+    uri: entityInfo.discoveryUrl + '/.well-known/openid-configuration',
     resolveWithFullResponse: true
   };
   return request.get(option)
@@ -775,42 +775,42 @@ router.post('/registerDetail', (req, res, next) => {
     })
     .then((frole) => {
       role = frole;
-      // Add organization if user not selected existing one.
-      let organizationInfo = {
+      // Add participant if user not selected existing one.
+      let participantInfo = {
         isApproved: false,
-        name: providerInfo.organizationName,
-        phoneNo: String(providerInfo.phoneNo),
-        address: providerInfo.address,
-        state: providerInfo.state,
-        city: providerInfo.city,
-        type: providerInfo.type,
-        zipcode: providerInfo.zipcode,
-        description: providerInfo.description
+        name: entityInfo.participantName,
+        phoneNo: String(entityInfo.phoneNo),
+        address: entityInfo.address,
+        state: entityInfo.state,
+        city: entityInfo.city,
+        type: entityInfo.type,
+        zipcode: entityInfo.zipcode,
+        description: entityInfo.description
       };
-      return Organizations.addOrganization(organizationInfo);
+      return Participants.addParticipant(participantInfo);
     })
-    .then((organization) => {
+    .then((participant) => {
       let data = {};
-      data.organizationId = organization._id;
+      data.participantId = participant._id;
       data.personInfo = {};
-      data.personInfo.email = providerInfo.email;
+      data.personInfo.email = entityInfo.email;
       data.personInfo.username = userInfo.email[0];
       data.personInfo.firstName = userInfo.given_name[0];
       data.personInfo.lastName = userInfo.family_name[0];
       data.personInfo.roleId = role._id;
       data.personInfo.isActive = true;
-      data.providerInfo = {};
-      data.providerInfo.name = providerInfo.organizationName;
-      data.providerInfo.discoveryUrl = providerInfo.discoveryUrl;
-      data.providerInfo.clientId = clientMetadata.client_id;
-      data.providerInfo.clientSecret = clientMetadata.client_secret;
-      data.providerInfo.oxdId = clientInfo.oxd_id;
-      data.providerInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
-      data.providerInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
-      data.providerInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
-      data.providerInfo.isApproved = false;
+      data.entityInfo = {};
+      data.entityInfo.name = entityInfo.participantName;
+      data.entityInfo.discoveryUrl = entityInfo.discoveryUrl;
+      data.entityInfo.clientId = clientMetadata.client_id;
+      data.entityInfo.clientSecret = clientMetadata.client_secret;
+      data.entityInfo.oxdId = clientInfo.oxd_id;
+      data.entityInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
+      data.entityInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
+      data.entityInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
+      data.entityInfo.isApproved = false;
 
-      return addProviderAndUser(data, res);
+      return addEntityAndUser(data, res);
     })
     .catch((err) => {
       if (!err.statusCode) {
@@ -844,14 +844,14 @@ router.post('/encrypt', (req, res, next) => {
   }
 });
 
-function addProviderAndUser(data, res) {
-  // Add provider
-  data.providerInfo.organizationId = data.organizationId;
-  return Providers.addProvider(data.providerInfo)
-    .then((provider) => {
+function addEntityAndUser(data, res) {
+  // Add entity
+  data.entityInfo.participant = data.participantId;
+  return Entities.addEntity(data.entityInfo)
+    .then((entity) => {
       // Add user
-      data.personInfo.providerId = provider._id;
-      data.personInfo.organizationId = data.organizationId;
+      data.personInfo.entity = entity._id;
+      data.personInfo.participant = data.participantId;
       return Users.createUser(data.personInfo)
         .then((user) => {
           // region Adding user to SCIM.
@@ -871,7 +871,7 @@ function addProviderAndUser(data, res) {
               }
               ],
               'userType': 'OrgAdmin',
-              'title': 'Organization Admin',
+              'title': 'Participant Admin',
               'active': 'true',
               //'password': data.personInfo.password,
               'roles': [{
@@ -879,7 +879,7 @@ function addProviderAndUser(data, res) {
               }],
               'role': 'orgadmin',
               'entitlements': [{
-                'value': 'Access to manage organization and provider added by user.'
+                'value': 'Access to manage participant and entity added by user.'
               }],
               'meta': {
                 'created': user.createdOn,
@@ -894,32 +894,32 @@ function addProviderAndUser(data, res) {
             from: common.smtpConfig.auth.user, // sender address
             to: user.email.toLowerCase(), // list of receivers
             subject: 'Registration : Gluu Federation', // Subject line
-            html: common.registrationEmailTemplate.format(user.name, data.providerInfo.clientId) // html body
+            html: common.registrationEmailTemplate.format(user.name, data.entityInfo.clientId) // html body
           };
 
           //Message.sendEmail(mailOption);
 
           return res.status(httpStatus.OK).send(user);
           // scim.addUser(userDetail).then(function (data) {
-          //     return updateScimId(data.id, user._id, provider._id, data.organizationId, res);
+          //     return updateScimId(data.id, user._id, entity._id, data.participantId, res);
           // }).catch(function (error) {
           //     console.log(error);
-          //     return deleteUserProviderAndOrg(user._id, provider._id, data.organizationId, res);
+          //     return deleteUserEntityAndOrg(user._id, entity._id, data.participantId, res);
           // });
           // endregion
         })
         .catch((err) => {
-          return deleteProviderAndOrg(provider._id, data.organizationId, res);
+          return deleteEntityAndOrg(entity._id, data.participantId, res);
         });
     })
     .catch((err) => {
-      return deleteOrganization(data.organizationId, res);
+      return deleteParticipant(data.participantId, res);
     });
 }
 
-function deleteOrganization(orgId, res) {
-  Organizations.removeOrganization(orgId)
-    .then((organization) => {
+function deleteParticipant(orgId, res) {
+  Participants.removeParticipant(orgId)
+    .then((participant) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
         message: common.message.INTERNAL_SERVER_ERROR
       });
@@ -932,10 +932,10 @@ function deleteOrganization(orgId, res) {
     });
 }
 
-function deleteProviderAndOrg(providerId, orgId, res) {
-  Providers.removeProvider(providerId)
-    .then((emptyProvider) => {
-      return deleteOrganization(orgId, res);
+function deleteEntityAndOrg(entityId, orgId, res) {
+  Entities.removeEntity(entityId)
+    .then((emptyEntity) => {
+      return deleteParticipant(orgId, res);
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -945,10 +945,10 @@ function deleteProviderAndOrg(providerId, orgId, res) {
     });
 }
 
-function deleteUserProviderAndOrg(userId, providerId, orgId, res) {
+function deleteUserEntityAndOrg(userId, entityId, orgId, res) {
   Users.removeUser(userId)
     .then((emptyUser) => {
-      return deleteProviderAndOrg(providerId, orgId, res);
+      return deleteEntityAndOrg(entityId, orgId, res);
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -958,13 +958,13 @@ function deleteUserProviderAndOrg(userId, providerId, orgId, res) {
     });
 }
 
-function updateScimId(scimId, userId, providerId, orgId, res) {
+function updateScimId(scimId, userId, entityId, orgId, res) {
   Users.updateScimId(userId, scimId)
     .then((user) => {
       return res.status(httpStatus.OK).send(user);
     })
     .catch((err) => {
-      return deleteUserProviderAndOrg(userId, providerId, orgId, res);
+      return deleteUserEntityAndOrg(userId, entityId, orgId, res);
 
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
         err: err,

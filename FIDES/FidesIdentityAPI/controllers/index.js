@@ -7,13 +7,13 @@ const express = require('express'),
  * Default route.
  */
 router.get('/loggedIn', (req, res) => res.status(200).send({
-  "message": "User logged in."
+  message: 'User logged in.'
 }));
 
 router.use('/', require('./users'));
-router.use('/', require('./providers'));
+router.use('/', require('./entities'));
 router.use('/', require('./roles'));
-router.use('/', require('./organizations'));
+router.use('/', require('./participants'));
 router.use('/', require('./federations'));
 router.use('/', require('./badgeCategory'));
 router.use('/', require('./badge'));

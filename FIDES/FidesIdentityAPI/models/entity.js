@@ -5,11 +5,33 @@ const mongoose = require('mongoose'),
 
 const common = require('../helpers/common');
 
-// define the schema for openid connect provider
-const providerSchema = mongoose.Schema({
+// define the schema for openid connect entity
+const entitySchema = mongoose.Schema({
+  '@id': {
+    type: String
+  },
+  '@context': {
+    type: String
+  },
   name: {
     type: String,
     required: true
+  },
+  url: {
+    type: String
+  },
+  description: {
+    type: String
+  },
+  registeredBy: {
+    type: String
+  },
+  federatedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Federation'
+  }],
+  metadata: {
+    type: mongoose.Schema.Types.Mixed
   },
   discoveryUrl: {
     type: String
@@ -75,14 +97,6 @@ const providerSchema = mongoose.Schema({
     type: String,
     required: false
   },
-  username: {
-    type: String,
-    required: false
-  },
-  password: {
-    type: String,
-    required: false
-  },
   refreshToken: {
     type: String,
     required: false
@@ -99,34 +113,19 @@ const providerSchema = mongoose.Schema({
     type: String,
     required: false
   },
-  organization: {
+  participant: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Organization'
+    ref: 'Participant'
   },
   isApproved: {
     type: Boolean,
     required: false
   },
-  '@context': {
-    type: String
-  },
-  '@id': {
-    type: String
-  },
   type : {
-    type: String
-  },
-  category : {
     type: String
   },
   issuer: {
     type: String
-  },
-  metadataStatements: {
-    type: mongoose.Schema.Types.Mixed
-  },
-  metadataStatementUris: {
-    type: mongoose.Schema.Types.Mixed
   },
   signedJwksUri: {
     type: String
@@ -140,20 +139,20 @@ const providerSchema = mongoose.Schema({
   strict:false
 });
 
-providerSchema.pre('findOne', populateOrganization);
-providerSchema.pre('findById', populateOrganization);
-providerSchema.pre('find', populateOrganization);
-providerSchema.pre('save', setUrl);
+entitySchema.pre('findOne', populateParticipant);
+entitySchema.pre('findById', populateParticipant);
+entitySchema.pre('find', populateParticipant);
+entitySchema.pre('save', setUrl);
 
-function populateOrganization() {
-  return this.populate('organization');
+function populateParticipant() {
+  return this.populate('participant');
 }
 
 function setUrl(next, done) {
-  this['@id'] = common.constant.OTTO_BASE_URL + common.constant.OTTO_PROVIDER_URL + '/' + this._id;
-  this['@context'] = common.constant.CONTEXT_SCHEMA_URL + common.constant.PROVIDER_CONTEXT;
+  this['@id'] = common.constant.OTTO_BASE_URL + common.constant.OTTO_ENTITY_URL + '/' + this._id;
+  this['@context'] = common.constant.CONTEXT_SCHEMA_URL + common.constant.ENTITY_CONTEXT;
   next();
 }
 
-// create the model for openid connect provider and expose it to our app
-module.exports = mongoose.model('Provider', providerSchema);
+// create the model for openid connect entity and expose it to our app
+module.exports = mongoose.model('Entity', entitySchema);

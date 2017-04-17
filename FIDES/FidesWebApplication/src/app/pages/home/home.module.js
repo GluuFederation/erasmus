@@ -9,7 +9,7 @@
     $stateProvider
       .state('home', {
         url: '/home',
-        title: ((!!$localStorageProvider.get("currentUser")) && $localStorageProvider.get("currentUser").role === 'orgadmin') ? 'Organization' : 'Home',
+        title: ((!!$localStorageProvider.get("currentUser")) && $localStorageProvider.get("currentUser").role === 'orgadmin') ? 'Participant' : 'Home',
         templateUrl: 'app/pages/home/home.html',
         controller: 'HomeController',
         controllerAs: "vm",

@@ -12,7 +12,7 @@
     vm.badges = [];
     vm.displayedCollection = [];
     vm.category = 0;
-    vm.organization = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.organization : null;
+    vm.organization = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.participant : null;
 
     vm.activate = activate;
     vm.openBadgeApproveModel = openBadgeApproveModel;

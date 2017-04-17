@@ -55,17 +55,16 @@ let createUser = (req) => {
 
       newUser.username = req.username;
       newUser.email = req.email;
-      //newUser.password = newUser.generateHash(req.password);
       newUser.firstName = req.firstName;
       newUser.lastName = req.lastName;
       newUser.role = req.roleId;
-      newUser.organization = req.organizationId;
-      newUser.provider = req.providerId;
+      newUser.participant = req.participant;
+      newUser.entity = req.entity;
       newUser.isActive = req.isActive || false;
       return newUser.save();
     })
     .then((newUser) => {
-      return User.populate(newUser, 'role organization');
+      return User.populate(newUser, 'role participant');
     })
     .then(newUser => {
       return Promise.resolve(newUser);
@@ -95,13 +94,10 @@ let updateUser = (req) => {
       if (!user) {
         return Promise.reject(false);
       }
-      // if(password){
-      //     user.password = user.generateHash(req.password);
-      // }
       user.firstName = req.firstName;
       user.lastName = req.lastName;
       user.role = req.roleId;
-      user.organization = req.organization || user.organization;
+      user.participant = req.participant || user.participant;
       user.isActive = req.isActive;
       user.phoneNo = req.phoneNo || user.phoneNo;
       user.address = req.address || user.address;
@@ -113,7 +109,7 @@ let updateUser = (req) => {
       return user.save();
     })
     .then((newUser) => {
-      return User.populate(newUser, 'role organization provider');
+      return User.populate(newUser, 'role participant entity');
     })
     .then(newUser => {
       return Promise.resolve(newUser);
@@ -233,24 +229,24 @@ let getAllUsers = () => {
 };
 
 /**
- * Get list of all the organizations.
+ * Get list of all the participants.
  * @return {users} - return users
  * @return {err} - return error
  */
-let getAllOrganizations = () => {
+let getAllParticipants = () => {
   return Roles.getRoleByName('admin')
     .then((role) => {
-      return User.find({role: {$ne: role._id}}, 'organization provider')
+      return User.find({role: {$ne: role._id}}, 'participant entity')
         .exec();
     })
     .then((users) => {
       if (users.length) {
-        let organizations = [];
+        let participants = [];
         users.forEach(function (user) {
-          user.organization._doc.provider = user.provider.discoveryUrl;
-          organizations.push(user.organization);
+          user.participant._doc.entity = user.entity.discoveryUrl;
+          participants.push(user.participant);
         });
-        return Promise.resolve(organizations);
+        return Promise.resolve(participants);
       }
       return Promise.reject(false);
     })
@@ -258,12 +254,12 @@ let getAllOrganizations = () => {
 };
 
 /**
- * Retrieves all providers.
+ * Retrieves all entitys.
  * @param {ObjectId} userId - Org admin user id.
  * @return {users} - return users
  * @return {err} - return error
  */
-let getAllProviders = (userId) => {
+let getAllEntities = (userId) => {
   return Roles.getRoleByName('admin')
     .then((role) => {
       let queryCondition = {};
@@ -278,13 +274,13 @@ let getAllProviders = (userId) => {
     })
     .then((users) => {
       if (users.length) {
-        let providers = [];
+        let entitys = [];
         users.forEach(function (user) {
-          let provider = user.provider;
-          provider.organization = user.organization;
-          providers.push(provider);
+          let entity = user.entity;
+          entity.participant = user.participant;
+          entitys.push(entity);
         });
-        return Promise.resolve(providers);
+        return Promise.resolve(entitys);
       }
       return Promise.reject(null);
     })
@@ -296,8 +292,8 @@ module.exports = {
   authenticateUser,
   getUser,
   getAllUsers,
-  getAllOrganizations,
-  getAllProviders,
+  getAllParticipants,
+  getAllEntities,
   updateUser,
   updatePassword,
   updateScimId,

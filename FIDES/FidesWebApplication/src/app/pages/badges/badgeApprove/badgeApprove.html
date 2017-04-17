@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-lg-8 col-md-8">
       <div ba-panel ba-panel-class="with-scroll">
-        <table st-safe-src="vm.organizations" st-table="vm.displayedCollection"
+        <table st-safe-src="vm.participants" st-table="vm.displayedCollection"
                class="table table-hover table-condensed">
           <thead>
           <tr class="sortable">
@@ -13,24 +13,24 @@
           </tr>
           <tr>
             <th style="display: none;"></th>
-            <th ng-show="vm.organizations"><input st-search="name" placeholder="Search name"
+            <th ng-show="vm.participants"><input st-search="name" placeholder="Search name"
                                                   class="input-sm form-control search-input col-lg-3" type="search"/>
             </th>
-            <th></th>
-            <th></th>
-            <th colspan="3" ng-show="!vm.organizations" style="color: #e85656;">There are no records to display.</th>
+            <th ng-show="vm.participants"></th>
+            <th ng-show="vm.participants"></th>
+            <th colspan="3" ng-show="!vm.participants" style="color: #e85656;">There are no records to display.</th>
           </tr>
           </thead>
           <tbody>
-          <tr ng-repeat="organization in vm.displayedCollection track by $index"
-              style="background: {{organization.isApproved ? '#fff' : '#ffcdd2'}}">
+          <tr ng-repeat="participant in vm.displayedCollection track by $index"
+              style="background: {{participant.isApproved ? '#fff' : '#ffcdd2'}}">
             <td style="display: none;"></td>
-            <td>{{organization.name}}</td>
-            <td>{{organization.pendingBadges.length}}</td>
+            <td>{{participant.name}}</td>
+            <td>{{participant.pendingBadges.length}}</td>
             <td>
               <button class="btn btn-primary btn-icon"
-                      ng-disabled="!organization.isApproved"
-                      ng-click="vm.openBadgeApproveModel(organization)" title="Edit"><i class="ion-checkmark-round"></i></button>
+                      ng-disabled="!participant.isApproved"
+                      ng-click="vm.openBadgeApproveModel(participant)" title="Edit"><i class="ion-checkmark-round"></i></button>
             </td>
           </tr>
           </tbody>

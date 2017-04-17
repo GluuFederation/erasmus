@@ -10,16 +10,16 @@ schemes:
   - http
 # will be prefixed to all paths
 basePath: /
-resourcePath: /Providers
-description: All about openid connect provider
+resourcePath: /Entities
+description: All about openid connect entity
 apis: 
 
-- path: /getAllProviders/{userId}
+- path: /getAllEntities/{userId}
   operations:
     - httpMethod: GET
-      summary: Get Providers by user
-      notes: Fetch all providers by user
-      nickname: getAllProviders
+      summary: Get Entities by user
+      notes: Fetch all entitys by user
+      nickname: getAllEntities
       consume:
         - application/json
       parameters:
@@ -34,12 +34,12 @@ apis:
           paramType: path
           description: unique id of user
 
-- path: /updateProvider
+- path: /updateEntity
   operations:
     - httpMethod: PUT
-      summary: Update provider
-      notes: Returns a updated provider
-      nickname: updateProvider
+      summary: Update entity
+      notes: Returns a updated entity
+      nickname: updateEntity
       consumes:
         - application/json
       parameters:
@@ -52,7 +52,7 @@ apis:
           dataType: string
           paramType: formData
           required: true
-          description: organization name
+          description: participant name
         - name: discoveryUrl
           dataType: string
           paramType: formData
@@ -62,19 +62,19 @@ apis:
           dataType: string
           paramType: formData
           required: true
-          description: organization address
-        - name: organizationId
+          description: participant address
+        - name: participantId
           dataType: string
           paramType: formData
           required: true
-          description: unique organization id
+          description: unique participant id
 
-- path: /approveProvider/{pid}
+- path: /approveEntity/{pid}
   operations:
     - httpMethod: GET
-      summary: Approve provider
-      notes: Returns a approved provider
-      nickname: approveProvider
+      summary: Approve entity
+      notes: Returns a approved entity
+      nickname: approveEntity
       consumes:
         - application/json
       parameters:
@@ -83,18 +83,18 @@ apis:
         paramType: header
         required: true
         description: authorization token
-      - name: providerId
+      - name: entityId
         dataType: string
         paramType: formData
         required: true
-        description: provider id
+        description: entity id
 
-- path: /removeProvider/{pid}
+- path: /removeEntity/{pid}
   operations:
     - httpMethod: DELETE
-      summary: Remove organization
-      notes: Returns a deleted provider
-      nickname: getOrganizationById
+      summary: Remove participant
+      notes: Returns a deleted entity
+      nickname: getParticipantById
       consumes:
         - application/json
       parameters:
@@ -107,4 +107,4 @@ apis:
         dataType: string
         paramType: path
         required: true
-        description: provider unique id
+        description: entity unique id

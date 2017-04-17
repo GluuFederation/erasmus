@@ -12,7 +12,7 @@
       updateUser: updateUser,
       createUser: createUser,
       getAllRoles: getAllRoles,
-      getAllOrganizations: getAllOrganizations
+      getAllParticipants: getAllParticipants
     };
 
     function getUsers(onSuccess, onError) {
@@ -35,8 +35,8 @@
       return $http.get(urls.BASE_API + "/getAllRoles").then(onSuccess).catch(onError);
     }
 
-    function getAllOrganizations(onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/getAllOrganizations").then(onSuccess).catch(onError);
+    function getAllParticipants(onSuccess, onError) {
+      return $http.get(urls.BASE_API + "/getAllParticipants").then(onSuccess).catch(onError);
     }
 
     return service;

@@ -2,13 +2,13 @@
   <div class="row">
     <div class="col-lg-12 col-md-8">
       <div ba-panel ba-panel-class="with-scroll">
-        <table st-safe-src="vm.organizations" st-table="vm.displayedCollection"
+        <table st-safe-src="vm.participants" st-table="vm.displayedCollection"
                class="table table-hover table-condensed">
           <thead>
           <tr class="sortable">
             <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
             <th class="col-lg-3" st-sort="name">Name</th>
-            <th class="col-lg-3" st-sort="federationId.name">Federation</th>
+            <th class="col-lg-3" st-sort="federation.name">Federation</th>
             <th st-sort="phoneNo">Phone no</th>
             <!--<th st-sort="address">Address</th>-->
             <th st-sort="zipcode">Zipcode</th>
@@ -20,77 +20,77 @@
           </tr>
           <tr>
             <th style="display: none;"></th>
-            <th ng-show="vm.organizations"><input st-search="name" placeholder="Search name"
+            <th ng-show="vm.participants"><input st-search="name" placeholder="Search name"
                                                   class="input-sm form-control search-input col-lg-3" type="search"/>
             </th>
-            <th ng-show="vm.organizations"><input st-search="federationId.name" placeholder="Search federation"
+            <th ng-show="vm.participants"><input st-search="federationId.name" placeholder="Search federation"
                                                   class="input-sm form-control search-input col-lg-3" type="search"/>
             </th>
-            <th ng-show="vm.organizations"><input st-search="phoneNo" placeholder="Search phone no"
+            <th ng-show="vm.participants"><input st-search="phoneNo" placeholder="Search phone no"
                                                   class="input-sm form-control search-input col-lg-3" type="search"/>
             </th>
-            <!--<th ng-show="vm.organizations"><input st-search="address" placeholder="Search address"-->
+            <!--<th ng-show="vm.participants"><input st-search="address" placeholder="Search address"-->
                                                   <!--class="input-sm form-control search-input col-lg-3" type="search"/>-->
             <!--</th>-->
-            <th ng-show="vm.organizations"><input st-search="zipcode" placeholder="Search zipcode"
+            <th ng-show="vm.participants"><input st-search="zipcode" placeholder="Search zipcode"
                                                   class="input-sm form-control search-input col-lg-3" type="search"/>
             </th>
-            <th ng-show="vm.organizations">
+            <th ng-show="vm.participants">
               <select st-search="state" class="input-sm form-control search-input col-lg-3" type="search">
                 <option value="">All</option>
-                <option ng-repeat="row in vm.organizations | unique:'state'" value="{{row.state}}">{{row.state}}
+                <option ng-repeat="row in vm.participants | unique:'state'" value="{{row.state}}">{{row.state}}
                 </option>
               </select>
             </th>
-            <th ng-show="vm.organizations">
+            <th ng-show="vm.participants">
               <select st-search="city" class="input-sm form-control search-input col-lg-3" type="search">
                 <option value="">All</option>
-                <option ng-repeat="row in vm.organizations | unique:'city'" value="{{row.city}}">{{row.city}}</option>
+                <option ng-repeat="row in vm.participants | unique:'city'" value="{{row.city}}">{{row.city}}</option>
               </select>
             </th>
-            <th ng-show="vm.organizations"><input st-search="type" placeholder="Search type"
+            <th ng-show="vm.participants"><input st-search="type" placeholder="Search type"
                                                   class="input-sm form-control search-input col-lg-3" type="search"/>
             </th>
-            <th ng-show="vm.organizations">
+            <th ng-show="vm.participants">
               <select st-search="isApproved" class="input-sm form-control search-input col-lg-3" type="search">
                 <option value="">All</option>
                 <option value="false">No</option>
                 <option value="true">Yes</option>
               </select>
             </th>
-            <th ng-show="vm.organizations"></th>
-            <th colspan="8" ng-show="!vm.organizations" style="color: #e85656;">There are no records to display.</th>
+            <th ng-show="vm.participants"></th>
+            <th colspan="8" ng-show="!vm.participants" style="color: #e85656;">There are no records to display.</th>
           </tr>
           </thead>
           <tbody>
-          <tr ng-repeat="organization in vm.displayedCollection track by $index" style="background: {{organization.isApproved ? '#fff' : '#ffcdd2'}}">
+          <tr ng-repeat="participant in vm.displayedCollection track by $index" style="background: {{participant.isApproved ? '#fff' : '#ffcdd2'}}">
             <td style="display: none;"></td>
-            <td>{{organization.name}}</td>
-            <td>{{organization.federation.name}}</td>
-            <td>{{organization.phoneNo}}</td>
-            <!--<td class="col-lg-4">{{organization.address}}</td>-->
-            <td>{{organization.zipcode}}</td>
-            <td>{{organization.state}}</td>
-            <td>{{organization.city}}</td>
-            <td>{{organization.type}}</td>
+            <td>{{participant.name}}</td>
+            <td>{{participant.memberOf[0].name}}</td>
+            <td>{{participant.phoneNo}}</td>
+            <!--<td class="col-lg-4">{{participant.address}}</td>-->
+            <td>{{participant.zipcode}}</td>
+            <td>{{participant.state}}</td>
+            <td>{{participant.city}}</td>
+            <td>{{participant.type}}</td>
             <td>
-              <input type="checkbox" title="Is Approved" disabled ng-checked="organization.isApproved"/>
+              <input type="checkbox" title="Is Approved" disabled ng-checked="participant.isApproved"/>
             </td>
             <td class="col-lg-4">
               <button class="btn btn-primary btn-icon"
-                      ng-disabled="organization.isApproved"
-                      ng-click="vm.openOranizationModal(organization, false)" title="Edit"><i class="ion-edit"></i></button>
+                      ng-disabled="participant.isApproved"
+                      ng-click="vm.openParticipantModal(participant, false)" title="Edit"><i class="ion-edit"></i></button>
               <button class="btn btn-danger btn-icon"
-                      ng-disabled="organization.isApproved"
-                      ng-click="vm.removeOrganization(organization)" title="Delete"><i class="ion-android-delete"></i>
+                      ng-disabled="participant.isApproved"
+                      ng-click="vm.removeOrganization(participant)" title="Delete"><i class="ion-android-delete"></i>
               </button>
-              <button class="btn btn-success btn-icon" ng-show="!organization.isApproved"
-                      ng-click="vm.openOranizationModal(organization, true)" title="Approve"><i
+              <button class="btn btn-success btn-icon" ng-show="!participant.isApproved"
+                      ng-click="vm.openParticipantModal(participant, true)" title="Approve"><i
                 class="ion-android-checkmark-circle"></i></button>
-              <button class="btn btn-success btn-icon" ng-show="organization.approvedBadges.length > 0"
-                      ng-click="vm.openApproveBadges(organization)" title="Approved Badges"><i
+              <button class="btn btn-success btn-icon" ng-show="participant.approvedBadges.length > 0"
+                      ng-click="vm.openApproveBadges(participant)" title="Approved Badges"><i
                 class="fa fa-bookmark"></i></button>
-              <a ng-if="(organization.trustMarkFile ? true : false)" href="{{organization.trustMarkFile}}" target="_blank" class="btn btn-success btn-icon" title="Trust mark file">
+              <a ng-if="(participant.trustMarkFile ? true : false)" href="{{participant.trustMarkFile}}" target="_blank" class="btn btn-success btn-icon" title="Trust mark file">
                 <i class="ion-ios-book"></i>
               </a>
             </td>

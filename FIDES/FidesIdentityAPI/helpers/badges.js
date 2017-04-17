@@ -1,8 +1,8 @@
 "use strict";
 
 const Badge = require('../models/badge');
-const Organization = require('../models/organization');
-const Provider = require('../models/provider');
+const Participant = require('../models/participant');
+const Entity = require('../models/entity');
 const User = require('../models/user');
 
 /**
@@ -121,13 +121,13 @@ let removeBadge = (id) => {
 
 /**
  * Remove badge by Id
- * @param {ObjectId} id - Organization id
+ * @param {ObjectId} id - Participant id
  * @param {[ObjectId]} id - Badges id
- * @return {organization} - return organization
+ * @return {participant} - return participant
  * @return {err} - return error
  */
 let badgeRequest = (oid, bids) => {
-  return Organization
+  return Participant
     .findOne({_id: oid, pendingBadges: { $nin: bids }})
     .exec()
     .then((oOrg) => {
@@ -137,19 +137,19 @@ let badgeRequest = (oid, bids) => {
       });
       return oOrg.save();
     })
-    .then((organization) => Promise.resolve(organization))
+    .then((participant) => Promise.resolve(participant))
     .catch(err => Promise.reject(err));
 };
 
 /**
  * Remove badge by Id
- * @param {ObjectId} id - Organization id
+ * @param {ObjectId} id - Participant id
  * @param {[ObjectId]} id - Badges id
- * @return {organization} - return organization
+ * @return {participant} - return participant
  * @return {err} - return error
  */
 let badgeApprove = (oid, bids) => {
-  return Organization
+  return Participant
     .findById(oid)
     .exec()
     .then((oOrg) => {
@@ -159,7 +159,7 @@ let badgeApprove = (oid, bids) => {
       oOrg.pendingBadges = oOrg.pendingBadges.filter(function(item){ return oOrg.approvedBadges.indexOf(String(item)) == -1; });
       return oOrg.save();
     })
-    .then((organization) => Promise.resolve(organization))
+    .then((participant) => Promise.resolve(participant))
     .catch(err => Promise.reject(err));
 };
 
@@ -170,15 +170,15 @@ let badgeApprove = (oid, bids) => {
  * @return {err} - return error
  */
 let getBadgeByIssuer = (discoveryUrl) => {
-  return Provider
+  return Entity
     .findOne({
       discoveryUrl: new RegExp('^' + discoveryUrl + '$', 'i')
     })
-    .then((oProvider) => {
-      return User.findOne({ provider: oProvider._id });
+    .then((oEntity) => {
+      return User.findOne({ entity: oEntity._id });
     })
     .then((oUser) => {
-      return Organization.findById(oUser.organization).populate('approvedBadges');
+      return Participant.findById(oUser.participant).populate('approvedBadges');
     })
     .catch((err) => Promise.reject(err));
 };
