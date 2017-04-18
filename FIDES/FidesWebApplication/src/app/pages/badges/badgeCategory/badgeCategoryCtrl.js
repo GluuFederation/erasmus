@@ -88,7 +88,7 @@
           }
           vm.badgeCategories.push(badge);
         }
-        vm.displayedCollection = angular.copy(vm.organizations);
+        vm.displayedCollection = angular.copy(vm.badgeCategories);
       });
     }
 

@@ -84,7 +84,7 @@
       //vm.editPassword = false;
       vm.selectedRole='admin';
       vm.roles = {};
-      vm.organizations = {};
+      vm.participants = {};
       vm.stateCityList = {};
       vm.states = [];
 
@@ -107,8 +107,8 @@
         vm.modalUser.city = userData.city;
         vm.modalUser.description = userData.description;
 
-        if(userData.organization) {
-          vm.modalUser.organization = userData.organization._id;
+        if(userData.participant) {
+          vm.modalUser.participant = userData.participant._id;
         }
       }
 
@@ -141,7 +141,7 @@
         function onSuccess(response) {
           if (response.data) {
             if (response.data.length > 0) {
-              vm.organizations = response.data;
+              vm.participants = response.data;
             }
           }
         }
@@ -173,12 +173,12 @@
         // }
 
         if(vm.selectedRole === 'orgadmin'){
-          if(!vm.modalUser.organization){
-            toastr.error("Please select organization.", "Update User", {});
+          if(!vm.modalUser.participant){
+            toastr.error("Please select participant.", "Update User", {});
             return false;
           }
         } else {
-          vm.modalUser.organization = undefined;
+          vm.modalUser.participant = undefined;
         }
 
         if (vm.isInEditMode) {

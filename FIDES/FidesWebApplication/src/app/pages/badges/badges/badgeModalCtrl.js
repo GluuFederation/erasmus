@@ -9,7 +9,7 @@
     var vm = this;
     vm.modalBadge = {};
     vm.modalBadge.noPicture = true;
-    vm.modalBadge.data = badge;
+    vm.modalBadge.data = angular.copy(badge);
     (!!badge._id) ? vm.modalBadge.data.category = badge.category._id : '';
     (!!badge.image) ? vm.modalBadge.data.oldImage = badge.image : '';
 

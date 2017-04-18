@@ -18,9 +18,15 @@ const constant = {
   PARTICIPANT_CONTEXT: '/otto/participant.jsonld',
   FEDERATION_CONTEXT: '/otto/federation.jsonld',
   ENTITY_CONTEXT: '/openid/op.jsonld',
+  RA_CONTEXT: '/openid/ra.jsonld',
+  METADATA_CONTEXT: '/openid/metadata.jsonld',
   OTTO_PARTICIPANT_URL: '/otto/participant',
   OTTO_FEDERATION_URL: '/otto/federations',
-  OTTO_ENTITY_URL: '/otto/federation_entity'
+  OTTO_ENTITY_URL: '/otto/federation_entity',
+  OTTO_RA_URL: '/otto/ra',
+  OTTO_METADATA_URL: '/otto/metadata',
+  RA_ID: '58f5da4957d53d2ffbbb31df',
+  METADATA_ID: '58f5da4957d53d2ffbbb31e0'
 };
 
 const func = {

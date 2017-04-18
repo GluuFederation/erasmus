@@ -27,7 +27,8 @@ const federationSchema = mongoose.Schema({
     ref: 'Entity'
   },
   registeredBy: {
-    type: String
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'RegistrationAuthority'
   },
   member: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -74,6 +75,7 @@ federationSchema.pre('save', setUrl);
 function setUrl(next, done) {
   this['@id'] = common.constant.OTTO_BASE_URL + common.constant.OTTO_FEDERATION_URL + '/' + this._id;
   this['@context'] = common.constant.CONTEXT_SCHEMA_URL + common.constant.FEDERATION_CONTEXT;
+  this.registeredBy = common.constant.RA_ID;
   next();
 }
 

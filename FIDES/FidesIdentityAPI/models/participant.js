@@ -33,7 +33,8 @@ const participantSchema = mongoose.Schema({
     ref: 'Entity'
   },
   registeredBy: {
-    type: String
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'RegistrationAuthority'
   },
   technicalContact: [{
     type: mongoose.Schema.Types.Mixed
@@ -96,6 +97,7 @@ function populateFederation() {
 function setUrl(next, done) {
   this['@id'] = common.constant.OTTO_BASE_URL + common.constant.OTTO_PARTICIPANT_URL + '/' + this._id;
   this['@context'] = common.constant.CONTEXT_SCHEMA_URL + common.constant.PARTICIPANT_CONTEXT;
+  this.registeredBy = common.constant.RA_ID;
   next();
 }
 

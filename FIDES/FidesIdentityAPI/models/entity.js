@@ -24,14 +24,16 @@ const entitySchema = mongoose.Schema({
     type: String
   },
   registeredBy: {
-    type: String
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'RegistrationAuthority'
   },
   federatedBy: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Federation'
   }],
   metadata: {
-    type: mongoose.Schema.Types.Mixed
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Metadata'
   },
   discoveryUrl: {
     type: String
@@ -151,6 +153,8 @@ function populateParticipant() {
 function setUrl(next, done) {
   this['@id'] = common.constant.OTTO_BASE_URL + common.constant.OTTO_ENTITY_URL + '/' + this._id;
   this['@context'] = common.constant.CONTEXT_SCHEMA_URL + common.constant.ENTITY_CONTEXT;
+  this.registeredBy = common.constant.RA_ID;
+  this.metadata = common.constant.METADATA_ID;
   next();
 }
 

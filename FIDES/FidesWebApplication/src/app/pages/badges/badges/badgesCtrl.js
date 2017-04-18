@@ -88,6 +88,7 @@
           }
         }
       }).result.then(function (badge) {
+        debugger;
         var index = _.findIndex(vm.badges, {_id: badge._id});
         if (index >= 0) {
           vm.badges[index] = badge;
