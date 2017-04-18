@@ -355,7 +355,7 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
             String fileName = location + File.separator + System.currentTimeMillis() + ".png";
 
             //logo file
-            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
+//            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
 
             //barcode dara
             String data = WordUtils.capitalizeFully(badge.getName());
