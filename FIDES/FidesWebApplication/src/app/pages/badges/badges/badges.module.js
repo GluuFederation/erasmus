@@ -13,7 +13,7 @@
                 controller: 'BadgesCtrl',
                 controllerAs: 'vm',
                 roles: ['admin', 'orgadmin'],
-                title: ((!!$localStorageProvider.get("currentUser")) && $localStorageProvider.get("currentUser").role === 'orgadmin') ? 'Badge Admin' : 'Badges',
+                title: ((!!$localStorageProvider.get("currentUser")) && $localStorageProvider.get("currentUser").role === 'orgadmin') ? 'Badge Admin' : 'Badge Templates',
                 sidebarMeta: {
                     order: 2
                 }

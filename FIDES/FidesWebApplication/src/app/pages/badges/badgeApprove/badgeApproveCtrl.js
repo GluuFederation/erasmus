@@ -5,62 +5,62 @@
     .controller('BadgeApproveCtrl', BadgeApproveCtrl);
 
   /** @ngInject */
-  function BadgeApproveCtrl($state, toastr, $uibModal, organizationService) {
+  function BadgeApproveCtrl($state, toastr, $uibModal, participantService) {
     var vm = this;
     vm.tablePageSize = 10;
-    vm.organizations = [];
+    vm.participants = [];
     vm.displayedCollection = [];
     vm.category = 0;
 
     vm.activate = activate;
     vm.openBadgeApproveModel = openBadgeApproveModel;
-    vm.getAllPendingOrganization = getAllPendingOrganization;
+    vm.getAllPendingParticipant = getAllPendingParticipant;
     vm.activate();
 
-    function openBadgeApproveModel(organization) {
-      vm.organizationModal = $uibModal.open({
+    function openBadgeApproveModel(participant) {
+      vm.participantModal = $uibModal.open({
         animation: true,
         templateUrl: 'app/pages/badges/badgeApprove/badgeApprove.modal.html',
         size: 'lg',
-        controller: ['$uibModalInstance', 'organization', 'badgesService', 'badgeRequestService', 'badgeCategoryService', badgeApproveCtrl],
+        controller: ['$uibModalInstance', 'participant', 'badgesService', 'badgeRequestService', 'badgeCategoryService', badgeApproveCtrl],
         controllerAs: 'vm',
         resolve: {
-          organization: function () {
-            return organization;
+          participant: function () {
+            return participant;
           }
         }
       });
 
-      vm.organizationModal.result.then(function (newOrganization) {
-        var index = _.findIndex(vm.organizations, {_id: newOrganization._id});
+      vm.participantModal.result.then(function (newParticipant) {
+        var index = _.findIndex(vm.participants, {_id: newParticipant._id});
         if (index >= 0) {
-          vm.organizations[index] = newOrganization;
+          vm.participants[index] = newParticipant;
         } else {
-          if (vm.organizations === undefined) {
-            vm.organizations = vm.displayedCollection = [];
+          if (vm.participants === undefined) {
+            vm.participants = vm.displayedCollection = [];
           }
 
-          vm.organizations.push(newOrganization);
+          vm.participants.push(newParticipant);
         }
 
-        vm.displayedCollection = angular.copy(vm.organizations);
+        vm.displayedCollection = angular.copy(vm.participants);
       });
     }
 
-    function badgeApproveCtrl($uibModalInstance, organization, badgesService, badgeRequestService, badgeCategoryService) {
+    function badgeApproveCtrl($uibModalInstance, participant, badgesService, badgeRequestService, badgeCategoryService) {
       var vm = this;
       vm.getPendingBadges = getPendingBadges;
       vm.getCategory = getCategory;
       vm.filterBadge = filterBadge;
       vm.badgeApprove = badgeApprove;
       vm.categories = [];
-      vm.organization = organization;
+      vm.participant = participant;
       vm.badges = [];
       vm.safeBadges = [];
       vm.selectedBadges = [];
 
       function getPendingBadges() {
-        badgesService.getBadgeByOrganization(vm.organization._id, 'pending').then(onSuccess).catch(onError);
+        badgesService.getBadgeByParticipant(vm.participant._id, 'pending').then(onSuccess).catch(onError);
 
         function onSuccess(response) {
           vm.badges = response.data;
@@ -97,8 +97,8 @@
       }
 
       function badgeApprove() {
-        if (!vm.organization.isApproved) {
-          toastr.error('Organization is not approved. Please contact to admin', 'Badge Request', {});
+        if (!vm.participant.isApproved) {
+          toastr.error('Participant is not approved. Please contact to admin', 'Badge Request', {});
           return;
         }
 
@@ -108,7 +108,7 @@
         }
 
         var formData = {
-          oid: vm.organization._id,
+          oid: vm.participant._id,
           bids: vm.selectedBadges
         };
         badgeRequestService.badgeApprove(formData).then(onSuccess).catch(onError);
@@ -128,23 +128,23 @@
       vm.getCategory();
     }
 
-    function getAllPendingOrganization() {
-      organizationService.getAllOrganizations().then(onSuccess).catch(onError);
+    function getAllPendingParticipant() {
+      participantService.getAllParticipants().then(onSuccess).catch(onError);
       function onSuccess(response) {
-        vm.organizations = response.data.filter(function (item) {
+        vm.participants = response.data.filter(function (item) {
           return (!!item.pendingBadges && item.pendingBadges.length);
         });
-        vm.displayedCollection = angular.copy(vm.organizations);
+        vm.displayedCollection = angular.copy(vm.participants);
       }
 
       function onError(error) {
-        vm.organization = [];
+        vm.participant = [];
         vm.displayedCollection = [];
       }
     }
 
     function activate() {
-      vm.getAllPendingOrganization();
+      vm.getAllPendingParticipant();
     }
   }
 })();

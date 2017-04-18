@@ -1,0 +1,83 @@
+<div class="modal-content">
+  <form name="vm.createEntityForm" novalidate>
+    <div class="modal-header">
+      <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
+        <em class="ion-ios-close-empty sn-link-close"></em>
+      </button>
+      <h4 class="modal-title" id="createEntityLabel">{{vm.isInEditMode ? 'Edit' : 'Create'}} Entity</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createEntityForm.name.$invalid && (vm.createEntityForm.name.$dirty || vm.createEntityForm.$submitted)}">
+            <label for="entityName">Name</label>
+            <input type="text" class="form-control" id="entityName" name="name" title="Name"
+                   placeholder="Name" ng-model="vm.modalEntity.name" ng-required="true">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createEntityForm.discoveryUrl.$invalid && (vm.createEntityForm.discoveryUrl.$dirty || vm.createEntityForm.$submitted)}">
+            <label for="discoveryUrl">Discovery URL</label>
+            <input type="text" class="form-control" id="discoveryUrl" name="discoveryUrl" title="Discovery URL"
+                   placeholder="URL" ng-model="vm.modalEntity.discoveryUrl" ng-required="true"/>
+          </div>
+        </div>
+      </div>
+      <!--<div class="row">
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createEntityForm.clientId.$invalid && (vm.createEntityForm.clientId.$dirty || vm.createEntityForm.$submitted)}">
+            <label for="clientId">Client ID</label>
+            <input type="text" class="form-control" id="clientId" name="clientId" title="Client ID"
+                   placeholder="Client ID" ng-model="vm.modalEntity.clientId" ng-required="true">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group"
+               ng-class="{'has-error': vm.createEntityForm.clientSecret.$invalid && (vm.createEntityForm.clientSecret.$dirty || vm.createEntityForm.$submitted)}">
+            <label for="clientSecret">Client Secret</label>
+            <input type="text" class="form-control" id="clientSecret" name="clientSecret" title="Client Secret"
+                   placeholder="Client Secret" ng-model="vm.modalEntity.clientSecret" ng-required="true"/>
+          </div>
+        </div>
+      </div>-->
+      <!--<div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <input type="text" class="form-control" id="username" name="username" title="Username"
+                   placeholder="Username" ng-model="vm.modalEntity.username"/>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <input type="text" class="form-control" id="password" name="password" title="Password"
+                   placeholder="Password" ng-model="vm.modalEntity.password"/>
+          </div>
+        </div>
+      </div>-->
+      <div class="row">
+        <div class="col-md-12">
+          <div id="divParticipant" class="form-group"
+               ng-class="{'has-error': vm.createEntityForm.participant.$invalid && (vm.createEntityForm.participant.$dirty || vm.createEntityForm.$submitted)}"
+               ng-show="vm.userRole === 'admin'">
+            <label for="userOrg">Participant</label>
+            <select class="form-control" id="userOrg" name="participant" title="Select Participant" selectpicker
+                    ng-required="vm.userRole === 'admin'"
+                    ng-model="vm.modalEntity.participant"
+                    ng-options="participant._id as participant.name for participant in vm.participants">
+              <option value="">Select Participant</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+      <button type="submit" class="btn btn-primary" ng-click="vm.pushEntity(vm.createEntityForm.$valid)">
+        {{vm.isInEditMode ? 'Update' : 'Create'}}
+      </button>
+    </div>
+  </form>
+</div>

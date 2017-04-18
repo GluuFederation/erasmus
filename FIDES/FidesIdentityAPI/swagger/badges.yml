@@ -67,7 +67,7 @@ apis:
           dataType: file
           paramType: formData
           required: true
-          description: trustmark file of organization
+          description: trustmark file of participant
 
 - path: /badges/{bid}
   operations:
@@ -112,7 +112,7 @@ apis:
           dataType: file
           paramType: formData
           required: true
-          description: trustmark file of organization
+          description: trustmark file of participant
 
 - path: /badges/{bid}
   operations:

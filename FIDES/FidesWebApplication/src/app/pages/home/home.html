@@ -3,56 +3,56 @@
     <h3 class="with-line">ERASMUS: Emergency Responder Authentication System for Mobile Users</h3>
   </div>
   <div class="panel-body" ng-if="vm.isShow">
-    <div class="alert bg-danger" ng-if="!vm.organization.isApproved">
-      <strong><i class="ion-android-cancel"></i> Organization waiting for approval.</strong>
+    <div class="alert bg-danger" ng-if="!vm.participant.isApproved">
+      <strong><i class="ion-android-cancel"></i> Participant waiting for approval.</strong>
     </div>
-    <div class="alert bg-info" ng-if="vm.organization.isApproved">
-      <strong><i class="ion-android-checkbox"></i> Organization is approved.</strong>
+    <div class="alert bg-info" ng-if="vm.participant.isApproved">
+      <strong><i class="ion-android-checkbox"></i> Participant is approved.</strong>
     </div>
     <div class="add-row-editable-table pull-right">
-      <button class="btn btn-primary" ng-click="vm.openOranizationModal()" ng-if="!vm.organization.isApproved">Edit</button>
+      <button class="btn btn-primary" ng-click="vm.openParticipantModal()" ng-if="!vm.participant.isApproved">Edit</button>
     </div>
     <table class="table table-bordered">
       <tbody>
         <tr>
           <td width="10%"><strong>Name</strong></td>
-          <td>{{vm.organization.name}}</td>
+          <td>{{vm.participant.name}}</td>
         </tr>
         <tr>
           <td><strong>Federation</strong></td>
-          <td>{{vm.organization.federationId.name}}</td>
+          <td>{{vm.participant.memberOf[0].name}}</td>
         </tr>
         <tr>
           <td><strong>Phone No</strong></td>
-          <td>{{vm.organization.phoneNo}}</td>
+          <td>{{vm.participant.phoneNo}}</td>
         </tr>
         <tr>
           <td><strong>Address</strong></td>
-          <td>{{vm.organization.address}}</td>
+          <td>{{vm.participant.address}}</td>
         </tr>
         <tr>
           <td><strong>Zipcode</strong></td>
-          <td>{{vm.organization.zipcode}}</td>
+          <td>{{vm.participant.zipcode}}</td>
         </tr>
         <tr>
           <td><strong>State</strong></td>
-          <td>{{vm.organization.state}}</td>
+          <td>{{vm.participant.state}}</td>
         </tr>
         <tr>
           <td><strong>City</strong></td>
-          <td>{{vm.organization.city}}</td>
+          <td>{{vm.participant.city}}</td>
         </tr>
         <tr>
           <td><strong>Type</strong></td>
-          <td>{{vm.organization.type}}</td>
+          <td>{{vm.participant.type}}</td>
         </tr>
         <tr>
           <td><strong>Approved</strong></td>
-          <td>{{vm.organization.isApproved ? 'Yes' : 'No'}}</td>
+          <td>{{vm.participant.isApproved ? 'Yes' : 'No'}}</td>
         </tr>
         <tr>
           <td><strong>Trust mark</strong></td>
-          <td><a href="{{vm.organization.trustMarkFile}}" target="_blank">{{vm.organization.trustMarkFile ? 'file' : '-'}}</a></td>
+          <td><a href="{{vm.participant.trustMarkFile}}" target="_blank">{{vm.participant.trustMarkFile ? 'file' : '-'}}</a></td>
         </tr>
       </tbody>
     </table>

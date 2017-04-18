@@ -12,7 +12,7 @@
     vm.selectedBadges = [];
     vm.categories = [];
     vm.category = 0;
-    vm.organization = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.organization : null;
+    vm.participant = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.participant : null;
 
     vm.getBadges = getBadges;
     vm.badgeRequest = badgeRequest;
@@ -28,7 +28,7 @@
 
       function onSuccess(response) {
         vm.allBadges = response.data;
-        badgeRequestService.getOrganizationById(vm.organization._id).then(onSuccess).catch(onError);
+        badgeRequestService.getParticipantById(vm.participant._id).then(onSuccess).catch(onError);
 
         function onSuccess(response) {
           vm.reqBadge = _.union(response.data.pendingBadges, response.data.approvedBadges) || [];
@@ -64,8 +64,8 @@
     }
 
     function badgeRequest() {
-      if (!vm.organization.isApproved) {
-        toastr.error('Organization is not approved. Please contact to admin', 'Badge Request', {});
+      if (!vm.participant.isApproved) {
+        toastr.error('Participant is not approved. Please contact to admin', 'Badge Request', {});
         return;
       }
 
@@ -79,7 +79,7 @@
       }
 
       var formData = {
-        oid: vm.organization._id,
+        oid: vm.participant._id,
         bids: bids
       };
       badgeRequestService.badgeRequest(formData).then(onSuccess).catch(onError);
@@ -106,7 +106,7 @@
     }
 
     function openModalBadgeDetail(badge) {
-      vm.organizationModal = $uibModal.open({
+      vm.participantModal = $uibModal.open({
         animation: true,
         templateUrl: 'app/pages/badges/badgeRequest/badgeDetail.modal.html',
         size: 'lg',

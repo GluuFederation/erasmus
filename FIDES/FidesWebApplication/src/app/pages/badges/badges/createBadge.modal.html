@@ -65,7 +65,7 @@
           </div>
           <div class="modal-body">
             <div class="form-group"
-                 ng-class="{'has-error': vm.createOrganizationLogoForm.bannerText.$invalid && (vm.createOrganizationLogoForm.bannerText.$dirty || vm.createOrganizationLogoForm.$submitted)}">
+                 ng-class="{'has-error': vm.createParticipantLogoForm.bannerText.$invalid && (vm.createParticipantLogoForm.bannerText.$dirty || vm.createParticipantLogoForm.$submitted)}">
               <label for="bannerText">Banner Text</label>
               <input type="text" class="form-control" id="bannerText" name="bannerText"
                      placeholder="Banner Text" ng-model="vm.modalBadge.logo.bannerText"
@@ -74,7 +74,7 @@
             </div>
             <div class="col-md-6">
               <div class="form-group"
-                   ng-class="{'has-error': vm.createOrganizationLogoForm.bannerColor.$invalid && (vm.createOrganizationLogoForm.bannerColor.$dirty || vm.createOrganizationLogoForm.$submitted)}">
+                   ng-class="{'has-error': vm.createParticipantLogoForm.bannerColor.$invalid && (vm.createParticipantLogoForm.bannerColor.$dirty || vm.createParticipantLogoForm.$submitted)}">
                 <label for="bannerText">Background Color</label>
                 <input type="color" class="form-control" id="bannerColor" name="bannerColor"
                        ng-model="vm.modalBadge.logo.bannerColor"
@@ -84,7 +84,7 @@
             </div>
             <div class="col-md-6">
               <div class="form-group"
-                   ng-class="{'has-error': vm.createOrganizationLogoForm.bannerTextColor.$invalid && (vm.createOrganizationLogoForm.bannerTextColor.$dirty || vm.createOrganizationLogoForm.$submitted)}">
+                   ng-class="{'has-error': vm.createParticipantLogoForm.bannerTextColor.$invalid && (vm.createParticipantLogoForm.bannerTextColor.$dirty || vm.createParticipantLogoForm.$submitted)}">
                 <label for="bannerTextColor">Text Color</label>
                 <input type="color" class="form-control" id="bannerTextColor"
                        name="bannerText0Color" ng-model="vm.modalBadge.logo.bannerTextColor"

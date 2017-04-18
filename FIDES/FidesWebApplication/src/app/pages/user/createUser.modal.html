@@ -56,15 +56,15 @@
           </div>
         </div>
         <div class="col-md-6">
-          <div id="divOrganization" class="form-group"
-               ng-class="{'has-error': vm.createUserForm.organization.$invalid && (vm.createUserForm.organization.$dirty || vm.createUserForm.$submitted)}"
+          <div id="divParticipant" class="form-group"
+               ng-class="{'has-error': vm.createUserForm.participant.$invalid && (vm.createUserForm.participant.$dirty || vm.createUserForm.$submitted)}"
                ng-show="vm.selectedRole === 'orgadmin'">
-            <label for="userOrg">Organization</label>
-            <select class="form-control" id="userOrg" name="organization" title="Select Organization" selectpicker
+            <label for="userOrg">Participant</label>
+            <select class="form-control" id="userOrg" name="participant" title="Select Participant" selectpicker
                     ng-required="vm.selectedRole === 'orgadmin'"
-                    ng-model="vm.modalUser.organization"
-                    ng-options="organization._id as organization.name for organization in vm.organizations">
-              <option value="">Select Organization</option>
+                    ng-model="vm.modalUser.participant"
+                    ng-options="participant._id as participant.name for participant in vm.participants">
+              <option value="">Select Participant</option>
             </select>
           </div>
         </div>

@@ -18,7 +18,7 @@
             <th st-sort="state">state</th>
             <th st-sort="city">city</th>
             <th st-sort="role.nameSlug">Role</th>
-            <th st-sort="organization.name">Organization</th>
+            <th st-sort="participant.name">Participant</th>
             <th>Actions</th>
           </tr>
           <tr>
@@ -48,7 +48,7 @@
             </th>
             <th ng-show="vm.users"><input st-search="role.nameSlug" placeholder="Search role"
                                           class="input-sm form-control search-input col-lg-3" type="search"/></th>
-            <th ng-show="vm.users"><input st-search="organization.name" placeholder="Search organization"
+            <th ng-show="vm.users"><input st-search="participant.name" placeholder="Search participant"
                                           class="input-sm form-control search-input col-lg-3" type="search"/></th>
             <th></th>
             <th colspan="7" ng-show="!vm.users" style="color: #e85656;">There are no records to display.</th>
@@ -76,7 +76,7 @@
               {{user.role.nameSlug}}
             </td>
             <td>
-              {{user.organization.name}}
+              {{user.participant.name}}
             </td>
             <td>
               <div class="buttons" ng-show="!rowform.$visible">

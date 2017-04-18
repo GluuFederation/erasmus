@@ -6,7 +6,7 @@ const express = require('express'),
   common = require('../helpers/common'),
   httpStatus = require('http-status'),
   Federations = require('../helpers/federations'),
-  Organization = require('../helpers/organizations');
+  Participant = require('../helpers/participants');
 
 /**
  * Get all active federations
@@ -30,25 +30,19 @@ router.get('/getAllFederations', (req, res, next) => {
  */
 router.post('/addFederation', (req, res, next) => {
   let federation = null;
+  req.body.sponsor = common.constant.OWNER_PARTICIPANT_ID;
+
   return Federations.addFederation(req.body)
-    .then((savedFederation) => Promise.resolve(savedFederation))
-    .then((savedFederation) => {
-      // Set Owner Organization
-      return Organization.setOwnerOrganization(common.constant.OWNER_ORGANIZATION_ID, savedFederation._id);
-    })
-    .then((federation) => res.status(httpStatus.OK).send(federation))
+    .then((savedFederation) => res.status(httpStatus.OK).send(savedFederation))
     .catch((err) => {
       if (err.code === 11000) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Federation ' + common.message.NOT_ACCEPTABLE_NAME});
       }
 
-      return federation.remove()
-        .then(() => {
-          return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-            err: err,
-            message: common.message.INTERNAL_SERVER_ERROR
-          });
-        });
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+        err: err,
+        message: common.message.INTERNAL_SERVER_ERROR
+      });
     });
 });
 
@@ -86,7 +80,10 @@ router.delete('/removeFederation/:id', (req, res, next) => {
   }
   return Federations.removeFederation(req.params.id)
     .then((federation) => res.status(httpStatus.OK).send(federation))
-    .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({err: err, message: common.message.INTERNAL_SERVER_ERROR}));
+    .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+      err: err,
+      message: common.message.INTERNAL_SERVER_ERROR
+    }));
 });
 
 module.exports = router;

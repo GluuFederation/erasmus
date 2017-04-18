@@ -171,7 +171,7 @@ router.delete('/badges/:id', (req, res, next) => {
 });
 
 /**
- * Request for badges by organization admin
+ * Request for badges by participant admin
  */
 router.post('/badgeRequest', (req, res, next) => {
   if (!req.body.oid) {
@@ -186,8 +186,8 @@ router.post('/badgeRequest', (req, res, next) => {
   }
 
   return Badges.badgeRequest(req.body.oid, req.body.bids)
-    .then((organization) => {
-      return res.status(httpStatus.OK).send(organization);
+    .then((participant) => {
+      return res.status(httpStatus.OK).send(participant);
     })
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,
@@ -212,8 +212,8 @@ router.post('/badgeApprove', (req, res, next) => {
   }
 
   return Badges.badgeApprove(req.body.oid, req.body.bids)
-    .then((organization) => {
-      return res.status(httpStatus.OK).send(organization);
+    .then((participant) => {
+      return res.status(httpStatus.OK).send(participant);
     })
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,

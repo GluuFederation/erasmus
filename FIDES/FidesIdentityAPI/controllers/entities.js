@@ -6,13 +6,13 @@ const express = require('express'),
   jwt = require('jsonwebtoken'),
   common = require('../helpers/common'),
   httpStatus = require('http-status'),
-  Providers = require('../helpers/providers'),
-  Organization = require('../helpers/organizations');
+  Entity = require('../helpers/entities'),
+  Participant = require('../helpers/participants');
 
 /**
- * Add provider.
+ * Add entity.
  */
-router.post('/createProvider', (req, res, next) => {
+router.post('/createEntity', (req, res, next) => {
   if (!req.body.name) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide name.'
@@ -24,20 +24,20 @@ router.post('/createProvider', (req, res, next) => {
       message: 'Please provide discovery URL.'
     });
   }
-  if (!req.body.organizationId) {
+  if (!req.body.participant) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide organization.'
+      message: 'Please provide participant.'
     });
   }
 
-  Providers.addProvider(req.body)
-    .then((provider) => {
-      return res.status(httpStatus.OK).send(provider);
+  Entity.addEntity(req.body)
+    .then((entity) => {
+      return res.status(httpStatus.OK).send(entity);
     })
     .catch((err) => {
       if (err.code === 11000) {
         // already exist for discoveryUrl
-        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Provider ' + common.message.NOT_ACCEPTABLE_NAME});
+        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Entity ' + common.message.NOT_ACCEPTABLE_NAME});
       }
 
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -48,9 +48,9 @@ router.post('/createProvider', (req, res, next) => {
 });
 
 /**
- * Update detail of provider.
+ * Update detail of entity.
  */
-router.post('/updateProvider', (req, res, next) => {
+router.post('/updateEntity', (req, res, next) => {
   if (!req.body._id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide id.'
@@ -66,20 +66,20 @@ router.post('/updateProvider', (req, res, next) => {
       message: 'Please provide discovery URL.'
     });
   }
-  if (!req.body.organizationId) {
+  if (!req.body.participant) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide organization.'
+      message: 'Please provide participant.'
     });
   }
 
-  Providers.updateProvider(req.body)
-    .then((provider) => {
-      return res.status(httpStatus.OK).send(provider);
+  Entity.updateEntity(req.body)
+    .then((entity) => {
+      return res.status(httpStatus.OK).send(entity);
     })
     .catch((err) => {
       if (err.code === 11000) {
         // already exist for discoveryUrl
-        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Provider ' + common.message.NOT_ACCEPTABLE_NAME});
+        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Entity ' + common.message.NOT_ACCEPTABLE_NAME});
       }
 
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -90,18 +90,18 @@ router.post('/updateProvider', (req, res, next) => {
 });
 
 /**
- * Remove provider. Accepts providerId as parameter.
+ * Remove entity. Accepts entityId as parameter.
  */
-router.delete('/removeProvider/:providerId', (req, res, next) => {
-  if (!req.params.providerId) {
+router.delete('/removeEntity/:id', (req, res, next) => {
+  if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide id.'
     });
   }
 
-  Providers.removeProvider(req.params.providerId)
-    .then((provider) => {
-      return res.status(httpStatus.OK).send(provider);
+  Entity.removeEntity(req.params.id)
+    .then((entity) => {
+      return res.status(httpStatus.OK).send(entity);
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -112,36 +112,36 @@ router.delete('/removeProvider/:providerId', (req, res, next) => {
 });
 
 /**
- *1 Approve provider. Accepts providerId as parameter.
+ *1 Approve entity. Accepts entityId as parameter.
  */
-router.get('/approveProvider/:providerId', (req, res, next) => {
-  if (!req.params.providerId) {
+router.get('/approveEntity/:id', (req, res, next) => {
+  if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide id.'
     });
   }
-  let provider = null;
+  let entity = null;
   let dataJson = {};
-  // Get provider details.
-  return Providers.getProviderById(req.params.providerId)
-    .then((fProvider) => {
-      provider = fProvider;
-      if (provider.isApproved) {
+  // Get entity details.
+  return Entity.getEntityById(req.params.id)
+    .then((fEntity) => {
+      entity = fEntity;
+      if (entity.isApproved) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Provider is already approved.'
+          message: 'Entity is already approved.'
         });
       }
 
-      if (provider.organization.isApproved !== true) {
+      if (entity.participant.isApproved !== true) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Please approve related organization first to proceed.'
+          message: 'Please approve related participant first to proceed.'
         });
       }
 
-      // Get provider configuration using discovery URL.
+      // Get entity configuration using discovery URL.
       const option = {
         method: 'GET',
-        uri: provider.discoveryUrl + '/.well-known/openid-configuration',
+        uri: entity.discoveryUrl + '/.well-known/openid-configuration',
         resolveWithFullResponse: true
       };
 
@@ -188,24 +188,22 @@ router.get('/approveProvider/:providerId', (req, res, next) => {
       }
 
       dataJson.id = dataJson.issuer;
-      dataJson.name = provider.name;
-      dataJson.client_id = provider.clientId;
-      dataJson.client_secret = provider.clientSecret;
+      dataJson.name = entity.name;
+      dataJson.client_id = entity.clientId;
+      dataJson.client_secret = entity.clientSecret;
       dataJson.keys = keysJson.keys;
 
-      provider.id = dataJson.issuer;
-      provider.name = dataJson.name;
-      provider.metadataStatements = dataJson.metadata_statements || null;
-      provider.metadataStatementUris = dataJson.metadata_statement_uris || null;
-      provider.signedJwksUri = dataJson.signed_jwks_uri;
-      provider.signingKeys = dataJson.signing_key;
-      provider.type = 'openid_provider';
+      entity.id = dataJson.issuer;
+      entity.name = dataJson.name;
+      entity.signedJwksUri = dataJson.signed_jwks_uri;
+      entity.signingKeys = dataJson.signing_key;
+      entity.type = 'openid_entity';
 
-      return provider.save();
+      return entity.save();
     })
-    .then((updatedProvider) => Organization.linkOrganizationAndEntity(updatedProvider.organization._id, updatedProvider._id))
-    .then((response) => Providers.approveProvider(req.params.providerId))
-    .then((provider) => res.status(200).send(provider))
+    .then((updatedEntity) => Participant.addEntityInPartcipant(updatedEntity.participant._id, updatedEntity._id))
+    .then((response) => Entity.approveEntity(req.params.id))
+    .then((entity) => res.status(200).send(entity))
     .catch((err) => {
       if (!err.statusCode) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({

@@ -18,7 +18,7 @@
     vm.openBadgeModal = openBadgeModal;
     vm.getCategory = getCategory;
     vm.activate = activate;
-    vm.organization = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.organization : null;
+    vm.participant = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.participant : null;
 
     vm.activate();
 
@@ -26,7 +26,7 @@
       if (vm.isShow) {
         badgesService.getBadges().then(onSuccess).catch(onError);
       } else {
-        badgesService.getBadgeByOrganization(vm.organization._id, 'all').then(onSuccess).catch(onError);
+        badgesService.getBadgeByParticipant(vm.participant._id, 'all').then(onSuccess).catch(onError);
       }
 
       function onSuccess(response) {

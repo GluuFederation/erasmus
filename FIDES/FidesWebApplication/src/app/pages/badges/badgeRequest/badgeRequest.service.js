@@ -9,7 +9,7 @@
     var service = {
       badgeRequest: badgeRequest,
       badgeApprove: badgeApprove,
-      getOrganizationById: getOrganizationById
+      getParticipantById: getParticipantById
     };
 
     function badgeRequest(formData) {
@@ -20,8 +20,8 @@
       return $http.post(urls.BASE_API + '/badgeApprove', formData);
     }
 
-    function getOrganizationById(oid) {
-      return $http.get(urls.BASE_API + '/getOrganizationById/' + oid);
+    function getParticipantById(oid) {
+      return $http.get(urls.BASE_API + '/getParticipantById/' + oid);
     }
 
     return service;

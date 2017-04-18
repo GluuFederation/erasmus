@@ -1,0 +1,74 @@
+<div class="widgets">
+  <div class="row">
+    <div class="col-lg-12 col-md-12">
+      <div ba-panel ba-panel-class="with-scroll">
+        <!--<div class="add-row-editable-table">-->
+          <!--<button class="btn btn-primary" ng-click="vm.openEntityModal(null)">Create Entity</button>-->
+        <!--</div>-->
+
+        <table st-safe-src="vm.entities" st-table="vm.displayedCollection" class="table table-hover table-condensed">
+          <thead>
+          <tr class="sortable">
+            <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
+            <th st-sort="name">Name</th>
+            <th st-sort="discoveryUrl">Discovery URL</th>
+            <th st-sort="clientId" style="max-width: 250px;">Client ID</th>
+            <th st-sort="participant.name">Participant</th>
+            <th></th>
+            <th>Actions</th>
+          </tr>
+          <tr>
+            <th style="display: none;"></th>
+            <th colspan="7" ng-show="vm.entities"><input st-search="" placeholder="Search"
+                                                          class="input-sm form-control search-input" type="search"/>
+            </th>
+            <th colspan="7" ng-show="!vm.entities" style="color: #e85656;">There are no records to display.</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="entity in vm.displayedCollection track by $index">
+            <td style="display: none;"></td>
+            <td>
+              {{entity.name}}
+            </td>
+            <td class="ellipis" style="max-width: 250px;" title="{{entity.discoveryUrl}}">
+              {{entity.discoveryUrl}}
+            </td>
+            <td class="ellipis" style="max-width: 250px;" title="{{entity.clientId}}">
+              {{entity.clientId}}
+            </td>
+            <td>
+              {{entity.participant.name}}
+            </td>
+            <td>
+              <input type="checkbox" title="Is Approved" disabled ng-checked="entity.isApproved"/>
+            </td>
+            <td>
+              <div class="buttons" ng-show="!rowform.$visible">
+                <button style="margin: 0px 5px;" class="btn btn-primary btn-icon" ng-disabled="entity.isApproved"
+                        ng-click="vm.openEntityModal(entity)" title="Edit"><i class="ion-edit"></i></button>
+                <button style="margin: 0px 5px;" class="btn btn-danger btn-icon" ng-disabled="entity.isApproved"
+                        ng-click="vm.removeEntity(entity)" title="Delete"><i class="ion-android-delete"></i>
+                </button>
+                <button style="margin: 0px 5px;" class="btn btn-success btn-icon"
+                        ng-disabled="!entity.participant.isApproved"
+                        ng-show="!entity.isApproved && vm.userRole === 'admin'"
+                        ng-click="vm.approveEntity(entity)"
+                        title="{{entity.participant.isApproved ? 'Approve' : 'Please approve related participant first.'}}"><i class="ion-android-checkmark-circle"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <td colspan="7" class="text-center">
+              <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
+            </td>
+          </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

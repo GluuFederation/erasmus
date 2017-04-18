@@ -10,25 +10,25 @@ schemes:
   - http
 # will be prefixed to all paths
 basePath: /
-resourcePath: /Organizations
-description: All about users Organization
+resourcePath: /Participants
+description: All about users Participant
 apis:
 
-- path: /getAllOrganizations
+- path: /getAllParticipants
   operations:
     - httpMethod: GET
-      summary: Get all organization
-      notes: Fetch all organization
-      nickname: getAllOrganizations
+      summary: Get all participant
+      notes: Fetch all participant
+      nickname: getAllParticipants
       consume:
         - application/json
 
-- path: /getOrganizationById/{oid}
+- path: /getParticipantById/{oid}
   operations:
     - httpMethod: GET
-      summary: Get organization by id
-      notes: Returns a organization based on organization id
-      nickname: getOrganizationById
+      summary: Get participant by id
+      notes: Returns a participant based on participant id
+      nickname: getParticipantById
       consumes:
         - application/json
       parameters:
@@ -41,14 +41,14 @@ apis:
           dataType: string
           paramType: path
           required: true
-          description: organization id
+          description: participant id
 
-- path: /updateOrganization
+- path: /updateParticipant
   operations:
     - httpMethod: PUT
-      summary: Update organization
-      notes: Returns a updated organization
-      nickname: updateOrganization
+      summary: Update participant
+      notes: Returns a updated participant
+      nickname: updateParticipant
       consumes:
         - multipart/form-data
       parameters:
@@ -61,34 +61,34 @@ apis:
         dataType: string
         paramType: formData
         required: true
-        description: organization name
+        description: participant name
       - name: phoneNo
         dataType: string
         paramType: formData
         required: true
-        description: organization phone No
+        description: participant phone No
       - name: address
         dataType: string
         paramType: formData
         required: true
-        description: organization address
+        description: participant address
       - name: zipcode
         dataType: string
         paramType: formData
         required: true
-        description: organization address
+        description: participant address
       - name: trustMarkFile
         dataType: file
         paramType: formData
         required: true
-        description: trustmark file of organization
+        description: trustmark file of participant
 
-- path: /approveOrganization
+- path: /approveParticipant
   operations:
     - httpMethod: POST
-      summary: Approved organization
-      notes: Returns a approved organization
-      nickname: approveOrganization
+      summary: Approved participant
+      notes: Returns a approved participant
+      nickname: approveParticipant
       consumes:
         - application/json
       parameters:
@@ -97,23 +97,23 @@ apis:
           paramType: header
           required: true
           description: authorization token
-        - name: organizationId
+        - name: participantId
           dataType: string
           paramType: formData
           required: true
-          description: organization id
+          description: participant id
         - name: federationId
           dataType: string
           paramType: formData
           required: true
           description: federation id
 
-- path: /removeOrganization/{oid}
+- path: /removeParticipant/{oid}
   operations:
     - httpMethod: DELETE
-      summary: Remove organization
-      notes: Returns a removed organization
-      nickname: removeOrganization
+      summary: Remove participant
+      notes: Returns a removed participant
+      nickname: removeParticipant
       consumes:
         - application/json
       parameters:
@@ -126,4 +126,4 @@ apis:
           dataType: string
           paramType: path
           required: true
-          description: organization id
+          description: participant id

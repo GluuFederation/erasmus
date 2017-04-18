@@ -12,7 +12,7 @@
       removeBadge: removeBadge,
       updateBadge: updateBadge,
       createBadge: createBadge,
-      getBadgeByOrganization: getBadgeByOrganization
+      getBadgeByParticipant: getBadgeByParticipant
     };
 
     function getBadges() {
@@ -37,8 +37,8 @@
       });
     }
 
-    function getBadgeByOrganization(id, status) {
-      return $http.get(urls.BASE_API + '/getBadgeByOrganization/' + id + '/' + status);
+    function getBadgeByParticipant(id, status) {
+      return $http.get(urls.BASE_API + '/getBadgeByParticipant/' + id + '/' + status);
     }
 
     return service;

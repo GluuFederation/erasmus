@@ -9,7 +9,7 @@
     var vm = this;
 
     // data members
-    vm.providerInfo = {};
+    vm.entityInfo = {};
     vm.states = [];
     vm.cities = [];
     vm.stateCityList = {};
@@ -20,18 +20,18 @@
 
     // definations
     vm.params = $location.search();
-    if (vm.params && vm.params.state && $localStorage.provider) {
-      if (vm.params.state === $localStorage.provider.client.state) {
-        vm.providerInfo = $localStorage.provider.providerInfo;
+    if (vm.params && vm.params.state && $localStorage.entity) {
+      if (vm.params.state === $localStorage.entity.client.state) {
+        vm.entityInfo = $localStorage.entity.entityInfo;
         if (vm.params.error) {
           toastr.error(vm.params.error_description, 'Sign Up', {});
         } else {
-          $localStorage.provider.client.code = vm.params.code;
-          registerService.registerDetail($localStorage.provider.providerInfo, $localStorage.provider.client, onSuccess, onError);
+          $localStorage.entity.client.code = vm.params.code;
+          registerService.registerDetail($localStorage.entity.entityInfo, $localStorage.entity.client, onSuccess, onError);
         }
       }
 
-      delete $localStorage.provider;
+      delete $localStorage.entity;
     }
 
     function onSuccess(response) {
@@ -69,13 +69,13 @@
     }
 
     function register() {
-      vm.providerInfo.redirectUrls = [urls.BASE.concat('/login.html'), urls.BASE.concat('/register.html')];
-      registerService.validateRegistrationDetail(vm.providerInfo, onSuccess, onError);
+      vm.entityInfo.redirectUrls = [urls.BASE.concat('/login.html'), urls.BASE.concat('/register.html')];
+      registerService.validateRegistrationDetail(vm.entityInfo, onSuccess, onError);
 
       function onSuccess(response) {
         if (response.data) {
           vm.state = response.data.state;
-          $localStorage.provider = {client: response.data, providerInfo: vm.providerInfo};
+          $localStorage.entity = {client: response.data, entityInfo: vm.entityInfo};
           $window.location = response.data.authEndpoint;
           event.preventDefault();
         }
@@ -90,7 +90,7 @@
 
     function onIndexChange(lastIndex, index) {
       if (lastIndex === 0) {
-        registerService.isUserAlreadyExist(vm.providerInfo, onSuccess, onError);
+        registerService.isUserAlreadyExist(vm.entityInfo, onSuccess, onError);
       } else if (lastIndex === 1) {
 
       }
@@ -115,7 +115,7 @@
     }
 
     function stateChanged() {
-      vm.cities = vm.stateCityList[vm.providerInfo.state];
+      vm.cities = vm.stateCityList[vm.entityInfo.state];
     }
 
     // init

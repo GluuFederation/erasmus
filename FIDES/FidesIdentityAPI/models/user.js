@@ -39,17 +39,17 @@ const userSchema = mongoose.Schema({
     type: String,
     required: false
   },
-  organization: {
+  participant: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Organization'
+    ref: 'Participant'
   },
   role: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Role'
   },
-  provider: {
+  entity: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Provider'
+    ref: 'Entity'
   },
   phoneNo: {
     type: String,
@@ -100,9 +100,9 @@ userSchema.methods.safeModel = function () {
     isActive: this.isActive,
     createdOn: this.createdOn,
     scimId: this.scimId,
-    organization: this.organization,
+    participant: this.participant,
     role: this.role,
-    provider: this.provider,
+    entity: this.entity,
     phoneNo: this.phoneNo,
     address: this.address,
     zipcode: this.zipcode,
@@ -118,7 +118,7 @@ userSchema.pre('findById', populateMasters);
 userSchema.pre('find', populateMasters);
 
 function populateMasters() {
-  this.populate('role organization provider');
+  this.populate('role participant entity');
   return this;
 }
 // create the model for users and expose it to our app

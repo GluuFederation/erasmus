@@ -10,17 +10,17 @@ const message = {
 };
 
 const constant = {
-  OWNER_ORGANIZATION_ID: '58d8b139987e8419d0a3c1cc',
+  OWNER_PARTICIPANT_ID: '58f45055cc0db2199f9edd4a',
   TRUST_MARK_FILEPATH: '/public/images/trustmark',
   BADGE_IMAGE_PATH: '/public/images/badges',
   OTTO_BASE_URL: 'http://localhost:5053',
   CONTEXT_SCHEMA_URL: 'https://raw.githubusercontent.com/KantaraInitiative/wg-otto/master/schema',
-  ORGANIZATION_CONTEXT: '/otto/organization.jsonld',
+  PARTICIPANT_CONTEXT: '/otto/participant.jsonld',
   FEDERATION_CONTEXT: '/otto/federation.jsonld',
-  PROVIDER_CONTEXT: '/openid/op.jsonld',
-  OTTO_ORGANIZATION_URL: '/otto/organization',
+  ENTITY_CONTEXT: '/openid/op.jsonld',
+  OTTO_PARTICIPANT_URL: '/otto/participant',
   OTTO_FEDERATION_URL: '/otto/federations',
-  OTTO_PROVIDER_URL: '/otto/federation_entity'
+  OTTO_ENTITY_URL: '/otto/federation_entity'
 };
 
 const func = {

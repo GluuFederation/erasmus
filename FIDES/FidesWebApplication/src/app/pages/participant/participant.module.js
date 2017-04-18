@@ -1,17 +1,17 @@
 (function () {
   'use strict';
 
-  angular.module('FidesWebApplication.pages.organization', [])
+  angular.module('FidesWebApplication.pages.participant', [])
     .config(routeConfig);
 
   /** @ngInject */
   function routeConfig($stateProvider) {
     $stateProvider
-      .state('organization', {
-        url: '/organization',
+      .state('participant', {
+        url: '/participant',
         title: 'Participants',
-        templateUrl: 'app/pages/organization/organization.html',
-        controller: 'OrganizationController',
+        templateUrl: 'app/pages/participant/participant.html',
+        controller: 'ParticipantController',
         controllerAs: 'vm',
         roles: ['admin'],
         authenticate: true,

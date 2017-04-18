@@ -9,7 +9,7 @@ const express = require('express'),
   fs = require('fs'),
   _ = require('lodash'),
   common = require('../helpers/common'),
-  Organizations = require('../helpers/organizations'),
+  Participant = require('../helpers/participants'),
   Federation = require('../helpers/federations');
 
 const storage = multer.diskStorage({
@@ -24,10 +24,10 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage}).any();
 
 /**
- * get approved Badge By Organization
+ * get approved Badge By Participant
  */
-router.get('/getBadgeByOrganization/:oid/:status', (req, res, next) => {
-  Organizations.getBadgeByOrganization(req.params.oid)
+router.get('/getBadgeByParticipant/:oid/:status', (req, res, next) => {
+  Participant.getBadgeByParticipant(req.params.oid)
     .then((org) => {
       if (req.params.status == 'approved') {
         return res.status(httpStatus.OK).send(org.approvedBadges);
@@ -52,10 +52,10 @@ router.get('/getBadgeByOrganization/:oid/:status', (req, res, next) => {
 });
 
 /**
- * get approved Badge By Organization
+ * get approved Badge By Participant
  */
-router.get('/getOrganizationById/:oid', (req, res, next) => {
-  Organizations.getOrganizationById(req.params.oid)
+router.get('/getParticipantById/:oid', (req, res, next) => {
+  Participant.getParticipantById(req.params.oid)
     .then((org) => {
       return res.status(httpStatus.OK).send(org);
     })
@@ -66,16 +66,16 @@ router.get('/getOrganizationById/:oid', (req, res, next) => {
 });
 
 /**
- * Update organization
+ * Update participant
  */
-router.put('/updateOrganization', upload, (req, res, next) => {
+router.put('/updateParticipant', upload, (req, res, next) => {
   if (!req.body._id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
     });
   }
   const filePath = common.constant.TRUST_MARK_FILEPATH;
-  req.body.trustMarkFile = (!!req.files[0]) ? process.env.BASE_URL + filePath.substr(7, filePath.length) + '/' + req.files[0].filename : null;
+  req.body.trustMarkFile = (!!req.files) ? process.env.BASE_URL + filePath.substr(7, filePath.length) + '/' + req.files[0].filename : null;
   if (req.body.trustMarkFile && (req.body.trustMarkFile != req.body.oldtrustMarkFile)) {
     try {
       fs.unlinkSync(common.constant.TRUST_MARK_FILEPATH + req.body.oldtrustMarkFile);
@@ -83,9 +83,9 @@ router.put('/updateOrganization', upload, (req, res, next) => {
     }
   }
 
-  Organizations.updateOrganization(req.body)
-    .then((updatedOrganization) => {
-      return res.status(httpStatus.OK).send(updatedOrganization);
+  Participant.updateParticipant(req.body)
+    .then((updatedParticipant) => {
+      return res.status(httpStatus.OK).send(updatedParticipant);
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -99,15 +99,15 @@ router.put('/updateOrganization', upload, (req, res, next) => {
 });
 
 /**
- * Remove organization
+ * Remove participant
  */
-router.delete('/removeOrganization/:organizationId', (req, res, next) => {
-  if (!req.params.organizationId) {
+router.delete('/removeParticipant/:id', (req, res, next) => {
+  if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
     });
   }
-  Organizations.removeOrganization(req.params.organizationId)
+  Participant.removeParticipant(req.params.id)
     .then((removedFederation) => res.status(httpStatus.OK).send(removedFederation))
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,
@@ -116,21 +116,21 @@ router.delete('/removeOrganization/:organizationId', (req, res, next) => {
 });
 
 /**
- * Approve organization
+ * Approve participant
  */
-router.post('/approveOrganization', (req, res, next) => {
-  if (!req.body.organizationId) {
+router.post('/approveParticipant', (req, res, next) => {
+  if (!req.body.participantId) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
     });
   }
-  Organizations.getOrganizationById(req.body.organizationId)
+  Participant.getParticipantById(req.body.participantId)
     .then((response) => {
-      // link organization with federation
-      return Federation.addParticipant(req.body.federationId, req.body.organizationId);
+      // link participant with federation
+      return Federation.addParticipant(req.body.federationId, req.body.participantId);
     })
-    .then((response) => Organizations.approveOrganization(req.body.organizationId, req.body.federationId))
-    .then((organization) => res.status(httpStatus.OK).send(organization))
+    .then((response) => Participant.approveParticipant(req.body.participantId, req.body.federationId))
+    .then((participant) => res.status(httpStatus.OK).send(participant))
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,
       message: common.message.INTERNAL_SERVER_ERROR

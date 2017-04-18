@@ -89,7 +89,7 @@
       vm.states = [];
 
       getAllRoles();
-      getAllOrganizations();
+      getAllParticipants();
       getStateCity();
 
       if (userData) {
@@ -136,8 +136,8 @@
         }
       }
 
-      function getAllOrganizations() {
-        userService.getAllOrganizations(onSuccess, onError);
+      function getAllParticipants() {
+        userService.getAllParticipants(onSuccess, onError);
         function onSuccess(response) {
           if (response.data) {
             if (response.data.length > 0) {
@@ -148,7 +148,7 @@
 
         function onError(error) {
           console.log(JSON.stringify(error));
-          toastr.error(error.data.message, 'Organizations', {})
+          toastr.error(error.data.message, 'Participants', {})
         }
       }
 
