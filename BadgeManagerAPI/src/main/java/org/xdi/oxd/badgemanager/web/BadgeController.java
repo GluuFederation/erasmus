@@ -46,11 +46,12 @@ public class BadgeController  {
 //            }
 
             //Dynamic
-            String[] split = accessToken.split("\\.");
-            String decodeTokenBody = Utils.decodeBase64url(split[1]);
-
-            JsonObject jsonObjectBody = new JsonParser().parse(decodeTokenBody).getAsJsonObject();
-            String issuer= jsonObjectBody.get("iss").getAsString();
+//            String[] split = accessToken.split("\\.");
+//            String decodeTokenBody = Utils.decodeBase64url(split[1]);
+//
+//            JsonObject jsonObjectBody = new JsonParser().parse(decodeTokenBody).getAsJsonObject();
+//            String issuer= jsonObjectBody.get("iss").getAsString();
+            String issuer= "https://ce-dev2.gluu.org";
 
             IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer,type);
 

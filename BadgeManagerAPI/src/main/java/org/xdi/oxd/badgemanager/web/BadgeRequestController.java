@@ -2,6 +2,7 @@ package org.xdi.oxd.badgemanager.web;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.commons.lang.WordUtils;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -41,7 +42,7 @@ import static org.xdi.oxd.badgemanager.qrcode.decorator.ImageOverlay.addImageOve
 @CrossOrigin
 @RestController
 @RequestMapping("/badges/request")
-public class BadgeRequestController {
+public class BadgeRequestController implements LDAPInitializer.ldapConnectionListner {
 
     private final ServletContext context;
 
@@ -52,6 +53,7 @@ public class BadgeRequestController {
 
     boolean isConnected = false;
     LdapEntryManager ldapEntryManager;
+    LDAPInitializer ldapInitializer = new LDAPInitializer(BadgeRequestController.this);
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String createBadgeRequest(@RequestBody BadgeRequests badgeRequest, HttpServletResponse response) {
@@ -73,11 +75,6 @@ public class BadgeRequestController {
 //        }
 
         //Dynamic
-        LDAPInitializer ldapInitializer = new LDAPInitializer((isConnected, ldapEntryManager) -> {
-            this.isConnected = isConnected;
-            this.ldapEntryManager = ldapEntryManager;
-        });
-
         if (isConnected) {
             try {
                 badgeRequest = BadgeRequestCommands.createBadgeRequest(ldapEntryManager, badgeRequest);
@@ -101,7 +98,7 @@ public class BadgeRequestController {
     }
 
     @RequestMapping(value = "listPending/{id:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getPendingBadgeRequestsByParticipant(@PathVariable String id, HttpServletResponse response) {
+    public String getPendingBadgeRequestsByParticipant(@RequestHeader(value="Authorization") String authorization, @PathVariable String id, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
         //Static
@@ -140,10 +137,12 @@ public class BadgeRequestController {
 //        }
 
         //Dynamic
-        LDAPInitializer ldapInitializer = new LDAPInitializer((isConnected, ldapEntryManager) -> {
-            this.isConnected = isConnected;
-            this.ldapEntryManager = ldapEntryManager;
-        });
+
+        if(!authorization.equalsIgnoreCase(Global.AccessToken)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            jsonResponse.addProperty("error", "You're not authorized to perform this request");
+            return jsonResponse.toString();
+        }
 
         if (isConnected) {
             try {
@@ -166,7 +165,7 @@ public class BadgeRequestController {
     }
 
     @RequestMapping(value = "approve", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String approveBadgeRequest(@RequestBody ApproveBadge approveBadge, HttpServletResponse response) {
+    public String approveBadgeRequest(@RequestHeader(value="Authorization") String authorization, @RequestBody ApproveBadge approveBadge, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
         //Static
@@ -183,10 +182,12 @@ public class BadgeRequestController {
 //        }
 
         //Dynamic
-        LDAPInitializer ldapInitializer = new LDAPInitializer((isConnected, ldapEntryManager) -> {
-            this.isConnected = isConnected;
-            this.ldapEntryManager = ldapEntryManager;
-        });
+
+        if(!authorization.equalsIgnoreCase(Global.AccessToken)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            jsonResponse.addProperty("error", "You're not authorized to perform this request");
+            return jsonResponse.toString();
+        }
 
         if (isConnected) {
             boolean isUpdated;
@@ -349,18 +350,21 @@ public class BadgeRequestController {
 
             System.out.print("Context real path: " + context.getRealPath(""));
 
+            //location of barcode
             String location = context.getRealPath("");
-
             String fileName = location + File.separator + System.currentTimeMillis() + ".png";
 
+            //logo file
 //            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
 
-            QRCBuilder<BufferedImage> qrCodeBuilder = new ZXingQRCodeBuilder();
+            //barcode dara
+            String data = WordUtils.capitalizeFully(badge.getName());
 
+            QRCBuilder<BufferedImage> qrCodeBuilder = new ZXingQRCodeBuilder();
             qrCodeBuilder.newQRCode()
                     .withSize(qrCodeSize, qrCodeSize)
                     .and()
-                    .withData(badge.getName())
+                    .withData(data)
                     .and()
                     .decorate(colorizeQRCode(new Color(51, 102, 153)))
                     .and()
@@ -380,6 +384,14 @@ public class BadgeRequestController {
             System.out.println("Exception in generating qr code: " + ex.getMessage());
             ex.printStackTrace();
             return false;
+        }
+    }
+
+    @Override
+    public void ldapConnected(boolean isConnected, LdapEntryManager ldapEntryManager) {
+        if (isConnected) {
+            this.ldapEntryManager = ldapEntryManager;
+            this.isConnected = isConnected;
         }
     }
 }

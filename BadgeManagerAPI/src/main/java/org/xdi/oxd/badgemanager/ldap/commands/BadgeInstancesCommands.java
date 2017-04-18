@@ -29,10 +29,16 @@ public class BadgeInstancesCommands {
             badges.setDn("inum=" + inum + ",ou=badgeInstances,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
             badges.setInum(inum);
 
-            if (!(ldapEntryManager.contains(badges.getDn(), BadgeInstances.class, Filter.create("(inum=" + badges.getInum() + ")")))) {
-                ldapEntryManager.persist(badges);
-                System.out.println("New badge instance entry");
-                return true;
+            if (!(ldapEntryManager.contains("ou=badgeInstances,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeInstances.class, Filter.create("(inum=" + badges.getInum() + ")")))) {
+                if (!ldapEntryManager.contains("ou=badgeInstances,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeInstances.class, Filter.create("(&(badgeRequestInum=" + badges.getBadgeRequestInum() + ")(templateBadgeId=" + badges.getTemplateBadgeId() + "))"))) {
+                    ldapEntryManager.persist(badges);
+                    System.out.println("New badge instance entry");
+                    return true;
+                } else {
+                    throw new Exception("You have already requested for same badge");
+                }
+
+
             } else {
                 createNewBadgeInstances(ldapEntryManager, badges);
             }
