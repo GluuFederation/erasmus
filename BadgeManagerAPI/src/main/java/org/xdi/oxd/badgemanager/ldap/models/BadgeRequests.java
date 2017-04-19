@@ -22,22 +22,22 @@ public class BadgeRequests {
     @LdapAttribute(name = "inum")
     private String inum;
 
-    @LdapAttribute(name = "masterBadgeId")
+    @LdapAttribute(name = "gluuTemplateBadgeId")
     private String templateBadgeId;
 
-    @LdapAttribute(name = "masterBadgeTitle")
+    @LdapAttribute(name = "gluuTemplateBadgeTitle")
     private String templateBadgeTitle;
 
-    @LdapAttribute(name = "organization")
+    @LdapAttribute(name = "gluuParticipant")
     private String participant;
 
-    @LdapAttribute(name = "status")
+    @LdapAttribute(name = "gluuStatus")
     private String status;
 
     @LdapAttribute(name = "gluuBadgeRequester")
     private String gluuBadgeRequester;
 
-    @LdapAttribute(name = "validity")
+    @LdapAttribute(name = "gluuValidity")
     private int validity;
 
     @LdapAttribute(name = "creationDate")

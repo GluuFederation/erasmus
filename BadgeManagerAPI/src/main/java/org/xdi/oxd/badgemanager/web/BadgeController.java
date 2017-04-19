@@ -3,14 +3,24 @@ package org.xdi.oxd.badgemanager.web;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.swagger.annotations.Api;
+import org.gluu.site.ldap.persistence.LdapEntryManager;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.xdi.oxd.badgemanager.global.Global;
+import org.xdi.oxd.badgemanager.ldap.LDAPInitializer;
+import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
+import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
+import org.xdi.oxd.badgemanager.ldap.commands.BadgeRequestCommands;
+import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
+import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
+import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
-import org.xdi.oxd.badgemanager.model.IssuerBadgeRequest;
+import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
-import org.xdi.oxd.badgemanager.util.Utils;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,7 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @Api(basePath = "/badges", description = "badges apis")
 @RequestMapping("/badges")
-public class BadgeController  {
+public class BadgeController implements LDAPInitializer.ldapConnectionListner {
+
+    boolean isConnected = false;
+    LdapEntryManager ldapEntryManager;
+    LDAPInitializer ldapInitializer = new LDAPInitializer(BadgeController.this);
 
     @RequestMapping(value = "listTemplateBadges/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTemplateBadgesByParticipant(@RequestParam String accessToken, @RequestParam String type, HttpServletResponse response) {
@@ -51,18 +65,26 @@ public class BadgeController  {
 //
 //            JsonObject jsonObjectBody = new JsonParser().parse(decodeTokenBody).getAsJsonObject();
 //            String issuer= jsonObjectBody.get("iss").getAsString();
-            String issuer= "https://ce-dev2.gluu.org";
+            String issuer = "https://ce-dev2.gluu.org";
 
-            IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer,type);
+            IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, type);
 
             final String uri = Global.API_ENDPOINT + Global.getTemplateBadgesByParticipant;
 
             DisableSSLCertificateCheckUtil.disableChecks();
             RestTemplate restTemplate = new RestTemplate();
-            String result = restTemplate.postForObject(uri, issuerBadgeRequest, String.class);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
+
+            HttpEntity<IssuerBadgeRequest> request = new HttpEntity<IssuerBadgeRequest>(issuerBadgeRequest,headers);
+
+            HttpEntity<String> strResponse = restTemplate.exchange(uri, HttpMethod.POST, request, String.class);
+
+            String result = strResponse.getBody();
 
             JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
-            if (jObjResponse != null){
+            if (jObjResponse != null) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.add("badges", GsonService.getGson().toJsonTree(jObjResponse));
                 jsonResponse.addProperty("error", false);
@@ -77,6 +99,46 @@ public class BadgeController  {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", "Please try after some time");
             return jsonResponse.toString();
+        }
+    }
+
+    @RequestMapping(value = "/{inum:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getBadgeByInum(@PathVariable String inum, HttpServletResponse response) {
+
+        JsonObject jsonResponse = new JsonObject();
+
+        //Static
+
+        //Dynamic
+        if (isConnected) {
+            try {
+                BadgeResponse objBadge = BadgeCommands.getBadgeResponseByInum(ldapEntryManager, inum);
+                if (objBadge != null) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    return GsonService.getGson().toJson(objBadge);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    jsonResponse.addProperty("error", "No such badge found");
+                    return jsonResponse.toString();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                jsonResponse.addProperty("error", e.getMessage());
+                return jsonResponse.toString();
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.addProperty("error", "Please try after some time");
+            return jsonResponse.toString();
+        }
+    }
+
+    @Override
+    public void ldapConnected(boolean isConnected, LdapEntryManager ldapEntryManager) {
+        if (isConnected) {
+            this.ldapEntryManager = ldapEntryManager;
+            this.isConnected = isConnected;
         }
     }
 }

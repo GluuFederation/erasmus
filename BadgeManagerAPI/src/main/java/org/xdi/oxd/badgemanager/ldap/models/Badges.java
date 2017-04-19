@@ -1,6 +1,7 @@
 package org.xdi.oxd.badgemanager.ldap.models;
 
 import org.gluu.site.ldap.persistence.annotation.LdapAttribute;
+import org.gluu.site.ldap.persistence.annotation.LdapDN;
 import org.gluu.site.ldap.persistence.annotation.LdapEntry;
 import org.gluu.site.ldap.persistence.annotation.LdapObjectClass;
 
@@ -12,45 +13,44 @@ import java.util.Date;
  */
 
 @LdapEntry
-@LdapObjectClass(values = {"top", "gluuBadgeClass"})
+@LdapObjectClass(values = {"top", "gluuBadgeAssertion"})
 public class Badges extends SimpleUser {
 
-    @LdapAttribute(name = "displayName")
-    String displayName;
+    @LdapDN
+    private String dn;
 
-    @LdapAttribute(name = "picture")
-    String picture;
+    @LdapAttribute(name = "gluuContext")
+    String context;
 
-    @LdapAttribute(name = "description")
-    String description;
+    @LdapAttribute(name = "gluuBadgeClassInum")
+    String badgeClassInum;
 
-    @LdapAttribute(name = "owner")
-    String owner;
+    @LdapAttribute(name = "gluuExpires")
+    Date expires = new Date();
 
-    @LdapAttribute(name = "gluuStatus")
-    boolean active = true;
+    @LdapAttribute(name = "gluuId")
+    String id;
 
     @LdapAttribute(name = "inum")
     String inum;
 
-    @LdapAttribute(name = "gluuAssociatedOrganization")
-    String gluuAssociatedOrganization;
+    @LdapAttribute(name = "gluuImage")
+    String image;
 
-    @LdapAttribute(name = "gluuBadgeExpiryDate")
-    Date gluuBadgeExpiryDate;
+    @LdapAttribute(name = "gluuIssuedOn")
+    Date issuedOn = new Date();
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
+    @LdapAttribute(name = "gluuRecipientIdentity")
+    String recipientIdentity;
 
-    @LdapAttribute(name = "creationDate")
-    Date creationDate = new Date();
+    @LdapAttribute(name = "gluuRecipientType")
+    String recipientType;
 
-    @LdapAttribute(name = "qrCode")
-    String qrCode;
+    @LdapAttribute(name = "gluuType")
+    String type;
 
-    Organizations gluuAssociatedOrganizationDetail = new Organizations();
-
+    @LdapAttribute(name = "gluuVerificationType")
+    String verificationType;
 
     public Badges() {
     }
@@ -63,96 +63,93 @@ public class Badges extends SimpleUser {
         this.inum = inum;
     }
 
-    public String getGluuAssociatedOrganization() {
-        return gluuAssociatedOrganization;
+    public String getContext() {
+        return context;
     }
 
-    public void setGluuAssociatedOrganization(String gluuAssociatedOrganization) {
-        this.gluuAssociatedOrganization = gluuAssociatedOrganization;
+    public void setContext(String context) {
+        this.context = context;
     }
 
-    public Date getGluuBadgeExpiryDate() {
-        return gluuBadgeExpiryDate;
+    public String getBadgeClassInum() {
+        return badgeClassInum;
     }
 
-    public void setGluuBadgeExpiryDate(Date gluuBadgeExpiryDate) {
-        this.gluuBadgeExpiryDate = gluuBadgeExpiryDate;
+    public void setBadgeClassInum(String badgeClassInum) {
+        this.badgeClassInum = badgeClassInum;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
+    public Date getExpires() {
+        return expires;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public void setExpires(Date expires) {
+        this.expires = expires;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public String getId() {
+        return id;
     }
 
-    public String getPicture() {
-        return picture;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setPicture(String picture) {
-        this.picture = picture;
+    public String getImage() {
+        return image;
     }
 
-    public String getDescription() {
-        return description;
+    public void setImage(String image) {
+        this.image = image;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public Date getIssuedOn() {
+        return issuedOn;
     }
 
-    public String getOwner() {
-        return owner;
+    public void setIssuedOn(Date issuedOn) {
+        this.issuedOn = issuedOn;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public String getRecipientIdentity() {
+        return recipientIdentity;
     }
 
-    public boolean isActive() {
-        return active;
+    public void setRecipientIdentity(String recipientIdentity) {
+        this.recipientIdentity = recipientIdentity;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public String getRecipientType() {
+        return recipientType;
     }
 
-    public Organizations getGluuAssociatedOrganizationDetail() {
-        return gluuAssociatedOrganizationDetail;
+    public void setRecipientType(String recipientType) {
+        this.recipientType = recipientType;
     }
 
-    public void setGluuAssociatedOrganizationDetail(Organizations gluuAssociatedOrganizationDetail) {
-        this.gluuAssociatedOrganizationDetail = gluuAssociatedOrganizationDetail;
+    public String getType() {
+        return type;
     }
 
-    public String getQrCode() {
-        return qrCode;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void setQrCode(String qrCode) {
-        this.qrCode = qrCode;
+    public String getVerificationType() {
+        return verificationType;
+    }
+
+    public void setVerificationType(String verificationType) {
+        this.verificationType = verificationType;
     }
 
     @Override
-    public String toString() {
-        return "Badges{" +
-                "displayName:'" + displayName + '\'' +
-                ", picture:'" + picture + '\'' +
-                ", qrCode:'" + qrCode + '\'' +
-                ", description:'" + description + '\'' +
-                ", owner:'" + owner + '\'' +
-                ", active:" + active +
-                ", inum:'" + inum + '\'' +
-                ", gluuAssociatedOrganization:'" + gluuAssociatedOrganization + '\'' +
-                ", gluuBadgeExpiryDate:" + gluuBadgeExpiryDate +
-                ", creationDate:" + creationDate +
-                ", gluuAssociatedOrganizationDetail:" + gluuAssociatedOrganizationDetail +
-                '}';
+    public String getDn() {
+        return dn;
+    }
+
+    @Override
+    public void setDn(String dn) {
+        this.dn = dn;
     }
 }

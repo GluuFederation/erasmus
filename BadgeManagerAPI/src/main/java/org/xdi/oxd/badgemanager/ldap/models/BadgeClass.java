@@ -13,13 +13,13 @@ import java.util.Date;
  */
 
 @LdapEntry
-@LdapObjectClass(values = {"top", "gluuBadgeInstance"})
-public class BadgeInstances {
+@LdapObjectClass(values = {"top", "gluuBadgeClass"})
+public class BadgeClass {
 
     @LdapDN
     private String dn;
 
-    @LdapAttribute(name = "type")
+    @LdapAttribute(name = "gluuType")
     String type;
 
     @LdapAttribute(name = "name")
@@ -28,7 +28,7 @@ public class BadgeInstances {
     @LdapAttribute(name = "description")
     String description;
 
-    @LdapAttribute(name = "image")
+    @LdapAttribute(name = "gluuImage")
     String image;
 
     @LdapAttribute(name = "inum")
@@ -37,13 +37,16 @@ public class BadgeInstances {
     @LdapAttribute(name = "creationDate")
     Date creationDate = new Date();
 
-    @LdapAttribute(name = "templateBadgeId")
+    @LdapAttribute(name = "gluuTemplateBadgeId")
     String templateBadgeId;
 
-    @LdapAttribute(name = "badgeRequestInum")
+    @LdapAttribute(name = "gluuBadgeRequestInum")
     String badgeRequestInum;
 
-    public BadgeInstances() {
+    @LdapAttribute(name = "gluuId")
+    String id;
+
+    public BadgeClass() {
     }
 
     public String getDescription() {
@@ -116,5 +119,13 @@ public class BadgeInstances {
 
     public void setBadgeRequestInum(String badgeRequestInum) {
         this.badgeRequestInum = badgeRequestInum;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

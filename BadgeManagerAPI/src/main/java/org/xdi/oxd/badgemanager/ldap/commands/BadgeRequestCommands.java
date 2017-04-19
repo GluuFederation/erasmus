@@ -38,7 +38,6 @@ public class BadgeRequestCommands {
 
         //Dynamic
         if (!(ldapEntryManager.contains("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")")))) {
-
             if (!ldapEntryManager.contains("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + badgeRequest.getGluuBadgeRequester() + ")(masterBadgeId=" + badgeRequest.getTemplateBadgeId() + "))"))) {
                 ldapEntryManager.persist(badgeRequest);
                 System.out.println("new badge request created");
@@ -66,7 +65,7 @@ public class BadgeRequestCommands {
         BadgeRequests badgeRequest = new BadgeRequests();
         badgeRequest.setDn("ou=badgeRequests, ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
-        return (ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(organization=" + id + ")(status=" + status + "))")));
+        return (ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuParticipant=" + id + ")(gluuStatus=" + status + "))")));
     }
 
     /**
@@ -128,7 +127,7 @@ public class BadgeRequestCommands {
      * @param status status
      * @return
      */
-    public static List<BadgeRequests> getApprovedBadgeRequests(LdapEntryManager ldapEntryManager, String email, String status) throws Exception {
+    public static List<BadgeRequests> getBadgeRequestsByStatus(LdapEntryManager ldapEntryManager, String email, String status) throws Exception {
 
         BadgeRequests badgeRequest = new BadgeRequests();
         badgeRequest.setDn("ou=badgeRequests, ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
