@@ -76,9 +76,26 @@ router.post('/getBadgeTemplatesByIssuer', (req, res, next) => {
       cat.forEach(function (ocat) {
         arr2[ocat] = [];
         org.approvedBadges.forEach(function (item) {
-          item._doc.participant = org._id;
           if (item.category.name == ocat) {
-            arr2[ocat].push(item);
+            const cat = {
+              id: process.env.BASE_URL + '/templateBadgeById/' + item._id,
+              name: item.name,
+              description: item.description,
+              image: item.image,
+              narrative: item.narrative,
+              type: item.type,
+              issuer: {
+                id: process.env.BASE_URL + '/getParticipantById/' + org._id,
+                name: org.name,
+                type: org.type,
+                url: process.env.BASE_URL,
+                verification: {
+                  allowedOrigins: process.env.BASE_URL,
+                  type: 'hosted'
+                }
+              }
+            };
+            arr2[ocat].push(cat);
           }
         });
       });
