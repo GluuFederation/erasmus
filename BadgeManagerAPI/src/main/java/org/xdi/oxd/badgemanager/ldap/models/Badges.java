@@ -52,6 +52,12 @@ public class Badges extends SimpleUser {
     @LdapAttribute(name = "gluuVerificationType")
     String verificationType;
 
+    @LdapAttribute(name = "gluuGUID")
+    String guid;
+
+    @LdapAttribute(name = "gluuKey")
+    String key;
+
     public Badges() {
     }
 
@@ -151,5 +157,21 @@ public class Badges extends SimpleUser {
     @Override
     public void setDn(String dn) {
         this.dn = dn;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

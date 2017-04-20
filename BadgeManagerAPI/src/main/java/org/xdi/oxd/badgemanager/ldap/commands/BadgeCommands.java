@@ -120,34 +120,40 @@ public class BadgeCommands {
                 List<Badges> badges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(inum=" + objBadges.getInum() + ")"));
 
                 if (badges.size() > 0) {
-                    objBadges= badges.get(0);
-                    BadgeResponse objBadge = new BadgeResponse();
-                    objBadge.setType(objBadges.getType());
-                    objBadge.setId(objBadges.getId());
-                    objBadge.setContext(objBadges.getContext());
-
-                    Recipient recipient = new Recipient();
-                    recipient.setType(objBadges.getRecipientType());
-                    recipient.setIdentity(objBadges.getRecipientIdentity());
-                    objBadge.setRecepient(recipient);
-
-                    objBadge.setIssuedOn(objBadges.getIssuedOn().toString());
-                    objBadge.setExpires(objBadges.getExpires().toString());
-
-                    BadgeVerification verification = new BadgeVerification();
-                    verification.setType(objBadges.getVerificationType());
-                    objBadge.setVerification(verification);
-
-                    BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseByInum(ldapEntryManager, objBadges.getBadgeClassInum());
-                    if (badge != null) {
-                        objBadge.setBadge(badge);
-                    }
-                    return objBadge;
+                    objBadges = badges.get(0);
+                    return GetBadgeResponse(ldapEntryManager, objBadges);
                 } else
                     return null;
             } else {
                 return null;
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves a badge by Id
+     *
+     * @param ldapEntryManager ldapEntryManager
+     * @param id               GUID of the badge
+     * @param key              key of the badge that is to be retrieved.
+     * @return
+     */
+    public static BadgeResponse getBadgeResponseById(LdapEntryManager ldapEntryManager, String id, String key) {
+        try {
+
+            Badges objBadges = new Badges();
+            objBadges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            List<Badges> lstBadges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuGUID=" + id + ")(gluuKey=" + key + "))"));
+
+            if (lstBadges.size() > 0) {
+                objBadges = lstBadges.get(0);
+                return GetBadgeResponse(ldapEntryManager, objBadges);
+            } else
+                return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -204,6 +210,37 @@ public class BadgeCommands {
         } catch (Exception e) {
             e.printStackTrace();
             throw new NotFoundException("No badge found");
+        }
+    }
+
+    private static BadgeResponse GetBadgeResponse(LdapEntryManager ldapEntryManager, Badges objBadges) {
+        try {
+            BadgeResponse objBadge = new BadgeResponse();
+            objBadge.setType(objBadges.getType());
+            objBadge.setId(objBadges.getId());
+            objBadge.setContext(objBadges.getContext());
+
+            Recipient recipient = new Recipient();
+            recipient.setType(objBadges.getRecipientType());
+            recipient.setIdentity(objBadges.getRecipientIdentity());
+            objBadge.setRecepient(recipient);
+
+            objBadge.setIssuedOn(objBadges.getIssuedOn().toString());
+            objBadge.setExpires(objBadges.getExpires().toString());
+
+            BadgeVerification verification = new BadgeVerification();
+            verification.setType(objBadges.getVerificationType());
+            objBadge.setVerification(verification);
+
+            BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseByInum(ldapEntryManager, objBadges.getBadgeClassInum());
+            if (badge != null) {
+                objBadge.setBadge(badge);
+            }
+
+            return objBadge;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 }

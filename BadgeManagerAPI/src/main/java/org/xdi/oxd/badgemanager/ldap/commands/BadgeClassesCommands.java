@@ -46,7 +46,7 @@ public class BadgeClassesCommands {
             if (!(ldapEntryManager.contains("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeClass.class, Filter.create("(inum=" + badges.getInum() + ")")))) {
                 if (!ldapEntryManager.contains("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeClass.class, Filter.create("(&(gluuBadgeRequestInum=" + badges.getBadgeRequestInum() + ")(gluuTemplateBadgeId=" + badges.getTemplateBadgeId() + "))"))) {
                     ldapEntryManager.persist(badges);
-                    System.out.println("New badge instance entry");
+                    System.out.println("New badge class entry");
                     return badges;
                 } else {
                     throw new Exception("Badge class already exists");
@@ -161,7 +161,7 @@ public class BadgeClassesCommands {
                     JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
 
                     if (jObjResponse != null) {
-                        criteria.setNarrative(jObjResponse.get("_id").getAsString());
+                        criteria.setNarrative(jObjResponse.get("narrative").getAsString());
                     }
 
                     objBadgeClass.setCriteria(criteria);
