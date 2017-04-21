@@ -52,10 +52,10 @@ public class Badges extends SimpleUser {
     @LdapAttribute(name = "gluuVerificationType")
     String verificationType;
 
-    @LdapAttribute(name = "gluuGUID")
+    @LdapAttribute(name = "gluuBadgeAssertionId")
     String guid;
 
-    @LdapAttribute(name = "gluuKey")
+    @LdapAttribute(name = "gluuBadgeAssertionKey")
     String key;
 
     public Badges() {

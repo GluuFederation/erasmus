@@ -117,6 +117,31 @@ public class BadgeClassesCommands {
     }
 
     /**
+     * Reterived a badge class by Id.
+     *
+     * @param ldapEntryManager ldapEntryManager.
+     * @param id               GUID of the badge class
+     * @param key              key of the badge class that is to be retrieved.
+     * @return
+     */
+    public static BadgeClassResponse getBadgeClassResponseById(LdapEntryManager ldapEntryManager, String id, String key) {
+        try {
+
+            BadgeClass badge = new BadgeClass();
+            badge.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            List<BadgeClass> badges = ldapEntryManager.findEntries(badge.getDn(), BadgeClass.class, Filter.create("(&(gluuBadgeClassId=" + id + ")(gluuBadgeClassKey=" + key + "))"));
+            if (badges.size() > 0)
+                return GetBadgeClassResponse(badges.get(0));
+            else
+                throw new NotFoundException("No such badge instance found");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new NotFoundException("No such badge instance found");
+        }
+    }
+
+    /**
      * Reterived a badge class by Inum.
      *
      * @param ldapEntryManager ldapEntryManager.
@@ -134,50 +159,7 @@ public class BadgeClassesCommands {
                 List<BadgeClass> badges = ldapEntryManager.findEntries(badge.getDn(), BadgeClass.class, Filter.create("(inum=" + badge.getInum() + ")"));
                 if (badges.size() > 0) {
                     badge = badges.get(0);
-                    BadgeClassResponse objBadgeClass = new BadgeClassResponse();
-                    objBadgeClass.setType(badge.getType());
-                    objBadgeClass.setId("https://example.org/badges/5");
-                    objBadgeClass.setName(badge.getName());
-                    objBadgeClass.setDescription(badge.getDescription());
-                    objBadgeClass.setImage(badge.getImage());
-                    Criteria criteria = new Criteria();
-                    Issuer issuer = new Issuer();
-                    Verification verification = new Verification();
-
-                    final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + badge.getTemplateBadgeId();
-
-                    DisableSSLCertificateCheckUtil.disableChecks();
-                    RestTemplate restTemplate = new RestTemplate();
-
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
-
-                    HttpEntity<String> request = new HttpEntity<>(headers);
-
-                    HttpEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
-
-                    String result = response.getBody();
-
-                    JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
-
-                    if (jObjResponse != null) {
-                        criteria.setNarrative(jObjResponse.get("narrative").getAsString());
-                    }
-
-                    objBadgeClass.setCriteria(criteria);
-
-                    issuer.setId("https://example.org/issuer");
-                    issuer.setType("Profile");
-                    issuer.setName("Example Maker Society");
-                    issuer.setUrl("https://example.org");
-                    issuer.setEmail("contact@example.org");
-
-                    verification.setAllowedOrigins("example.org");
-
-                    issuer.setVerification(verification);
-                    objBadgeClass.setIssuer(issuer);
-
-                    return objBadgeClass;
+                    return GetBadgeClassResponse(badge);
                 } else
                     throw new NotFoundException("No such badge class found");
             } else {
@@ -201,5 +183,58 @@ public class BadgeClassesCommands {
         badges.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
         return (ldapEntryManager.findEntries(badges.getDn(), BadgeClass.class, null));
+    }
+
+    private static BadgeClassResponse GetBadgeClassResponse(BadgeClass badge) {
+        try {
+            BadgeClassResponse objBadgeClass = new BadgeClassResponse();
+            objBadgeClass.setType(badge.getType());
+            objBadgeClass.setId(badge.getId());
+            objBadgeClass.setName(badge.getName());
+            objBadgeClass.setDescription(badge.getDescription());
+            objBadgeClass.setImage(badge.getImage());
+            Criteria criteria = new Criteria();
+            Issuer issuer = new Issuer();
+            Verification verification = new Verification();
+
+            final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + badge.getTemplateBadgeId();
+
+            DisableSSLCertificateCheckUtil.disableChecks();
+            RestTemplate restTemplate = new RestTemplate();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
+
+            HttpEntity<String> request = new HttpEntity<>(headers);
+
+            HttpEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
+
+            String result = response.getBody();
+
+            JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
+
+            if (jObjResponse != null) {
+                criteria.setNarrative(jObjResponse.get("narrative").getAsString());
+            }
+
+            objBadgeClass.setCriteria(criteria);
+
+            issuer.setId("https://example.org/issuer");
+            issuer.setType("Profile");
+            issuer.setName("Example Maker Society");
+            issuer.setUrl("https://example.org");
+            issuer.setEmail("contact@example.org");
+
+            verification.setAllowedOrigins("example.org");
+
+            issuer.setVerification(verification);
+            objBadgeClass.setIssuer(issuer);
+
+            return objBadgeClass;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.out.print("Exception in retrieving badge class response: " + ex.getMessage());
+            return null;
+        }
     }
 }

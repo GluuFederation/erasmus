@@ -4,9 +4,9 @@ package org.xdi.oxd.badgemanager.model;
  * Created by Arvind Tomar on 19/4/17.
  */
 public class BadgeResponse {
-    private String context, id, type, issuedOn, expires;
+    private String context, id, type, issuedOn, expires, image;
 
-    private Recipient recepient;
+    private Recipient recipient;
 
     private BadgeVerification verification;
 
@@ -44,12 +44,12 @@ public class BadgeResponse {
         this.issuedOn = issuedOn;
     }
 
-    public Recipient getRecepient() {
-        return recepient;
+    public Recipient getRecipient() {
+        return recipient;
     }
 
-    public void setRecepient(Recipient recepient) {
-        this.recepient = recepient;
+    public void setRecipient(Recipient recipient) {
+        this.recipient = recipient;
     }
 
     public BadgeVerification getVerification() {
@@ -74,5 +74,13 @@ public class BadgeResponse {
 
     public void setExpires(String expires) {
         this.expires = expires;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

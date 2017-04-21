@@ -147,11 +147,10 @@ public class BadgeCommands {
             Badges objBadges = new Badges();
             objBadges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
-            List<Badges> lstBadges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuGUID=" + id + ")(gluuKey=" + key + "))"));
+            List<Badges> lstBadges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + ")(gluuBadgeAssertionKey=" + key + "))"));
 
             if (lstBadges.size() > 0) {
-                objBadges = lstBadges.get(0);
-                return GetBadgeResponse(ldapEntryManager, objBadges);
+                return GetBadgeResponse(ldapEntryManager, lstBadges.get(0));
             } else
                 return null;
         } catch (Exception e) {
@@ -219,11 +218,12 @@ public class BadgeCommands {
             objBadge.setType(objBadges.getType());
             objBadge.setId(objBadges.getId());
             objBadge.setContext(objBadges.getContext());
+            objBadge.setImage(objBadges.getImage());
 
             Recipient recipient = new Recipient();
             recipient.setType(objBadges.getRecipientType());
             recipient.setIdentity(objBadges.getRecipientIdentity());
-            objBadge.setRecepient(recipient);
+            objBadge.setRecipient(recipient);
 
             objBadge.setIssuedOn(objBadges.getIssuedOn().toString());
             objBadge.setExpires(objBadges.getExpires().toString());

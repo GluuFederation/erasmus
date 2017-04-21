@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import io.swagger.annotations.Api;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -13,18 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.LDAPInitializer;
-import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
-import org.xdi.oxd.badgemanager.ldap.commands.BadgeRequestCommands;
-import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
-import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
-import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 
@@ -40,6 +34,9 @@ public class BadgeController implements LDAPInitializer.ldapConnectionListner {
     boolean isConnected = false;
     LdapEntryManager ldapEntryManager;
     LDAPInitializer ldapInitializer = new LDAPInitializer(BadgeController.this);
+
+    @Autowired
+    public RedisTemplate<Object, Object> redisTemplate;
 
     @RequestMapping(value = "listTemplateBadges/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTemplateBadgesByParticipant(@RequestParam String accessToken, @RequestParam String type, HttpServletResponse response) {
@@ -72,10 +69,10 @@ public class BadgeController implements LDAPInitializer.ldapConnectionListner {
             String issuer = "https://ce-dev2.gluu.org";
 
             String hostName = InetAddress.getLocalHost().getHostName();
-            System.out.print("hostname:"+InetAddress.getLocalHost().getHostName());
-            System.out.print("canonical hostname:"+InetAddress.getLocalHost().getCanonicalHostName());
-            System.out.print("host address:"+InetAddress.getLocalHost().getHostAddress());
-            System.out.print("address:"+InetAddress.getLocalHost().getAddress().toString());
+            System.out.print("hostname:" + InetAddress.getLocalHost().getHostName());
+            System.out.print("canonical hostname:" + InetAddress.getLocalHost().getCanonicalHostName());
+            System.out.print("host address:" + InetAddress.getLocalHost().getHostAddress());
+            System.out.print("address:" + InetAddress.getLocalHost().getAddress().toString());
 
             IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, type);
 
@@ -145,9 +142,47 @@ public class BadgeController implements LDAPInitializer.ldapConnectionListner {
     }
 
     @RequestMapping(value = "verify/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String verifyBadge(@PathVariable String id, @RequestParam(value="key") String key, HttpServletResponse response) {
+    public String verifyBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
+
+        //Dynamic
+        if (isConnected) {
+            try {
+                BadgeResponse badge = BadgeCommands.getBadgeResponseById(ldapEntryManager, id, key);
+                if (badge != null) {
+                    jsonResponse.addProperty("error", false);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    return GsonService.getGson().toJson(badge);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "No such badge found");
+                    return jsonResponse.toString();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                jsonResponse.addProperty("error", e.getMessage());
+                return jsonResponse.toString();
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.addProperty("error", "Please try after some time");
+            return jsonResponse.toString();
+        }
+    }
+
+    @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletResponse response) {
+
+        JsonObject jsonResponse = new JsonObject();
+
+        if (redisTemplate.opsForValue().get(id + key) == null) {
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "Oops!! Badge link expired");
+            return jsonResponse.toString();
+        }
 
         //Dynamic
         if (isConnected) {

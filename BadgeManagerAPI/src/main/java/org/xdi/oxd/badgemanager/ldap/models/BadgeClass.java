@@ -46,6 +46,12 @@ public class BadgeClass {
     @LdapAttribute(name = "gluuId")
     String id;
 
+    @LdapAttribute(name = "gluuBadgeClassId")
+    String guid;
+
+    @LdapAttribute(name = "gluuBadgeClassKey")
+    String key;
+
     public BadgeClass() {
     }
 
@@ -127,5 +133,21 @@ public class BadgeClass {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

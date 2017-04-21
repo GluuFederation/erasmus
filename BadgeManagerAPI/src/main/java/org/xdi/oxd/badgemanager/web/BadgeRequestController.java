@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import org.apache.commons.lang.WordUtils;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,20 +27,20 @@ import org.xdi.oxd.badgemanager.model.CreateBadgeResponse;
 import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
 import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
+import org.xdi.oxd.badgemanager.util.JWTUtil;
 import org.xdi.oxd.badgemanager.util.Utils;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.xdi.oxd.badgemanager.qrcode.decorator.ColoredQRCode.colorizeQRCode;
 import static org.xdi.oxd.badgemanager.qrcode.decorator.ImageOverlay.addImageOverlay;
@@ -59,12 +60,20 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
         this.context = context;
     }
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     private HttpServletRequest request;
 
     boolean isConnected = false;
     LdapEntryManager ldapEntryManager;
     LDAPInitializer ldapInitializer = new LDAPInitializer(BadgeRequestController.this);
+
+    @Autowired
+    public RedisTemplate<Object, Object> redisTemplate;
+
+    public void saveRedis(String key, String value, int timeout) throws IOException {
+        redisTemplate.opsForValue().set(key, value);
+        redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+    }
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String createBadgeRequest(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody CreateBadgeRequest badgeRequest, HttpServletResponse response) {
@@ -211,12 +220,6 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
 //        }
 
         //Dynamic
-
-        System.out.print("request url: "+request.getRequestURL());
-        System.out.print("request uri: "+request.getRequestURI());
-        System.out.println("Host = " + request.getServerName());
-        System.out.println("Port = " + request.getServerPort());
-        System.out.println("Scheme = " + request.getScheme());
 
         if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -384,6 +387,10 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
                     objBadgeClass.setDescription(jObjResponse.get("description").getAsString());
                     objBadgeClass.setBadgeRequestInum(objBadgeRequest.getInum());
                     objBadgeClass.setImage(jObjResponse.get("image").getAsString());
+                    objBadgeClass.setGuid(Utils.generateRandomGUID());
+                    objBadgeClass.setKey(Utils.generateRandomKey(12));
+
+                    objBadgeClass.setId(Utils.getBaseURL(servletRequest) + "/badgeClass/" + objBadgeClass.getGuid() + "?key=" + objBadgeClass.getKey());
 
                     objBadgeClass = BadgeClassesCommands.createBadgeClass(ldapEntryManager, objBadgeClass);
 
@@ -391,10 +398,9 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
                         //Create actual badge entry(badge assertion)
                         Badges objBadge = new Badges();
                         objBadge.setContext("https://w3id.org/openbadges/v2");
-                        objBadge.setId("https://example.org/assertions/123");
                         objBadge.setType("Assertion");
-                        objBadge.setRecipientType("email");
-                        objBadge.setRecipientIdentity(objBadgeRequest.getGluuBadgeRequester());
+                        objBadge.setRecipientType("text");
+                        objBadge.setRecipientIdentity(JWTUtil.generateJWT("{\"email\":\"test_user@test.org\",\"email_verified\":\"true\",\"sub\":\"K6sBjQkZQl3RP-XILa1gLa2k211zv4BgoVJCtvfRZjA\",\"zoneinfo\":\"America/Chicago\",\"nickname\":\"user\",\"website\":\"http://www.gluu.org\",\"middle_name\":\"User\",\"locale\":\"en-US\",\"preferred_username\":\"user\",\"given_name\":\"Test\",\"picture\":\"http://www.gluu.org/wp-content/uploads/2012/04/mike3.png\",\"updated_at\":\"20170224125915.538Z\",\"name\":\"oxAuth Test User\",\"birthdate\":\"1983-1-6\",\"family_name\":\"User\",\"gender\":\"Male\",\"profile\":\"http://www.mywebsite.com/profile\"}"));
                         objBadge.setVerificationType("hosted");
                         objBadge.setBadgeClassInum(objBadgeClass.getInum());
                         objBadge.setGuid(Utils.generateRandomGUID());
@@ -402,7 +408,11 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
 
                         objBadge.setId(Utils.getBaseURL(servletRequest) + "/badges/verify/" + objBadge.getGuid() + "?key=" + objBadge.getKey());
 
-                        if (generateQrCode(objBadge, objBadgeClass.getImage(), 250, "png")) {
+                        String tempURL = Utils.getBaseURL(servletRequest) + "/badges/" + objBadge.getGuid() + "?key=" + objBadge.getKey();
+                        String redisKey = objBadge.getGuid() + objBadge.getKey();
+                        saveRedis(redisKey, tempURL, 90);
+
+                        if (generateQrCode(objBadge, objBadgeClass.getImage(), tempURL, 250, "png")) {
                             System.out.print("QR Code generated successfully");
                         } else {
                             System.out.print("Failed to generate QR Code");
@@ -423,7 +433,7 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
                 }
             }
         } catch (Exception ex) {
-            System.out.print("Exception in insert badge instance entry:" + ex.getMessage());
+            System.out.print("Exception in insert badge assertion entry:" + ex.getMessage());
             ex.printStackTrace();
             return false;
         }
@@ -435,15 +445,15 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
      * OutputStream where the image data can be written.
      *
      * @param badge       The  badge object from which content should be encoded with the QR-code.
-     * @param qrCodeSize  The QR-code must be quadratic. So this is the number of pixel
+     * @param tempURL
+     *@param qrCodeSize  The QR-code must be quadratic. So this is the number of pixel
      *                    in width and height.
      * @param imageFormat The image format in which the image should be rendered. As
-     *                    Example 'png' or 'jpg'. See @javax.imageio.ImageIO for more
-     *                    information which image formats are supported.
-     * @throws Exception If an Exception occur during the create of the QR-code or
+ *                    Example 'png' or 'jpg'. See @javax.imageio.ImageIO for more
+ *                    information which image formats are supported.   @throws Exception If an Exception occur during the create of the QR-code or
      *                   while writing the data into the OutputStream.
      */
-    private boolean generateQrCode(Badges badge, String logoFileURL, int qrCodeSize, String imageFormat) {
+    private boolean generateQrCode(Badges badge, String logoFileURL, String tempURL, int qrCodeSize, String imageFormat) {
         try {
 
             float TRANSPARENCY = 0.75f;
@@ -456,16 +466,16 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
             String fileName = location + File.separator + System.currentTimeMillis() + ".png";
 
             //logo file
-//            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
+            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
 
             //barcode data
-            String data = WordUtils.capitalizeFully("test data");
+//            String data = WordUtils.capitalizeFully("test data");
 
             QRCBuilder<BufferedImage> qrCodeBuilder = new ZXingQRCodeBuilder();
             qrCodeBuilder.newQRCode()
                     .withSize(qrCodeSize, qrCodeSize)
                     .and()
-                    .withData(data)
+                    .withData(tempURL)
                     .and()
                     .decorate(colorizeQRCode(new Color(51, 102, 153)))
                     .and()

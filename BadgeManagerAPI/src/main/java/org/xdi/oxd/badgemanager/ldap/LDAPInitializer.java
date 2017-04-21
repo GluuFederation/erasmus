@@ -20,12 +20,6 @@ import java.util.Properties;
  */
 public class LDAPInitializer {
 
-    //Local
-//    private static String fileName = "src/main/resources/ecs-oxauth-ldap.properties";
-    //Server
-    private static String fileName = "classpath:/WEB-INF/classes/ecs-oxauth-ldap.properties";
-//    private static String fileName = "src/main/java/org/xdi/oxd/badgemanager/ldap/ecs-oxauth-ldap.properties";
-
     private static String configId = "";
     private static String userName = "cn=directory manager,o=gluu";
     private static String bindDN = "cn=directory manager,o=gluu";
@@ -77,27 +71,6 @@ public class LDAPInitializer {
 
     private static Properties prepareAuthConnectionProperties(GluuLdapConfiguration ldapAuthConfig) {
 
-        FileConfiguration configuration = new FileConfiguration(fileName,true);
-//        PropertiesConfiguration propertiesConfig;
-//        try {
-//            propertiesConfig= new  org.apache.commons.configuration.PropertiesConfiguration(fileName);
-//        } catch (ConfigurationException e) {
-//            e.printStackTrace();
-//            System.out.println("Configuration exception:"+e.getMessage());
-//        }
-
-//        URL resource = LDAPInitializer.class.getResource("ecs-oxauth-ldap.properties");
-//        PropertiesConfiguration config;
-//        try {
-//            config = new PropertiesConfiguration(resource.getPath());
-//        } catch (ConfigurationException e) {
-//            e.printStackTrace();
-//        }
-
-//        FileConfiguration configuration = new FileConfiguration(resource.getPath(),true);
-//        System.out.print("Ldap properties file path is:"+resource.getPath());
-
-//        Properties properties = (Properties) configuration.getProperties().clone();
         Properties properties = new Properties();
         if (ldapAuthConfig != null) {
                 properties.setProperty("servers", servers); //"localhost:1636");//buildServersString(ldapAuthConfig.getServers()));

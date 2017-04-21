@@ -9,12 +9,10 @@ import org.springframework.web.client.RestTemplate;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.LDAPInitializer;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
+import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
-import org.xdi.oxd.badgemanager.model.BadgeClassResponse;
-import org.xdi.oxd.badgemanager.model.Criteria;
-import org.xdi.oxd.badgemanager.model.Issuer;
-import org.xdi.oxd.badgemanager.model.Verification;
+import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +23,7 @@ import java.util.List;
  */
 @CrossOrigin
 @RestController
-@RequestMapping("/badge/instance")
+@RequestMapping("/badgeClass/")
 public class BadgeClassController implements LDAPInitializer.ldapConnectionListner {
 
     boolean isConnected = false;
@@ -33,31 +31,30 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
 
     LDAPInitializer ldapInitializer = new LDAPInitializer(BadgeClassController.this);
 
-    //@RequestMapping(value = "/{id:.+}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    public String updateBadgeInstance(@PathVariable String id, @RequestBody BadgeClass badges, HttpServletResponse response) {
-//
-//        JsonObject jsonResponse = new JsonObject();
-//        badges.setInum(id);
-//        if (isConnected) {
-//            try {
-//                BadgeClassesCommands.updateBadge(ldapEntryManager, badges);
-//                jsonResponse.addProperty("success", "Badge instance updated successfully");
-//                return jsonResponse.toString();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//                jsonResponse.addProperty("error", e.getMessage());
-//                return jsonResponse.toString();
-//            }
-//
-//        } else {
-//            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//            jsonResponse.addProperty("error", "Please try after some time");
-//            return jsonResponse.toString();
-//        }
-//    }
+    @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getBadgeClass(@PathVariable String id, @RequestParam(value="key") String key, HttpServletResponse response) {
 
-    @RequestMapping(value = "/{inum:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+        JsonObject jsonResponse = new JsonObject();
+
+        //Dynamic
+        if (isConnected) {
+            try {
+                BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(ldapEntryManager, id, key);
+                return returnResponse(badge,response,"No such badge found");
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                jsonResponse.addProperty("error", e.getMessage());
+                return jsonResponse.toString();
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.addProperty("error", "Please try after some time");
+            return jsonResponse.toString();
+        }
+    }
+
+//    @RequestMapping(value = "/{inum:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getBadgeClassByInum(@PathVariable String inum, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
@@ -275,80 +272,6 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
 //        }
     }
 
-    @RequestMapping(value = "verify/{accessToken:.+}/{inum:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String verifyBadge(@PathVariable String accessToken, @PathVariable String inum, HttpServletResponse response) {
-
-        JsonObject jsonResponse = new JsonObject();
-
-        try {
-//            Static
-            String result = " {\n" +
-                    "    \"type\": \"BadgeClass\",\n" +
-                    "    \"id\": \"https://example.org/badges/5\",\n" +
-                    "    \"name\": \"Emergency Medical Technician-Basic\",\n" +
-                    "    \"description\": \"EMT-Basic training requires about 100 hours of instruction, including practice in a hospital or ambulance\",\n" +
-                    "    \"image\": \"https://example.org/badges/5/image\",\n" +
-                    "    \"criteria\": {\n" +
-                    "      \"narrative\": \"EMT-Basic students must pass an exam testing the ability to assess patient condition, handle trauma or cardiac emergencies and clear blocked airways. They also learn to immobilize injured patients and give oxygen. \"\n" +
-                    "    },\n" +
-                    "    \"issuer\": {\n" +
-                    "      \"id\": \"https://example.org/issuer\",\n" +
-                    "      \"type\": \"Profile\",\n" +
-                    "      \"name\": \"National Registry of Emergency Medical Technicians-state specific\",\n" +
-                    "      \"url\": \"https://example.org\",\n" +
-                    "      \"email\": \"contact@example.org\",\n" +
-                    "      \"verification\": {\n" +
-                    "         \"allowedOrigins\": \"example.org\"\n" +
-                    "      }\n" +
-                    "    }\n" +
-                    "  }";
-
-            JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
-
-            if (jObjResponse != null) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                jsonResponse.add("badge", GsonService.getGson().toJsonTree(jObjResponse));
-                jsonResponse.addProperty("error", false);
-                jsonResponse.addProperty("responseMsg", "Badge verified successfully");
-                return jsonResponse.toString();
-            } else {
-                response.setStatus(HttpServletResponse.SC_OK);
-                jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("responseMsg", "Badge verification failed");
-                return jsonResponse.toString();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            jsonResponse.addProperty("error", e.getMessage());
-            return jsonResponse.toString();
-        }
-
-        //Dynamic
-//        if (isConnected) {
-//            try {
-//                BadgeClass badges = BadgeClassesCommands.getBadgeClassByInum(ldapEntryManager, id);
-//                if (badges != null) {
-//                    response.setStatus(HttpServletResponse.SC_OK);
-//                    return GsonService.getGson().toJson(badges);
-//                } else {
-//                    response.setStatus(HttpServletResponse.SC_CONFLICT);
-//                    jsonResponse.addProperty("error", "No such badge found");
-//                    return jsonResponse.toString();
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                response.setStatus(HttpServletResponse.SC_CONFLICT);
-//                jsonResponse.addProperty("error", e.getMessage());
-//                return jsonResponse.toString();
-//            }
-//        } else {
-//            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//            jsonResponse.addProperty("error", "Please try after some time");
-//            return jsonResponse.toString();
-//        }
-    }
-
     //    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getBadgeInstances(HttpServletResponse response) {
         JsonObject jsonResponse = new JsonObject();
@@ -397,6 +320,20 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
         } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", "Please try after some time");
+            return jsonResponse.toString();
+        }
+    }
+
+    private String returnResponse(BadgeClassResponse badge, HttpServletResponse response, String errorMsg){
+        JsonObject jsonResponse = new JsonObject();
+        if (badge != null) {
+            jsonResponse.addProperty("error", false);
+            response.setStatus(HttpServletResponse.SC_OK);
+            return GsonService.getGson().toJson(badge);
+        } else {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", errorMsg);
             return jsonResponse.toString();
         }
     }
