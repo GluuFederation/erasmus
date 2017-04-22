@@ -3,13 +3,10 @@ package org.xdi.oxd.badgemanager.ldap;
 import org.gluu.site.ldap.LDAPConnectionProvider;
 import org.gluu.site.ldap.OperationsFacade;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
-import org.springframework.boot.SpringApplication;
 import org.xdi.model.ldap.GluuLdapConfiguration;
-import org.xdi.oxd.badgemanager.OxdSpringApplication;
 import org.xdi.oxd.badgemanager.config.DefaultConfig;
 import org.xdi.oxd.badgemanager.ldap.commands.ServerCommands;
 import org.xdi.util.StringHelper;
-import org.xdi.util.properties.FileConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +20,9 @@ public class LDAPInitializer {
     private static String configId = "";
     private static String userName = "cn=directory manager,o=gluu";
     private static String bindDN = "cn=directory manager,o=gluu";
+//    Server
+//    private static String bindPassword = "ldapsu";
+//    Local
     private static String bindPassword = "admin";
     private static String servers = "localhost:1636";
     private static List<String> serversStringsList = new ArrayList<String>() {{

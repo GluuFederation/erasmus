@@ -51,9 +51,9 @@ public class Utils {
     public static String getBaseURL(HttpServletRequest request) {
         String url;
         if (request.getServerPort() == 80 || request.getServerPort() == 443) {
-            url = request.getScheme() + "://" + request.getServerName();
+            url = request.getScheme() + "://" + request.getServerName()+request.getContextPath();
         } else {
-            url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()+request.getContextPath();
         }
         return url;
     }

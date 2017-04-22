@@ -3,7 +3,6 @@ package org.xdi.oxd.badgemanager.web;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.swagger.annotations.Api;
-import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -13,9 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.xdi.oxd.badgemanager.global.Global;
-import org.xdi.oxd.badgemanager.ldap.LDAPInitializer;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
+import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 
@@ -29,11 +28,7 @@ import java.net.InetAddress;
 @RestController
 @Api(basePath = "/badges", description = "badges apis")
 @RequestMapping("/badges")
-public class BadgeController implements LDAPInitializer.ldapConnectionListner {
-
-    boolean isConnected = false;
-    LdapEntryManager ldapEntryManager;
-    LDAPInitializer ldapInitializer = new LDAPInitializer(BadgeController.this);
+public class BadgeController  {
 
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
@@ -117,9 +112,9 @@ public class BadgeController implements LDAPInitializer.ldapConnectionListner {
         //Static
 
         //Dynamic
-        if (isConnected) {
+        if (LDAPService.isConnected()) {
             try {
-                BadgeResponse objBadge = BadgeCommands.getBadgeResponseByInum(ldapEntryManager, inum);
+                BadgeResponse objBadge = BadgeCommands.getBadgeResponseByInum(LDAPService.ldapEntryManager, inum);
                 if (objBadge != null) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     return GsonService.getGson().toJson(objBadge);
@@ -147,9 +142,9 @@ public class BadgeController implements LDAPInitializer.ldapConnectionListner {
         JsonObject jsonResponse = new JsonObject();
 
         //Dynamic
-        if (isConnected) {
+        if (LDAPService.isConnected()) {
             try {
-                BadgeResponse badge = BadgeCommands.getBadgeResponseById(ldapEntryManager, id, key);
+                BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key);
                 if (badge != null) {
                     jsonResponse.addProperty("error", false);
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -185,9 +180,9 @@ public class BadgeController implements LDAPInitializer.ldapConnectionListner {
         }
 
         //Dynamic
-        if (isConnected) {
+        if (LDAPService.connected) {
             try {
-                BadgeResponse badge = BadgeCommands.getBadgeResponseById(ldapEntryManager, id, key);
+                BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key);
                 if (badge != null) {
                     jsonResponse.addProperty("error", false);
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -208,14 +203,6 @@ public class BadgeController implements LDAPInitializer.ldapConnectionListner {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", "Please try after some time");
             return jsonResponse.toString();
-        }
-    }
-
-    @Override
-    public void ldapConnected(boolean isConnected, LdapEntryManager ldapEntryManager) {
-        if (isConnected) {
-            this.ldapEntryManager = ldapEntryManager;
-            this.isConnected = isConnected;
         }
     }
 }

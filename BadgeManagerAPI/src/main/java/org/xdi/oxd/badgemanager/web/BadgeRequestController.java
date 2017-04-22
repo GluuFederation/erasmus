@@ -2,7 +2,6 @@ package org.xdi.oxd.badgemanager.web;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.commons.lang.WordUtils;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,6 +20,7 @@ import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
+import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.ApproveBadge;
 import org.xdi.oxd.badgemanager.model.CreateBadgeRequest;
 import org.xdi.oxd.badgemanager.model.CreateBadgeResponse;
@@ -51,7 +51,7 @@ import static org.xdi.oxd.badgemanager.qrcode.decorator.ImageOverlay.addImageOve
 @CrossOrigin
 @RestController
 @RequestMapping("/badges/request")
-public class BadgeRequestController implements LDAPInitializer.ldapConnectionListner {
+public class BadgeRequestController {
 
     private final ServletContext context;
 
@@ -62,10 +62,6 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
 
     @Autowired(required = true)
     private HttpServletRequest request;
-
-    boolean isConnected = false;
-    LdapEntryManager ldapEntryManager;
-    LDAPInitializer ldapInitializer = new LDAPInitializer(BadgeRequestController.this);
 
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
@@ -95,7 +91,7 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
 //        }
 
         //Dynamic
-        if (isConnected) {
+        if (LDAPService.isConnected()) {
             try {
 
                 BadgeRequests objBadgeRequest = new BadgeRequests();
@@ -104,7 +100,7 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
                 objBadgeRequest.setTemplateBadgeId(badgeRequest.getTemplateBadgeId());
                 objBadgeRequest.setTemplateBadgeTitle(badgeRequest.getTemplateBadgeTitle());
 
-                CreateBadgeResponse objBadgeResponse = BadgeRequestCommands.createBadgeRequestNew(ldapEntryManager, objBadgeRequest);
+                CreateBadgeResponse objBadgeResponse = BadgeRequestCommands.createBadgeRequestNew(LDAPService.ldapEntryManager, objBadgeRequest);
                 if (objBadgeResponse != null) {
                     jsonResponse.add("badgeRequest", GsonService.getGson().toJsonTree(objBadgeResponse));
                     jsonResponse.addProperty("error", false);
@@ -177,9 +173,9 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
             return jsonResponse.toString();
         }
 
-        if (isConnected) {
+        if (LDAPService.isConnected()) {
             try {
-                List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getPendingBadgeRequestsNew(ldapEntryManager, participant, "Pending");
+                List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getPendingBadgeRequestsNew(LDAPService.ldapEntryManager, participant, "Pending");
                 if (lstBadgeRequests.size() > 0) {
                     jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
                     jsonResponse.addProperty("error", false);
@@ -227,7 +223,7 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
             return jsonResponse.toString();
         }
 
-        if (isConnected) {
+        if (LDAPService.isConnected()) {
             boolean isUpdated;
             try {
 
@@ -236,7 +232,7 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
                 badgeRequest.setStatus("Approved");
                 badgeRequest.setValidity(approveBadge.getValidity());
 
-                isUpdated = BadgeRequestCommands.updateBadgeRequest(ldapEntryManager, badgeRequest);
+                isUpdated = BadgeRequestCommands.updateBadgeRequest(LDAPService.ldapEntryManager, badgeRequest);
                 if (isUpdated) {
                     jsonResponse.addProperty("responseMsg", "Badge request approved successfully");
                     createBadgeClass(request, approveBadge.getInum());
@@ -299,15 +295,10 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
 //        }
 
         //Dynamic
-        LDAPInitializer ldapInitializer = new LDAPInitializer((isConnected, ldapEntryManager) -> {
-            this.isConnected = isConnected;
-            this.ldapEntryManager = ldapEntryManager;
-        });
-
-        if (isConnected) {
+        if (LDAPService.isConnected()) {
             try {
                 String email = accessToken;
-                List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(ldapEntryManager, email, "Approved");
+                List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, "Approved");
                 if (lstBadgeRequests.size() > 0) {
                     jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
                     jsonResponse.addProperty("error", false);
@@ -357,81 +348,87 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
 //
 //            return true;
 
-            BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(ldapEntryManager, badgeRequestInum);
-            if (objBadgeRequest != null) {
+            if(LDAPService.isConnected()){
+                BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequestInum);
+                if (objBadgeRequest != null) {
 
-                final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + objBadgeRequest.getTemplateBadgeId();
+                    final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + objBadgeRequest.getTemplateBadgeId();
 
-                DisableSSLCertificateCheckUtil.disableChecks();
-                RestTemplate restTemplate = new RestTemplate();
+                    DisableSSLCertificateCheckUtil.disableChecks();
+                    RestTemplate restTemplate = new RestTemplate();
 
-                HttpHeaders headers = new HttpHeaders();
-                headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
 
-                HttpEntity<String> request = new HttpEntity<>(headers);
-                HttpEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
+                    HttpEntity<String> request = new HttpEntity<>(headers);
+                    HttpEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
 
-                String result = response.getBody();
+                    String result = response.getBody();
 
-                JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
-                if (jObjResponse != null) {
-                    if (jObjResponse.has("message") && jObjResponse.get("message").getAsString().equalsIgnoreCase("Badge not found")) {
-                        System.out.print("Unable to persist badge class entry. reason is:" + jObjResponse.get("message").getAsString());
-                        return false;
-                    }
-
-                    BadgeClass objBadgeClass = new BadgeClass();
-                    objBadgeClass.setTemplateBadgeId(jObjResponse.get("_id").getAsString());
-                    objBadgeClass.setName(jObjResponse.get("name").getAsString());
-                    objBadgeClass.setType("BadgeClass");
-                    objBadgeClass.setDescription(jObjResponse.get("description").getAsString());
-                    objBadgeClass.setBadgeRequestInum(objBadgeRequest.getInum());
-                    objBadgeClass.setImage(jObjResponse.get("image").getAsString());
-                    objBadgeClass.setGuid(Utils.generateRandomGUID());
-                    objBadgeClass.setKey(Utils.generateRandomKey(12));
-
-                    objBadgeClass.setId(Utils.getBaseURL(servletRequest) + "/badgeClass/" + objBadgeClass.getGuid() + "?key=" + objBadgeClass.getKey());
-
-                    objBadgeClass = BadgeClassesCommands.createBadgeClass(ldapEntryManager, objBadgeClass);
-
-                    if (objBadgeClass.getInum() != null) {
-                        //Create actual badge entry(badge assertion)
-                        Badges objBadge = new Badges();
-                        objBadge.setContext("https://w3id.org/openbadges/v2");
-                        objBadge.setType("Assertion");
-                        objBadge.setRecipientType("text");
-                        objBadge.setRecipientIdentity(JWTUtil.generateJWT("{\"email\":\"test_user@test.org\",\"email_verified\":\"true\",\"sub\":\"K6sBjQkZQl3RP-XILa1gLa2k211zv4BgoVJCtvfRZjA\",\"zoneinfo\":\"America/Chicago\",\"nickname\":\"user\",\"website\":\"http://www.gluu.org\",\"middle_name\":\"User\",\"locale\":\"en-US\",\"preferred_username\":\"user\",\"given_name\":\"Test\",\"picture\":\"http://www.gluu.org/wp-content/uploads/2012/04/mike3.png\",\"updated_at\":\"20170224125915.538Z\",\"name\":\"oxAuth Test User\",\"birthdate\":\"1983-1-6\",\"family_name\":\"User\",\"gender\":\"Male\",\"profile\":\"http://www.mywebsite.com/profile\"}"));
-                        objBadge.setVerificationType("hosted");
-                        objBadge.setBadgeClassInum(objBadgeClass.getInum());
-                        objBadge.setGuid(Utils.generateRandomGUID());
-                        objBadge.setKey(Utils.generateRandomKey(12));
-
-                        objBadge.setId(Utils.getBaseURL(servletRequest) + "/badges/verify/" + objBadge.getGuid() + "?key=" + objBadge.getKey());
-
-                        String tempURL = Utils.getBaseURL(servletRequest) + "/badges/" + objBadge.getGuid() + "?key=" + objBadge.getKey();
-                        String redisKey = objBadge.getGuid() + objBadge.getKey();
-                        saveRedis(redisKey, tempURL, 90);
-
-                        if (generateQrCode(objBadge, objBadgeClass.getImage(), tempURL, 250, "png")) {
-                            System.out.print("QR Code generated successfully");
-                        } else {
-                            System.out.print("Failed to generate QR Code");
-                        }
-
-                        objBadge = BadgeCommands.createBadge(ldapEntryManager, objBadge);
-
-                        if (objBadge.getInum() != null) {
-                            return true;
-                        } else {
-                            System.out.print("Unable to persist badge entry");
+                    JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
+                    if (jObjResponse != null) {
+                        if (jObjResponse.has("message") && jObjResponse.get("message").getAsString().equalsIgnoreCase("Badge not found")) {
+                            System.out.print("Unable to persist badge class entry. reason is:" + jObjResponse.get("message").getAsString());
                             return false;
                         }
-                    } else {
-                        System.out.print("Unable to persist badge entry. reason is: badge class not persisted");
-                        return false;
+
+                        BadgeClass objBadgeClass = new BadgeClass();
+                        objBadgeClass.setTemplateBadgeId(jObjResponse.get("_id").getAsString());
+                        objBadgeClass.setName(jObjResponse.get("name").getAsString());
+                        objBadgeClass.setType("BadgeClass");
+                        objBadgeClass.setDescription(jObjResponse.get("description").getAsString());
+                        objBadgeClass.setBadgeRequestInum(objBadgeRequest.getInum());
+                        objBadgeClass.setImage(jObjResponse.get("image").getAsString());
+                        objBadgeClass.setGuid(Utils.generateRandomGUID());
+                        objBadgeClass.setKey(Utils.generateRandomKey(12));
+
+                        objBadgeClass.setId(Utils.getBaseURL(servletRequest) + "/badgeClass/" + objBadgeClass.getGuid() + "?key=" + objBadgeClass.getKey());
+
+                        objBadgeClass = BadgeClassesCommands.createBadgeClass(LDAPService.ldapEntryManager, objBadgeClass);
+
+                        if (objBadgeClass.getInum() != null) {
+                            //Create actual badge entry(badge assertion)
+                            Badges objBadge = new Badges();
+                            objBadge.setContext("https://w3id.org/openbadges/v2");
+                            objBadge.setType("Assertion");
+                            objBadge.setRecipientType("text");
+                            objBadge.setRecipientIdentity(JWTUtil.generateJWT("{\"email\":\"test_user@test.org\",\"email_verified\":\"true\",\"sub\":\"K6sBjQkZQl3RP-XILa1gLa2k211zv4BgoVJCtvfRZjA\",\"zoneinfo\":\"America/Chicago\",\"nickname\":\"user\",\"website\":\"http://www.gluu.org\",\"middle_name\":\"User\",\"locale\":\"en-US\",\"preferred_username\":\"user\",\"given_name\":\"Test\",\"picture\":\"http://www.gluu.org/wp-content/uploads/2012/04/mike3.png\",\"updated_at\":\"20170224125915.538Z\",\"name\":\"oxAuth Test User\",\"birthdate\":\"1983-1-6\",\"family_name\":\"User\",\"gender\":\"Male\",\"profile\":\"http://www.mywebsite.com/profile\"}"));
+                            objBadge.setVerificationType("hosted");
+                            objBadge.setBadgeClassInum(objBadgeClass.getInum());
+                            objBadge.setGuid(Utils.generateRandomGUID());
+                            objBadge.setKey(Utils.generateRandomKey(12));
+
+                            objBadge.setId(Utils.getBaseURL(servletRequest) + "/badges/verify/" + objBadge.getGuid() + "?key=" + objBadge.getKey());
+
+                            String tempURL = Utils.getBaseURL(servletRequest) + "/badges/" + objBadge.getGuid() + "?key=" + objBadge.getKey();
+                            String redisKey = objBadge.getGuid() + objBadge.getKey();
+                            saveRedis(redisKey, tempURL, 90);
+
+                            if (generateQrCode(objBadge, objBadgeClass.getImage(), tempURL, 250, "png")) {
+                                System.out.print("QR Code generated successfully");
+                            } else {
+                                System.out.print("Failed to generate QR Code");
+                            }
+
+                            objBadge = BadgeCommands.createBadge(LDAPService.ldapEntryManager, objBadge);
+
+                            if (objBadge.getInum() != null) {
+                                return true;
+                            } else {
+                                System.out.print("Unable to persist badge entry");
+                                return false;
+                            }
+                        } else {
+                            System.out.print("Unable to persist badge entry. reason is: badge class not persisted");
+                            return false;
+                        }
                     }
                 }
+            } else {
+                System.out.print("Unable to persist badge class entry.Not connected with LDAP");
+                return false;
             }
+
         } catch (Exception ex) {
             System.out.print("Exception in insert badge assertion entry:" + ex.getMessage());
             ex.printStackTrace();
@@ -446,12 +443,12 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
      *
      * @param badge       The  badge object from which content should be encoded with the QR-code.
      * @param tempURL
-     *@param qrCodeSize  The QR-code must be quadratic. So this is the number of pixel
+     * @param qrCodeSize  The QR-code must be quadratic. So this is the number of pixel
      *                    in width and height.
      * @param imageFormat The image format in which the image should be rendered. As
- *                    Example 'png' or 'jpg'. See @javax.imageio.ImageIO for more
- *                    information which image formats are supported.   @throws Exception If an Exception occur during the create of the QR-code or
-     *                   while writing the data into the OutputStream.
+     *                    Example 'png' or 'jpg'. See @javax.imageio.ImageIO for more
+     *                    information which image formats are supported.   @throws Exception If an Exception occur during the create of the QR-code or
+     *                    while writing the data into the OutputStream.
      */
     private boolean generateQrCode(Badges badge, String logoFileURL, String tempURL, int qrCodeSize, String imageFormat) {
         try {
@@ -495,14 +492,6 @@ public class BadgeRequestController implements LDAPInitializer.ldapConnectionLis
             System.out.println("Exception in generating qr code: " + ex.getMessage());
             ex.printStackTrace();
             return false;
-        }
-    }
-
-    @Override
-    public void ldapConnected(boolean isConnected, LdapEntryManager ldapEntryManager) {
-        if (isConnected) {
-            this.ldapEntryManager = ldapEntryManager;
-            this.isConnected = isConnected;
         }
     }
 }

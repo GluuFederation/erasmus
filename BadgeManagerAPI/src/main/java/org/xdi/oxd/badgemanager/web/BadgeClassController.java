@@ -12,6 +12,7 @@ import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
+import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 
@@ -24,12 +25,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/badgeClass/")
-public class BadgeClassController implements LDAPInitializer.ldapConnectionListner {
-
-    boolean isConnected = false;
-    LdapEntryManager ldapEntryManager;
-
-    LDAPInitializer ldapInitializer = new LDAPInitializer(BadgeClassController.this);
+public class BadgeClassController {
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getBadgeClass(@PathVariable String id, @RequestParam(value="key") String key, HttpServletResponse response) {
@@ -37,9 +33,9 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
         JsonObject jsonResponse = new JsonObject();
 
         //Dynamic
-        if (isConnected) {
+        if (LDAPService.isConnected()) {
             try {
-                BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(ldapEntryManager, id, key);
+                BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(LDAPService.ldapEntryManager, id, key);
                 return returnResponse(badge,response,"No such badge found");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -105,9 +101,9 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
 //        }
 
         //Dynamic
-        if (isConnected) {
+        if (LDAPService.isConnected()) {
             try {
-                BadgeClass badges = BadgeClassesCommands.getBadgeClassByInum(ldapEntryManager, inum);
+                BadgeClass badges = BadgeClassesCommands.getBadgeClassByInum(LDAPService.ldapEntryManager, inum);
                 if (badges != null) {
                     BadgeClassResponse objBadge = new BadgeClassResponse();
                     objBadge.setType(badges.getType());
@@ -194,7 +190,7 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
         }
 
         //Dynamic
-//        if (isConnected) {
+//        if (connected) {
 //            try {
 //                BadgeClass badges = BadgeClassesCommands.getBadgeClassByInum(ldapEntryManager, id);
 //                if (badges != null) {
@@ -248,7 +244,7 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
         }
 
         //Dynamic
-//        if (isConnected) {
+//        if (connected) {
 //            try {
 //                BadgeClass badges = BadgeClassesCommands.getBadgeClassByInum(ldapEntryManager, id);
 //                if (badges != null) {
@@ -275,8 +271,8 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
     //    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getBadgeInstances(HttpServletResponse response) {
         JsonObject jsonResponse = new JsonObject();
-        if (isConnected) {
-            List<BadgeClass> badges = BadgeClassesCommands.getAllBadgeClasses(ldapEntryManager);
+        if (LDAPService.isConnected()) {
+            List<BadgeClass> badges = BadgeClassesCommands.getAllBadgeClasses(LDAPService.ldapEntryManager);
             if (badges != null) {
 
                 for (BadgeClass badge : badges) {
@@ -306,8 +302,8 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
     public String removeBadgeInstance(@PathVariable String id, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
-        if (isConnected) {
-            boolean isDeleted = BadgeClassesCommands.deleteBadgeClassByInum(ldapEntryManager, id);
+        if (LDAPService.isConnected()) {
+            boolean isDeleted = BadgeClassesCommands.deleteBadgeClassByInum(LDAPService.ldapEntryManager, id);
             if (isDeleted) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("success", "Badge instance was deleted successfully");
@@ -335,14 +331,6 @@ public class BadgeClassController implements LDAPInitializer.ldapConnectionListn
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", errorMsg);
             return jsonResponse.toString();
-        }
-    }
-
-    @Override
-    public void ldapConnected(boolean isConnected, LdapEntryManager ldapEntryManager) {
-        if (isConnected) {
-            this.ldapEntryManager = ldapEntryManager;
-            this.isConnected = isConnected;
         }
     }
 }
