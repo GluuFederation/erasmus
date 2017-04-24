@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
-            <!--<scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
 
         <!--Test-->
@@ -107,14 +107,48 @@
 
         <!--Uncomment this dependency while run in local only-->
         <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-web</artifactId>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-web</artifactId>-->
         <!--</dependency>-->
 
         <!--jpa-->
         <!--<dependency>-->
             <!--<groupId>org.springframework.boot</groupId>-->
             <!--<artifactId>spring-boot-starter-data-jpa</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.hibernate</groupId>-->
+            <!--<artifactId>hibernate-core</artifactId>-->
+            <!--<version>4.1.4.Final</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.hibernate</groupId>-->
+            <!--<artifactId>hibernate-entitymanager</artifactId>-->
+            <!--<version>5.2.3.Final</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash;json-smart &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>net.minidev</groupId>-->
+            <!--<artifactId>json-smart</artifactId>-->
+            <!--<version>1.0.9</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; net.minidev/asm &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>net.minidev</groupId>-->
+            <!--<artifactId>asm</artifactId>-->
+            <!--<version>1.0.2</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; slf4j-api &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>slf4j-api</artifactId>-->
+            <!--<version>1.7.25</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; jayway json-path &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>com.jayway.jsonpath</groupId>-->
+            <!--<artifactId>json-path</artifactId>-->
+            <!--<version>0.8.1</version>-->
         <!--</dependency>-->
 
         <!--<dependency>-->
@@ -190,26 +224,34 @@
             <version>2.0.0</version>
         </dependency>
 
-        <!-- Inject -->
-        <!--<dependency>-->
-            <!--<groupId>javax.inject</groupId>-->
-            <!--<artifactId>javax.inject</artifactId>-->
-            <!--<version>1</version>-->
-        <!--</dependency>-->
+        <!--Inject-->
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
 
-        <!--&lt;!&ndash; Oxd &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.xdi</groupId>-->
-            <!--<artifactId>oxd-java</artifactId>-->
-            <!--<version>2.4.4.Final</version>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--&lt;!&ndash; whatever the correct values are &ndash;&gt;-->
-                    <!--<groupId>com.google.guava</groupId>-->
-                    <!--<artifactId>guava</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
+        <!-- Oxd -->
+        <dependency>
+            <groupId>org.xdi</groupId>
+            <artifactId>oxd-java</artifactId>
+            <version>2.4.4.Final</version>
+            <exclusions>
+                <exclusion>
+                    <!-- whatever the correct values are -->
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
     </dependencies>
 

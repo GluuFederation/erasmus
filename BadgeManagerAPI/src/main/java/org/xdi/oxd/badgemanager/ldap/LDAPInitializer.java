@@ -21,9 +21,9 @@ public class LDAPInitializer {
     private static String userName = "cn=directory manager,o=gluu";
     private static String bindDN = "cn=directory manager,o=gluu";
 //    Server
-//    private static String bindPassword = "ldapsu";
+    private static String bindPassword = "ldapsu";
 //    Local
-    private static String bindPassword = "admin";
+//    private static String bindPassword = "admin";
     private static String servers = "localhost:1636";
     private static List<String> serversStringsList = new ArrayList<String>() {{
         add("localhost:1636");

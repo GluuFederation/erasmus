@@ -2,7 +2,6 @@ package org.xdi.oxd.badgemanager.web;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -12,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.xdi.oxd.badgemanager.global.Global;
-import org.xdi.oxd.badgemanager.ldap.LDAPInitializer;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeRequestCommands;
@@ -66,7 +64,7 @@ public class BadgeRequestController {
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
 
-    public void saveRedis(String key, String value, int timeout) throws IOException {
+    public void setRedisData(String key, String value, int timeout) throws IOException {
         redisTemplate.opsForValue().set(key, value);
         redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
     }
@@ -402,7 +400,7 @@ public class BadgeRequestController {
 
                             String tempURL = Utils.getBaseURL(servletRequest) + "/badges/" + objBadge.getGuid() + "?key=" + objBadge.getKey();
                             String redisKey = objBadge.getGuid() + objBadge.getKey();
-                            saveRedis(redisKey, tempURL, 90);
+                            setRedisData(redisKey, tempURL, 90);
 
                             if (generateQrCode(objBadge, objBadgeClass.getImage(), tempURL, 250, "png")) {
                                 System.out.print("QR Code generated successfully");

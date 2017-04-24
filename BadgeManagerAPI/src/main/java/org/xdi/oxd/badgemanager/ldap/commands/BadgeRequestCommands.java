@@ -247,6 +247,7 @@ public class BadgeRequestCommands {
             objResponse.setTemplateBadgeId(obj.getTemplateBadgeId());
             objResponse.setTemplateBadgeTitle(obj.getTemplateBadgeTitle());
             objResponse.setStatus(obj.getStatus());
+            objResponse.setRequesterEmail(obj.getGluuBadgeRequester());
 
             lstBadgeResponse.add(objResponse);
         }

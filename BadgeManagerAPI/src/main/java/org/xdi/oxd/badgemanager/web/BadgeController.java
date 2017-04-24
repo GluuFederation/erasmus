@@ -11,13 +11,20 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.xdi.oxd.badgemanager.Settings;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
+import org.xdi.oxd.client.CommandClient;
+import org.xdi.oxd.common.Command;
+import org.xdi.oxd.common.CommandType;
+import org.xdi.oxd.common.params.GetUserInfoParams;
+import org.xdi.oxd.common.response.GetUserInfoResponse;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.net.InetAddress;
 
@@ -28,10 +35,13 @@ import java.net.InetAddress;
 @RestController
 @Api(basePath = "/badges", description = "badges apis")
 @RequestMapping("/badges")
-public class BadgeController  {
+public class BadgeController {
 
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
+
+    @Inject
+    private Settings settings;
 
     @RequestMapping(value = "listTemplateBadges/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTemplateBadgesByParticipant(@RequestParam String accessToken, @RequestParam String type, HttpServletResponse response) {
@@ -61,13 +71,27 @@ public class BadgeController  {
 //
 //            JsonObject jsonObjectBody = new JsonParser().parse(decodeTokenBody).getAsJsonObject();
 //            String issuer= jsonObjectBody.get("iss").getAsString();
-            String issuer = "https://ce-dev2.gluu.org";
 
-            String hostName = InetAddress.getLocalHost().getHostName();
-            System.out.print("hostname:" + InetAddress.getLocalHost().getHostName());
-            System.out.print("canonical hostname:" + InetAddress.getLocalHost().getCanonicalHostName());
-            System.out.print("host address:" + InetAddress.getLocalHost().getHostAddress());
-            System.out.print("address:" + InetAddress.getLocalHost().getAddress().toString());
+            CommandClient client = null;
+            try {
+                client = new CommandClient("localhost", 8099);
+
+                GetUserInfoParams params = new GetUserInfoParams();
+                params.setOxdId(settings.getOxdId(redisTemplate));
+                params.setAccessToken(accessToken);
+
+                final GetUserInfoResponse resp = client.send(new Command(CommandType.GET_USER_INFO).setParamsObject(params)).dataAsResponse(GetUserInfoResponse.class);
+                String claims = GsonService.getGson().toJson(resp.getClaims());
+                JsonObject jObjClaims = new JsonParser().parse(claims).getAsJsonObject();
+                System.out.println("Name:" + GsonService.getValueFromJson("name", jObjClaims));
+                System.out.println("Email:" + GsonService.getValueFromJson("email", jObjClaims));
+            } catch (Exception ex) {
+                System.out.println("Exception in retrieving user info:" + ex.getMessage());
+            } finally {
+                CommandClient.closeQuietly(client);
+            }
+
+            String issuer = "https://ce-dev2.gluu.org";
 
             IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, type);
 

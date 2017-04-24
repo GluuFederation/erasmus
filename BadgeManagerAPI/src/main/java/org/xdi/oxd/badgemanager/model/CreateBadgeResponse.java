@@ -4,7 +4,7 @@ package org.xdi.oxd.badgemanager.model;
  * Created by Arvind Tomar on 20/4/17.
  */
 public class CreateBadgeResponse {
-    private String inum, participant, templateBadgeId, templateBadgeTitle, status;
+    private String inum, participant, templateBadgeId, templateBadgeTitle, status, requesterEmail;
 
     public String getInum() {
         return inum;
@@ -44,5 +44,13 @@ public class CreateBadgeResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getRequesterEmail() {
+        return requesterEmail;
+    }
+
+    public void setRequesterEmail(String requesterEmail) {
+        this.requesterEmail = requesterEmail;
     }
 }
