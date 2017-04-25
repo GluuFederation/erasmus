@@ -54,7 +54,7 @@ router.get('/getBadgeByParticipant/:oid/:status', (req, res, next) => {
 /**
  * get approved Badge By Participant
  */
-router.get('/getParticipantById/:oid', (req, res, next) => {
+router.get('/participant/:oid', (req, res, next) => {
   Participant.getParticipantById(req.params.oid)
     .then((org) => {
       return res.status(httpStatus.OK).send(org);

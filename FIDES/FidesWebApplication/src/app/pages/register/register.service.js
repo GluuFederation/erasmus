@@ -30,7 +30,7 @@
     }
 
     function getUSStateCity() {
-      return $http.get('us_states_cities.json');
+      return $http.get(urls.BASE + '/us_states_cities.json');
     }
     return service;
   }

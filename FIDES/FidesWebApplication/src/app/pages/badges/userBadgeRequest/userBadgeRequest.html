@@ -25,7 +25,7 @@
           <tr ng-repeat="badge in vm.displayedCollection track by $index"
               style="background: {{badge.isApproved ? '#fff' : '#ffcdd2'}}">
             <td style="display: none;"></td>
-            <td>{{badge.gluuBadgeRequester}}</td>
+            <td>{{badge.requesterEmail}}</td>
             <td>{{badge.templateBadgeTitle}}</td>
             <td>
               <button class="btn btn-primary btn-icon"
