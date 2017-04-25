@@ -22,7 +22,7 @@ const upload = multer({storage: storage}).any();
 /**
  * Get all active badges
  */
-router.get('/badges', upload, (req, res, next) => {
+router.get('/badges', (req, res, next) => {
   Badges.getAllBadges()
     .then((badges) => {
       if (!badges) {
@@ -39,7 +39,7 @@ router.get('/badges', upload, (req, res, next) => {
 /**
  * Get badge by id
  */
-router.get('/templateBadgeById/:id', upload, (req, res, next) => {
+router.get('/templateBadge/:id', upload, (req, res, next) => {
   Badges.getBadgeById(req.params.id)
     .then((badges) => {
       if (!badges) {
@@ -78,19 +78,19 @@ router.post('/getBadgeTemplatesByIssuer', (req, res, next) => {
         org.approvedBadges.forEach(function (item) {
           if (item.category.name == ocat) {
             const cat = {
-              id: process.env.BASE_URL + '/templateBadgeById/' + item._id,
+              id: process.env.BASE_URL + '/templateBadge/' + item._id,
               name: item.name,
               description: item.description,
               image: item.image,
               narrative: item.narrative,
               type: item.type,
               issuer: {
-                id: process.env.BASE_URL + '/getParticipantById/' + org._id,
+                id: process.env.BASE_URL + '/participant/' + org._id,
                 name: org.name,
                 type: org.type,
-                url: process.env.BASE_URL,
+                url: req.body.issuer,
                 verification: {
-                  allowedOrigins: process.env.BASE_URL,
+                  allowedOrigins: req.body.issuer,
                   type: 'hosted'
                 }
               }

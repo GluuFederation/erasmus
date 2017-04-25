@@ -98,8 +98,8 @@ angular.module('FidesWebApplication', [
 }]).config(['$httpProvider', function ($httpProvider) {
   //Http Interceptor to check auth failures for xhr requests
   $httpProvider.interceptors.push('authHttpResponseInterceptor');
-}]).factory('stateCityService',['$http', function ($http) {
-  return $http.get('us_states_cities.json');
+}]).factory('stateCityService',['$http', 'urls', function ($http, urls) {
+  return $http.get(urls.BASE + '/us_states_cities.json');
 }]).filter('myStrictFilter', function($filter){
   return function(input, predicate){
     return $filter('filter')(input, predicate, true);
