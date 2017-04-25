@@ -4,9 +4,14 @@ import com.unboundid.ldap.sdk.Filter;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.xdi.oxd.badgemanager.config.DefaultConfig;
+import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.service.InumService;
 import org.xdi.oxd.badgemanager.ldap.service.MergeService;
+import org.xdi.oxd.badgemanager.model.BadgeClassResponse;
+import org.xdi.oxd.badgemanager.model.BadgeResponse;
+import org.xdi.oxd.badgemanager.model.BadgeVerification;
+import org.xdi.oxd.badgemanager.model.Recipient;
 
 import java.util.List;
 
@@ -26,19 +31,19 @@ public class BadgeCommands {
     public static Badges createBadge(LdapEntryManager ldapEntryManager, Badges badges) throws Exception {
 
         String inum = InumService.getInum(InumService.badgePrefix);
-        badges.setDn("inum=" + inum + ",ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+        badges.setDn("inum=" + inum + ",ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
         badges.setInum(inum);
 
-        if (OrganizationCommands.findOrganizationfromDN(ldapEntryManager, badges.getGluuAssociatedOrganization()) != null) {
-            if (!(ldapEntryManager.contains(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")")))) {
+        if (!(ldapEntryManager.contains("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", Badges.class, Filter.create("(inum=" + badges.getInum() + ")")))) {
+            if (!ldapEntryManager.contains("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeRequests.class, Filter.create("(&(gluuBadgeClassInum=" + badges.getBadgeClassInum() + ")(gluuRecipientIdentity=" + badges.getRecipientIdentity() + "))"))) {
                 ldapEntryManager.persist(badges);
                 System.out.println("new badge entry");
                 return badges;
             } else {
-                createBadge(ldapEntryManager, badges);
+                throw new Exception("Badge already exists");
             }
         } else {
-            throw new NotFoundException("No matching organization found");
+            createBadge(ldapEntryManager, badges);
         }
         throw new Error("There was problem creating a badge");
     }
@@ -52,19 +57,15 @@ public class BadgeCommands {
      * @throws Exception
      */
     public static boolean updateBadge(LdapEntryManager ldapEntryManager, Badges badges) throws Exception {
-        if (OrganizationCommands.findOrganizationfromDN(ldapEntryManager, badges.getGluuAssociatedOrganization()) != null) {
-            String inum = badges.getInum();
-            badges.setDn("inum=" + inum + ",ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
-            if (ldapEntryManager.contains(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
-                MergeService.merge(badges,ldapEntryManager.findEntries(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")")).get(0));
-                ldapEntryManager.merge(badges);
-                System.out.println("updated entry ");
-                return true;
-            } else {
-                throw new NotFoundException("No such badge found");
-            }
+        String inum = badges.getInum();
+        badges.setDn("inum=" + inum + ",ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+        if (ldapEntryManager.contains(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
+            MergeService.merge(badges, ldapEntryManager.findEntries(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")")).get(0));
+            ldapEntryManager.merge(badges);
+            System.out.println("updated entry ");
+            return true;
         } else {
-            throw new NotFoundException("No matching organization found");
+            throw new NotFoundException("No such badge found");
         }
     }
 
@@ -80,7 +81,7 @@ public class BadgeCommands {
 
             Badges badge = new Badges();
             badge.setInum(Inum);
-            badge.setDn("inum=" + Inum + ",ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+            badge.setDn("inum=" + Inum + ",ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
             if (ldapEntryManager.contains(badge.getDn(), Badges.class, Filter.create("(inum=" + badge.getInum() + ")"))) {
 
@@ -102,6 +103,63 @@ public class BadgeCommands {
     }
 
     /**
+     * Retrieves a badge by Inum
+     *
+     * @param ldapEntryManager ldapEntryManager
+     * @param Inum             Inum of the badge that is to be retrieved.
+     * @return
+     */
+    public static BadgeResponse getBadgeResponseByInum(LdapEntryManager ldapEntryManager, String Inum) {
+        try {
+
+            Badges objBadges = new Badges();
+            objBadges.setInum(Inum);
+            objBadges.setDn("inum=" + Inum + ",ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            if (ldapEntryManager.contains(objBadges.getDn(), Badges.class, Filter.create("(inum=" + objBadges.getInum() + ")"))) {
+                List<Badges> badges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(inum=" + objBadges.getInum() + ")"));
+
+                if (badges.size() > 0) {
+                    objBadges = badges.get(0);
+                    return GetBadgeResponse(ldapEntryManager, objBadges);
+                } else
+                    return null;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves a badge by Id
+     *
+     * @param ldapEntryManager ldapEntryManager
+     * @param id               GUID of the badge
+     * @param key              key of the badge that is to be retrieved.
+     * @return
+     */
+    public static BadgeResponse getBadgeResponseById(LdapEntryManager ldapEntryManager, String id, String key) {
+        try {
+
+            Badges objBadges = new Badges();
+            objBadges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            List<Badges> lstBadges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + ")(gluuBadgeAssertionKey=" + key + "))"));
+
+            if (lstBadges.size() > 0) {
+                return GetBadgeResponse(ldapEntryManager, lstBadges.get(0));
+            } else
+                return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Deletes badge by Inum
      *
      * @param ldapEntryManager ldapEntryManager
@@ -111,11 +169,11 @@ public class BadgeCommands {
     public static boolean deleteBadgeByInum(LdapEntryManager ldapEntryManager, String inum) {
         try {
             Badges badges = new Badges();
-            badges.setDn("inum=" + inum + ",ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+            badges.setDn("inum=" + inum + ",ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
             badges.setInum(inum);
             if (ldapEntryManager.contains(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
                 ldapEntryManager.remove(badges);
-                System.out.println("Deleted entry ");
+                System.out.println("Deleted badge entry ");
                 return true;
             } else {
                 return false;
@@ -135,7 +193,7 @@ public class BadgeCommands {
     public static List<Badges> getAllBadges(LdapEntryManager ldapEntryManager) {
 
         Badges badges = new Badges();
-        badges.setDn("ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+        badges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
         return (ldapEntryManager.findEntries(badges.getDn(), Badges.class, null));
     }
@@ -154,25 +212,35 @@ public class BadgeCommands {
         }
     }
 
-    /**
-     * Retrieves badges for a specific organization
-     *
-     * @param ldapEntryManager ldapEntryManager
-     * @param dn               dn of the badge that is to be retrieved
-     * @param orgDN            dn of organization to verify if the badge exists in context of organization
-     * @return
-     */
-    public static Badges findBadgefromDNAndOrganization(LdapEntryManager ldapEntryManager, String dn, String orgDN) {
+    private static BadgeResponse GetBadgeResponse(LdapEntryManager ldapEntryManager, Badges objBadges) {
         try {
-            List<Badges> badges = ldapEntryManager.findEntries(dn, Badges.class, Filter.create("(gluuAssociatedOrganization=" + orgDN + ")"));
-            if (badges.size() > 0) {
-                return badges.get(0);
-            } else {
-                throw new NotFoundException("No badge found");
+            BadgeResponse objBadge = new BadgeResponse();
+            objBadge.setType(objBadges.getType());
+            objBadge.setId(objBadges.getId());
+            objBadge.setContext(objBadges.getContext());
+            objBadge.setImage(objBadges.getImage());
+
+            Recipient recipient = new Recipient();
+            recipient.setType(objBadges.getRecipientType());
+            recipient.setIdentity(objBadges.getRecipientIdentity());
+            objBadge.setRecipient(recipient);
+
+            objBadge.setIssuedOn(objBadges.getIssuedOn().toString());
+            objBadge.setExpires(objBadges.getExpires().toString());
+
+            BadgeVerification verification = new BadgeVerification();
+            verification.setType(objBadges.getVerificationType());
+            objBadge.setVerification(verification);
+
+            BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseByInum(ldapEntryManager, objBadges.getBadgeClassInum());
+            if (badge != null) {
+                objBadge.setBadge(badge);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new NotFoundException("No badge found");
+
+            return objBadge;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 }

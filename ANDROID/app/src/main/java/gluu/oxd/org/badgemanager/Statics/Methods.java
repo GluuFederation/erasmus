@@ -185,7 +185,6 @@ public class Methods {
             mgr.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
         }
 
-
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
         if (fragmentManager.findFragmentById(R.id.content_home_screen).getTag() != fragment.getTag()) {
             fragmentManager.beginTransaction()
