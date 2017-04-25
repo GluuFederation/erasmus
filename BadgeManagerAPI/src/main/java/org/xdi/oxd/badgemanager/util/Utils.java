@@ -1,5 +1,7 @@
 package org.xdi.oxd.badgemanager.util;
 
+import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 
@@ -9,12 +11,13 @@ import java.util.UUID;
 /**
  * Created by Arvind Tomar on 10/4/17.
  */
+@Component
 public class Utils {
 
     /**
      * Decodes Base 64 url.
      */
-    public static String decodeBase64url(String strEncoded)
+    public String decodeBase64url(String strEncoded)
             throws UnsupportedEncodingException {
         if (strEncoded != null) {
             byte[] decodedBytes = Base64.getDecoder().decode(strEncoded);
@@ -27,7 +30,7 @@ public class Utils {
     /**
      * Generates random GUID.
      */
-    public static String generateRandomGUID() {
+    public String generateRandomGUID() {
         UUID uuid = UUID.randomUUID();
         return uuid.toString();
     }
@@ -35,7 +38,7 @@ public class Utils {
     /**
      * Generates random alpha numeric String.
      */
-    public static String generateRandomKey(int count) {
+    public String generateRandomKey(int count) {
         String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder builder = new StringBuilder();
         while (count-- != 0) {
@@ -48,7 +51,7 @@ public class Utils {
     /**
      * Generates base url.
      */
-    public static String getBaseURL(HttpServletRequest request) {
+    public String getBaseURL(HttpServletRequest request) {
         String url;
         if (request.getServerPort() == 80 || request.getServerPort() == 443) {
             url = request.getScheme() + "://" + request.getServerName()+request.getContextPath();

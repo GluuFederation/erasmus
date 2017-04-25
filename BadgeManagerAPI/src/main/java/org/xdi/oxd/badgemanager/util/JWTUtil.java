@@ -8,23 +8,28 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.UUID;
 
 /**
  * Created by Arvind Tomar on 21/4/17.
  */
+@Component
 public class JWTUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(JWTUtil.class);
 
     /**
      * Generates JWT using private key.
      */
-    public static String generateJWTWithPrivateKey(String payload) {
+    public String generateJWTWithPrivateKey(String payload) {
 
         try {
             // RSA signatures require a public and private RSA key pair, the public key
@@ -60,7 +65,7 @@ public class JWTUtil {
             return signedJWT.serialize();
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.print("Exception in generating JWT: " + ex.getMessage());
+            logger.error("Exception in generating JWT: " + ex.getMessage());
         }
         return null;
     }
@@ -68,7 +73,7 @@ public class JWTUtil {
     /**
      * Generates JWT.
      */
-    public static String generateJWT(String payload) {
+    public String generateJWT(String payload) {
 
         try {
 
@@ -99,7 +104,7 @@ public class JWTUtil {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.print("Exception in generating JWT: " + ex.getMessage());
+            logger.error("Exception in generating JWT: " + ex.getMessage());
         }
         return null;
     }

@@ -22,12 +22,10 @@ public final class DisableSSLCertificateCheckUtil {
     private static class NullX509TrustManager implements X509TrustManager {
         public void checkClientTrusted(X509Certificate[] chain, String authType)
                 throws CertificateException {
-            System.out.println();
         }
 
         public void checkServerTrusted(X509Certificate[] chain, String authType)
                 throws CertificateException {
-            System.out.println();
         }
 
         public X509Certificate[] getAcceptedIssuers() {

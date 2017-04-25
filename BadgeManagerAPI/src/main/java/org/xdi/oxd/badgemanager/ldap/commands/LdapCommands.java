@@ -3,6 +3,8 @@ package org.xdi.oxd.badgemanager.ldap.commands;
 import com.unboundid.ldap.sdk.Filter;
 import com.unboundid.ldap.sdk.LDAPException;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -23,9 +25,10 @@ import java.util.List;
 @PropertySource("classpath:application.properties")
 public class LdapCommands {
 
+    private static final Logger logger = LoggerFactory.getLogger(LdapCommands.class);
+
     @Autowired
     Environment env;
-
 
     /**
      * Finind person By Inum
@@ -47,9 +50,8 @@ public class LdapCommands {
      * create new Person entry or update if exists
      * @param ldapEntryManager
      * @param person
-     * @return
+     * @return boolean
      */
-
     public boolean createOrUpdatePerson(LdapEntryManager ldapEntryManager, Person person) {
         if (person.getSub() != null || person.getSub().length() > 2) {
             try {
@@ -57,7 +59,7 @@ public class LdapCommands {
                 person.setInum(person.getSub());
                 if (!(ldapEntryManager.contains(person.getDn(), Person.class, Filter.create("(inum=" + person.getInum() + ")")))) {
                     ldapEntryManager.persist(person);
-                    System.out.println("new organization entry");
+                    logger.info("new organization entry");
                     return true;
                 } else {
                     Person p = ldapEntryManager.findEntries(person.getDn(), Person.class, Filter.create("(inum=" + person.getInum() + ")")).get(0);
@@ -67,7 +69,7 @@ public class LdapCommands {
                         MergeService.merge(p,person);
                         ldapEntryManager.merge(person);
                     }
-                    System.out.println("Use modified with dn" + person.getDn());
+                    logger.info("Use modified with dn" + person.getDn());
                     return true;
                 }
             } catch (Exception e) {
@@ -75,7 +77,7 @@ public class LdapCommands {
                 return false;
             }
         } else {
-            System.out.println("person inum/sub not available");
+            logger.info("person inum/sub not available");
             return false;
         }
     }
@@ -92,7 +94,7 @@ public class LdapCommands {
         try {
             if (ldapEntryManager.contains(org.getDn(), Organizations.class, Filter.create("(inum=" + org.getO() + ")"))) {
                 ldapEntryManager.persist(org);
-                System.out.println("new organization entry for organization");
+                logger.info("new organization entry for organization");
                 return true;
             } else {
                 org.setDescription("this test organization");

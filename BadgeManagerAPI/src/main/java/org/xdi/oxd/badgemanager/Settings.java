@@ -1,5 +1,7 @@
 package org.xdi.oxd.badgemanager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,8 @@ import java.io.IOException;
 
 @Component
 public class Settings {
+
+    private static final Logger logger = LoggerFactory.getLogger(Settings.class);
 
     @Value("${oxd.server.op-host}")
     private String opHost;
@@ -36,14 +40,16 @@ public class Settings {
     }
 
     public String getOxdId(RedisTemplate<Object, Object> redisTemplate) {
-        if (redisTemplate.opsForValue().get(opHost) != null) {
-            this.oxdId = redisTemplate.opsForValue().get(opHost).toString();
+        logger.info("opHost in getOxdId():"+this.opHost);
+        if (redisTemplate.opsForValue().get(this.opHost) != null) {
+            this.oxdId = redisTemplate.opsForValue().get(this.opHost).toString();
+            logger.info("Site Oxd Id:"+this.oxdId);
             return this.oxdId;
         }
 
         CommandResponse commandResponse = oxdService.registerSite(redirectUrl, logoutUrl, postLogoutUrl);
         if (commandResponse.getStatus().equals(ResponseStatus.ERROR)) {
-            System.out.println("Error in register site in oxd:" + CommandResponse.INTERNAL_ERROR_RESPONSE_AS_STRING);
+            logger.error("Error in register site in oxd:" + CommandResponse.INTERNAL_ERROR_RESPONSE_AS_STRING);
             throw new RuntimeException("Can not register site: {redirectUrl: '" + redirectUrl + "', logoutUrl: '" + logoutUrl + "', postLogoutUrl: '" + postLogoutUrl + "'}. Plese see the oxd-server.log");
         }
 
@@ -53,8 +59,10 @@ public class Settings {
         try {
             setRedisData(redisTemplate, this.opHost, this.oxdId);
         } catch (IOException e) {
+            logger.error("Exception in storing oxd id to redis:"+e.getMessage());
             e.printStackTrace();
         }
+        logger.info("Site Oxd Id:"+this.oxdId);
         return this.oxdId;
     }
 }

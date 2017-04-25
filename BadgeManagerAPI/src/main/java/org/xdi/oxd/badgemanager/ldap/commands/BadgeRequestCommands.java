@@ -2,6 +2,8 @@ package org.xdi.oxd.badgemanager.ldap.commands;
 
 import com.unboundid.ldap.sdk.Filter;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xdi.oxd.badgemanager.config.DefaultConfig;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.service.InumService;
@@ -16,7 +18,8 @@ import java.util.List;
  * Created by Arvind Tomar on 14/10/16.
  */
 public class BadgeRequestCommands {
-    //Crete new badge request according to organization and badge
+
+    private static final Logger logger = LoggerFactory.getLogger(BadgeRequestCommands.class);
 
     /**
      * Crete new badge request according to participant and template badge
@@ -41,7 +44,7 @@ public class BadgeRequestCommands {
         if (!(ldapEntryManager.contains("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")")))) {
             if (!ldapEntryManager.contains("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + badgeRequest.getGluuBadgeRequester() + ")(masterBadgeId=" + badgeRequest.getTemplateBadgeId() + "))"))) {
                 ldapEntryManager.persist(badgeRequest);
-                System.out.println("new badge request created");
+                logger.info("new badge request created");
                 return badgeRequest;
             } else {
                 throw new Exception("You have already requested for same badge");
@@ -76,7 +79,7 @@ public class BadgeRequestCommands {
         if (!(ldapEntryManager.contains("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")")))) {
             if (!ldapEntryManager.contains("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + badgeRequest.getGluuBadgeRequester() + ")(gluuTemplateBadgeId=" + badgeRequest.getTemplateBadgeId() + ")(gluuParticipant=" + badgeRequest.getParticipant() + "))"))) {
                 ldapEntryManager.persist(badgeRequest);
-                System.out.println("new badge request created");
+                logger.info("new badge request created");
                 CreateBadgeResponse objResponse = new CreateBadgeResponse();
                 objResponse.setInum(badgeRequest.getInum());
                 objResponse.setParticipant(badgeRequest.getParticipant());
@@ -140,7 +143,7 @@ public class BadgeRequestCommands {
             badgeRequest.setInum(inum);
             if (ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")"))) {
                 ldapEntryManager.remove(badgeRequest);
-                System.out.println("Deleted entry ");
+                logger.info("Deleted entry ");
                 return true;
             } else {
                 return false;
@@ -165,10 +168,10 @@ public class BadgeRequestCommands {
             if (ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")"))) {
                 MergeService.merge(badgeRequest, ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")")).get(0));
                 ldapEntryManager.merge(badgeRequest);
-                System.out.println("Badge request updated successfully");
+                logger.info("Badge request updated successfully");
                 return true;
             } else {
-                System.out.println("Badge request not found");
+                logger.info("Badge request not found");
                 return false;
             }
         } catch (Exception e) {

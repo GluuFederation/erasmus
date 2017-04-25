@@ -3,6 +3,8 @@ package org.xdi.oxd.badgemanager.ldap.commands;
 import com.unboundid.ldap.sdk.Filter;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.jboss.resteasy.spi.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xdi.oxd.badgemanager.config.DefaultConfig;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.models.Badges;
@@ -19,6 +21,8 @@ import java.util.List;
  * Created by Arvind Tomar on 10/7/16.
  */
 public class BadgeCommands {
+
+    private static final Logger logger = LoggerFactory.getLogger(BadgeCommands.class);
 
     /**
      * Creates new badge that belongs to an organization
@@ -37,7 +41,7 @@ public class BadgeCommands {
         if (!(ldapEntryManager.contains("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", Badges.class, Filter.create("(inum=" + badges.getInum() + ")")))) {
             if (!ldapEntryManager.contains("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeRequests.class, Filter.create("(&(gluuBadgeClassInum=" + badges.getBadgeClassInum() + ")(gluuRecipientIdentity=" + badges.getRecipientIdentity() + "))"))) {
                 ldapEntryManager.persist(badges);
-                System.out.println("new badge entry");
+                logger.info("new badge entry");
                 return badges;
             } else {
                 throw new Exception("Badge already exists");
@@ -62,7 +66,7 @@ public class BadgeCommands {
         if (ldapEntryManager.contains(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
             MergeService.merge(badges, ldapEntryManager.findEntries(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")")).get(0));
             ldapEntryManager.merge(badges);
-            System.out.println("updated entry ");
+            logger.info("updated entry ");
             return true;
         } else {
             throw new NotFoundException("No such badge found");
@@ -173,7 +177,7 @@ public class BadgeCommands {
             badges.setInum(inum);
             if (ldapEntryManager.contains(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
                 ldapEntryManager.remove(badges);
-                System.out.println("Deleted badge entry ");
+                logger.info("Deleted badge entry ");
                 return true;
             } else {
                 return false;
