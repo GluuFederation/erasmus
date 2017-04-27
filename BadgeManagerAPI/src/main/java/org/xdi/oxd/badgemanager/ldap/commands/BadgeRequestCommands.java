@@ -5,14 +5,18 @@ import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xdi.oxd.badgemanager.config.DefaultConfig;
+import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
+import org.xdi.oxd.badgemanager.ldap.models.Organizations;
 import org.xdi.oxd.badgemanager.ldap.service.InumService;
+import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.ldap.service.MergeService;
 import org.xdi.oxd.badgemanager.model.CreateBadgeResponse;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Arvind Tomar on 14/10/16.
@@ -142,9 +146,12 @@ public class BadgeRequestCommands {
             badgeRequest.setDn("inum=" + inum + ",ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
             badgeRequest.setInum(inum);
             if (ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")"))) {
-                ldapEntryManager.remove(badgeRequest);
-                logger.info("Deleted entry ");
-                return true;
+                if(BadgeClassesCommands.deleteBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, inum)){
+                    ldapEntryManager.remove(badgeRequest);
+                    logger.info("Badge request entry deleted successfully");
+                    return true;
+                }
+                return false;
             } else {
                 return false;
             }
@@ -210,6 +217,21 @@ public class BadgeRequestCommands {
         badgeRequest.setDn("ou=badgeRequests, ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
         return GetResponseList((ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(gluuStatus=" + status + "))"))));
+    }
+
+    /**
+     * Get all badge requests for user
+     *
+     * @param ldapEntryManager ldapEntryManager
+     * @param email            user email
+     * @return
+     */
+    public static List<CreateBadgeResponse> getAllBadgeRequestsByRequester(LdapEntryManager ldapEntryManager, String email) throws Exception {
+
+        BadgeRequests badgeRequest = new BadgeRequests();
+        badgeRequest.setDn("ou=badgeRequests, ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+        return GetResponseList((ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + "))"))));
     }
 
     /**

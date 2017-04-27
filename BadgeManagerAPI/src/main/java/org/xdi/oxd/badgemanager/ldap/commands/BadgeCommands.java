@@ -91,16 +91,40 @@ public class BadgeCommands {
             badge.setDn("inum=" + Inum + ",ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
             if (ldapEntryManager.contains(badge.getDn(), Badges.class, Filter.create("(inum=" + badge.getInum() + ")"))) {
-
                 List<Badges> badges = ldapEntryManager.findEntries(badge.getDn(), Badges.class, Filter.create("(inum=" + badge.getInum() + ")"));
-
                 if (badges.size() > 0)
                     return badges.get(0);
                 else
                     return null;
-
             } else {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
+    /**
+     * Retrieves a badge by badge class Inum.
+     *
+     * @param ldapEntryManager ldapEntryManager.
+     * @param Inum             Inum of the badge class.
+     * @return
+     */
+    public static Badges getBadgeByBadgeClassInum(LdapEntryManager ldapEntryManager, String Inum) {
+        try {
+
+            Badges badge = new Badges();
+            badge.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            if (ldapEntryManager.contains(badge.getDn(), Badges.class, Filter.create("(gluuBadgeClassInum=" + Inum + ")"))) {
+                List<Badges> badges = ldapEntryManager.findEntries(badge.getDn(), Badges.class, Filter.create("(gluuBadgeClassInum=" + Inum + ")"));
+                if (badges.size() > 0)
+                    return badges.get(0);
+                else
+                    return null;
+            } else {
                 return null;
             }
         } catch (Exception e) {
@@ -115,7 +139,7 @@ public class BadgeCommands {
      * @param ldapEntryManager ldapEntryManager
      * @param Inum             Inum of the badge that is to be retrieved.
      * @param utils
-     *@param request @return
+     * @param request          @return
      */
     public static BadgeResponse getBadgeResponseByInum(LdapEntryManager ldapEntryManager, String Inum, Utils utils, HttpServletRequest request) {
         try {
@@ -195,6 +219,42 @@ public class BadgeCommands {
     }
 
     /**
+     * Deletes badge by badge class Inum
+     *
+     * @param ldapEntryManager ldapEntryManager
+     * @param inum             inum of the badge class
+     * @return
+     */
+    public static boolean deleteBadgeByBadgeClassInum(LdapEntryManager ldapEntryManager, String inum) {
+        try {
+            Badges badges = new Badges();
+            badges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            if (ldapEntryManager.contains(badges.getDn(), Badges.class, Filter.create("(gluuBadgeClassInum=" + inum + ")"))) {
+                Badges badge = BadgeCommands.getBadgeByBadgeClassInum(ldapEntryManager, inum);
+                if (badge != null && badge.getInum() != null) {
+                    if (BadgeCommands.deleteBadgeByInum(ldapEntryManager, badge.getInum())) {
+                        logger.info("Badge entry deleted successfully");
+                        return true;
+                    } else {
+                        logger.info("Badge entry not deleted");
+                        return false;
+                    }
+                } else {
+                    logger.info("Badge entry not found");
+                    return true;
+                }
+            } else {
+                logger.info("Badge entry not found");
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
      * Lists all the badge that are into the system
      *
      * @param ldapEntryManager ldapEntryManager
@@ -228,7 +288,7 @@ public class BadgeCommands {
             objBadge.setType(objBadges.getType());
             objBadge.setId(objBadges.getId());
             objBadge.setContext(objBadges.getContext());
-            if(objBadges.getImage()!=null){
+            if (objBadges.getImage() != null) {
                 objBadge.setImage(utils.getBaseURL(request) + File.separator + "images" + File.separator + objBadges.getImage());
             } else {
                 objBadge.setImage("");

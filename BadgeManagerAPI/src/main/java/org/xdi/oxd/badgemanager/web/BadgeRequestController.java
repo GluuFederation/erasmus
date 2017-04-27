@@ -22,6 +22,7 @@ import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.ApproveBadge;
+import org.xdi.oxd.badgemanager.model.BadgeRequestResponse;
 import org.xdi.oxd.badgemanager.model.CreateBadgeRequest;
 import org.xdi.oxd.badgemanager.model.CreateBadgeResponse;
 import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
@@ -40,6 +41,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -81,22 +83,6 @@ public class BadgeRequestController {
     public String createBadgeRequest(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody CreateBadgeRequest badgeRequest, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
-//        Static
-//        try {
-//            badgeRequest = BadgeRequestCommands.createBadgeRequest(ldapEntryManager, badgeRequest);
-//            jsonResponse.add("badgeRequest", GsonService.getGson().toJsonTree(badgeRequest));
-//            jsonResponse.addProperty("error", false);
-//            response.setStatus(HttpServletResponse.SC_OK);
-//            return jsonResponse.toString();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//            jsonResponse.addProperty("error", true);
-//            jsonResponse.addProperty("errorMsg", e.getMessage());
-//            return jsonResponse.toString();
-//        }
-
-        //Dynamic
         if (LDAPService.isConnected()) {
             try {
 
@@ -208,20 +194,6 @@ public class BadgeRequestController {
     public String approveBadgeRequest(@RequestHeader(value = "Authorization") String authorization, @RequestBody ApproveBadge approveBadge, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
-        //Static
-//        try {
-//            jsonResponse.addProperty("responseMsg", "Badge request approved successfully");
-//            jsonResponse.addProperty("error", false);
-//            response.setStatus(HttpServletResponse.SC_OK);
-//            return jsonResponse.toString();
-//        } catch (Exception e) {
-//            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//            jsonResponse.addProperty("error", true);
-//            jsonResponse.addProperty("responseMsg", e.getMessage());
-//            return jsonResponse.toString();
-//        }
-
-        //Dynamic
 
         if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -261,56 +233,39 @@ public class BadgeRequestController {
         }
     }
 
-    @RequestMapping(value = "listApproved", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getApprovedBadgeRequests(@RequestHeader(value = "AccessToken") String accessToken, HttpServletResponse response) {
+    @RequestMapping(value = "list/{status:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getBadgeRequestsByStatus(@RequestHeader(value = "AccessToken") String accessToken, @PathVariable String status, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
-        //Static
-//        List<BadgeRequests> lstBadgeRequests=new ArrayList<>();
-//        BadgeRequests obj1=new BadgeRequests();
-//        obj1.setInum("@!4301.2A50.9A09.7688!1002!BA48.6F40");
-//        obj1.setTemplateBadgeId("58dfa009a016c8832d9b7ea9");
-//        obj1.setTemplateBadgeTitle("Emergency Medical Technician-Basic");
-//        obj1.setParticipant("58e1dfaf159139ee277d7ab7");
-//        obj1.setStatus("Approved");
-//        obj1.setGluuBadgeRequester("test@test.com");
-//        obj1.setDn("inum=@!4301.2A50.9A09.7688!1002!BA48.6F40,ou=badgeRequests,ou=badges,o=@!C460.F7DA.F3E9.4A62!0001!5EE3.2D5C,o=gluu");
-//
-//        BadgeRequests obj2=new BadgeRequests();
-//        obj2.setInum("@!4301.2A50.9A09.7688!1002!D79C.9514");
-//        obj2.setTemplateBadgeId("58dfa009a016c8832d9b7ea9");
-//        obj2.setTemplateBadgeTitle("Entry-Level Firefighter");
-//        obj2.setParticipant("58e1dfaf159139ee277d7ab7");
-//        obj2.setStatus("Approved");
-//        obj2.setGluuBadgeRequester("test@test.com");
-//        obj2.setDn("inum=@!4301.2A50.9A09.7688!1002!D79C.9514,ou=badgeRequests,ou=badges,o=@!C460.F7DA.F3E9.4A62!0001!5EE3.2D5C,o=gluu");
-//
-//        lstBadgeRequests.add(obj1);
-//        lstBadgeRequests.add(obj2);
-//
-//        try {
-//            jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
-//            jsonResponse.addProperty("error", false);
-//            response.setStatus(HttpServletResponse.SC_OK);
-//            return jsonResponse.toString();
-//        } catch (Exception e) {
-//            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//            jsonResponse.addProperty("error", true);
-//            jsonResponse.addProperty("errorMsg", e.getMessage());
-//            return jsonResponse.toString();
-//        }
-
-        //Dynamic
         if (LDAPService.isConnected()) {
             try {
                 String email = accessToken;
-                List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, "Approved");
-                if (lstBadgeRequests.size() > 0) {
-                    jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
-                    jsonResponse.addProperty("error", false);
+                if (status.equalsIgnoreCase("all")) {
+                    BadgeRequestResponse badgeRequests = new BadgeRequestResponse();
+                    List<CreateBadgeResponse> lstApprovedBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, "Approved");
+                    List<CreateBadgeResponse> lstPendingBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, "Pending");
+                    if (lstPendingBadgeRequests.size() > 0) {
+                        badgeRequests.setPendingBadgeRequests(lstPendingBadgeRequests);
+                    }
+                    if (lstApprovedBadgeRequests.size() > 0) {
+                        badgeRequests.setApprovedBadgerequests(lstApprovedBadgeRequests);
+                    }
+                    if(badgeRequests.getApprovedBadgerequests().size()==0 && badgeRequests.getPendingBadgeRequests().size()==0){
+                        jsonResponse.addProperty("error", true);
+                        jsonResponse.addProperty("errorMsg", "No badge requests found");
+                    } else {
+                        jsonResponse.addProperty("error", false);
+                        jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(badgeRequests));
+                    }
                 } else {
-                    jsonResponse.addProperty("error", true);
-                    jsonResponse.addProperty("errorMsg", "No approved badge requests found");
+                    List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, status);
+                    if (lstBadgeRequests.size() == 0) {
+                        jsonResponse.addProperty("error", true);
+                        jsonResponse.addProperty("errorMsg", "No badge requests found");
+                    } else {
+                        jsonResponse.addProperty("error", false);
+                        jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
+                    }
                 }
 
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -319,6 +274,28 @@ public class BadgeRequestController {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", e.getMessage());
+                return jsonResponse.toString();
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.addProperty("error", "Please try after some time");
+            return jsonResponse.toString();
+        }
+    }
+
+    @RequestMapping(value = "delete/{inum:.+}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String removeBadgeRequest(@PathVariable String inum, HttpServletResponse response) {
+
+        JsonObject jsonResponse = new JsonObject();
+        if (LDAPService.isConnected()) {
+            boolean isDeleted = BadgeRequestCommands.deleteBadgeRequestByInum(LDAPService.ldapEntryManager, inum);
+            if (isDeleted) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("success", "Badge Request deleted successfully");
+                return jsonResponse.toString();
+            } else {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                jsonResponse.addProperty("error", "No badge request found");
                 return jsonResponse.toString();
             }
         } else {

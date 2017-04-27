@@ -3,6 +3,7 @@ package org.xdi.oxd.badgemanager.ldap.commands;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.unboundid.ldap.sdk.Filter;
+import io.swagger.models.auth.In;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.ldap.service.InumService;
+import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.BadgeClassResponse;
 import org.xdi.oxd.badgemanager.model.Criteria;
 import org.xdi.oxd.badgemanager.model.Issuer;
@@ -77,10 +79,51 @@ public class BadgeClassesCommands {
             badges.setInum(inum);
             if (ldapEntryManager.contains(badges.getDn(), BadgeClass.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
                 ldapEntryManager.remove(badges);
-                logger.info("Deleted entry ");
+                logger.info("Deleted badge class entry ");
                 return true;
             } else {
                 return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Delete a badge class by badge request inum.
+     *
+     * @param ldapEntryManager ldapEntryManager.
+     * @param inum             Inum of the badge request.
+     * @return
+     */
+    public static boolean deleteBadgeClassByBadgeRequestInum(LdapEntryManager ldapEntryManager, String inum) {
+        try {
+            BadgeClass badges = new BadgeClass();
+            badges.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            if (ldapEntryManager.contains(badges.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + inum + ")"))) {
+                BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(ldapEntryManager, inum);
+                if (badgeClass != null && badgeClass.getInum() != null) {
+                    if (BadgeCommands.deleteBadgeByBadgeClassInum(ldapEntryManager, badgeClass.getInum())) {
+                        if (BadgeClassesCommands.deleteBadgeClassByInum(ldapEntryManager, badgeClass.getInum())) {
+                            logger.info("Badge class entry deleted successfully");
+                            return true;
+                        } else {
+                            logger.info("Badge class entry not deleted");
+                            return false;
+                        }
+                    } else {
+                        logger.info("Badge entry not deleted");
+                        return false;
+                    }
+                } else {
+                    logger.info("Badge class entry not found");
+                    return true;
+                }
+            } else {
+                logger.info("Badge class entry not found");
+                return true;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,13 +150,41 @@ public class BadgeClassesCommands {
                 if (badges.size() > 0)
                     return badges.get(0);
                 else
-                    throw new NotFoundException("No such badge instance found");
+                    throw new NotFoundException("No such badge class found");
             } else {
-                throw new NotFoundException("No such badge instance found");
+                throw new NotFoundException("No such badge class found");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new NotFoundException("No such badge instance found");
+            throw new NotFoundException("No such badge class found");
+        }
+    }
+
+    /**
+     * Reterived a badge class by badge request Inum.
+     *
+     * @param ldapEntryManager ldapEntryManager.
+     * @param Inum             Inum of the badge request.
+     * @return
+     */
+    public static BadgeClass getBadgeClassByBadgeRequestInum(LdapEntryManager ldapEntryManager, String Inum) throws Exception {
+        try {
+
+            BadgeClass badge = new BadgeClass();
+            badge.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            if (ldapEntryManager.contains(badge.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + Inum + ")"))) {
+                List<BadgeClass> badges = ldapEntryManager.findEntries(badge.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + Inum + ")"));
+                if (badges.size() > 0)
+                    return badges.get(0);
+                else
+                    throw new NotFoundException("No such badge class found");
+            } else {
+                throw new NotFoundException("No such badge class found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new NotFoundException("No such badge class found");
         }
     }
 
