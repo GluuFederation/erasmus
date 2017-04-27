@@ -3,6 +3,8 @@ package org.xdi.oxd.badgemanager.ldap;
 import org.gluu.site.ldap.LDAPConnectionProvider;
 import org.gluu.site.ldap.OperationsFacade;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xdi.model.ldap.GluuLdapConfiguration;
 import org.xdi.oxd.badgemanager.config.DefaultConfig;
 import org.xdi.oxd.badgemanager.ldap.commands.ServerCommands;
@@ -40,27 +42,29 @@ public class LDAPInitializer {
     }};
     private static LdapEntryManager ldapEntryManager;
 
+    private static final Logger logger = LoggerFactory.getLogger(LDAPInitializer.class);
+
     public LDAPInitializer(ldapConnectionListner ldapConnection) {
         GluuLdapConfiguration gluuLdapConfiguration = new GluuLdapConfiguration(configId, bindDN, bindPassword, serversStringsList, maxConnections, useSSL, baseDNsStringsList, primaryKey, localPrimaryKey, useAnonymousBind);
         LDAPConnectionProvider ldapConnectionProvider = new LDAPConnectionProvider(prepareAuthConnectionProperties((gluuLdapConfiguration)));
         OperationsFacade operationsFacade = new OperationsFacade(ldapConnectionProvider);
         ldapEntryManager = new LdapEntryManager(operationsFacade);
         if (ldapEntryManager.authenticate(userName, bindPassword)) {
-            System.out.println("Connection Success");
+            logger.info("Connection Success");
             try {
                 DefaultConfig.config_organization = ServerCommands.getRootOrgranizationInum(ldapEntryManager);
                 if (DefaultConfig.config_organization == null || DefaultConfig.config_organization.equals("")) {
-                    System.out.println("Can't find organization dn configured properly in LDAP");
+                    logger.info("Can't find organization dn configured properly in LDAP");
                 } else {
-                    System.out.println("Organization dn configured properly in LDAP");
+                    logger.info("Organization dn configured properly in LDAP");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("Can't find organization dn configured properly in LDAP. Exception is:"+e.getMessage());
+                logger.error("Can't find organization dn configured properly in LDAP. Exception is:"+e.getMessage());
             }
             ldapConnection.ldapConnected(true, ldapEntryManager);
         } else {
-            System.out.println("Connection fail");
+            logger.error("Connection fail");
             ldapConnection.ldapConnected(false, ldapEntryManager);
         }
     }

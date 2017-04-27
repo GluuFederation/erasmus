@@ -11,22 +11,18 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.xdi.oxd.badgemanager.Settings;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.*;
+import org.xdi.oxd.badgemanager.service.UserInfoService;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
-import org.xdi.oxd.client.CommandClient;
-import org.xdi.oxd.common.Command;
-import org.xdi.oxd.common.CommandType;
-import org.xdi.oxd.common.params.GetUserInfoParams;
-import org.xdi.oxd.common.response.GetUserInfoResponse;
+import org.xdi.oxd.badgemanager.util.Utils;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.InetAddress;
 
 /**
  * Created by Arvind Tomar on 10/10/16.
@@ -41,7 +37,10 @@ public class BadgeController {
     public RedisTemplate<Object, Object> redisTemplate;
 
     @Inject
-    private Settings settings;
+    private UserInfoService userInfoService;
+
+    @Inject
+    private Utils utils;
 
     @RequestMapping(value = "listTemplateBadges/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTemplateBadgesByParticipant(@RequestParam String accessToken, @RequestParam String type, HttpServletResponse response) {
@@ -66,29 +65,10 @@ public class BadgeController {
 //            }
 
             //Dynamic
-//            String[] split = accessToken.split("\\.");
-//            String decodeTokenBody = Utils.decodeBase64url(split[1]);
-//
-//            JsonObject jsonObjectBody = new JsonParser().parse(decodeTokenBody).getAsJsonObject();
-//            String issuer= jsonObjectBody.get("iss").getAsString();
-
-            CommandClient client = null;
-            try {
-                client = new CommandClient("localhost", 8099);
-
-                GetUserInfoParams params = new GetUserInfoParams();
-                params.setOxdId(settings.getOxdId(redisTemplate));
-                params.setAccessToken(accessToken);
-
-                final GetUserInfoResponse resp = client.send(new Command(CommandType.GET_USER_INFO).setParamsObject(params)).dataAsResponse(GetUserInfoResponse.class);
-                String claims = GsonService.getGson().toJson(resp.getClaims());
-                JsonObject jObjClaims = new JsonParser().parse(claims).getAsJsonObject();
-                System.out.println("Name:" + GsonService.getValueFromJson("name", jObjClaims));
-                System.out.println("Email:" + GsonService.getValueFromJson("email", jObjClaims));
-            } catch (Exception ex) {
-                System.out.println("Exception in retrieving user info:" + ex.getMessage());
-            } finally {
-                CommandClient.closeQuietly(client);
+//            retrieve user info
+            UserInfo userInfo = userInfoService.getUserInfo(accessToken);
+            if (userInfo != null) {
+                String issuer = userInfo.getIssuer();
             }
 
             String issuer = "https://ce-dev2.gluu.org";
@@ -129,7 +109,7 @@ public class BadgeController {
     }
 
     //    @RequestMapping(value = "/{inum:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getBadgeByInum(@PathVariable String inum, HttpServletResponse response) {
+    public String getBadgeByInum(@PathVariable String inum, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
@@ -138,7 +118,7 @@ public class BadgeController {
         //Dynamic
         if (LDAPService.isConnected()) {
             try {
-                BadgeResponse objBadge = BadgeCommands.getBadgeResponseByInum(LDAPService.ldapEntryManager, inum);
+                BadgeResponse objBadge = BadgeCommands.getBadgeResponseByInum(LDAPService.ldapEntryManager, inum, utils, request);
                 if (objBadge != null) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     return GsonService.getGson().toJson(objBadge);
@@ -161,14 +141,14 @@ public class BadgeController {
     }
 
     @RequestMapping(value = "verify/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String verifyBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletResponse response) {
+    public String verifyBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
         //Dynamic
         if (LDAPService.isConnected()) {
             try {
-                BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key);
+                BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key, utils, request);
                 if (badge != null) {
                     jsonResponse.addProperty("error", false);
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -193,7 +173,7 @@ public class BadgeController {
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletResponse response) {
+    public String getBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
@@ -206,7 +186,7 @@ public class BadgeController {
         //Dynamic
         if (LDAPService.connected) {
             try {
-                BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key);
+                BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key, utils, request);
                 if (badge != null) {
                     jsonResponse.addProperty("error", false);
                     response.setStatus(HttpServletResponse.SC_OK);

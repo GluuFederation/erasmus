@@ -111,67 +111,6 @@
         <!--<artifactId>spring-boot-starter-web</artifactId>-->
         <!--</dependency>-->
 
-        <!--jpa-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-data-jpa</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.hibernate</groupId>-->
-            <!--<artifactId>hibernate-core</artifactId>-->
-            <!--<version>4.1.4.Final</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.hibernate</groupId>-->
-            <!--<artifactId>hibernate-entitymanager</artifactId>-->
-            <!--<version>5.2.3.Final</version>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash;json-smart &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>net.minidev</groupId>-->
-            <!--<artifactId>json-smart</artifactId>-->
-            <!--<version>1.0.9</version>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash; net.minidev/asm &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>net.minidev</groupId>-->
-            <!--<artifactId>asm</artifactId>-->
-            <!--<version>1.0.2</version>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash; slf4j-api &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>slf4j-api</artifactId>-->
-            <!--<version>1.7.25</version>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash; jayway json-path &ndash;&gt;-->
-        <!--<dependency>-->
-            <!--<groupId>com.jayway.jsonpath</groupId>-->
-            <!--<artifactId>json-path</artifactId>-->
-            <!--<version>0.8.1</version>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-thymeleaf</artifactId>-->
-        <!--</dependency>-->
-
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-devtools</artifactId>-->
-        <!--<optional>true</optional>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-configuration-processor</artifactId>-->
-        <!--<optional>true</optional>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>commons-fileupload</groupId>-->
-        <!--<artifactId>commons-fileupload</artifactId>-->
-        <!--<version>1.2.2</version>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>

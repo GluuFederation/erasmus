@@ -6,6 +6,10 @@ package org.xdi.oxd.badgemanager.model;
 public class IssuerBadgeRequest {
     private String issuer,type;
 
+    public IssuerBadgeRequest(String iss){
+        this.issuer=iss;
+    }
+
     public IssuerBadgeRequest(String iss, String type){
         this.issuer=iss;
         this.type=type;

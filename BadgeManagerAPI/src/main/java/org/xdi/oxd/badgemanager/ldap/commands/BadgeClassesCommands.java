@@ -5,16 +5,16 @@ import com.google.gson.JsonParser;
 import com.unboundid.ldap.sdk.Filter;
 import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.jboss.resteasy.spi.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.xdi.oxd.badgemanager.config.DefaultConfig;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
+import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.ldap.service.InumService;
 import org.xdi.oxd.badgemanager.model.BadgeClassResponse;
 import org.xdi.oxd.badgemanager.model.Criteria;
@@ -22,13 +22,14 @@ import org.xdi.oxd.badgemanager.model.Issuer;
 import org.xdi.oxd.badgemanager.model.Verification;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by Arvind Tomar on 10/10/16.
  */
 public class BadgeClassesCommands {
+
+    private static final Logger logger = LoggerFactory.getLogger(BadgeRequestCommands.class);
 
     /**
      * Assign a badge to a user which has been requested by him or her
@@ -46,7 +47,7 @@ public class BadgeClassesCommands {
             if (!(ldapEntryManager.contains("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeClass.class, Filter.create("(inum=" + badges.getInum() + ")")))) {
                 if (!ldapEntryManager.contains("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeClass.class, Filter.create("(&(gluuBadgeRequestInum=" + badges.getBadgeRequestInum() + ")(gluuTemplateBadgeId=" + badges.getTemplateBadgeId() + "))"))) {
                     ldapEntryManager.persist(badges);
-                    System.out.println("New badge class entry");
+                    logger.info("New badge class entry");
                     return badges;
                 } else {
                     throw new Exception("Badge class already exists");
@@ -56,7 +57,7 @@ public class BadgeClassesCommands {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Exception in badge class entry: " + e.getMessage());
+            logger.error("Exception in badge class entry: " + e.getMessage());
             throw new Exception("There was error creating badge class");
         }
         throw new Exception("There was error in persist a badge class");
@@ -76,7 +77,7 @@ public class BadgeClassesCommands {
             badges.setInum(inum);
             if (ldapEntryManager.contains(badges.getDn(), BadgeClass.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
                 ldapEntryManager.remove(badges);
-                System.out.println("Deleted entry ");
+                logger.info("Deleted entry ");
                 return true;
             } else {
                 return false;
@@ -214,18 +215,47 @@ public class BadgeClassesCommands {
             JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
 
             if (jObjResponse != null) {
-                criteria.setNarrative(jObjResponse.get("narrative").getAsString());
+                criteria.setNarrative(GsonService.getValueFromJson("narrative", jObjResponse));
             }
 
             objBadgeClass.setCriteria(criteria);
+
+//            issuer
+//            BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, badge.getBadgeRequestInum());
+//            if (objBadgeRequest != null && objBadgeRequest.getParticipant() != null) {
+//                final String uriParticipant = Global.API_ENDPOINT + Global.participant + "/" + objBadgeRequest.getParticipant();
+//                HttpEntity<String> responseParticipant = restTemplate.exchange(uriParticipant, HttpMethod.GET, request, String.class);
+//
+//                String resultParticipant = responseParticipant.getBody();
+//
+//                JsonObject jObjResponseParticipant = new JsonParser().parse(resultParticipant).getAsJsonObject();
+//
+//                issuer.setId(GsonService.getValueFromJson("id", jObjResponseParticipant));
+//                issuer.setType(GsonService.getValueFromJson("type", jObjResponseParticipant));
+//                issuer.setName(GsonService.getValueFromJson("name", jObjResponseParticipant));
+//                issuer.setUrl("https://example.org");
+//
+//                String verificationJson = GsonService.getValueFromJson("verification", jObjResponseParticipant);
+//                if (verificationJson != null && verificationJson.length() > 0) {
+//                    JsonObject jObjVerification = new JsonParser().parse(verificationJson).getAsJsonObject();
+//
+//                    verification.setAllowedOrigins(GsonService.getValueFromJson("allowedOrigins", jObjVerification));
+//                    verification.setType(GsonService.getValueFromJson("type", jObjVerification));
+//
+//                    issuer.setVerification(verification);
+//                }
+//
+//                objBadgeClass.setIssuer(issuer);
+//            }
 
             issuer.setId("https://example.org/issuer");
             issuer.setType("Profile");
             issuer.setName("Example Maker Society");
             issuer.setUrl("https://example.org");
-            issuer.setEmail("contact@example.org");
+//            issuer.setEmail("contact@example.org");
 
             verification.setAllowedOrigins("example.org");
+            verification.setType("hosted");
 
             issuer.setVerification(verification);
             objBadgeClass.setIssuer(issuer);
@@ -233,7 +263,7 @@ public class BadgeClassesCommands {
             return objBadgeClass;
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.print("Exception in retrieving badge class response: " + ex.getMessage());
+            logger.error("Exception in retrieving badge class response: " + ex.getMessage());
             return null;
         }
     }
