@@ -330,30 +330,6 @@ public class BadgeRequestController {
 
     private boolean createBadgeClass(HttpServletRequest servletRequest, String badgeRequestInum) {
         try {
-
-//            BadgeClass objBadgeInstance = new BadgeClass();
-//            objBadgeInstance.setTemplateBadgeId("58dfa009a016c8832d9b7ea9");
-//            objBadgeInstance.setName("Emergency Medical Technician-Basic");
-//            objBadgeInstance.setType("BadgeClass");
-//            objBadgeInstance.setDescription("This is Emergency Medical Technician-Basic badge");
-//            objBadgeInstance.setBadgeRequestInum(badgeRequestInum);
-//
-//            objBadgeInstance = BadgeClassesCommands.createBadgeClass(ldapEntryManager, objBadgeInstance);
-//
-//            //Create actual badge entry(badge assertion)
-//            Badges objBadge = new Badges();
-//            objBadge.setContext("https://w3id.org/openbadges/v2");
-//            objBadge.setId("https://example.org/assertions/123");
-//            objBadge.setType("Assertion");
-//            objBadge.setRecipientType("email");
-//            objBadge.setRecipientIdentity("alice@example.org");
-//            objBadge.setVerificationType("hosted");
-//            objBadge.setBadgeClassInum(objBadgeInstance.getInum());
-//
-//            objBadge = BadgeCommands.createBadge(ldapEntryManager, objBadge);
-//
-//            return true;
-
             if (LDAPService.isConnected()) {
                 BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequestInum);
                 if (objBadgeRequest != null) {
@@ -447,7 +423,7 @@ public class BadgeRequestController {
 
             return BadgeCommands.createBadge(LDAPService.ldapEntryManager, objBadge);
         } catch (Exception ex) {
-            logger.error("Exception in persist badge entry."+ex.getMessage());
+            logger.error("Exception in persist badge entry." + ex.getMessage());
         }
 
         return objBadge;
@@ -464,7 +440,6 @@ public class BadgeRequestController {
      * @param imageFormat The image format in which the image should be rendered. As
      *                    Example 'png' or 'jpg'. See @javax.imageio.ImageIO for more
      *                    information which image formats are supported.   @throws Exception If an Exception occur during the create of the QR-code or
-     *                    while writing the data into the OutputStream.
      */
     private boolean generateQrCode(Badges badge, String logoFileURL, String tempURL, int qrCodeSize, String imageFormat) {
         try {
@@ -473,11 +448,17 @@ public class BadgeRequestController {
             float OVERLAY_RATIO = 0.25f;
 
             //location of barcode
-            String location = context.getRealPath("");
-            String fileName = location + File.separator + System.currentTimeMillis() + ".png";
+            String fileName = System.currentTimeMillis() + ".png";
+            String imagesPath = utils.getStaticResourcePath(context);
+            System.out.println("path :" + imagesPath);
+            if (new File(imagesPath).exists()) {
+                System.out.println("Directory exists:" + imagesPath);
+            }
+            String filePath = imagesPath + File.separator + fileName;
+            System.out.println("file path:" + filePath);
 
             //logo file
-//            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
+            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
 
             //barcode data
 //            String data = WordUtils.capitalizeFully("test data");
@@ -493,12 +474,12 @@ public class BadgeRequestController {
                     .decorate(addImageOverlay(ImageIO.read(new URL(logoFileURL).openStream()), TRANSPARENCY, OVERLAY_RATIO))
                     .and()
                     .doVerify(false)
-                    .toFile(fileName, imageFormat);
+                    .toFile(filePath, imageFormat);
 
             String[] arFilePath = fileName.split("/resources");
             if (arFilePath.length > 0) {
-                String filePath = arFilePath[arFilePath.length - 1];
-                badge.setImage(filePath);
+                String filepath = arFilePath[arFilePath.length - 1];
+                badge.setImage(filepath);
             }
 
             return true;

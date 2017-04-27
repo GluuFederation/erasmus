@@ -2,6 +2,7 @@ package org.xdi.oxd.badgemanager.util;
 
 import org.springframework.stereotype.Component;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 
@@ -49,7 +50,7 @@ public class Utils {
     }
 
     /**
-     * Generates base url.
+     * Retrieve base url.
      */
     public String getBaseURL(HttpServletRequest request) {
         String url;
@@ -59,5 +60,12 @@ public class Utils {
             url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()+request.getContextPath();
         }
         return url;
+    }
+
+    /**
+     * Retrieve static resource path.
+     */
+    public String getStaticResourcePath(ServletContext context) {
+        return context.getRealPath("/WEB-INF/classes/static/images");
     }
 }

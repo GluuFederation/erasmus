@@ -14,7 +14,10 @@ import org.xdi.oxd.badgemanager.model.BadgeClassResponse;
 import org.xdi.oxd.badgemanager.model.BadgeResponse;
 import org.xdi.oxd.badgemanager.model.BadgeVerification;
 import org.xdi.oxd.badgemanager.model.Recipient;
+import org.xdi.oxd.badgemanager.util.Utils;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -111,9 +114,10 @@ public class BadgeCommands {
      *
      * @param ldapEntryManager ldapEntryManager
      * @param Inum             Inum of the badge that is to be retrieved.
-     * @return
+     * @param utils
+     *@param request @return
      */
-    public static BadgeResponse getBadgeResponseByInum(LdapEntryManager ldapEntryManager, String Inum) {
+    public static BadgeResponse getBadgeResponseByInum(LdapEntryManager ldapEntryManager, String Inum, Utils utils, HttpServletRequest request) {
         try {
 
             Badges objBadges = new Badges();
@@ -125,7 +129,7 @@ public class BadgeCommands {
 
                 if (badges.size() > 0) {
                     objBadges = badges.get(0);
-                    return GetBadgeResponse(ldapEntryManager, objBadges);
+                    return GetBadgeResponse(ldapEntryManager, objBadges, utils, request);
                 } else
                     return null;
             } else {
@@ -143,9 +147,11 @@ public class BadgeCommands {
      * @param ldapEntryManager ldapEntryManager
      * @param id               GUID of the badge
      * @param key              key of the badge that is to be retrieved.
+     * @param utils
+     * @param request
      * @return
      */
-    public static BadgeResponse getBadgeResponseById(LdapEntryManager ldapEntryManager, String id, String key) {
+    public static BadgeResponse getBadgeResponseById(LdapEntryManager ldapEntryManager, String id, String key, Utils utils, HttpServletRequest request) {
         try {
 
             Badges objBadges = new Badges();
@@ -154,7 +160,7 @@ public class BadgeCommands {
             List<Badges> lstBadges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + ")(gluuBadgeAssertionKey=" + key + "))"));
 
             if (lstBadges.size() > 0) {
-                return GetBadgeResponse(ldapEntryManager, lstBadges.get(0));
+                return GetBadgeResponse(ldapEntryManager, lstBadges.get(0), utils, request);
             } else
                 return null;
         } catch (Exception e) {
@@ -216,13 +222,17 @@ public class BadgeCommands {
         }
     }
 
-    private static BadgeResponse GetBadgeResponse(LdapEntryManager ldapEntryManager, Badges objBadges) {
+    private static BadgeResponse GetBadgeResponse(LdapEntryManager ldapEntryManager, Badges objBadges, Utils utils, HttpServletRequest request) {
         try {
             BadgeResponse objBadge = new BadgeResponse();
             objBadge.setType(objBadges.getType());
             objBadge.setId(objBadges.getId());
             objBadge.setContext(objBadges.getContext());
-            objBadge.setImage(objBadges.getImage());
+            if(objBadges.getImage()!=null){
+                objBadge.setImage(utils.getBaseURL(request) + File.separator + "images" + File.separator + objBadges.getImage());
+            } else {
+                objBadge.setImage("");
+            }
 
             Recipient recipient = new Recipient();
             recipient.setType(objBadges.getRecipientType());
