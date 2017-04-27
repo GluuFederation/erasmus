@@ -233,7 +233,7 @@ let getAllUsers = () => {
  * @return {users} - return users
  * @return {err} - return error
  */
-let getAllParticipants = () => {
+let getAllParticipants = (params) => {
   return Roles.getRoleByName('admin')
     .then((role) => {
       return User.find({role: {$ne: role._id}}, 'participant entity')
@@ -243,7 +243,15 @@ let getAllParticipants = () => {
       if (users.length) {
         let participants = [];
         users.forEach(function (user) {
-          user.participant._doc.entity = user.entity.discoveryUrl;
+          if (!!params.state && !!params.city && params.state != 'all' && params.city != 'all') {
+            if (user.participant.state == params.state && user.participant.city == params.city) {
+              user.participant._doc.discoveryUrl = user.entity.discoveryUrl;
+              participants.push(user.participant);
+            }
+            return;
+          }
+
+          user.participant._doc.discoveryUrl = user.entity.discoveryUrl;
           participants.push(user.participant);
         });
         return Promise.resolve(participants);

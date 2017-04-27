@@ -10,6 +10,7 @@ const express = require('express'),
   _ = require('lodash'),
   common = require('../helpers/common'),
   Participant = require('../helpers/participants'),
+  Users = require('../helpers/users'),
   Federation = require('../helpers/federations');
 
 const storage = multer.diskStorage({
@@ -63,6 +64,25 @@ router.get('/participant/:oid', (req, res, next) => {
       err: err,
       message: common.message.INTERNAL_SERVER_ERROR
     }));
+});
+
+/**
+ * Get list of all the participants.
+ */
+router.get('/participant', (req, res, next) => {
+  Users.getAllParticipants(req.query)
+    .then((participants) => {
+      if (!participants) {
+        return res.status(httpStatus.OK).send({message: 'Participant ' + common.message.NOT_FOUND});
+      }
+      return res.status(httpStatus.OK).send(participants);
+    })
+    .catch((err) => {
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+        err: err,
+        message: common.message.INTERNAL_SERVER_ERROR
+      });
+    });
 });
 
 /**

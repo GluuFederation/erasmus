@@ -329,7 +329,7 @@ router.post('/updateUser', (req, res, next) => {
  * Get list of all the participants.
  */
 router.get('/getAllParticipants', (req, res, next) => {
-  Users.getAllParticipants()
+  Users.getAllParticipants(req.query)
     .then((participants) => {
       if (!participants) {
         return res.status(httpStatus.OK).send({message: 'Participant ' + common.message.NOT_FOUND});
