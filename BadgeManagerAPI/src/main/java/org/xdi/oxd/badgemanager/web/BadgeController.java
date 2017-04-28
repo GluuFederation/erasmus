@@ -3,6 +3,8 @@ package org.xdi.oxd.badgemanager.web;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.swagger.annotations.Api;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -12,17 +14,37 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.xdi.oxd.badgemanager.global.Global;
+import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
+import org.xdi.oxd.badgemanager.ldap.commands.BadgeRequestCommands;
+import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
+import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
+import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.*;
+import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
+import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
 import org.xdi.oxd.badgemanager.service.UserInfoService;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 import org.xdi.oxd.badgemanager.util.Utils;
 
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import static org.xdi.oxd.badgemanager.qrcode.decorator.ColoredQRCode.colorizeQRCode;
+import static org.xdi.oxd.badgemanager.qrcode.decorator.ImageOverlay.addImageOverlay;
 
 /**
  * Created by Arvind Tomar on 10/10/16.
@@ -33,6 +55,8 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/badges")
 public class BadgeController {
 
+    private static final Logger logger = LoggerFactory.getLogger(BadgeController.class);
+
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
 
@@ -42,7 +66,19 @@ public class BadgeController {
     @Inject
     private Utils utils;
 
-    @RequestMapping(value = "listTemplateBadges/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    private final ServletContext context;
+
+    @Autowired
+    public BadgeController(ServletContext context) {
+        this.context = context;
+    }
+
+    public void setRedisData(String key, String value, int timeout) throws IOException {
+        redisTemplate.opsForValue().set(key, value);
+        redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+    }
+
+    @RequestMapping(value = "templates/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTemplateBadgesByParticipant(@RequestParam String accessToken, @RequestParam String type, HttpServletResponse response) {
         JsonObject jsonResponse = new JsonObject();
 
@@ -85,38 +121,6 @@ public class BadgeController {
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            jsonResponse.addProperty("error", "Please try after some time");
-            return jsonResponse.toString();
-        }
-    }
-
-    //    @RequestMapping(value = "/{inum:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getBadgeByInum(@PathVariable String inum, HttpServletRequest request, HttpServletResponse response) {
-
-        JsonObject jsonResponse = new JsonObject();
-
-        //Static
-
-        //Dynamic
-        if (LDAPService.isConnected()) {
-            try {
-                BadgeResponse objBadge = BadgeCommands.getBadgeResponseByInum(LDAPService.ldapEntryManager, inum, utils, request);
-                if (objBadge != null) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    return GsonService.getGson().toJson(objBadge);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
-                    jsonResponse.addProperty("error", "No such badge found");
-                    return jsonResponse.toString();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                jsonResponse.addProperty("error", e.getMessage());
-                return jsonResponse.toString();
-            }
-        } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", "Please try after some time");
             return jsonResponse.toString();
@@ -192,4 +196,143 @@ public class BadgeController {
             return jsonResponse.toString();
         }
     }
+
+    @RequestMapping(value = "details/{badgeRequestInum:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getBadgeByBadgeRequestInum(@PathVariable String badgeRequestInum, HttpServletRequest request, HttpServletResponse response) {
+
+        JsonObject jsonResponse = new JsonObject();
+
+        if (LDAPService.isConnected()) {
+            try {
+
+                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequestInum);
+                if (badgeRequests != null && badgeRequests.getInum() != null) {
+                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
+                    if (badgeClass != null && badgeClass.getInum() != null) {
+                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
+                        if (badges != null && badges.getInum() != null) {
+
+                            String tempURL = utils.getBaseURL(request) + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
+                            String redisKey = badges.getGuid() + badges.getKey();
+                            setRedisData(redisKey, tempURL, 95);
+//                            logger.info("Temp URL:" + tempURL);
+
+                            if (generateQrCode(badges, badgeClass.getImage(), tempURL, 250, "png")) {
+                                logger.info("QR Code generated successfully");
+                                DisplayBadge badge = new DisplayBadge();
+                                badge.setQrCode(utils.getBaseURL(request) + File.separator + "images" + File.separator + badges.getImage());
+                                badge.setBadgePublicURL(badges.getId());
+                                badge.setBadgeTitle(badgeRequests.getTemplateBadgeTitle());
+
+                                Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
+                                System.out.println("Current time:" + calendar.getTime().toString());
+                                calendar.add(Calendar.SECOND, 95);
+                                System.out.println("Expire time:" + calendar.getTime().toString());
+                                badge.setExpiresAt(calendar.getTime().toString());
+
+                                Recipient recipient = new Recipient();
+                                recipient.setType(badges.getRecipientType());
+                                recipient.setIdentity(badges.getRecipientIdentity());
+                                badge.setRecipient(recipient);
+
+                                response.setStatus(HttpServletResponse.SC_OK);
+                                return GsonService.getGson().toJson(badge);
+                            } else {
+                                logger.error("Failed to generate QR Code");
+                                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                                jsonResponse.addProperty("error", "No such badge found");
+                                return jsonResponse.toString();
+                            }
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_CONFLICT);
+                            jsonResponse.addProperty("error", "No such badge found");
+                            return jsonResponse.toString();
+                        }
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        jsonResponse.addProperty("error", "No such badge found");
+                        return jsonResponse.toString();
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    jsonResponse.addProperty("error", "No such badge found");
+                    return jsonResponse.toString();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                jsonResponse.addProperty("error", e.getMessage());
+                return jsonResponse.toString();
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.addProperty("error", "Please try after some time");
+            return jsonResponse.toString();
+        }
+    }
+
+    /**
+     * Call this method to create a QR-code image. You must provide the
+     * OutputStream where the image data can be written.
+     *
+     * @param badge       The  badge object from which content should be encoded with the QR-code.
+     * @param tempURL
+     * @param qrCodeSize  The QR-code must be quadratic. So this is the number of pixel
+     *                    in width and height.
+     * @param imageFormat The image format in which the image should be rendered. As
+     *                    Example 'png' or 'jpg'. See @javax.imageio.ImageIO for more
+     *                    information which image formats are supported.   @throws Exception If an Exception occur during the create of the QR-code or
+     */
+    private boolean generateQrCode(Badges badge, String logoFileURL, String tempURL, int qrCodeSize, String imageFormat) {
+        try {
+
+            float TRANSPARENCY = 0.75f;
+            float OVERLAY_RATIO = 0.25f;
+
+            //location of barcode
+            String fileName = System.currentTimeMillis() + ".png";
+            //Server
+            String imagesPath = utils.getStaticResourcePath(context);
+            //Local
+//            String imagesPath = "src/main/resources/static/images";
+            System.out.println("path :" + imagesPath);
+            if (new File(imagesPath).exists()) {
+                System.out.println("Directory exists:" + imagesPath);
+            }
+            String filePath = imagesPath + File.separator + fileName;
+            System.out.println("file path:" + filePath);
+
+            //logo file
+//            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
+
+            //barcode data
+//            String data = WordUtils.capitalizeFully("test data");
+
+            QRCBuilder<BufferedImage> qrCodeBuilder = new ZXingQRCodeBuilder();
+            qrCodeBuilder.newQRCode()
+                    .withSize(qrCodeSize, qrCodeSize)
+                    .and()
+                    .withData(tempURL)
+                    .and()
+//                    .decorate(colorizeQRCode(new Color(51, 102, 153)))
+//                    .and()
+                    .decorate(addImageOverlay(ImageIO.read(new URL(logoFileURL).openStream()), TRANSPARENCY, OVERLAY_RATIO))
+                    .and()
+                    .doVerify(false)
+                    .toFile(filePath, imageFormat);
+
+            String[] arFilePath = fileName.split("/resources");
+            if (arFilePath.length > 0) {
+                String filepath = arFilePath[arFilePath.length - 1];
+                badge.setImage(filepath);
+            }
+
+            return true;
+        } catch (Exception ex) {
+            logger.error("Exception in generating qr code: " + ex.getMessage());
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
 }

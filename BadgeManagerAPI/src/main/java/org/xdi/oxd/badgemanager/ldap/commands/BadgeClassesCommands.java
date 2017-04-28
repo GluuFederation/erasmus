@@ -319,13 +319,13 @@ public class BadgeClassesCommands {
 //                objBadgeClass.setIssuer(issuer);
 //            }
 
-            issuer.setId("https://example.org/issuer");
+            issuer.setId("https://erasmusdev.gluu.org");
             issuer.setType("Profile");
-            issuer.setName("Example Maker Society");
-            issuer.setUrl("https://example.org");
-//            issuer.setEmail("contact@example.org");
+            issuer.setName("Erasmus");
+            issuer.setUrl("https://erasmusdev.gluu.org");
+            issuer.setEmail("erasmussupport@gluu.org");
 
-            verification.setAllowedOrigins("example.org");
+            verification.setAllowedOrigins("https://erasmusdev.gluu.org");
             verification.setType("hosted");
 
             issuer.setVerification(verification);

@@ -4,8 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,28 +23,14 @@ import org.xdi.oxd.badgemanager.model.ApproveBadge;
 import org.xdi.oxd.badgemanager.model.BadgeRequestResponse;
 import org.xdi.oxd.badgemanager.model.CreateBadgeRequest;
 import org.xdi.oxd.badgemanager.model.CreateBadgeResponse;
-import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
-import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 import org.xdi.oxd.badgemanager.util.JWTUtil;
 import org.xdi.oxd.badgemanager.util.Utils;
 
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.xdi.oxd.badgemanager.qrcode.decorator.ColoredQRCode.colorizeQRCode;
-import static org.xdi.oxd.badgemanager.qrcode.decorator.ImageOverlay.addImageOverlay;
 
 /**
  * Created by Arvind Tomar on 14/10/16.
@@ -58,26 +42,12 @@ public class BadgeRequestController {
 
     private static final Logger logger = LoggerFactory.getLogger(BadgeRequestController.class);
 
-    private final ServletContext context;
-
     @Inject
     private JWTUtil jwtUtil;
 
     @Inject
     private Utils utils;
 
-    @Autowired
-    public BadgeRequestController(ServletContext context) {
-        this.context = context;
-    }
-
-    @Autowired
-    public RedisTemplate<Object, Object> redisTemplate;
-
-    public void setRedisData(String key, String value, int timeout) throws IOException {
-        redisTemplate.opsForValue().set(key, value);
-        redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
-    }
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String createBadgeRequest(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody CreateBadgeRequest badgeRequest, HttpServletResponse response) {
@@ -387,17 +357,6 @@ public class BadgeRequestController {
 
             objBadge.setId(utils.getBaseURL(servletRequest) + "/badges/verify/" + objBadge.getGuid() + "?key=" + objBadge.getKey());
 
-            String tempURL = utils.getBaseURL(servletRequest) + "/badges/" + objBadge.getGuid() + "?key=" + objBadge.getKey();
-            String redisKey = objBadge.getGuid() + objBadge.getKey();
-            setRedisData(redisKey, tempURL, 90);
-            logger.info("Temp URL:" + tempURL);
-
-            if (generateQrCode(objBadge, objBadgeClass.getImage(), tempURL, 250, "png")) {
-                logger.info("QR Code generated successfully");
-            } else {
-                logger.error("Failed to generate QR Code");
-            }
-
             return BadgeCommands.createBadge(LDAPService.ldapEntryManager, objBadge);
         } catch (Exception ex) {
             logger.error("Exception in persist badge entry." + ex.getMessage());
@@ -406,64 +365,5 @@ public class BadgeRequestController {
         return objBadge;
     }
 
-    /**
-     * Call this method to create a QR-code image. You must provide the
-     * OutputStream where the image data can be written.
-     *
-     * @param badge       The  badge object from which content should be encoded with the QR-code.
-     * @param tempURL
-     * @param qrCodeSize  The QR-code must be quadratic. So this is the number of pixel
-     *                    in width and height.
-     * @param imageFormat The image format in which the image should be rendered. As
-     *                    Example 'png' or 'jpg'. See @javax.imageio.ImageIO for more
-     *                    information which image formats are supported.   @throws Exception If an Exception occur during the create of the QR-code or
-     */
-    private boolean generateQrCode(Badges badge, String logoFileURL, String tempURL, int qrCodeSize, String imageFormat) {
-        try {
 
-            float TRANSPARENCY = 0.75f;
-            float OVERLAY_RATIO = 0.25f;
-
-            //location of barcode
-            String fileName = System.currentTimeMillis() + ".png";
-            String imagesPath = utils.getStaticResourcePath(context);
-            System.out.println("path :" + imagesPath);
-            if (new File(imagesPath).exists()) {
-                System.out.println("Directory exists:" + imagesPath);
-            }
-            String filePath = imagesPath + File.separator + fileName;
-            System.out.println("file path:" + filePath);
-
-            //logo file
-            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
-
-            //barcode data
-//            String data = WordUtils.capitalizeFully("test data");
-
-            QRCBuilder<BufferedImage> qrCodeBuilder = new ZXingQRCodeBuilder();
-            qrCodeBuilder.newQRCode()
-                    .withSize(qrCodeSize, qrCodeSize)
-                    .and()
-                    .withData(tempURL)
-                    .and()
-                    .decorate(colorizeQRCode(new Color(51, 102, 153)))
-                    .and()
-                    .decorate(addImageOverlay(ImageIO.read(new URL(logoFileURL).openStream()), TRANSPARENCY, OVERLAY_RATIO))
-                    .and()
-                    .doVerify(false)
-                    .toFile(filePath, imageFormat);
-
-            String[] arFilePath = fileName.split("/resources");
-            if (arFilePath.length > 0) {
-                String filepath = arFilePath[arFilePath.length - 1];
-                badge.setImage(filepath);
-            }
-
-            return true;
-        } catch (Exception ex) {
-            logger.error("Exception in generating qr code: " + ex.getMessage());
-            ex.printStackTrace();
-            return false;
-        }
-    }
 }

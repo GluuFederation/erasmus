@@ -288,11 +288,11 @@ public class BadgeCommands {
             objBadge.setType(objBadges.getType());
             objBadge.setId(objBadges.getId());
             objBadge.setContext(objBadges.getContext());
-            if (objBadges.getImage() != null) {
-                objBadge.setImage(utils.getBaseURL(request) + File.separator + "images" + File.separator + objBadges.getImage());
-            } else {
-                objBadge.setImage("");
-            }
+//            if (objBadges.getImage() != null) {
+//                objBadge.setImage(utils.getBaseURL(request) + File.separator + "images" + File.separator + objBadges.getImage());
+//            } else {
+//                objBadge.setImage("");
+//            }
 
             Recipient recipient = new Recipient();
             recipient.setType(objBadges.getRecipientType());

@@ -14,7 +14,7 @@ import java.util.Date;
 
 @LdapEntry
 @LdapObjectClass(values = {"top", "gluuBadgeAssertion"})
-public class Badges extends SimpleUser {
+public class Badges  {
 
     @LdapDN
     private String dn;
@@ -149,16 +149,6 @@ public class Badges extends SimpleUser {
         this.verificationType = verificationType;
     }
 
-    @Override
-    public String getDn() {
-        return dn;
-    }
-
-    @Override
-    public void setDn(String dn) {
-        this.dn = dn;
-    }
-
     public String getGuid() {
         return guid;
     }
@@ -173,5 +163,13 @@ public class Badges extends SimpleUser {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getDn() {
+        return dn;
+    }
+
+    public void setDn(String dn) {
+        this.dn = dn;
     }
 }

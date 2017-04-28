@@ -4,7 +4,7 @@ package org.xdi.oxd.badgemanager.model;
  * Created by Arvind Tomar on 19/4/17.
  */
 public class BadgeResponse {
-    private String context, id, type, issuedOn, expires, image;
+    private String context, id, type, issuedOn, expires;
 
     private Recipient recipient;
 
@@ -74,13 +74,5 @@ public class BadgeResponse {
 
     public void setExpires(String expires) {
         this.expires = expires;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 }

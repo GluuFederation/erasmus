@@ -4,7 +4,7 @@ package org.xdi.oxd.badgemanager.model;
  * Created by Arvind Tomar on 19/4/17.
  */
 public class Issuer {
-    private String id, type, name, url;
+    private String id, type, name, url, email;
 
     private Verification verification;
 
@@ -46,5 +46,13 @@ public class Issuer {
 
     public void setVerification(Verification verification) {
         this.verification = verification;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
