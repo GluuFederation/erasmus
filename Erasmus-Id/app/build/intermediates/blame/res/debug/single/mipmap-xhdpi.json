@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/log.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/log.png"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/ic_launcher.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/qr_code.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/qr_code.png"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/ic_settings.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/ic_settings.png"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/ic_search.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/ic_search.png"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/ic_help.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/ic_help.png"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/ic_action_add.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/ic_action_add.png"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/ic_add_circle_outline.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/ic_add_circle_outline.png"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/mipmap-xhdpi/ic_action_cancel.png",
+        "source": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/res/mipmap-xhdpi/ic_action_cancel.png"
+    }
+]

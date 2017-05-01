@@ -1,0 +1,66 @@
+[
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_slide_in_bottom.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_slide_in_bottom.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_grow_fade_in_from_bottom.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_grow_fade_in_from_bottom.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/design_bottom_sheet_slide_in.xml",
+        "source": "/home/lcom58/.android/build-cache/c30152f06db461b2b609d011fe6660b6c390c7db/output/res/anim/design_bottom_sheet_slide_in.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/design_bottom_sheet_slide_out.xml",
+        "source": "/home/lcom58/.android/build-cache/c30152f06db461b2b609d011fe6660b6c390c7db/output/res/anim/design_bottom_sheet_slide_out.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_slide_out_bottom.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_slide_out_bottom.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_slide_out_top.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_slide_out_top.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/design_snackbar_out.xml",
+        "source": "/home/lcom58/.android/build-cache/c30152f06db461b2b609d011fe6660b6c390c7db/output/res/anim/design_snackbar_out.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_popup_exit.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_popup_exit.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_fade_out.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_fade_out.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_fade_in.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_fade_in.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/design_snackbar_in.xml",
+        "source": "/home/lcom58/.android/build-cache/c30152f06db461b2b609d011fe6660b6c390c7db/output/res/anim/design_snackbar_in.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_popup_enter.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_popup_enter.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_shrink_fade_out_from_bottom.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_shrink_fade_out_from_bottom.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/design_fab_in.xml",
+        "source": "/home/lcom58/.android/build-cache/c30152f06db461b2b609d011fe6660b6c390c7db/output/res/anim/design_fab_in.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/design_fab_out.xml",
+        "source": "/home/lcom58/.android/build-cache/c30152f06db461b2b609d011fe6660b6c390c7db/output/res/anim/design_fab_out.xml"
+    },
+    {
+        "merged": "/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/res/merged/debug/anim/abc_slide_in_top.xml",
+        "source": "/home/lcom58/.android/build-cache/a4616159ea4502074da04165278d3e258086683d/output/res/anim/abc_slide_in_top.xml"
+    }
+]

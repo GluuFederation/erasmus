@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="net.gluu.erasmus"
+      android:versionCode="187"
+      android:versionName="0.5.1-18-gb24d549"
+      split="lib_slice_0_apk">
+</manifest>

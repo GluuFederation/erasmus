@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--<layout xmlns:android="http://schemas.android.com/apk/res/android">-->
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/value_10"
+                android:text="@string/select_state"
+                android:textSize="@dimen/text_18" />
+
+            <Spinner
+                android:id="@+id/sp_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/value_10"
+                android:text="@string/select_city"
+                android:textSize="@dimen/text_18" />
+
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_cities"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_horizontal_margin"
+                tools:listitem="@layout/city_item" />
+
+        </LinearLayout>
+    </LinearLayout>
+<!--</layout>-->

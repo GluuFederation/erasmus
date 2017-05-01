@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name_short">Erasmus-Id</string>
+    <string name="auth_granted">Authorization granted</string>
+    <string name="intro_header">OpenID AppAuth Demo</string>
+    <string name="openid_logo_content_description">AppAuth Logo</string>
+    <string name="refresh_token">Refresh token</string>
+    <string name="access_token_expires_at">Access token expires at: %s</string>
+    <string name="no_access_token_returned">No access token returned</string>
+    <string name="no_refresh_token_returned">No refresh token returned</string>
+    <string name="refresh_token_returned">Refresh token returned</string>
+    <string name="no_id_token_returned">No ID token returned</string>
+    <string name="id_token_returned">ID token returned</string>
+    <string name="view_profile">View user info</string>
+    <string name="userinfo_profile_content_description">User profile picture</string>
+    <string name="login_hint_value">Account ID (e.g. test@example.com)</string>
+    <string name="account_id_description">The Account ID is optional. If specified, it is transmitted as a login_hint parameter in the authorization request.</string>
+    <string name="auth_options">Authorization options:</string>
+    <string name="browser_selector_label">Use browser:</string>
+    <string name="browser_icon_contentDescription">Browser app icon</string>
+    <string name="browser_appauth_default_label">AppAuth heuristic selection</string>
+    <string name="custom_tab_label">"%1$s (custom tab)"</string>
+    <string name="retry_label">Retry</string>
+    <string name="not_authorized">Not authorized</string>
+    <string name="start_authorization">Start authorization</string>
+    <string name="reauthorize">Reauthorize</string>
+    <string name="sign_out">Sign out</string>
+    <string name="no_access_token_expiry">Access time has no defined expiry</string>
+    <string name="access_token_expired">Access token has expired</string>
+    <string name="auth_settings">Authorization settings in use:</string>
+
+    <string name="app_name">Badge Manager</string>
+    <string name="gluu">gluu</string>
+    <string name="search">search</string>
+    <string name="select_organization">Select Organization</string>
+    <string name="title_activity_badge_status">BadgeStatusActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="badge_status">Badge Status</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">Login</string>
+    <string name="request_badges">Request Badges</string>
+    <string name="permission_camera_rationale">PERMISSION CAMERA RATIONALE</string>
+    <string name="ok">OK</string>
+    <string name="low_storage">LOW STORAGE</string>
+    <string name="no_permission">NO PERMISSION</string>
+    <string name="badge_info">Badge Info</string>
+    <string name="select_city">Select City</string>
+    <string name="select_state">Select State</string>
+    <string name="request_badge">Request badge</string>
+
+</resources>

@@ -1,0 +1,7 @@
+#Mon May 01 19:00:36 IST 2017
+base.0=/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_f443ccb38cbff69abfcc5307418b45fc6906c5f3
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_36f6cf2b4eba4ce07b68b56a9f263cbcbeedf034/classes.dex
+base.1=/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_36f6cf2b4eba4ce07b68b56a9f263cbcbeedf034
+file.0=/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_f443ccb38cbff69abfcc5307418b45fc6906c5f3/classes.dex

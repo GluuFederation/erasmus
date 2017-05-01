@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.gluu.appauth.test" >
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="25" />
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:functionalTest="false"
+        android:handleProfiling="false"
+        android:label="Tests for net.gluu.appauth.test"
+        android:targetPackage="net.gluu.appauth.test" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application>
+        <uses-library android:name="android.test.runner" />
+
+        <activity
+            android:name="net.gluu.appauth.AuthorizationManagementActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="net.gluu.appauth.RedirectUriReceiverActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="net.openid.appauth.test" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

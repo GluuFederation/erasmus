@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="/home/lcom58/Documents/ANDROID_PROJECT/Erasmus-Id/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="c82741bc129dd5f99f11a4ab8666ae24262053b6">
+        <dex dex="/home/lcom58/Documents/ANDROID_PROJECT/Erasmus-Id/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_2ad9da1785755f85495131afbdb0dbce8eff046e/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="c82741bc129dd5f99f11a4ab8666ae24262053b6">
+        <dex dex="/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_f443ccb38cbff69abfcc5307418b45fc6906c5f3/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="284c3e67242f595f312990fa960c669f26be7d85">
+        <dex dex="/media/lcom58/D/DEVELOPER20/erasmus/Erasmus-Id/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_36f6cf2b4eba4ce07b68b56a9f263cbcbeedf034/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/home/lcom58/Documents/ANDROID_PROJECT/Erasmus-Id/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.1"
+        sha1="e34b11a056b02d75cba74596a6fdf66317b4297c">
+        <dex dex="/home/lcom58/Documents/ANDROID_PROJECT/Erasmus-Id/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_75e84f8705db0ab6bffe07d5bac4227b891db9ba/classes.dex" />
+    </item>
+
+</items>
