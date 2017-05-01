@@ -1,1 +1,0 @@
-## BadgeManager Android App
