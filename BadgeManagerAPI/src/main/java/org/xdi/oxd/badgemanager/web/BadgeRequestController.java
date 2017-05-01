@@ -92,42 +92,6 @@ public class BadgeRequestController {
     public String getPendingBadgeRequestsByParticipant(@RequestHeader(value = "Authorization") String authorization, @PathVariable String participant, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
-        //Static
-//        List<BadgeRequests> lstBadgeRequests=new ArrayList<>();
-//        BadgeRequests obj1=new BadgeRequests();
-//        obj1.setInum("@!4301.2A50.9A09.7688!1002!BA48.6F40");
-//        obj1.setTemplateBadgeId("58dfa009a016c8832d9b7ea9");
-//        obj1.setTemplateBadgeTitle("Emergency Medical Technician-Basic");
-//        obj1.setParticipant("58e1dfaf159139ee277d7ab7");
-//        obj1.setStatus("Pending");
-//        obj1.setGluuBadgeRequester("test@test.com");
-//        obj1.setDn("inum=@!4301.2A50.9A09.7688!1002!BA48.6F40,ou=badgeRequests,ou=badges,o=@!C460.F7DA.F3E9.4A62!0001!5EE3.2D5C,o=gluu");
-//
-//        BadgeRequests obj2=new BadgeRequests();
-//        obj2.setInum("@!4301.2A50.9A09.7688!1002!D79C.9514");
-//        obj2.setTemplateBadgeId("58dfa009a016c8832d9b7ea9");
-//        obj2.setTemplateBadgeTitle("Entry-Level Firefighter");
-//        obj2.setParticipant("58e1dfaf159139ee277d7ab7");
-//        obj2.setStatus("Pending");
-//        obj2.setGluuBadgeRequester("test@test.com");
-//        obj2.setDn("inum=@!4301.2A50.9A09.7688!1002!D79C.9514,ou=badgeRequests,ou=badges,o=@!C460.F7DA.F3E9.4A62!0001!5EE3.2D5C,o=gluu");
-//
-//        lstBadgeRequests.add(obj1);
-//        lstBadgeRequests.add(obj2);
-//
-//        try {
-//            jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
-//            jsonResponse.addProperty("error", false);
-//            response.setStatus(HttpServletResponse.SC_OK);
-//            return jsonResponse.toString();
-//        } catch (Exception e) {
-//            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-//            jsonResponse.addProperty("error", true);
-//            jsonResponse.addProperty("errorMsg", e.getMessage());
-//            return jsonResponse.toString();
-//        }
-
-        //Dynamic
 
         if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

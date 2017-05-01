@@ -81,7 +81,7 @@ public class ParticipantController {
             } else {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "No organizations found");
+                jsonResponse.addProperty("errorMsg", "No participants found");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
