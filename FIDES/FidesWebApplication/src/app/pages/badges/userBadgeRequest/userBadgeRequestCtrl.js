@@ -55,7 +55,7 @@
 
         var formData = {
           inum: badge.inum,
-          validity: vm.days
+          validity: vm.validity
         };
         userBadgeRequestService.badgeApprove(formData).then(onSuccess).catch(onError);
 

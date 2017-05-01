@@ -21,7 +21,7 @@
     }
 
     function getParticipantById(oid) {
-      return $http.get(urls.BASE_API + '/getParticipantById/' + oid);
+      return $http.get(urls.BASE_API + '/participant/' + oid);
     }
 
     return service;
