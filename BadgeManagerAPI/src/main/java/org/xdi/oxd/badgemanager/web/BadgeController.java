@@ -1,8 +1,13 @@
 package org.xdi.oxd.badgemanager.web;
 
+import com.google.common.hash.Hashing;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.swagger.annotations.Api;
+import org.apache.commons.io.FileUtils;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +41,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import static org.xdi.oxd.badgemanager.qrcode.decorator.ColoredQRCode.colorizeQRCode;
@@ -170,7 +177,6 @@ public class BadgeController {
             return jsonResponse.toString();
         }
 
-        //Dynamic
         if (LDAPService.connected) {
             try {
                 BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key, utils, request);
@@ -212,12 +218,17 @@ public class BadgeController {
                         Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
 
-                            String tempURL = utils.getBaseURL(request) + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
+                            String tempURLBase = utils.getBaseURL(request);
+                            String tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
                             String redisKey = badges.getGuid() + badges.getKey();
                             setRedisData(redisKey, tempURL, 95);
-//                            logger.info("Temp URL:" + tempURL);
+                            final String id = Hashing.murmur3_32().hashString(tempURL, StandardCharsets.UTF_8).toString();
+                            System.out.println("Shortern url id:" + id);
+                            String shortenURL = tempURLBase + "/tmp/" + id;
+                            System.out.println("Shortern url:" + shortenURL);
+                            setRedisData(id, tempURL, 95);
 
-                            if (generateQrCode(badges, badgeClass.getImage(), tempURL, 250, "png")) {
+                            if (generateQrCode(badges, badgeClass.getImage(), shortenURL, 250, "png")) {
                                 logger.info("QR Code generated successfully");
                                 DisplayBadge badge = new DisplayBadge();
                                 badge.setQrCode(utils.getBaseURL(request) + File.separator + "images" + File.separator + badges.getImage());
@@ -288,6 +299,30 @@ public class BadgeController {
 
             float TRANSPARENCY = 0.75f;
             float OVERLAY_RATIO = 0.25f;
+            logger.info("Logo file url:" + logoFileURL);
+
+            //logo file
+//            String logoFileName = + System.currentTimeMillis() + ".png";
+////            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.79");
+//            //Server
+//            String logoPath = utils.getStaticResourceLogoPath(context);
+//            //Local
+////            String logoPath = "src/main/resources/static/logo";
+//            System.out.println("logo file path :" + logoPath);
+//            if (new File(logoPath).exists()) {
+//                System.out.println("Directory exists:" + logoPath);
+//                FileUtils.cleanDirectory(new File(logoPath));
+//            }
+//            String logoFilePath = logoPath + File.separator + logoFileName;
+//            System.out.println("logo file path:" + logoFilePath);
+//            if(!downloadUsingStream(logoFileURL, logoFilePath)){
+//                return false;
+//            }
+//            File logoFile = new File(logoFilePath);
+//
+//            if (!logoFile.exists()) {
+//                return false;
+//            }
 
             //location of barcode
             String fileName = System.currentTimeMillis() + ".png";
@@ -298,15 +333,10 @@ public class BadgeController {
             System.out.println("path :" + imagesPath);
             if (new File(imagesPath).exists()) {
                 System.out.println("Directory exists:" + imagesPath);
+                FileUtils.cleanDirectory(new File(imagesPath));
             }
             String filePath = imagesPath + File.separator + fileName;
             System.out.println("file path:" + filePath);
-
-            //logo file
-//            logoFileURL = logoFileURL.replace("127.0.0.1", "192.168.200.86");
-
-            //barcode data
-//            String data = WordUtils.capitalizeFully("test data");
 
             QRCBuilder<BufferedImage> qrCodeBuilder = new ZXingQRCodeBuilder();
             qrCodeBuilder.newQRCode()
@@ -314,9 +344,9 @@ public class BadgeController {
                     .and()
                     .withData(tempURL)
                     .and()
-//                    .decorate(colorizeQRCode(new Color(51, 102, 153)))
+                    .decorate(colorizeQRCode(new Color(51, 102, 153)))
 //                    .and()
-                    .decorate(addImageOverlay(ImageIO.read(new URL(logoFileURL).openStream()), TRANSPARENCY, OVERLAY_RATIO))
+//                    .decorate(addImageOverlay(ImageIO.read(logoFile), TRANSPARENCY, OVERLAY_RATIO))
                     .and()
                     .doVerify(false)
                     .toFile(filePath, imageFormat);
@@ -335,4 +365,35 @@ public class BadgeController {
         }
     }
 
+    private boolean downloadUsingStream(String urlStr, String file) throws IOException {
+        try {
+
+            final String userAgent = "Mozilla/5.0 (X11; U; Linux i586; en-US; rv:1.7.3) Gecko/20040924 Epiphany/1.4.4 (Ubuntu)";
+
+            Connection.Response resultImageResponse = Jsoup.connect(urlStr)
+                    .userAgent(userAgent)
+                    .ignoreContentType(true).execute();
+
+            FileOutputStream out = (new FileOutputStream(file));
+            out.write(resultImageResponse.bodyAsBytes());  // resultImageResponse.body() is where the image's contents are.
+            out.close();
+
+//            URL url = new URL(urlStr);
+//            BufferedInputStream bis = new BufferedInputStream(url.openStream());
+//            FileOutputStream fis = new FileOutputStream(file);
+//            byte[] buffer = new byte[1024];
+//            int count = 0;
+//            while ((count = bis.read(buffer, 0, 1024)) != -1) {
+//                fis.write(buffer, 0, count);
+//            }
+//            fis.close();
+//            bis.close();
+            logger.info("Logo image stored successfully");
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            logger.error("Exception in storing logo image:" + ex.getMessage());
+            return false;
+        }
+    }
 }

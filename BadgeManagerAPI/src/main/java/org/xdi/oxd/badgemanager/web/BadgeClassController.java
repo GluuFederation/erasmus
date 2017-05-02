@@ -23,7 +23,6 @@ public class BadgeClassController {
 
         JsonObject jsonResponse = new JsonObject();
 
-        //Dynamic
         if (LDAPService.isConnected()) {
             try {
                 BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(LDAPService.ldapEntryManager, id, key);

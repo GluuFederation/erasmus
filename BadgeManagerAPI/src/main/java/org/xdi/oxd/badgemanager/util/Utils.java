@@ -68,4 +68,11 @@ public class Utils {
     public String getStaticResourcePath(ServletContext context) {
         return context.getRealPath("/WEB-INF/classes/static/images");
     }
+
+    /**
+     * Retrieve static resource path.
+     */
+    public String getStaticResourceLogoPath(ServletContext context) {
+        return context.getRealPath("/WEB-INF/classes/static/logo");
+    }
 }
