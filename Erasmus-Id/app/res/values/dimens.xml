@@ -1,0 +1,180 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="section_margin">16dp</dimen>
+
+    <dimen name="value_1">1dp</dimen>
+    <dimen name="value_2">2dp</dimen>
+    <dimen name="value_3">3dp</dimen>
+    <dimen name="value_4">4dp</dimen>
+    <dimen name="value_5">5dp</dimen>
+    <dimen name="value_6">6dp</dimen>
+    <dimen name="value_7">7dp</dimen>
+    <dimen name="value_8">8dp</dimen>
+    <dimen name="value_9">9dp</dimen>
+    <dimen name="value_10">10dp</dimen>
+    <dimen name="value_11">11dp</dimen>
+    <dimen name="value_12">12dp</dimen>
+    <dimen name="value_13">13dp</dimen>
+    <dimen name="value_14">14dp</dimen>
+    <dimen name="value_15">15dp</dimen>
+    <dimen name="value_16">16dp</dimen>
+    <dimen name="value_17">17dp</dimen>
+    <dimen name="value_18">18dp</dimen>
+    <dimen name="value_19">19dp</dimen>
+    <dimen name="value_20">20dp</dimen>
+    <dimen name="value_21">21dp</dimen>
+    <dimen name="value_22">22dp</dimen>
+    <dimen name="value_23">23dp</dimen>
+    <dimen name="value_24">24dp</dimen>
+    <dimen name="value_25">25dp</dimen>
+    <dimen name="value_26">26dp</dimen>
+    <dimen name="value_27">27dp</dimen>
+    <dimen name="value_28">28dp</dimen>
+    <dimen name="value_29">29dp</dimen>
+    <dimen name="value_30">30dp</dimen>
+    <dimen name="value_31">31dp</dimen>
+    <dimen name="value_32">32dp</dimen>
+    <dimen name="value_33">33dp</dimen>
+    <dimen name="value_34">34dp</dimen>
+    <dimen name="value_35">35dp</dimen>
+    <dimen name="value_36">36dp</dimen>
+    <dimen name="value_37">37dp</dimen>
+    <dimen name="value_38">38dp</dimen>
+    <dimen name="value_39">39dp</dimen>
+    <dimen name="value_40">40dp</dimen>
+    <dimen name="value_45">45dp</dimen>
+    <dimen name="value_50">50dp</dimen>
+    <dimen name="value_55">55dp</dimen>
+    <dimen name="value_60">60dp</dimen>
+    <dimen name="value_70">70dp</dimen>
+
+    <dimen name="value_80">80dp</dimen>
+    <dimen name="value_85">85dp</dimen>
+    <dimen name="value_90">90dp</dimen>
+    <dimen name="value_100">100dp</dimen>
+    <dimen name="value_110">110dp</dimen>
+    <dimen name="value_120">120dp</dimen>
+    <dimen name="value_150">130dp</dimen>
+    <dimen name="value_170">170dp</dimen>
+    <dimen name="value_180">130dp</dimen>
+    <dimen name="value_200">150dp</dimen>
+    <dimen name="value_220">220dp</dimen>
+    <dimen name="value_250">250dp</dimen>
+    <dimen name="value_260">260dp</dimen>
+    <dimen name="value_300">300dp</dimen>
+    <dimen name="value_320">320dp</dimen>
+    <dimen name="value_500">500dp</dimen>
+
+
+    <dimen name="text_18">18sp</dimen>
+    <dimen name="text_6">6sp</dimen>
+    <dimen name="text_8">8sp</dimen>
+    <dimen name="text_10">10sp</dimen>
+    <dimen name="text_12">12sp</dimen>
+    <dimen name="text_14">14sp</dimen>
+    <dimen name="text_16">16sp</dimen>
+    <dimen name="text_17">17sp</dimen>
+    <dimen name="text_20">20sp</dimen>
+    <dimen name="text_22">22sp</dimen>
+    <dimen name="text_24">24sp</dimen>
+    <dimen name="text_26">26sp</dimen>
+    <dimen name="text_28">28sp</dimen>
+    <dimen name="text_30">30sp</dimen>
+    <dimen name="text_32">32sp</dimen>
+    <dimen name="text_38">38sp</dimen>
+    <dimen name="text_45">45sp</dimen>
+    <dimen name="text_50">50sp</dimen>
+    <dimen name="text_60">60sp</dimen>
+    <dimen name="text_70">70sp</dimen>
+    <dimen name="text_80">80sp</dimen>
+    <dimen name="text_90">90sp</dimen>
+    <dimen name="text_100">100sp</dimen>
+
+
+    <!--Other-->
+
+    <dimen name="nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_header_height">160dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="line_separator">0.5dp</dimen>
+    <dimen name="line_separator2">0.1dp</dimen>
+    <dimen name="value_160">110dp</dimen>
+
+    <dimen name="menu_margin">15dp</dimen>
+    <dimen name="menu_text">14sp</dimen>
+    <dimen name="divider_height">5dp</dimen>
+    <dimen name="menu_top">3dp</dimen>
+    <dimen name="menu_text_top">3dp</dimen>
+
+    <dimen name="blue_circle_margin">10dp</dimen>
+    <dimen name="bottom_bar">60dp</dimen>
+    <dimen name="blue_circle">200dp</dimen>
+    <dimen name="dimond_margin">208dp</dimen>
+    <dimen name="row_image_4">90dp</dimen>
+    <dimen name="row_image_3">120dp</dimen>
+
+    <dimen name="photobooth_image">300dp</dimen>
+    <dimen name="photobooth_selection_width">100dp</dimen>
+    <dimen name="photobooth_selection_height">70dp</dimen>
+
+    <dimen name="cross_image_start_end">-18dp</dimen>
+    <dimen name="cross_image_middle">-36dp</dimen>
+    <dimen name="filter_size">48dp</dimen>
+    <dimen name="filter_size_width">55dp</dimen>
+
+    <dimen name="connect_device_width">280dp</dimen>
+    <dimen name="connect_device_height">250dp</dimen>
+
+    <dimen name="preview_photobooth_main">300dp</dimen>
+    <dimen name="preview_photobooth_sub_width">200dp</dimen>
+    <dimen name="preview_photobooth_sub_height">100dp</dimen>
+
+    <dimen name="swap_extra">120dp</dimen>
+    <dimen name="main_effect">38dp</dimen>
+    <dimen name="main_effect_w">50dp</dimen>
+    <dimen name="award_print_width">320dp</dimen>
+    <dimen name="award_print_color_width">240dp</dimen>
+    <dimen name="award_print_color_height">190dp</dimen>
+    <dimen name="award_title_text_size">24sp</dimen>
+    <dimen name="award_subtitle_text_size">17sp</dimen>
+    <dimen name="award_print_icon_HW">90dp</dimen>
+    <dimen name="mosaic_preview">48dp</dimen>
+    <dimen name="mosaic_preview_heigth">40dp</dimen>
+    <dimen name="replace_gallery">70dp</dimen>
+    <dimen name="sticker_preview">60dp</dimen>
+    <dimen name="image_detail_padding">0.2dp</dimen>
+
+    <dimen name="polygon_size_small">48dp</dimen>
+    <dimen name="polygon_size">72dp</dimen>
+    <dimen name="polygon_size_big">78dp</dimen>
+    <dimen name="polygon_top">17dp</dimen>
+    <dimen name="polygon_bottom_right">3dp</dimen>
+    <dimen name="polygon_margin_left">48dp</dimen>
+    <!-- polygon_bottom_right + (polygon_size - polygon_size* 0.25) -->
+    <dimen name="polgyon_margin_bottom">64dp</dimen>
+    <dimen name="rippleStrokeWidth">10dp</dimen>
+    <dimen name="rippleRadius">10dp</dimen>
+
+    <dimen name="menu_title">22sp</dimen>
+    <dimen name="menu_title_padding">14dp</dimen>
+    <dimen name="menu_activities_list_padding_left">24dp</dimen>
+    <dimen name="menu_activities_list_padding_top_down">14dp</dimen>
+    <dimen name="menu_entries_text">20sp</dimen>
+    <dimen name="menu_entries_title">16sp</dimen>
+    <dimen name="menu_entries_sides_padding">10dp</dimen>
+    <dimen name="menu_entries_top_down_padding">15dp</dimen>
+    <dimen name="menu_entries_top_down_radio_padding">7dp</dimen>
+
+    <dimen name="chip_padding">2dp</dimen>
+    <dimen name="chip_side_padding">6dp</dimen>
+    <dimen name="chip_spacing">4dp</dimen>
+    <dimen name="chip_line_spacing">4dp</dimen>
+    <dimen name="chip_corner_radius">16dp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+    <dimen name="fast_scroll_overlay_text_size">18dp</dimen>
+    <dimen name="appbar_padding_top">8dp</dimen>
+
+</resources>

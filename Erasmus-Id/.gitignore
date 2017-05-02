@@ -1,8 +1,7 @@
-.gradle
 /local.properties
 build
 app/build
 library/build
 .idea/*
 *.iml
-erasmus-id.keystore
+appauth.keystore

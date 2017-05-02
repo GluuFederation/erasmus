@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<layout xmlns:android="http://schemas.android.com/apk/res/android">-->
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+    android:id="@+id/coordinator">
+
+        <include layout="@layout/toolbar" android:id="@+id/toolbar" />
+
+    <!--
+            displayed while token requests are occurring
+            -->
+    <LinearLayout
+        android:id="@+id/loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        android:layout_below="@+id/toolbar">
+
+        <TextView
+            android:id="@+id/loading_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <ProgressBar
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"/>
+
+    </LinearLayout>
+
+    <!-- Shown when authorization has failed. -->
+    <LinearLayout
+        android:id="@+id/not_authorized"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/loading_container">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/not_authorized"
+            style="@style/Base.TextAppearance.AppCompat.Title" />
+
+        <TextView
+            android:id="@+id/explanation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/reauth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reauthorize" />
+
+    </LinearLayout>
+
+    !-- Shown when the user is authorized, and there are no pending operations -->
+    <LinearLayout
+        android:id="@+id/authorized"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@+id/not_authorized">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/auth_granted"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/refresh_token"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/refresh_token"
+                style="@style/Widget.AppCompat.Button"/>
+
+            <Button
+                android:id="@+id/view_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/view_profile"
+                style="@style/Widget.AppCompat.Button" />
+
+            <Button
+                android:id="@+id/sign_out"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_out"
+                style="@style/Widget.AppCompat.Button.Colored"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/refresh_token_info"
+            android:layout_marginTop="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Refresh token returned"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/access_token_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Token expires at: 2016-01-01 12:00 UTC"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/id_token_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            tools:text="ID token returned"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:id="@+id/userinfo_card"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="8dp"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:id="@+id/userinfo_profile"
+                    android:contentDescription="@string/userinfo_profile_content_description"
+                    app:srcCompat="@drawable/unknown_user_48dp" />
+
+                <TextView
+                    android:id="@+id/userinfo_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="8dp"
+                    android:paddingStart="8dp"
+                    android:paddingRight="0dp"
+                    android:paddingEnd="0dp"
+                    tools:text="Jane Doe"
+                    style="@style/Base.TextAppearance.AppCompat.Title" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/userinfo_json"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                tools:text="{'blah': 'blah'}" />
+        </LinearLayout>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/AppTheme"
+            app:tabSelectedTextColor="@color/colorPrimary"
+            app:tabTextColor="@android:color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/ll_bottom_menu"
+            android:layout_below="@+id/tabLayout">
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v4.view.ViewPager>
+        </LinearLayout>
+
+    </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_bottom_menu"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/value_80"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:background="@color/menu_bg">
+
+            <TextView
+                android:id="@+id/tv_scan"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:drawableTop="@mipmap/qr_code"
+                android:gravity="bottom|center"
+                android:padding="@dimen/value_10"
+                android:text="Scan QR"
+                android:textColor="@android:color/black"
+                android:drawableTint="@android:color/darker_gray"/>
+
+            <TextView
+                android:id="@+id/tv_logs"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:drawableTop="@mipmap/log"
+                android:gravity="bottom|center"
+                android:padding="@dimen/value_10"
+                android:text="Logs"
+                android:textColor="@android:color/black"
+                android:drawableTint="@android:color/darker_gray"/>
+
+
+            <TextView
+                android:id="@+id/tv_settings"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:drawableTop="@mipmap/ic_settings"
+                android:gravity="bottom|center"
+                android:padding="@dimen/value_10"
+                android:text="Settings"
+                android:textColor="@android:color/black"
+                android:drawableTint="@android:color/darker_gray"
+                />
+
+            <TextView
+                android:id="@+id/tv_about"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:drawableTop="@mipmap/ic_help"
+                android:gravity="bottom|center"
+                android:padding="@dimen/value_10"
+                android:text="About"
+                android:textColor="@android:color/black"
+                android:drawableTint="@android:color/darker_gray"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+<!--</layout>-->
