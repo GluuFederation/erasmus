@@ -276,28 +276,100 @@ public class BadgeController {
                             } else {
                                 logger.error("Failed to generate QR Code");
                                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                                jsonResponse.addProperty("error", "No such badge found");
+                                jsonResponse.addProperty("error", true);
+                                jsonResponse.addProperty("errorMsg", "No such badge found");
                                 return jsonResponse.toString();
                             }
                         } else {
                             response.setStatus(HttpServletResponse.SC_CONFLICT);
-                            jsonResponse.addProperty("error", "No such badge found");
+                            jsonResponse.addProperty("error", true);
+                            jsonResponse.addProperty("errorMsg", "No such badge found");
                             return jsonResponse.toString();
                         }
                     } else {
                         response.setStatus(HttpServletResponse.SC_CONFLICT);
-                        jsonResponse.addProperty("error", "No such badge found");
+                        jsonResponse.addProperty("error", true);
+                        jsonResponse.addProperty("errorMsg", "No such badge found");
                         return jsonResponse.toString();
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
-                    jsonResponse.addProperty("error", "No such badge found");
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                jsonResponse.addProperty("error", e.getMessage());
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", e.getMessage());
+                return jsonResponse.toString();
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "Please try after some time");
+            return jsonResponse.toString();
+        }
+    }
+
+    @RequestMapping(value = "setPrivacy/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String setBadgePrivacy(@RequestParam String badgeRequestInum, @RequestParam String privacy, HttpServletRequest request, HttpServletResponse response) {
+
+        JsonObject jsonResponse = new JsonObject();
+
+        if (LDAPService.isConnected()) {
+            try {
+                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequestInum);
+                if (badgeRequests != null && badgeRequests.getInum() != null) {
+                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
+                    if (badgeClass != null && badgeClass.getInum() != null) {
+                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
+                        if (badges != null && badges.getInum() != null) {
+
+                            badges.setBadgePrivacy(privacy);
+
+                            if (badges.getBadgePrivacy().equalsIgnoreCase("public")) {
+                                badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());
+                            } else if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
+                                badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid() + "?key=" + badges.getKey());
+                            }
+
+                            boolean isUpdated = BadgeCommands.updateBadge(LDAPService.ldapEntryManager, badges);
+                            if(isUpdated){
+                                response.setStatus(HttpServletResponse.SC_OK);
+                                jsonResponse.addProperty("error", false);
+                                jsonResponse.addProperty("errorMsg", "Badge privacy set successfully");
+                                return jsonResponse.toString();
+                            } else {
+                                response.setStatus(HttpServletResponse.SC_OK);
+                                jsonResponse.addProperty("error", true);
+                                jsonResponse.addProperty("errorMsg", "Failed to set badge privacy");
+                                return jsonResponse.toString();
+                            }
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_CONFLICT);
+                            jsonResponse.addProperty("error", true);
+                            jsonResponse.addProperty("errorMsg", "No such badge found");
+                            return jsonResponse.toString();
+                        }
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        jsonResponse.addProperty("error", true);
+                        jsonResponse.addProperty("errorMsg", "No such badge found");
+                        return jsonResponse.toString();
+                    }
+                } else {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "No such badge found");
+                    return jsonResponse.toString();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", e.getMessage());
                 return jsonResponse.toString();
             }
         } else {

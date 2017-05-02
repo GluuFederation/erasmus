@@ -69,7 +69,7 @@ public class BadgeCommands {
         if (ldapEntryManager.contains(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
             MergeService.merge(badges, ldapEntryManager.findEntries(badges.getDn(), Badges.class, Filter.create("(inum=" + badges.getInum() + ")")).get(0));
             ldapEntryManager.merge(badges);
-            logger.info("updated entry ");
+            logger.info("updated badge entry ");
             return true;
         } else {
             throw new NotFoundException("No such badge found");
