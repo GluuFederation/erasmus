@@ -8,15 +8,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
-import net.gluu.erasmus.adapters.BadgeAdapter;
+import net.gluu.erasmus.adapters.BadgeRequestAdapter;
 import net.gluu.erasmus.model.Badge;
+import net.gluu.erasmus.model.BadgeRequest;
 
 import java.util.ArrayList;
 
 public class RequestBadgeActivity extends AppCompatActivity {
 
-    private ArrayList<Badge> badgeList;
-    private BadgeAdapter adapter;
+    private ArrayList<BadgeRequest> badgeList;
+    private BadgeRequestAdapter adapter;
     RecyclerView mRvBadges;
 
     @Override
@@ -39,22 +40,19 @@ public class RequestBadgeActivity extends AppCompatActivity {
 
         mRvBadges= (RecyclerView) findViewById(R.id.rv_badges);
         mRvBadges.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        adapter = new BadgeAdapter(RequestBadgeActivity.this, getBadgeList(),true);
+        adapter = new BadgeRequestAdapter(RequestBadgeActivity.this, getBadgeList(),true);
         mRvBadges.setAdapter(adapter);
-
     }
 
-    public ArrayList<Badge> getBadgeList() {
+    public ArrayList<BadgeRequest> getBadgeList() {
         badgeList = new ArrayList<>();
         String[] ArrCity = getResources().getStringArray(R.array.badge);
         for (int i = 0; i < 15; i++) {
 
-            Badge badge = new Badge();
-            badge.setBadgeId(i);
-            badge.setBadgeName(ArrCity[i]);
+            BadgeRequest badge = new BadgeRequest();
+            badge.setTemplateBadgeTitle(ArrCity[i]);
             badgeList.add(badge);
         }
         return badgeList;
     }
-
 }

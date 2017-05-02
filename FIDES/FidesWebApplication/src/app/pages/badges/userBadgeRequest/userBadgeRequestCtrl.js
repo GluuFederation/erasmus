@@ -47,7 +47,11 @@
       vm.badge = badge;
       vm.validity = 0;
 
-      function badgeApprove() {
+      function badgeApprove(isFormValid) {
+        if (!isFormValid) {
+          return false;
+        }
+
         if (vm.validity < 1 || vm.validity > 10) {
           toastr.error('Please enter days between 1 to 10', 'Badge', {});
           return;

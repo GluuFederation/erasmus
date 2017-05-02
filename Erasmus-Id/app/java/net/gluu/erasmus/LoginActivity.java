@@ -103,8 +103,8 @@ public final class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
 
-        findViewById(R.id.retry).setOnClickListener((View view) ->
-            mExecutor.submit(this::initializeAppAuth));
+//        findViewById(R.id.retry).setOnClickListener((View view) ->
+//            mExecutor.submit(this::initializeAppAuth));
         findViewById(R.id.start_auth).setOnClickListener((View view) -> startAuth());
 
         if (!mConfiguration.isValid()) {
@@ -156,10 +156,7 @@ public final class LoginActivity extends AppCompatActivity {
 
     @MainThread
     void startAuth() {
-        final String loginHint = ((EditText) findViewById(R.id.login_hint_value))
-            .getText()
-            .toString()
-            .trim();
+        final String loginHint = getString(R.string.login_hint_value);
 
         displayLoading("Making authorization request");
 
@@ -275,28 +272,28 @@ public final class LoginActivity extends AppCompatActivity {
      */
     @MainThread
     private void configureBrowserSelector() {
-        Spinner spinner = (Spinner) findViewById(R.id.browser_selector);
-        final BrowserSelectionAdapter adapter = new BrowserSelectionAdapter(this);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                BrowserInfo info = adapter.getItem(position);
-                if (info == null) {
-                    mBrowserMatcher = AnyBrowserMatcher.INSTANCE;
-                    return;
-                } else {
-                    mBrowserMatcher = new ExactBrowserMatcher(info.mDescriptor);
-                }
-
-                recreateAuthorizationService();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                mBrowserMatcher = AnyBrowserMatcher.INSTANCE;
-            }
-        });
+//        Spinner spinner = (Spinner) findViewById(R.id.browser_selector);
+//        final BrowserSelectionAdapter adapter = new BrowserSelectionAdapter(this);
+//        spinner.setAdapter(adapter);
+//        spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                BrowserInfo info = adapter.getItem(position);
+//                if (info == null) {
+//                    mBrowserMatcher = AnyBrowserMatcher.INSTANCE;
+//                    return;
+//                } else {
+//                    mBrowserMatcher = new ExactBrowserMatcher(info.mDescriptor);
+//                }
+//
+//                recreateAuthorizationService();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//                mBrowserMatcher = AnyBrowserMatcher.INSTANCE;
+//            }
+//        });
     }
 
     /**
@@ -347,21 +344,22 @@ public final class LoginActivity extends AppCompatActivity {
 
     @MainThread
     private void displayLoading(String loadingMessage) {
-        findViewById(R.id.loading_container).setVisibility(View.VISIBLE);
-        findViewById(R.id.auth_container).setVisibility(View.GONE);
-        findViewById(R.id.error_container).setVisibility(View.GONE);
-
-        ((TextView) findViewById(R.id.loading_description)).setText(loadingMessage);
+//        findViewById(R.id.loading_container).setVisibility(View.VISIBLE);
+//        findViewById(R.id.auth_container).setVisibility(View.GONE);
+//        findViewById(R.id.error_container).setVisibility(View.GONE);
+//
+//        ((TextView) findViewById(R.id.loading_description)).setText(loadingMessage);
+        Application.showProgressBar();
     }
 
     @MainThread
     private void displayError(String error, boolean recoverable) {
-        findViewById(R.id.error_container).setVisibility(View.VISIBLE);
-        findViewById(R.id.loading_container).setVisibility(View.GONE);
-        findViewById(R.id.auth_container).setVisibility(View.GONE);
-
-        ((TextView) findViewById(R.id.error_description)).setText(error);
-        findViewById(R.id.retry).setVisibility(recoverable ? View.VISIBLE : View.GONE);
+//        findViewById(R.id.error_container).setVisibility(View.VISIBLE);
+//        findViewById(R.id.loading_container).setVisibility(View.GONE);
+//        findViewById(R.id.auth_container).setVisibility(View.GONE);
+//
+//        ((TextView) findViewById(R.id.error_description)).setText(error);
+//        findViewById(R.id.retry).setVisibility(recoverable ? View.VISIBLE : View.GONE);
     }
 
     // WrongThread inference is incorrect in this case
@@ -373,9 +371,11 @@ public final class LoginActivity extends AppCompatActivity {
 
     @MainThread
     private void displayAuthOptions() {
-        findViewById(R.id.auth_container).setVisibility(View.VISIBLE);
-        findViewById(R.id.loading_container).setVisibility(View.GONE);
-        findViewById(R.id.error_container).setVisibility(View.GONE);
+        Application.hideProgressBar();
+        findViewById(R.id.start_auth).setVisibility(View.VISIBLE);
+//        findViewById(R.id.auth_container).setVisibility(View.VISIBLE);
+//        findViewById(R.id.loading_container).setVisibility(View.GONE);
+//        findViewById(R.id.error_container).setVisibility(View.GONE);
 
         AuthState state = mAuthStateManager.getCurrent();
         AuthorizationServiceConfiguration config = state.getAuthorizationServiceConfiguration();
@@ -387,7 +387,7 @@ public final class LoginActivity extends AppCompatActivity {
             authEndpointStr = "Static auth endpoint: \n";
         }
         authEndpointStr += config.authorizationEndpoint;
-        ((TextView) findViewById(R.id.auth_endpoint)).setText(authEndpointStr);
+//        ((TextView) findViewById(R.id.auth_endpoint)).setText(authEndpointStr);
 
         String clientIdStr;
         if (state.getLastRegistrationResponse() != null) {
@@ -396,7 +396,7 @@ public final class LoginActivity extends AppCompatActivity {
             clientIdStr = "Static client ID: \n";
         }
         clientIdStr += mClientId;
-        ((TextView) findViewById(R.id.client_id)).setText(clientIdStr);
+//        ((TextView) findViewById(R.id.client_id)).setText(clientIdStr);
     }
 
     @TargetApi(Build.VERSION_CODES.M)

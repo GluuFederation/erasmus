@@ -109,11 +109,12 @@ public class SelectOpActivity extends AppCompatActivity {
     }
 
     private void getOp() {
+        Application.showProgressBar();
         Call<ParticipantsResponse> call = mObjAPI.getParticipants("all", "all");
         call.enqueue(new Callback<ParticipantsResponse>() {
             @Override
             public void onResponse(Call<ParticipantsResponse> call, Response<ParticipantsResponse> response) {
-
+                Application.hideProgressBar();
                 if (response.errorBody() == null && response.body() != null) {
                     ParticipantsResponse objResponse = response.body();
 
@@ -127,14 +128,15 @@ public class SelectOpActivity extends AppCompatActivity {
                         }
                     }
                 } else {
-                    Log.v("TAG", "Error from server in user card add:" + response.errorBody());
+                    Log.v("TAG", "Error from server in retrieving participants:" + response.errorBody());
                     Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<ParticipantsResponse> call, Throwable t) {
-                Log.v("TAG", "Response user card add failure" + t.getMessage());
+                Log.v("TAG", "Response retrieving participants failure" + t.getMessage());
+                Application.hideProgressBar();
             }
         });
     }

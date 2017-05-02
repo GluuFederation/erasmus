@@ -14,8 +14,12 @@
 
 package net.gluu.erasmus;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.support.v7.app.AppCompatDelegate;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import net.gluu.erasmus.model.Participant;
 
@@ -26,13 +30,37 @@ import net.gluu.erasmus.model.Participant;
 public final class Application extends android.app.Application {
     public static Context mApplicationContext;
     public static String State, City;
+    public static String AccessToken;
     public static Participant participant;
     public static String wellknownurl = "/.well-known/openid-configuration";
+    public static ProgressBar mProgress;
 
     @Override
     public void onCreate() {
         super.onCreate();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         mApplicationContext = getApplicationContext();
+
+        mProgress = new ProgressBar(this);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        params.addRule(RelativeLayout.CENTER_VERTICAL);
+        params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        mProgress.setLayoutParams(params);
+        mProgress.setVisibility(View.GONE);
+    }
+
+    public static void showProgressBar() {
+        if (mProgress == null)
+            return;
+
+        mProgress.setVisibility(View.VISIBLE);
+    }
+
+    public static void hideProgressBar() {
+        if (mProgress == null)
+            return;
+
+        mProgress.setVisibility(View.GONE);
     }
 }

@@ -7,15 +7,24 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import net.gluu.erasmus.Application;
 import net.gluu.erasmus.R;
-import net.gluu.erasmus.adapters.BadgeAdapter;
+import net.gluu.erasmus.adapters.BadgeRequestAdapter;
+import net.gluu.erasmus.api.APIInterface;
+import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.model.Badge;
+import net.gluu.erasmus.model.BadgeRequests;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,6 +46,7 @@ public class PendingBadgeFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     RecyclerView mRvBadges;
+    APIInterface mObjAPI;
 
     public PendingBadgeFragment() {
         // Required empty public constructor
@@ -63,6 +73,7 @@ public class PendingBadgeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mObjAPI = APIService.createService(APIInterface.class);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -81,9 +92,8 @@ public class PendingBadgeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mRvBadges= (RecyclerView) view.findViewById(R.id.rv_badges);
         mRvBadges.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRvBadges.setAdapter(new BadgeAdapter(getActivity(),getBadgeList(),false));
+        getPendingBadgeRequests();
     }
-
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -135,6 +145,38 @@ public class PendingBadgeFragment extends Fragment {
             badgeList.add(badge);
         }
         return badgeList;
+    }
+
+    private void getPendingBadgeRequests() {
+        Application.showProgressBar();
+        Call<BadgeRequests> call = mObjAPI.getBadgeRequests("test@test.com", "Pending");
+        call.enqueue(new Callback<BadgeRequests>() {
+            @Override
+            public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {
+                Application.hideProgressBar();
+                if (response.errorBody() == null && response.body() != null) {
+                    BadgeRequests objResponse = response.body();
+
+                    if (objResponse != null) {
+                        if (objResponse.getError()) {
+                            Log.v("TAG", "Error in retrieving badge requests");
+                        } else {
+                            Log.v("TAG", "badge requests retrieved:" + objResponse.getBadgeRequests().size());
+                            mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), false));
+                        }
+                    }
+                } else {
+                    Log.v("TAG", "Error from server in retrieving badge requests:" + response.errorBody());
+                    Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BadgeRequests> call, Throwable t) {
+                Log.v("TAG", "Response retrieving badge requests failure" + t.getMessage());
+                Application.hideProgressBar();
+            }
+        });
     }
 
 }

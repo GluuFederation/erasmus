@@ -65,7 +65,7 @@ public class BadgeStatusActivity extends AppCompatActivity {
     TabLayout mTabLayout;
     ViewPager mViewPager;
 
-    private static final String TAG = "TokenActivity";
+    private static final String TAG = "BadgeStatusActivity";
 
     private static final String KEY_USER_INFO = "userInfo";
 
@@ -84,19 +84,19 @@ public class BadgeStatusActivity extends AppCompatActivity {
         Configuration config = Configuration.getInstance(this);
         if (config.hasConfigurationChanged()) {
             Toast.makeText(
-                this,
-                "Configuration change detected",
-                Toast.LENGTH_SHORT)
-                .show();
+                    this,
+                    "Configuration change detected",
+                    Toast.LENGTH_SHORT)
+                    .show();
             signOut();
             return;
         }
 
         mAuthService = new AuthorizationService(
-            this,
-            new AppAuthConfiguration.Builder()
-                .setConnectionBuilder(config.getConnectionBuilder())
-                .build());
+                this,
+                new AppAuthConfiguration.Builder()
+                        .setConnectionBuilder(config.getConnectionBuilder())
+                        .build());
 
         setContentView(R.layout.activity_badge_status);
         displayLoading("Restoring state...");
@@ -110,7 +110,6 @@ public class BadgeStatusActivity extends AppCompatActivity {
         }
         initViews();
         initListeners();
-        init();
     }
 
     @Override
@@ -118,7 +117,7 @@ public class BadgeStatusActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_badge_status, menu);
         return super.onCreateOptionsMenu(menu);
-}
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -131,8 +130,8 @@ public class BadgeStatusActivity extends AppCompatActivity {
     }
 
     private void initListeners() {
-        mTabLayout= (TabLayout) findViewById(R.id.tabLayout);
-        mViewPager= (ViewPager) findViewById(R.id.viewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        mViewPager = (ViewPager) findViewById(R.id.viewPager);
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
         mTabLayout.setOnTabSelectedListener(new TabSelectedListener());
     }
@@ -143,9 +142,9 @@ public class BadgeStatusActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        Toolbar toolbar= (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        TextView mTvTitle= (TextView) toolbar.findViewById(R.id.tv_title);
+        TextView mTvTitle = (TextView) toolbar.findViewById(R.id.tv_title);
         mTvTitle.setVisibility(View.VISIBLE);
         mTvTitle.setText(R.string.badge_status);
     }
@@ -164,7 +163,6 @@ public class BadgeStatusActivity extends AppCompatActivity {
     }
 
     private void getFragments() {
-
         ApproveBadgeFragment approveBadgeFragment = ApproveBadgeFragment.newInstance("", "");
         PendingBadgeFragment pendingBadgeFragment = PendingBadgeFragment.newInstance("", "");
         fragments = new ArrayList<>();
@@ -245,7 +243,7 @@ public class BadgeStatusActivity extends AppCompatActivity {
         findViewById(R.id.authorized).setVisibility(View.GONE);
         findViewById(R.id.loading_container).setVisibility(View.GONE);
 
-        ((TextView)findViewById(R.id.explanation)).setText(explanation);
+        ((TextView) findViewById(R.id.explanation)).setText(explanation);
         findViewById(R.id.reauth).setOnClickListener((View view) -> signOut());
     }
 
@@ -255,7 +253,7 @@ public class BadgeStatusActivity extends AppCompatActivity {
         findViewById(R.id.authorized).setVisibility(View.GONE);
         findViewById(R.id.not_authorized).setVisibility(View.GONE);
 
-        ((TextView)findViewById(R.id.loading_description)).setText(message);
+        ((TextView) findViewById(R.id.loading_description)).setText(message);
     }
 
 
@@ -265,7 +263,7 @@ public class BadgeStatusActivity extends AppCompatActivity {
         // dynamic client registration (if applicable), to save from retrieving them again.
         AuthState currentState = mStateManager.getCurrent();
         AuthState clearedState =
-            new AuthState(currentState.getAuthorizationServiceConfiguration());
+                new AuthState(currentState.getAuthorizationServiceConfiguration());
         if (currentState.getLastRegistrationResponse() != null) {
             clearedState.update(currentState.getLastRegistrationResponse());
         }
@@ -279,21 +277,25 @@ public class BadgeStatusActivity extends AppCompatActivity {
 
     @MainThread
     private void displayAuthorized() {
+
         findViewById(R.id.authorized).setVisibility(View.VISIBLE);
         findViewById(R.id.not_authorized).setVisibility(View.GONE);
         findViewById(R.id.loading_container).setVisibility(View.GONE);
 
         AuthState state = mStateManager.getCurrent();
+        Log.v("TAG", "Access token:" + state.getAccessToken());
+        Application.AccessToken = state.getAccessToken();
+        init();
 
         TextView refreshTokenInfoView = (TextView) findViewById(R.id.refresh_token_info);
         refreshTokenInfoView.setText((state.getRefreshToken() == null)
-            ? R.string.no_refresh_token_returned
-            : R.string.refresh_token_returned);
+                ? R.string.no_refresh_token_returned
+                : R.string.refresh_token_returned);
 
         TextView idTokenInfoView = (TextView) findViewById(R.id.id_token_info);
         idTokenInfoView.setText((state.getIdToken()) == null
-            ? R.string.no_id_token_returned
-            : R.string.id_token_returned);
+                ? R.string.no_id_token_returned
+                : R.string.id_token_returned);
 
         TextView accessTokenInfoView = (TextView) findViewById(R.id.access_token_info);
         if (state.getAccessToken() == null) {
@@ -307,20 +309,20 @@ public class BadgeStatusActivity extends AppCompatActivity {
             } else {
                 String template = getResources().getString(R.string.access_token_expires_at);
                 accessTokenInfoView.setText(String.format(template,
-                    DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss ZZ").print(expiresAt)));
+                        DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss ZZ").print(expiresAt)));
             }
         }
 
         Button refreshTokenButton = (Button) findViewById(R.id.refresh_token);
         refreshTokenButton.setVisibility(state.getRefreshToken() != null
-            ? View.VISIBLE
-            : View.GONE);
+                ? View.VISIBLE
+                : View.GONE);
         refreshTokenButton.setOnClickListener((View view) -> refreshAccessToken());
 
         Button viewProfileButton = (Button) findViewById(R.id.view_profile);
 
         AuthorizationServiceDiscovery discoveryDoc =
-            state.getAuthorizationServiceConfiguration().discoveryDoc;
+                state.getAuthorizationServiceConfiguration().discoveryDoc;
         if (discoveryDoc == null || discoveryDoc.getUserinfoEndpoint() == null) {
             viewProfileButton.setVisibility(View.GONE);
         } else {
@@ -328,7 +330,7 @@ public class BadgeStatusActivity extends AppCompatActivity {
             viewProfileButton.setOnClickListener((View view) -> fetchUserInfo());
         }
 
-        ((Button)findViewById(R.id.sign_out)).setOnClickListener((View view) -> signOut());
+        ((Button) findViewById(R.id.sign_out)).setOnClickListener((View view) -> signOut());
 
         View userInfoCard = findViewById(R.id.userinfo_card);
         JSONObject userInfo = mUserInfoJson.get();
@@ -344,9 +346,9 @@ public class BadgeStatusActivity extends AppCompatActivity {
 
                 if (userInfo.has("picture")) {
                     Glide.with(BadgeStatusActivity.this)
-                        .load(Uri.parse(userInfo.getString("picture")))
-                        .fitCenter()
-                        .into((ImageView) findViewById(R.id.userinfo_profile));
+                            .load(Uri.parse(userInfo.getString("picture")))
+                            .fitCenter()
+                            .into((ImageView) findViewById(R.id.userinfo_profile));
                 }
 
                 ((TextView) findViewById(R.id.userinfo_json)).setText(mUserInfoJson.toString());
@@ -361,68 +363,68 @@ public class BadgeStatusActivity extends AppCompatActivity {
     private void exchangeAuthorizationCode(AuthorizationResponse authorizationResponse) {
         displayLoading("Exchanging authorization code");
         performTokenRequest(
-            authorizationResponse.createTokenExchangeRequest(),
-            this::handleCodeExchangeResponse);
+                authorizationResponse.createTokenExchangeRequest(),
+                this::handleCodeExchangeResponse);
     }
 
     @MainThread
     private void performTokenRequest(
-        TokenRequest request,
-        AuthorizationService.TokenResponseCallback callback) {
+            TokenRequest request,
+            AuthorizationService.TokenResponseCallback callback) {
         ClientAuthentication clientAuthentication;
         try {
             clientAuthentication = mStateManager.getCurrent().getClientAuthentication();
         } catch (ClientAuthentication.UnsupportedAuthenticationMethod ex) {
             Log.d(TAG, "Token request cannot be made, client authentication for the token "
-                + "endpoint could not be constructed (%s)", ex);
+                    + "endpoint could not be constructed (%s)", ex);
             displayNotAuthorized("Client authentication method is unsupported");
             return;
         }
 
         mAuthService.performTokenRequest(
-            request,
-            clientAuthentication,
-            callback);
+                request,
+                clientAuthentication,
+                callback);
     }
 
     @MainThread
     private void performTokenValidation(
-        TokenResponse response,
-        AuthorizationService.TokenValidationResponseCallback callback) {
+            TokenResponse response,
+            AuthorizationService.TokenValidationResponseCallback callback) {
 
         mAuthService.performTokenValidation(
-            response,
-            callback);
+                response,
+                callback);
     }
 
     @WorkerThread
     private void handleAccessTokenResponse(
-        @Nullable TokenResponse tokenResponse,
-        @Nullable AuthorizationException authException) {
+            @Nullable TokenResponse tokenResponse,
+            @Nullable AuthorizationException authException) {
         mStateManager.updateAfterTokenResponse(tokenResponse, authException);
         runOnUiThread(this::displayAuthorized);
     }
 
     @MainThread
     private void handleCodeExchangeResponse(
-        @Nullable TokenResponse tokenResponse,
-        @Nullable AuthorizationException authException) {
+            @Nullable TokenResponse tokenResponse,
+            @Nullable AuthorizationException authException) {
 
         mStateManager.updateAfterTokenResponse(tokenResponse, authException);
         if (!mStateManager.getCurrent().isAuthorized()) {
             final String message = "Authorization Code exchange failed"
-                + ((authException != null) ? authException.error : "");
+                    + ((authException != null) ? authException.error : "");
 
             // WrongThread inference is incorrect for lambdas
             //noinspection WrongThread
             runOnUiThread(() -> displayNotAuthorized(message));
         } else {
             if (tokenResponse != null
-                && tokenResponse.idToken != null
-                && tokenResponse.request.configuration.discoveryDoc != null) {
+                    && tokenResponse.idToken != null
+                    && tokenResponse.request.configuration.discoveryDoc != null) {
                 performTokenValidation(
-                    tokenResponse,
-                    this::handleTokenValidationResponse);
+                        tokenResponse,
+                        this::handleTokenValidationResponse);
             } else {
                 final String message = "Failed to perform id_token validation";
 
@@ -435,10 +437,11 @@ public class BadgeStatusActivity extends AppCompatActivity {
 
     @WorkerThread
     private void handleTokenValidationResponse(
-        boolean isTokenValid,
-        @Nullable AuthorizationException authException) {
+            boolean isTokenValid,
+            @Nullable AuthorizationException authException) {
         if (isTokenValid) {
             runOnUiThread(this::displayAuthorized);
+
         } else {
             final String message = "Invalid id_token";
 
@@ -469,9 +472,9 @@ public class BadgeStatusActivity extends AppCompatActivity {
         }
 
         AuthorizationServiceDiscovery discovery =
-            mStateManager.getCurrent()
-                .getAuthorizationServiceConfiguration()
-                .discoveryDoc;
+                mStateManager.getCurrent()
+                        .getAuthorizationServiceConfiguration()
+                        .discoveryDoc;
 
         URL userInfoEndpoint;
         try {
@@ -486,11 +489,11 @@ public class BadgeStatusActivity extends AppCompatActivity {
         mExecutor.submit(() -> {
             try {
                 HttpURLConnection conn =
-                    (HttpURLConnection) userInfoEndpoint.openConnection();
+                        (HttpURLConnection) userInfoEndpoint.openConnection();
                 conn.setRequestProperty("Authorization", "Bearer " + accessToken);
                 conn.setInstanceFollowRedirects(false);
                 String response = Okio.buffer(Okio.source(conn.getInputStream()))
-                    .readString(Charset.forName("UTF-8"));
+                        .readString(Charset.forName("UTF-8"));
                 mUserInfoJson.set(new JSONObject(response));
             } catch (IOException ioEx) {
                 Log.e(TAG, "Network error when querying userinfo endpoint", ioEx);
@@ -507,16 +510,16 @@ public class BadgeStatusActivity extends AppCompatActivity {
     @MainThread
     private void showSnackbar(String message) {
         Snackbar.make(findViewById(R.id.coordinator),
-            message,
-            Snackbar.LENGTH_SHORT)
-            .show();
+                message,
+                Snackbar.LENGTH_SHORT)
+                .show();
     }
 
     @MainThread
     private void refreshAccessToken() {
         displayLoading("Refreshing access token");
         performTokenRequest(
-            mStateManager.getCurrent().createTokenRefreshRequest(),
-            this::handleAccessTokenResponse);
+                mStateManager.getCurrent().createTokenRefreshRequest(),
+                this::handleAccessTokenResponse);
     }
 }

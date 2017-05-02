@@ -14,22 +14,23 @@ import android.widget.TextView;
 import net.gluu.erasmus.DisplayBadgeActivity;
 import net.gluu.erasmus.R;
 import net.gluu.erasmus.model.Badge;
+import net.gluu.erasmus.model.BadgeRequest;
 
 import java.util.List;
 
 /**
- * Created by lcom16 on 20/4/17.
+ * Created by Meghna Joshi on 20/4/17.
  */
 
-public class BadgeAdapter extends RecyclerView.Adapter<BadgeAdapter.ViewHolder> {
+public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapter.ViewHolder> {
 
-    private final List<Badge> mValues;
+    private final List<BadgeRequest> mBadgeRequests;
     Context mContext;
     boolean isFromRequest;
 
-    public BadgeAdapter(Context context, List<Badge> items, boolean isFromRequest) {
+    public BadgeRequestAdapter(Context context, List<BadgeRequest> items, boolean isFromRequest) {
         mContext = context;
-        mValues = items;
+        mBadgeRequests = items;
         this.isFromRequest = isFromRequest;
     }
 
@@ -42,18 +43,18 @@ public class BadgeAdapter extends RecyclerView.Adapter<BadgeAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final Badge badge = mValues.get(position);
-        holder.mBadgeName.setText(badge.getBadgeName());
+        final BadgeRequest badgeRequest = mBadgeRequests.get(position);
+        holder.mBadgeName.setText(badgeRequest.getTemplateBadgeTitle());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isFromRequest) {
-                    new AlertDialog.Builder(mContext).setMessage("Do you want to Request " + badge.getBadgeName() + " Badge?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    new AlertDialog.Builder(mContext).setMessage("Do you want to Request " + badgeRequest.getTemplateBadgeTitle() + " Badge?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Intent i = new Intent(mContext, DisplayBadgeActivity.class);
-                            i.putExtra("badgeName",badge.getBadgeName());
+                            i.putExtra("badgeName",badgeRequest.getTemplateBadgeTitle());
                             mContext.startActivity(i);
                         }
                     }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -76,7 +77,7 @@ public class BadgeAdapter extends RecyclerView.Adapter<BadgeAdapter.ViewHolder> 
             @Override
             public void onClick(View v) {
 
-                mValues.remove(position);
+                mBadgeRequests.remove(position);
                 notifyItemRemoved(position);
             }
         });
@@ -84,7 +85,7 @@ public class BadgeAdapter extends RecyclerView.Adapter<BadgeAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mBadgeRequests.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

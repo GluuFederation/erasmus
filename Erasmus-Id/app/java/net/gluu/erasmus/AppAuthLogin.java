@@ -106,10 +106,10 @@ public class AppAuthLogin extends AppCompatActivity implements View.OnClickListe
 
     @MainThread
     private void displayLoading(String loadingMessage) {
-        findViewById(R.id.loading_container).setVisibility(View.VISIBLE);
-        findViewById(R.id.auth_container).setVisibility(View.GONE);
-        findViewById(R.id.error_container).setVisibility(View.GONE);
-
-        ((TextView)findViewById(R.id.loading_description)).setText(loadingMessage);
+//        findViewById(R.id.loading_container).setVisibility(View.VISIBLE);
+//        findViewById(R.id.auth_container).setVisibility(View.GONE);
+//        findViewById(R.id.error_container).setVisibility(View.GONE);
+//
+//        ((TextView)findViewById(R.id.loading_description)).setText(loadingMessage);
     }
 }
