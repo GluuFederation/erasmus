@@ -86,7 +86,8 @@ public class ParticipantController {
             }
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            jsonResponse.addProperty("error", "Please try after some time");
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "Please try after some time");
             return jsonResponse.toString();
         }
     }

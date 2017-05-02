@@ -26,7 +26,7 @@ public class Badges  {
     String badgeClassInum;
 
     @LdapAttribute(name = "gluuExpires")
-    Date expires = new Date();
+    Date expires = null;
 
     @LdapAttribute(name = "gluuId")
     String id;

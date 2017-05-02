@@ -354,7 +354,11 @@ public class BadgeCommands {
             objBadge.setRecipient(recipient);
 
             objBadge.setIssuedOn(objBadges.getIssuedOn().toString());
-            objBadge.setExpires(objBadges.getExpires().toString());
+            objBadge.setExpires("");
+
+            if(objBadges.getBadgePrivacy().equalsIgnoreCase("private")){
+                objBadge.setExpires(objBadges.getExpires().toString());
+            }
 
             BadgeVerification verification = new BadgeVerification();
             verification.setType(objBadges.getVerificationType());
