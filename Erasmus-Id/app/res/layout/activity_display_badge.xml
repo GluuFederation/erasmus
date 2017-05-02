@@ -20,29 +20,25 @@
 
             <ImageView
                 android:id="@+id/iv_user_img"
-                android:layout_width="@dimen/value_200"
-                android:layout_height="@dimen/value_200"
+                android:layout_width="@dimen/value_150"
+                android:layout_height="@dimen/value_150"
                 android:layout_centerHorizontal="true"
                 android:layout_margin="@dimen/value_10"
                 android:src="@drawable/avatar"/>
 
-            <Button
-                android:id="@+id/btn_scan"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:id="@+id/iv_qrcode"
+                android:layout_width="@dimen/value_220"
+                android:layout_height="@dimen/value_220"
                 android:layout_below="@+id/iv_user_img"
                 android:layout_centerHorizontal="true"
-                android:background="@color/colorAccent"
-                android:paddingLeft="@dimen/value_50"
-                android:paddingRight="@dimen/value_50"
-                android:text="Scan QR code"
-                android:textColor="@color/white" />
+                android:src="@drawable/badge"
+                android:contentDescription="@string/app_name"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/btn_scan"
-                android:layout_marginTop="@dimen/value_20"
+                android:layout_below="@+id/iv_qrcode"
                 android:orientation="vertical">
 
                 <LinearLayout

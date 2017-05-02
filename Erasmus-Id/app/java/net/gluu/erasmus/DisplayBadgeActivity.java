@@ -18,7 +18,6 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_badge);
         initToolbar();
-        findViewById(R.id.btn_scan).setOnClickListener(this);
         mTvBadgeName= (TextView) findViewById(R.id.tv_badge_name);
         if (getIntent().getStringExtra("badgeName") != null && !getIntent().getStringExtra("badgeName").isEmpty())
             mTvBadgeName.setText(getIntent().getStringExtra("badgeName"));
@@ -35,12 +34,14 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_scan:
-                Intent intent = new Intent(getApplicationContext(), SimpleScannerActivity.class);
-//                intent.putExtra(QRCaptureActivity.AutoFocus, true);
-//                intent.putExtra(QRCaptureActivity.UseFlash, false);
-                startActivityForResult(intent, RC_BARCODE_CAPTURE);
+            default:
                 break;
+//            case R.id.btn_scan:
+//                Intent intent = new Intent(getApplicationContext(), SimpleScannerActivity.class);
+////                intent.putExtra(QRCaptureActivity.AutoFocus, true);
+////                intent.putExtra(QRCaptureActivity.UseFlash, false);
+//                startActivityForResult(intent, RC_BARCODE_CAPTURE);
+//                break;
         }
     }
 
