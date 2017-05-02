@@ -135,18 +135,39 @@ public class BadgeController {
     }
 
     @RequestMapping(value = "verify/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String verifyBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletRequest request, HttpServletResponse response) {
+    public String verifyBadge(@PathVariable String id, @RequestParam(value = "key", required = false) String key, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
-        //Dynamic
         if (LDAPService.isConnected()) {
             try {
-                BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key, utils, request);
-                if (badge != null) {
-                    jsonResponse.addProperty("error", false);
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    return GsonService.getGson().toJson(badge);
+                Badges badge = BadgeCommands.getBadgeById(LDAPService.ldapEntryManager, id, utils, request);
+                if (badge != null && badge.getInum() != null) {
+                    if (badge.getBadgePrivacy().equalsIgnoreCase("public")) {
+                        BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, utils, request);
+                        return returnBadgeResponse(badgeResponse, response, "No such badge found");
+                    } else if (badge.getBadgePrivacy().equalsIgnoreCase("private")) {
+                        if (key != null && key.length() > 0) {
+                            if (redisTemplate.opsForValue().get(key) == null) {
+                                jsonResponse.addProperty("error", true);
+                                jsonResponse.addProperty("errorMsg", "Oops!! Badge expired");
+                                return jsonResponse.toString();
+                            } else {
+                                BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
+                                return returnBadgeResponse(badgeResponse, response, "No such badge found");
+                            }
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_CONFLICT);
+                            jsonResponse.addProperty("error", true);
+                            jsonResponse.addProperty("errorMsg", "Oops! Unauthorized access");
+                            return jsonResponse.toString();
+                        }
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        jsonResponse.addProperty("error", true);
+                        jsonResponse.addProperty("errorMsg", "No such badge found");
+                        return jsonResponse.toString();
+                    }
                 } else {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     jsonResponse.addProperty("error", true);
@@ -179,7 +200,7 @@ public class BadgeController {
 
         if (LDAPService.connected) {
             try {
-                BadgeResponse badge = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, key, utils, request);
+                BadgeResponse badge = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
                 if (badge != null) {
                     jsonResponse.addProperty("error", false);
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -217,6 +238,10 @@ public class BadgeController {
                     if (badgeClass != null && badgeClass.getInum() != null) {
                         Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
+
+                            if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
+                                setRedisData(badges.getKey(), badges.getId(), 95);
+                            }
 
                             String tempURLBase = utils.getBaseURL(request);
                             String tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
@@ -327,9 +352,9 @@ public class BadgeController {
             //location of barcode
             String fileName = System.currentTimeMillis() + ".png";
             //Server
-            String imagesPath = utils.getStaticResourcePath(context);
+//            String imagesPath = utils.getStaticResourcePath(context);
             //Local
-//            String imagesPath = "src/main/resources/static/images";
+            String imagesPath = "src/main/resources/static/images";
             System.out.println("path :" + imagesPath);
             if (new File(imagesPath).exists()) {
                 System.out.println("Directory exists:" + imagesPath);
@@ -394,6 +419,20 @@ public class BadgeController {
             ex.printStackTrace();
             logger.error("Exception in storing logo image:" + ex.getMessage());
             return false;
+        }
+    }
+
+    private String returnBadgeResponse(BadgeResponse badgeResponse, HttpServletResponse response, String errorMsg) {
+        JsonObject jsonResponse = new JsonObject();
+        if (badgeResponse != null) {
+            jsonResponse.addProperty("error", false);
+            response.setStatus(HttpServletResponse.SC_OK);
+            return GsonService.getGson().toJson(badgeResponse);
+        } else {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", errorMsg);
+            return jsonResponse.toString();
         }
     }
 }

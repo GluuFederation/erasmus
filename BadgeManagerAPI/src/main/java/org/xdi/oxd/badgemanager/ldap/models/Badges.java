@@ -58,6 +58,9 @@ public class Badges  {
     @LdapAttribute(name = "gluuBadgeAssertionKey")
     String key;
 
+    @LdapAttribute(name = "gluuBadgePrivacy")
+    String badgePrivacy;
+
     public Badges() {
     }
 
@@ -171,5 +174,13 @@ public class Badges  {
 
     public void setDn(String dn) {
         this.dn = dn;
+    }
+
+    public String getBadgePrivacy() {
+        return badgePrivacy;
+    }
+
+    public void setBadgePrivacy(String badgePrivacy) {
+        this.badgePrivacy = badgePrivacy;
     }
 }

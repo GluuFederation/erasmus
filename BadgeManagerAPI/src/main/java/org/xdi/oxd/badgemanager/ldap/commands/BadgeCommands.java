@@ -170,12 +170,39 @@ public class BadgeCommands {
      *
      * @param ldapEntryManager ldapEntryManager
      * @param id               GUID of the badge
+     * @param utils
+     * @param request
+     * @return
+     */
+    public static BadgeResponse getBadgeResponseById(LdapEntryManager ldapEntryManager, String id, Utils utils, HttpServletRequest request) {
+        try {
+
+            Badges objBadges = new Badges();
+            objBadges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            List<Badges> lstBadges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + "))"));
+
+            if (lstBadges.size() > 0) {
+                return GetBadgeResponse(ldapEntryManager, lstBadges.get(0), utils, request);
+            } else
+                return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves a badge by Id and key
+     *
+     * @param ldapEntryManager ldapEntryManager
+     * @param id               GUID of the badge
      * @param key              key of the badge that is to be retrieved.
      * @param utils
      * @param request
      * @return
      */
-    public static BadgeResponse getBadgeResponseById(LdapEntryManager ldapEntryManager, String id, String key, Utils utils, HttpServletRequest request) {
+    public static BadgeResponse getBadgeResponseByIdAndKey(LdapEntryManager ldapEntryManager, String id, String key, Utils utils, HttpServletRequest request) {
         try {
 
             Badges objBadges = new Badges();
@@ -185,6 +212,33 @@ public class BadgeCommands {
 
             if (lstBadges.size() > 0) {
                 return GetBadgeResponse(ldapEntryManager, lstBadges.get(0), utils, request);
+            } else
+                return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves a badge by Id
+     *
+     * @param ldapEntryManager ldapEntryManager
+     * @param id               GUID of the badge
+     * @param utils
+     * @param request
+     * @return
+     */
+    public static Badges getBadgeById(LdapEntryManager ldapEntryManager, String id, Utils utils, HttpServletRequest request) {
+        try {
+
+            Badges objBadges = new Badges();
+            objBadges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+            List<Badges> lstBadges = ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + "))"));
+
+            if (lstBadges.size() > 0) {
+                return lstBadges.get(0);
             } else
                 return null;
         } catch (Exception e) {

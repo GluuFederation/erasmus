@@ -48,7 +48,6 @@ public class BadgeRequestController {
     @Inject
     private Utils utils;
 
-
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String createBadgeRequest(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody CreateBadgeRequest badgeRequest, HttpServletResponse response) {
 
@@ -147,7 +146,7 @@ public class BadgeRequestController {
                 isUpdated = BadgeRequestCommands.updateBadgeRequest(LDAPService.ldapEntryManager, badgeRequest);
                 if (isUpdated) {
                     jsonResponse.addProperty("responseMsg", "Badge request approved successfully");
-                    createBadgeClass(request, approveBadge.getInum());
+                    createBadgeClass(request, approveBadge);
                 } else {
                     jsonResponse.addProperty("responseMsg", "Badge request approved failed");
                 }
@@ -184,7 +183,7 @@ public class BadgeRequestController {
                     if (lstApprovedBadgeRequests.size() > 0) {
                         badgeRequests.setApprovedBadgerequests(lstApprovedBadgeRequests);
                     }
-                    if(badgeRequests.getApprovedBadgerequests().size()==0 && badgeRequests.getPendingBadgeRequests().size()==0){
+                    if (badgeRequests.getApprovedBadgerequests().size() == 0 && badgeRequests.getPendingBadgeRequests().size() == 0) {
                         jsonResponse.addProperty("error", true);
                         jsonResponse.addProperty("errorMsg", "No badge requests found");
                     } else {
@@ -239,10 +238,10 @@ public class BadgeRequestController {
         }
     }
 
-    private boolean createBadgeClass(HttpServletRequest servletRequest, String badgeRequestInum) {
+    private boolean createBadgeClass(HttpServletRequest servletRequest, ApproveBadge approveBadgeRequest) {
         try {
             if (LDAPService.isConnected()) {
-                BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequestInum);
+                BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, approveBadgeRequest.getInum());
                 if (objBadgeRequest != null) {
 
                     final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + objBadgeRequest.getTemplateBadgeId();
@@ -280,7 +279,7 @@ public class BadgeRequestController {
                         objBadgeClass = BadgeClassesCommands.createBadgeClass(LDAPService.ldapEntryManager, objBadgeClass);
 
                         if (objBadgeClass.getInum() != null) {
-                            Badges objBadge = createBadge(servletRequest, objBadgeClass);
+                            Badges objBadge = createBadge(servletRequest, objBadgeClass, approveBadgeRequest);
                             if (objBadge.getInum() != null) {
                                 return true;
                             } else {
@@ -305,7 +304,7 @@ public class BadgeRequestController {
         return false;
     }
 
-    private Badges createBadge(HttpServletRequest servletRequest, BadgeClass objBadgeClass) {
+    private Badges createBadge(HttpServletRequest servletRequest, BadgeClass objBadgeClass, ApproveBadge approveBadge) {
         Badges objBadge = new Badges();
 
         try {
@@ -318,16 +317,18 @@ public class BadgeRequestController {
             objBadge.setBadgeClassInum(objBadgeClass.getInum());
             objBadge.setGuid(utils.generateRandomGUID());
             objBadge.setKey(utils.generateRandomKey(12));
+            objBadge.setBadgePrivacy(approveBadge.getPrivacy());
 
-            objBadge.setId(utils.getBaseURL(servletRequest) + "/badges/verify/" + objBadge.getGuid() + "?key=" + objBadge.getKey());
+            if (objBadge.getBadgePrivacy().equalsIgnoreCase("public")) {
+                objBadge.setId(utils.getBaseURL(servletRequest) + "/badges/verify/" + objBadge.getGuid());
+            } else if (objBadge.getBadgePrivacy().equalsIgnoreCase("private")) {
+                objBadge.setId(utils.getBaseURL(servletRequest) + "/badges/verify/" + objBadge.getGuid() + "?key=" + objBadge.getKey());
+            }
 
             return BadgeCommands.createBadge(LDAPService.ldapEntryManager, objBadge);
         } catch (Exception ex) {
             logger.error("Exception in persist badge entry." + ex.getMessage());
         }
-
         return objBadge;
     }
-
-
 }
