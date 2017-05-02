@@ -56,10 +56,10 @@
     <dimen name="value_100">100dp</dimen>
     <dimen name="value_110">110dp</dimen>
     <dimen name="value_120">120dp</dimen>
-    <dimen name="value_150">130dp</dimen>
+    <dimen name="value_150">150dp</dimen>
     <dimen name="value_170">170dp</dimen>
     <dimen name="value_180">130dp</dimen>
-    <dimen name="value_200">150dp</dimen>
+    <dimen name="value_200">200dp</dimen>
     <dimen name="value_220">220dp</dimen>
     <dimen name="value_250">250dp</dimen>
     <dimen name="value_260">260dp</dimen>

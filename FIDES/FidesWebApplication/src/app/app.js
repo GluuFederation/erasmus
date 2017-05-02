@@ -28,7 +28,7 @@ angular.module('FidesWebApplication', [
   AUTH_URL: 'https://127.0.0.1:3000/login.html',
   BASE_API: 'http://127.0.0.1:8000',
   USER_PROFILE: 'assets/img/theme/no-photo.png',
-  BADGE_URL: 'http://127.0.0.1:8088'
+  BADGE_URL: 'https://192.168.200.78:8088'
 }).run(function ($rootScope, $localStorage, $http, $window, $state, urls, toastr) {
   if ($window.location.pathname == "/login.html" || $window.location.pathname == "/register.html") {
     removeTokenAndRedirect($localStorage, $http, $window, urls);
