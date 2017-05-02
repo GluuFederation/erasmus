@@ -118,7 +118,8 @@ public class BadgeRequestController {
             }
         } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            jsonResponse.addProperty("error", "Please try after some time");
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "Please try after some time");
             return jsonResponse.toString();
         }
     }
@@ -130,38 +131,41 @@ public class BadgeRequestController {
 
         if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            jsonResponse.addProperty("error", "You're not authorized to perform this request");
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
             return jsonResponse.toString();
         }
 
         if (LDAPService.isConnected()) {
-            boolean isUpdated;
             try {
-
                 BadgeRequests badgeRequest = new BadgeRequests();
                 badgeRequest.setInum(approveBadge.getInum());
                 badgeRequest.setStatus("Approved");
                 badgeRequest.setValidity(approveBadge.getValidity());
 
-                isUpdated = BadgeRequestCommands.updateBadgeRequest(LDAPService.ldapEntryManager, badgeRequest);
-                if (isUpdated) {
-                    jsonResponse.addProperty("responseMsg", "Badge request approved successfully");
-                    createBadgeClass(request, approveBadge);
+                if (createBadgeClass(request, approveBadge)) {
+                    if (BadgeRequestCommands.updateBadgeRequest(LDAPService.ldapEntryManager, badgeRequest)) {
+                        jsonResponse.addProperty("message", "Badge request approved successfully");
+                    } else {
+                        jsonResponse.addProperty("message", "Badge request approved failed");
+                    }
                 } else {
-                    jsonResponse.addProperty("responseMsg", "Badge request approved failed");
+                    jsonResponse.addProperty("message", "Badge request approved failed");
                 }
+
                 jsonResponse.addProperty("error", false);
                 response.setStatus(HttpServletResponse.SC_OK);
                 return jsonResponse.toString();
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("responseMsg", e.getMessage());
+                jsonResponse.addProperty("errorMsg", e.getMessage());
                 return jsonResponse.toString();
             }
         } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            jsonResponse.addProperty("error", "Please try after some time");
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "Please try after some time");
             return jsonResponse.toString();
         }
     }
@@ -211,7 +215,8 @@ public class BadgeRequestController {
             }
         } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            jsonResponse.addProperty("error", "Please try after some time");
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "Please try after some time");
             return jsonResponse.toString();
         }
     }
@@ -224,11 +229,13 @@ public class BadgeRequestController {
             boolean isDeleted = BadgeRequestCommands.deleteBadgeRequestByInum(LDAPService.ldapEntryManager, inum);
             if (isDeleted) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                jsonResponse.addProperty("success", "Badge Request deleted successfully");
+                jsonResponse.addProperty("error", false);
+                jsonResponse.addProperty("message", "Badge Request deleted successfully");
                 return jsonResponse.toString();
             } else {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                jsonResponse.addProperty("error", "No badge request found");
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "No badge request found");
                 return jsonResponse.toString();
             }
         } else {

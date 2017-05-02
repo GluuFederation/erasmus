@@ -19,37 +19,39 @@ import javax.servlet.http.HttpServletResponse;
 public class BadgeClassController {
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getBadgeClass(@PathVariable String id, @RequestParam(value="key") String key, HttpServletResponse response) {
+    public String getBadgeClass(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
         if (LDAPService.isConnected()) {
             try {
                 BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(LDAPService.ldapEntryManager, id, key);
-                return returnResponse(badge,response,"No such badge found");
+                return returnResponse(badge, response);
             } catch (Exception e) {
-                e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                jsonResponse.addProperty("error", e.getMessage());
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", e.getMessage());
+                e.printStackTrace();
                 return jsonResponse.toString();
             }
         } else {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            jsonResponse.addProperty("error", "Please try after some time");
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "Please try after some time");
             return jsonResponse.toString();
         }
     }
 
-    private String returnResponse(BadgeClassResponse badge, HttpServletResponse response, String errorMsg){
+    private String returnResponse(BadgeClassResponse badge, HttpServletResponse response) {
         JsonObject jsonResponse = new JsonObject();
         if (badge != null) {
-            jsonResponse.addProperty("error", false);
             response.setStatus(HttpServletResponse.SC_OK);
+            jsonResponse.addProperty("error", false);
             return GsonService.getGson().toJson(badge);
         } else {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", errorMsg);
+            jsonResponse.addProperty("errorMsg", "No such badge found");
             return jsonResponse.toString();
         }
     }
