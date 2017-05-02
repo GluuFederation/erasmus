@@ -1,12 +1,12 @@
 package org.xdi.oxd.badgemanager.model;
 
 /**
- * Created by lcom78 on 14/4/17.
+ * Created by Arvind Tomar on 14/4/17.
  */
 public class ApproveBadge {
 
-    private String inum;
-    private  int validity;
+    private String inum, privacy;
+    private int validity;
 
     public String getInum() {
         return inum;
@@ -22,5 +22,13 @@ public class ApproveBadge {
 
     public void setValidity(int validity) {
         this.validity = validity;
+    }
+
+    public String getPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(String privacy) {
+        this.privacy = privacy;
     }
 }
