@@ -429,9 +429,9 @@ public class BadgeController {
             //location of barcode
             String fileName = System.currentTimeMillis() + ".png";
             //Server
-//            String imagesPath = utils.getStaticResourcePath(context);
+            String imagesPath = utils.getStaticResourcePath(context);
             //Local
-            String imagesPath = "src/main/resources/static/images";
+//            String imagesPath = "src/main/resources/static/images";
             System.out.println("path :" + imagesPath);
             if (new File(imagesPath).exists()) {
                 System.out.println("Directory exists:" + imagesPath);
