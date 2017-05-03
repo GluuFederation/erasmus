@@ -90,7 +90,7 @@ public class PendingBadgeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mRvBadges= (RecyclerView) view.findViewById(R.id.rv_badges);
+        mRvBadges = (RecyclerView) view.findViewById(R.id.rv_badges);
         mRvBadges.setLayoutManager(new LinearLayoutManager(getActivity()));
         getPendingBadgeRequests();
     }
@@ -134,22 +134,9 @@ public class PendingBadgeFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    public ArrayList<Badge> getBadgeList() {
-        ArrayList<Badge> badgeList = new ArrayList<>();
-        String[] ArrCity = getResources().getStringArray(R.array.badge);
-        for (int i = 0; i < 15; i++) {
-
-            Badge badge = new Badge();
-            badge.setBadgeId(i);
-            badge.setBadgeName(ArrCity[i]);
-            badgeList.add(badge);
-        }
-        return badgeList;
-    }
-
     private void getPendingBadgeRequests() {
         Application.showProgressBar();
-        Call<BadgeRequests> call = mObjAPI.getBadgeRequests("test@test.com", "Pending");
+        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.AccessToken, "Pending", Application.participant.getOpHost());
         call.enqueue(new Callback<BadgeRequests>() {
             @Override
             public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {

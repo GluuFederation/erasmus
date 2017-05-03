@@ -134,22 +134,9 @@ public class ApproveBadgeFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    public ArrayList<Badge> getBadgeList() {
-        ArrayList<Badge> badgeList = new ArrayList<>();
-        String[] ArrCity = getResources().getStringArray(R.array.badge);
-        for (int i = 0; i < 15; i++) {
-
-            Badge badge = new Badge();
-            badge.setBadgeId(i);
-            badge.setBadgeName(ArrCity[i]);
-            badgeList.add(badge);
-        }
-        return badgeList;
-    }
-
     private void getApprovedBadgeRequests() {
         Application.showProgressBar();
-        Call<BadgeRequests> call = mObjAPI.getBadgeRequests("test@test.com", "Approved");
+        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.AccessToken, "Approved", Application.participant.getOpHost());
         call.enqueue(new Callback<BadgeRequests>() {
             @Override
             public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {

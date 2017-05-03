@@ -49,5 +49,7 @@
     <string name="select_city">Select City</string>
     <string name="select_state">Select State</string>
     <string name="request_badge">Request badge</string>
+    <string name="dummy_org">Houstan Fire Department</string>
+    <string name="change_org">Change Organization</string>
 
 </resources>
