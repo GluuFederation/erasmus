@@ -1,6 +1,7 @@
 package org.xdi.oxd.badgemanager.web;
 
 import com.google.common.hash.Hashing;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.swagger.annotations.Api;
@@ -80,21 +81,28 @@ public class BadgeController {
         redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
     }
 
-    @RequestMapping(value = "templates/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getTemplateBadgesByParticipant(@RequestParam String accessToken, @RequestParam String type, HttpServletResponse response) {
+    @RequestMapping(value = "templates", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getTemplateBadgesByParticipant(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody TemplateBadgeRequest templateBadgeRequest, HttpServletResponse response) {
         JsonObject jsonResponse = new JsonObject();
 
         try {
 
+            if (accessToken == null || templateBadgeRequest.getOpHost() == null) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return jsonResponse.toString();
+            }
+
 //            retrieve user info
-            UserInfo userInfo = userInfoService.getUserInfo(accessToken);
+            UserInfo userInfo = userInfoService.getUserInfo(templateBadgeRequest.getOpHost(),accessToken);
             if (userInfo != null) {
                 String issuer = userInfo.getIssuer();
             }
 
-            String issuer = "https://ce-dev2.gluu.org";
+            String issuer = templateBadgeRequest.getOpHost();
 
-            IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, type);
+            IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, templateBadgeRequest.getType());
 
             final String uri = Global.API_ENDPOINT + Global.getTemplateBadgesByParticipant;
 
@@ -110,7 +118,7 @@ public class BadgeController {
 
             String result = strResponse.getBody();
 
-            JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
+            JsonArray jObjResponse = new JsonParser().parse(result).getAsJsonArray();
             if (jObjResponse != null) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.add("badges", GsonService.getGson().toJsonTree(jObjResponse));
@@ -243,7 +251,7 @@ public class BadgeController {
                                 calendar.add(Calendar.SECOND, 95);
                                 badges.setExpires(calendar.getTime());
                                 boolean isUpdated = BadgeCommands.updateBadge(LDAPService.ldapEntryManager, badges);
-                                logger.info("Badge updated after expires set:"+isUpdated);
+                                logger.info("Badge updated after expires set:" + isUpdated);
                             }
 
                             String tempURLBase = utils.getBaseURL(request);
@@ -313,21 +321,21 @@ public class BadgeController {
         }
     }
 
-    @RequestMapping(value = "setPrivacy/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String setBadgePrivacy(@RequestParam String badgeRequestInum, @RequestParam String privacy, HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "setPrivacy", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String setBadgePrivacy(@RequestBody PrivacyRequest privacy, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
         if (LDAPService.isConnected()) {
             try {
-                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequestInum);
+                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, privacy.getBadgeRequestInum());
                 if (badgeRequests != null && badgeRequests.getInum() != null) {
                     BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
                     if (badgeClass != null && badgeClass.getInum() != null) {
                         Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
 
-                            badges.setBadgePrivacy(privacy);
+                            badges.setBadgePrivacy(privacy.getPrivacy());
 
                             if (badges.getBadgePrivacy().equalsIgnoreCase("public")) {
                                 badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());
@@ -341,7 +349,7 @@ public class BadgeController {
                             }
 
                             boolean isUpdated = BadgeCommands.updateBadge(LDAPService.ldapEntryManager, badges);
-                            if(isUpdated){
+                            if (isUpdated) {
                                 response.setStatus(HttpServletResponse.SC_OK);
                                 jsonResponse.addProperty("error", false);
                                 jsonResponse.addProperty("message", "Badge privacy set successfully");

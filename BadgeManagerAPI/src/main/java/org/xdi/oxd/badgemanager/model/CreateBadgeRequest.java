@@ -4,7 +4,7 @@ package org.xdi.oxd.badgemanager.model;
  * Created by Arvind Tomar on 20/4/17.
  */
 public class CreateBadgeRequest {
-    private String participant, templateBadgeId, templateBadgeTitle;
+    private String participant, templateBadgeId, templateBadgeTitle, opHost;
 
     public String getParticipant() {
         return participant;
@@ -28,5 +28,13 @@ public class CreateBadgeRequest {
 
     public void setTemplateBadgeTitle(String templateBadgeTitle) {
         this.templateBadgeTitle = templateBadgeTitle;
+    }
+
+    public String getOpHost() {
+        return opHost;
+    }
+
+    public void setOpHost(String opHost) {
+        this.opHost = opHost;
     }
 }

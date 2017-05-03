@@ -22,8 +22,8 @@ public class OxdServiceImpl implements OxdService {
 
     private static final Logger logger = LoggerFactory.getLogger(OxdServiceImpl.class);
 
-    @Value("${oxd.server.op-host}")
-    private String opHost;
+//    @Value("${oxd.server.op-host}")
+//    private String opHost;
 
     @Value("${oxd.server.host}")
     private String host;
@@ -48,7 +48,7 @@ public class OxdServiceImpl implements OxdService {
     }
 
     @Override
-    public CommandResponse registerSite(String redirectUrl, String logoutUrl, String postLogoutRedirectUrl) {
+    public CommandResponse registerSite(String opHost,String redirectUrl, String logoutUrl, String postLogoutRedirectUrl) {
         final RegisterSiteParams commandParams = new RegisterSiteParams();
         commandParams.setOpHost(opHost);
         commandParams.setAuthorizationRedirectUri(redirectUrl);

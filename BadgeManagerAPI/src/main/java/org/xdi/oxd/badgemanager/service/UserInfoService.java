@@ -32,12 +32,12 @@ public class UserInfoService {
     @Inject
     private OxdService oxdService;
 
-    public UserInfo getUserInfo(String accessToken) {
+    public UserInfo getUserInfo(String opHost, String accessToken) {
         UserInfo userInfo = new UserInfo();
 
         try {
-            CommandResponse respUserInfo = oxdService.getUserInfo(settings.getOxdId(redisTemplate), accessToken);
-            logger.error("User info response status:" + respUserInfo.getStatus());
+            CommandResponse respUserInfo = oxdService.getUserInfo(settings.getOxdId(redisTemplate, opHost), accessToken);
+            logger.info("User info response status:" + respUserInfo.getStatus());
             if (respUserInfo.getStatus().equals(org.xdi.oxd.common.ResponseStatus.ERROR)) {
                 logger.error("Error in retrieving user info in oxd:" + CommandResponse.INTERNAL_ERROR_RESPONSE_AS_STRING);
                 return null;
