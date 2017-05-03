@@ -81,13 +81,13 @@ public class BadgeController {
         redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
     }
 
-    @RequestMapping(value = "templates/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getTemplateBadgesByParticipant(@RequestHeader(value = "AccessToken") String accessToken, @RequestParam String opHost, @RequestParam String type, HttpServletResponse response) {
+    @RequestMapping(value = "templates", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getTemplateBadgesByParticipant(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody TemplateBadgeRequest templateBadgeRequest, HttpServletResponse response) {
         JsonObject jsonResponse = new JsonObject();
 
         try {
 
-            if (accessToken == null || opHost == null) {
+            if (accessToken == null || templateBadgeRequest.getOpHost() == null) {
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -95,14 +95,14 @@ public class BadgeController {
             }
 
 //            retrieve user info
-            UserInfo userInfo = userInfoService.getUserInfo(opHost,accessToken);
+            UserInfo userInfo = userInfoService.getUserInfo(templateBadgeRequest.getOpHost(),accessToken);
             if (userInfo != null) {
                 String issuer = userInfo.getIssuer();
             }
 
-            String issuer = opHost;
+            String issuer = templateBadgeRequest.getOpHost();
 
-            IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, type);
+            IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, templateBadgeRequest.getType());
 
             final String uri = Global.API_ENDPOINT + Global.getTemplateBadgesByParticipant;
 
@@ -321,21 +321,21 @@ public class BadgeController {
         }
     }
 
-    @RequestMapping(value = "setPrivacy/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String setBadgePrivacy(@RequestParam String badgeRequestInum, @RequestParam String privacy, HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "setPrivacy", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String setBadgePrivacy(@RequestBody PrivacyRequest privacy, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
         if (LDAPService.isConnected()) {
             try {
-                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequestInum);
+                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, privacy.getBadgeRequestInum());
                 if (badgeRequests != null && badgeRequests.getInum() != null) {
                     BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
                     if (badgeClass != null && badgeClass.getInum() != null) {
                         Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
 
-                            badges.setBadgePrivacy(privacy);
+                            badges.setBadgePrivacy(privacy.getPrivacy());
 
                             if (badges.getBadgePrivacy().equalsIgnoreCase("public")) {
                                 badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());

@@ -45,8 +45,8 @@ public class BadgeClassController {
     private String returnResponse(BadgeClassResponse badge, HttpServletResponse response) {
         JsonObject jsonResponse = new JsonObject();
         if (badge != null) {
-            response.setStatus(HttpServletResponse.SC_OK);
             jsonResponse.addProperty("error", false);
+            response.setStatus(HttpServletResponse.SC_OK);
             return GsonService.getGson().toJson(badge);
         } else {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
