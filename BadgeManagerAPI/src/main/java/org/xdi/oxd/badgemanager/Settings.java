@@ -18,8 +18,8 @@ public class Settings {
 
     private static final Logger logger = LoggerFactory.getLogger(Settings.class);
 
-    @Value("${oxd.server.op-host}")
-    private String opHost;
+//    @Value("${oxd.server.op-host}")
+//    private String opHost;
 
     @Value("${oxd.client.redirect-uri}")
     private String redirectUrl;
@@ -39,15 +39,16 @@ public class Settings {
         redisTemplate.opsForValue().set(key, value);
     }
 
-    public String getOxdId(RedisTemplate<Object, Object> redisTemplate) {
-        logger.info("opHost in getOxdId():"+this.opHost);
-        if (redisTemplate.opsForValue().get(this.opHost) != null) {
-            this.oxdId = redisTemplate.opsForValue().get(this.opHost).toString();
-            logger.info("Site Oxd Id:"+this.oxdId);
+    public String getOxdId(RedisTemplate<Object, Object> redisTemplate, String opHost) {
+        logger.info("opHost in getOxdId():" + opHost);
+
+        if (redisTemplate.opsForValue().get(opHost) != null) {
+            this.oxdId = redisTemplate.opsForValue().get(opHost).toString();
+            logger.info("Site Oxd Id:" + this.oxdId);
             return this.oxdId;
         }
 
-        CommandResponse commandResponse = oxdService.registerSite(redirectUrl, logoutUrl, postLogoutUrl);
+        CommandResponse commandResponse = oxdService.registerSite(opHost, redirectUrl, logoutUrl, postLogoutUrl);
         if (commandResponse.getStatus().equals(ResponseStatus.ERROR)) {
             logger.error("Error in register site in oxd:" + CommandResponse.INTERNAL_ERROR_RESPONSE_AS_STRING);
             throw new RuntimeException("Can not register site: {redirectUrl: '" + redirectUrl + "', logoutUrl: '" + logoutUrl + "', postLogoutUrl: '" + postLogoutUrl + "'}. Plese see the oxd-server.log");
@@ -57,12 +58,12 @@ public class Settings {
         this.oxdId = response.getOxdId();
 
         try {
-            setRedisData(redisTemplate, this.opHost, this.oxdId);
+            setRedisData(redisTemplate, opHost, this.oxdId);
         } catch (IOException e) {
-            logger.error("Exception in storing oxd id to redis:"+e.getMessage());
+            logger.error("Exception in storing oxd id to redis:" + e.getMessage());
             e.printStackTrace();
         }
-        logger.info("Site Oxd Id:"+this.oxdId);
+        logger.info("Site Oxd Id:" + this.oxdId);
         return this.oxdId;
     }
 }

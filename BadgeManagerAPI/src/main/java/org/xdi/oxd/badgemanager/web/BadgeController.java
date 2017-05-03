@@ -1,6 +1,7 @@
 package org.xdi.oxd.badgemanager.web;
 
 import com.google.common.hash.Hashing;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.swagger.annotations.Api;
@@ -81,18 +82,25 @@ public class BadgeController {
     }
 
     @RequestMapping(value = "templates/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getTemplateBadgesByParticipant(@RequestParam String accessToken, @RequestParam String type, HttpServletResponse response) {
+    public String getTemplateBadgesByParticipant(@RequestHeader(value = "AccessToken") String accessToken, @RequestParam String opHost, @RequestParam String type, HttpServletResponse response) {
         JsonObject jsonResponse = new JsonObject();
 
         try {
 
+            if (accessToken == null || opHost == null) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return jsonResponse.toString();
+            }
+
 //            retrieve user info
-            UserInfo userInfo = userInfoService.getUserInfo(accessToken);
+            UserInfo userInfo = userInfoService.getUserInfo(opHost,accessToken);
             if (userInfo != null) {
                 String issuer = userInfo.getIssuer();
             }
 
-            String issuer = "https://ce-dev2.gluu.org";
+            String issuer = opHost;
 
             IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, type);
 
@@ -110,7 +118,7 @@ public class BadgeController {
 
             String result = strResponse.getBody();
 
-            JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
+            JsonArray jObjResponse = new JsonParser().parse(result).getAsJsonArray();
             if (jObjResponse != null) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.add("badges", GsonService.getGson().toJsonTree(jObjResponse));
@@ -243,7 +251,7 @@ public class BadgeController {
                                 calendar.add(Calendar.SECOND, 95);
                                 badges.setExpires(calendar.getTime());
                                 boolean isUpdated = BadgeCommands.updateBadge(LDAPService.ldapEntryManager, badges);
-                                logger.info("Badge updated after expires set:"+isUpdated);
+                                logger.info("Badge updated after expires set:" + isUpdated);
                             }
 
                             String tempURLBase = utils.getBaseURL(request);
@@ -341,7 +349,7 @@ public class BadgeController {
                             }
 
                             boolean isUpdated = BadgeCommands.updateBadge(LDAPService.ldapEntryManager, badges);
-                            if(isUpdated){
+                            if (isUpdated) {
                                 response.setStatus(HttpServletResponse.SC_OK);
                                 jsonResponse.addProperty("error", false);
                                 jsonResponse.addProperty("message", "Badge privacy set successfully");
