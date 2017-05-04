@@ -49,7 +49,7 @@ public class BadgeClassController {
             response.setStatus(HttpServletResponse.SC_OK);
             return GsonService.getGson().toJson(badge);
         } else {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            response.setStatus(HttpServletResponse.SC_OK);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "No such badge found");
             return jsonResponse.toString();

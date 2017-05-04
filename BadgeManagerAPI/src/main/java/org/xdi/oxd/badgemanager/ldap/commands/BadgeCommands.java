@@ -72,7 +72,8 @@ public class BadgeCommands {
             logger.info("updated badge entry ");
             return true;
         } else {
-            throw new NotFoundException("No such badge found");
+            logger.info("No such badge found");
+            return false;
         }
     }
 
@@ -328,7 +329,7 @@ public class BadgeCommands {
             if (badges.size() > 0) {
                 return badges.get(0);
             } else {
-                throw new NotFoundException("No badge found");
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();

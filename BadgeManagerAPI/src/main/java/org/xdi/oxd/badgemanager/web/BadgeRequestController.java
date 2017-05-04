@@ -65,12 +65,12 @@ public class BadgeRequestController {
 //            retrieve user info
             UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
             if (userInfo == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 return jsonResponse.toString();
             } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 return jsonResponse.toString();
@@ -120,7 +120,7 @@ public class BadgeRequestController {
         if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_OK);
             return jsonResponse.toString();
         }
 
@@ -156,7 +156,7 @@ public class BadgeRequestController {
         JsonObject jsonResponse = new JsonObject();
 
         if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_OK);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
             return jsonResponse.toString();
@@ -205,12 +205,12 @@ public class BadgeRequestController {
         if (userInfo == null) {
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_OK);
             return jsonResponse.toString();
         } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_OK);
             return jsonResponse.toString();
         }
         String email = userInfo.getEmail();
@@ -265,22 +265,29 @@ public class BadgeRequestController {
     public String removeBadgeRequest(@PathVariable String inum, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
-        if (LDAPService.isConnected()) {
-            boolean isDeleted = BadgeRequestCommands.deleteBadgeRequestByInum(LDAPService.ldapEntryManager, inum);
-            if (isDeleted) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                jsonResponse.addProperty("error", false);
-                jsonResponse.addProperty("message", "Badge Request deleted successfully");
-                return jsonResponse.toString();
+        try {
+            if (LDAPService.isConnected()) {
+                boolean isDeleted = BadgeRequestCommands.deleteBadgeRequestByInum(LDAPService.ldapEntryManager, inum);
+                if (isDeleted) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    jsonResponse.addProperty("error", false);
+                    jsonResponse.addProperty("message", "Badge Request deleted successfully");
+                    return jsonResponse.toString();
+                } else {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "No badge request found");
+                    return jsonResponse.toString();
+                }
             } else {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "No badge request found");
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                jsonResponse.addProperty("error", "Please try after some time");
                 return jsonResponse.toString();
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            jsonResponse.addProperty("error", "Please try after some time");
+        } catch (Exception ex) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", ex.getMessage());
             return jsonResponse.toString();
         }
     }

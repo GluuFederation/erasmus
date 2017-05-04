@@ -37,6 +37,7 @@ public class TempURLController {
         JsonObject jsonResponse = new JsonObject();
 
         if (redisTemplate.opsForValue().get(id) == null) {
+            response.setStatus(HttpServletResponse.SC_OK);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "Oops!! Badge link expired");
             return jsonResponse.toString();

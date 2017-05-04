@@ -79,7 +79,7 @@ public class ParticipantController {
                 jsonResponse.addProperty("error", false);
                 return jsonResponse.toString();
             } else {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "No participants found");
                 return jsonResponse.toString();
