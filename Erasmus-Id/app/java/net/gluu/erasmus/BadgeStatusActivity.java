@@ -65,7 +65,7 @@ public class BadgeStatusActivity extends AppCompatActivity {
     TabLayout mTabLayout;
     ViewPager mViewPager;
 
-    private static final String TAG = "BadgeStatusActivity";
+    private static final String TAG = "TokenActivity";
 
     private static final String KEY_USER_INFO = "userInfo";
 
@@ -110,6 +110,7 @@ public class BadgeStatusActivity extends AppCompatActivity {
         }
         initViews();
         initListeners();
+        init();
     }
 
     @Override
@@ -277,15 +278,11 @@ public class BadgeStatusActivity extends AppCompatActivity {
 
     @MainThread
     private void displayAuthorized() {
-
         findViewById(R.id.authorized).setVisibility(View.VISIBLE);
         findViewById(R.id.not_authorized).setVisibility(View.GONE);
         findViewById(R.id.loading_container).setVisibility(View.GONE);
 
         AuthState state = mStateManager.getCurrent();
-        Log.v("TAG", "Access token:" + state.getAccessToken());
-        Application.AccessToken = state.getAccessToken();
-        init();
 
         TextView refreshTokenInfoView = (TextView) findViewById(R.id.refresh_token_info);
         refreshTokenInfoView.setText((state.getRefreshToken() == null)
@@ -301,6 +298,8 @@ public class BadgeStatusActivity extends AppCompatActivity {
         if (state.getAccessToken() == null) {
             accessTokenInfoView.setText(R.string.no_access_token_returned);
         } else {
+            Application.AccessToken = state.getAccessToken();
+            Log.v("TAG", "Access token:" + Application.AccessToken);
             Long expiresAt = state.getAccessTokenExpirationTime();
             if (expiresAt == null) {
                 accessTokenInfoView.setText(R.string.no_access_token_expiry);
@@ -441,7 +440,6 @@ public class BadgeStatusActivity extends AppCompatActivity {
             @Nullable AuthorizationException authException) {
         if (isTokenValid) {
             runOnUiThread(this::displayAuthorized);
-
         } else {
             final String message = "Invalid id_token";
 
