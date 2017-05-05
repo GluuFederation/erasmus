@@ -1,5 +1,6 @@
 package net.gluu.erasmus.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import net.gluu.erasmus.R;
 import net.gluu.erasmus.adapters.BadgeRequestAdapter;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
+import net.gluu.erasmus.model.APIBadgeRequest;
 import net.gluu.erasmus.model.Badge;
 import net.gluu.erasmus.model.BadgeRequests;
 
@@ -47,6 +49,7 @@ public class ApproveBadgeFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     RecyclerView mRvBadges;
     APIInterface mObjAPI;
+    ProgressDialog mProgress;
 
     public ApproveBadgeFragment() {
         // Required empty public constructor
@@ -74,6 +77,8 @@ public class ApproveBadgeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mObjAPI = APIService.createService(APIInterface.class);
+        mProgress = new ProgressDialog(getActivity());
+        mProgress.setMessage("Loading badges..");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -135,34 +140,47 @@ public class ApproveBadgeFragment extends Fragment {
     }
 
     private void getApprovedBadgeRequests() {
-        Application.showProgressBar();
-        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.AccessToken, "Approved", Application.participant.getOpHost());
+        showProgressBar();
+        APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "Approved");
+        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.AccessToken, badgeRequest);
         call.enqueue(new Callback<BadgeRequests>() {
             @Override
             public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {
-                Application.hideProgressBar();
+                hideProgressBar();
                 if (response.errorBody() == null && response.body() != null) {
                     BadgeRequests objResponse = response.body();
 
                     if (objResponse != null) {
                         if (objResponse.getError()) {
-                            Log.v("TAG", "Error in retrieving badge requests");
+                            Log.v("TAG", "Error in retrieving approved badge requests");
                         } else {
-                            Log.v("TAG", "badge requests retrieved:" + objResponse.getBadgeRequests().size());
-                            mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), false));
+                            Log.v("TAG", "approved badge requests retrieved:" + objResponse.getBadgeRequests().size());
+                            mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), true));
                         }
                     }
                 } else {
-                    Log.v("TAG", "Error from server in retrieving badge requests:" + response.errorBody());
+                    Log.v("TAG", "Error from server in retrieving approved badge requests:" + response.errorBody());
                     Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<BadgeRequests> call, Throwable t) {
-                Log.v("TAG", "Response retrieving badge requests failure" + t.getMessage());
-                Application.hideProgressBar();
+                Log.v("TAG", "Response retrieving approved badge requests failure" + t.getMessage());
+                hideProgressBar();
             }
         });
+    }
+
+    private void showProgressBar() {
+        if (mProgress == null)
+            return;
+
+        mProgress.show();
+    }
+
+    private void hideProgressBar() {
+        if (mProgress != null && mProgress.isShowing())
+            mProgress.dismiss();
     }
 }

@@ -16,6 +16,7 @@ package net.gluu.erasmus;
 
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,10 +30,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.gluu.appauth.AppAuthConfiguration;
@@ -47,8 +44,6 @@ import net.gluu.appauth.RegistrationResponse;
 import net.gluu.appauth.ResponseTypeValues;
 import net.gluu.appauth.browser.AnyBrowserMatcher;
 import net.gluu.appauth.browser.BrowserMatcher;
-import net.gluu.appauth.browser.ExactBrowserMatcher;
-import net.gluu.erasmus.BrowserSelectionAdapter.BrowserInfo;
 
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
@@ -82,6 +77,8 @@ public final class LoginActivity extends AppCompatActivity {
     private final AtomicReference<String> mClientId = new AtomicReference<>();
     private ExecutorService mExecutor;
 
+    ProgressDialog mProgress;
+
     @NonNull
     private BrowserMatcher mBrowserMatcher = AnyBrowserMatcher.INSTANCE;
 
@@ -102,6 +99,9 @@ public final class LoginActivity extends AppCompatActivity {
         }
 
         setContentView(R.layout.activity_login);
+
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("Loading..");
 
 //        findViewById(R.id.retry).setOnClickListener((View view) ->
 //            mExecutor.submit(this::initializeAppAuth));
@@ -346,12 +346,7 @@ public final class LoginActivity extends AppCompatActivity {
 
     @MainThread
     private void displayLoading(String loadingMessage) {
-//        findViewById(R.id.loading_container).setVisibility(View.VISIBLE);
-//        findViewById(R.id.auth_container).setVisibility(View.GONE);
-//        findViewById(R.id.error_container).setVisibility(View.GONE);
-//
-//        ((TextView) findViewById(R.id.loading_description)).setText(loadingMessage);
-        Application.showProgressBar();
+        showProgressBar();
     }
 
     @MainThread
@@ -373,11 +368,8 @@ public final class LoginActivity extends AppCompatActivity {
 
     @MainThread
     private void displayAuthOptions() {
-        Application.hideProgressBar();
+        hideProgressBar();
         findViewById(R.id.start_auth).setVisibility(View.VISIBLE);
-//        findViewById(R.id.auth_container).setVisibility(View.VISIBLE);
-//        findViewById(R.id.loading_container).setVisibility(View.GONE);
-//        findViewById(R.id.error_container).setVisibility(View.GONE);
 
         AuthState state = mAuthStateManager.getCurrent();
         AuthorizationServiceConfiguration config = state.getAuthorizationServiceConfiguration();
@@ -389,7 +381,6 @@ public final class LoginActivity extends AppCompatActivity {
             authEndpointStr = "Static auth endpoint: \n";
         }
         authEndpointStr += config.authorizationEndpoint;
-//        ((TextView) findViewById(R.id.auth_endpoint)).setText(authEndpointStr);
 
         String clientIdStr;
         if (state.getLastRegistrationResponse() != null) {
@@ -398,7 +389,6 @@ public final class LoginActivity extends AppCompatActivity {
             clientIdStr = "Static client ID: \n";
         }
         clientIdStr += mClientId;
-//        ((TextView) findViewById(R.id.client_id)).setText(clientIdStr);
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -409,5 +399,17 @@ public final class LoginActivity extends AppCompatActivity {
         } else {
             return getResources().getColor(color);
         }
+    }
+
+    private void showProgressBar() {
+        if (mProgress == null)
+            return;
+
+        mProgress.show();
+    }
+
+    private void hideProgressBar() {
+        if (mProgress != null && mProgress.isShowing())
+            mProgress.dismiss();
     }
 }
