@@ -92,7 +92,7 @@ public class BadgeRequestCommands {
                 objResponse.setStatus(badgeRequest.getStatus());
                 return objResponse;
             } else {
-                throw new Exception("You have already requested for same badge");
+                return null;
             }
         } else {
             createBadgeRequestNew(ldapEntryManager, badgeRequest);

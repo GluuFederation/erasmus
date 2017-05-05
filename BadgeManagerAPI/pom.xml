@@ -36,6 +36,7 @@
         <liquibase-slf4j.version>1.2.1</liquibase-slf4j.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
         <jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
 
     <dependencies>
@@ -107,8 +108,8 @@
 
         <!--Uncomment this dependency while run in local only-->
         <!--<dependency>-->
-        <!--<groupId>org.springframework.boot</groupId>-->
-        <!--<artifactId>spring-boot-starter-web</artifactId>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-web</artifactId>-->
         <!--</dependency>-->
 
         <dependency>

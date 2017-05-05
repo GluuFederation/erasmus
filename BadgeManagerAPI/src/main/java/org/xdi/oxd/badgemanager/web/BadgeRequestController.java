@@ -91,7 +91,7 @@ public class BadgeRequestController {
                     jsonResponse.addProperty("error", false);
                 } else {
                     jsonResponse.addProperty("error", true);
-                    jsonResponse.addProperty("errorMsg", "Unable to request badge");
+                    jsonResponse.addProperty("errorMsg", "You have already requested for same badge");
                 }
 
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -99,7 +99,8 @@ public class BadgeRequestController {
 
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                jsonResponse.addProperty("error", "Please try after some time");
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "Please try after some time");
                 logger.error("Error in connecting database:");
                 return jsonResponse.toString();
             }
@@ -200,6 +201,13 @@ public class BadgeRequestController {
     public String getBadgeRequestsByStatus(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody BadgeRequest badgeRequest, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
+
+        if (!badgeRequest.getStatus().equalsIgnoreCase("all") || !badgeRequest.getStatus().equalsIgnoreCase("approved") || !badgeRequest.getStatus().equalsIgnoreCase("pending")) {
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "Invalid status");
+            response.setStatus(HttpServletResponse.SC_OK);
+            return jsonResponse.toString();
+        }
 
         UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
         if (userInfo == null) {
