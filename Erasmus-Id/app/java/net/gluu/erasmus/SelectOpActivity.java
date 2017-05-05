@@ -1,5 +1,6 @@
 package net.gluu.erasmus;
 
+import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,12 +20,7 @@ import android.widget.TextView;
 import net.gluu.erasmus.adapters.OPAdapter;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
-import net.gluu.erasmus.model.Participant;
 import net.gluu.erasmus.model.ParticipantsResponse;
-import net.gluu.erasmus.model.Op;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,11 +28,11 @@ import retrofit2.Response;
 
 public class SelectOpActivity extends AppCompatActivity {
 
-    private SearchView searchView;
+    SearchView searchView;
     OPAdapter adapter;
     RecyclerView mRvOrganization;
     APIInterface mObjAPI;
-    List<Participant> lstParticipant;
+    ProgressDialog mProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +40,9 @@ public class SelectOpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_op);
 
         mObjAPI = APIService.createService(APIInterface.class);
+
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("Requesting OP..");
 
         initToolbar();
         mRvOrganization = (RecyclerView) findViewById(R.id.rvOrganization);
@@ -95,26 +94,13 @@ public class SelectOpActivity extends AppCompatActivity {
         }
     }
 
-    public ArrayList<Op> getOPList() {
-        ArrayList<Op> opList = new ArrayList<>();
-        String[] ArrOp = getResources().getStringArray(R.array.city);
-        for (int i = 0; i < 11; i++) {
-            Op op = new Op();
-            op.setCityId(i);
-            op.setOpName(ArrOp[i]);
-            op.setOpId(i);
-            opList.add(op);
-        }
-        return opList;
-    }
-
     private void getOp() {
-        Application.showProgressBar();
+        showProgressBar();
         Call<ParticipantsResponse> call = mObjAPI.getParticipants("all", "all");
         call.enqueue(new Callback<ParticipantsResponse>() {
             @Override
             public void onResponse(Call<ParticipantsResponse> call, Response<ParticipantsResponse> response) {
-                Application.hideProgressBar();
+                hideProgressBar();
                 if (response.errorBody() == null && response.body() != null) {
                     ParticipantsResponse objResponse = response.body();
 
@@ -136,8 +122,20 @@ public class SelectOpActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ParticipantsResponse> call, Throwable t) {
                 Log.v("TAG", "Response retrieving participants failure" + t.getMessage());
-                Application.hideProgressBar();
+                hideProgressBar();
             }
         });
+    }
+
+    private void showProgressBar() {
+        if (mProgress == null)
+            return;
+
+        mProgress.show();
+    }
+
+    private void hideProgressBar() {
+        if (mProgress != null && mProgress.isShowing())
+            mProgress.dismiss();
     }
 }

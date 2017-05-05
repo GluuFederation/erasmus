@@ -66,41 +66,31 @@ router.post('/getBadgeTemplatesByIssuer', (req, res, next) => {
 
   Badges.getBadgeByIssuer(req.body.issuer)
     .then((org) => {
-      const cat = [];
+      let lstbadge = [];
       org.approvedBadges.forEach(function (item) {
-        if (cat.indexOf(item.category.name) <= -1 && (req.body.type == item.category.name || req.body.type == 'all'))
-          cat.push(item.category.name);
-      });
-
-      const arr2 = {};
-      cat.forEach(function (ocat) {
-        arr2[ocat] = [];
-        org.approvedBadges.forEach(function (item) {
-          if (item.category.name == ocat) {
-            const cat = {
-              id: process.env.BASE_URL + '/templateBadge/' + item._id,
-              name: item.name,
-              description: item.description,
-              image: item.image,
-              narrative: item.narrative,
-              type: item.type,
-              issuer: {
-                id: process.env.BASE_URL + '/participant/' + org._id,
-                name: org.name,
-                type: org.type,
-                url: req.body.issuer,
-                verification: {
-                  allowedOrigins: req.body.issuer,
-                  type: 'hosted'
-                }
-              }
-            };
-            arr2[ocat].push(cat);
+        const cat = {
+          id: process.env.BASE_URL + '/templateBadge/' + item._id,
+          name: item.name,
+          description: item.description,
+          image: item.image,
+          narrative: item.narrative,
+          type: item.type,
+          issuer: {
+            id: process.env.BASE_URL + '/participant/' + org._id,
+            name: org.name,
+            type: org.type,
+            url: req.body.issuer,
+            verification: {
+              allowedOrigins: req.body.issuer,
+              type: 'hosted'
+            }
           }
-        });
+        };
+        if (req.body.type == item.category.name || req.body.type == 'all') {
+          lstbadge.push(cat);
+        }
       });
-
-      return res.status(httpStatus.OK).send(arr2);
+      return res.status(httpStatus.OK).send(lstbadge);
     })
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,

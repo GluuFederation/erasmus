@@ -27,7 +27,7 @@ Description: https://source.android.com/source/code-style.html
                  value="Package name ''{0}'' must be lower-case."/>
     </module>
 
-    <!-- Require standard type names -->
+    <!-- Require standard status names -->
     <module name="TypeName">
         <message key="name.invalidPattern"
          value="Type name ''{0}'' must begin with a capital letter."/>
@@ -40,7 +40,7 @@ Description: https://source.android.com/source/code-style.html
     <module name="ClassTypeParameterName">
       <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]+[T]$)"/>
       <message key="name.invalidPattern"
-               value="Class type parameter ''{0}'' must either be a single upper-case character, or begin with an upper-case character and end with 'T'."/>
+               value="Class status parameter ''{0}'' must either be a single upper-case character, or begin with an upper-case character and end with 'T'."/>
     </module>
 
     <!-- Non-public, non-static members must start with "m" -->
@@ -68,7 +68,7 @@ Description: https://source.android.com/source/code-style.html
     <module name="MethodTypeParameterName">
       <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]+[T]$)"/>
       <message key="name.invalidPattern"
-               value="Method type parameter ''{0}'' must either be a single upper-case character or begin with an upper-case character and end with 'T'."/>
+               value="Method status parameter ''{0}'' must either be a single upper-case character or begin with an upper-case character and end with 'T'."/>
     </module>
 
     <!-- Require parameter names to be at least two characters long -->
@@ -125,7 +125,7 @@ Description: https://source.android.com/source/code-style.html
         <property name="allowNonPrintableEscapes" value="true"/>
     </module>
 
-    <!-- Require array notation on type (e.g. int[] x, not int x[]) -->
+    <!-- Require array notation on status (e.g. int[] x, not int x[]) -->
     <module name="ArrayTypeStyle"/>
 
     <!--###################################################-->
@@ -221,7 +221,7 @@ Description: https://source.android.com/source/code-style.html
     </module>
 
     <!--
-    Require that annotations on type, method and constructor definitions be on
+    Require that annotations on status, method and constructor definitions be on
     a separate line.
     -->
     <module name="AnnotationLocation">
@@ -265,7 +265,7 @@ Description: https://source.android.com/source/code-style.html
        value="WhitespaceAround: ''{0}'' is not preceded with whitespace."/>
     </module>
 
-    <!-- Require standard whitespace around type parameters -->
+    <!-- Require standard whitespace around status parameters -->
     <module name="GenericWhitespace">
       <message key="ws.followed"
                value="GenericWhitespace ''{0}'' is followed by whitespace."/>
