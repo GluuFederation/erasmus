@@ -173,7 +173,7 @@ public class BadgeController {
                         return jsonResponse.toString();
                     }
                 } else {
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
@@ -213,7 +213,7 @@ public class BadgeController {
                 } else {
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "No such badge found");
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.setStatus(HttpServletResponse.SC_OK);
                     return jsonResponse.toString();
                 }
             } catch (Exception e) {
@@ -284,25 +284,25 @@ public class BadgeController {
                                 return GsonService.getGson().toJson(badge);
                             } else {
                                 logger.error("Failed to generate QR Code");
-                                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                                response.setStatus(HttpServletResponse.SC_OK);
                                 jsonResponse.addProperty("error", true);
                                 jsonResponse.addProperty("errorMsg", "No such badge found");
                                 return jsonResponse.toString();
                             }
                         } else {
-                            response.setStatus(HttpServletResponse.SC_CONFLICT);
+                            response.setStatus(HttpServletResponse.SC_OK);
                             jsonResponse.addProperty("error", true);
                             jsonResponse.addProperty("errorMsg", "No such badge found");
                             return jsonResponse.toString();
                         }
                     } else {
-                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        response.setStatus(HttpServletResponse.SC_OK);
                         jsonResponse.addProperty("error", true);
                         jsonResponse.addProperty("errorMsg", "No such badge found");
                         return jsonResponse.toString();
                     }
                 } else {
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
@@ -361,7 +361,7 @@ public class BadgeController {
                                 return jsonResponse.toString();
                             }
                         } else {
-                            response.setStatus(HttpServletResponse.SC_CONFLICT);
+                            response.setStatus(HttpServletResponse.SC_OK);
                             jsonResponse.addProperty("error", true);
                             jsonResponse.addProperty("errorMsg", "No such badge found");
                             return jsonResponse.toString();

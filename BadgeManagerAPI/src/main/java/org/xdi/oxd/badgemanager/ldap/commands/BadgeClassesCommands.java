@@ -150,7 +150,7 @@ public class BadgeClassesCommands {
                 if (badges.size() > 0)
                     return badges.get(0);
                 else
-                    throw new NotFoundException("No such badge class found");
+                    return null;
             } else {
                 throw new NotFoundException("No such badge class found");
             }
@@ -178,9 +178,9 @@ public class BadgeClassesCommands {
                 if (badges.size() > 0)
                     return badges.get(0);
                 else
-                    throw new NotFoundException("No such badge class found");
+                    return null;
             } else {
-                throw new NotFoundException("No such badge class found");
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -206,7 +206,7 @@ public class BadgeClassesCommands {
             if (badges.size() > 0)
                 return GetBadgeClassResponse(badges.get(0));
             else
-                throw new NotFoundException("No such badge instance found");
+                return null;
         } catch (Exception e) {
             e.printStackTrace();
             throw new NotFoundException("No such badge instance found");
@@ -233,7 +233,7 @@ public class BadgeClassesCommands {
                     badge = badges.get(0);
                     return GetBadgeClassResponse(badge);
                 } else
-                    throw new NotFoundException("No such badge class found");
+                    return null;
             } else {
                 throw new NotFoundException("No such badge class found");
             }
