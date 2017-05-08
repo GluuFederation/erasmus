@@ -51,5 +51,10 @@
     <string name="request_badge">Request badge</string>
     <string name="dummy_org">Houstan Fire Department</string>
     <string name="change_org">Change Organization</string>
+    <string name="camera_permission_denied">You have denied for Camera or Media Permission, You can still allow manually from Setting</string>
+    <string name="retry">retry</string>
+    <string name="exit">exit</string>
+    <string name="require_permission">require special permission</string>
+
 
 </resources>
