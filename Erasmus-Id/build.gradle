@@ -4,6 +4,7 @@ apply from: 'config/keystore.gradle'
 buildscript {
     repositories {
         jcenter()
+        maven { url '/home/lcom58/androidsdk/extras/android/m2repository' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.0'

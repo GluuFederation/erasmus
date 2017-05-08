@@ -6,6 +6,7 @@ import net.gluu.erasmus.model.BadgeRequests;
 import net.gluu.erasmus.model.BadgeTemplates;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.ParticipantsResponse;
+import net.gluu.erasmus.model.PrivacyRequest;
 import net.gluu.erasmus.model.TemplateBadgeRequest;
 
 import retrofit2.Call;
@@ -35,5 +36,8 @@ public interface APIInterface {
 
     @GET("badges/details/{badgeRequestInum}")
     Call<DisplayBadge> getBadge(@Path("badgeRequestInum") String badgeRequestInum);
+
+    @POST("badges/setPrivacy")
+    Call<BadgeRequest> setPrivacy(@Body PrivacyRequest privacy);
 
 }
