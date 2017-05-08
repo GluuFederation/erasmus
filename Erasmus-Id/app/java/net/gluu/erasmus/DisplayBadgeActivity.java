@@ -5,15 +5,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
+
+import net.gluu.erasmus.model.Recipient;
+import net.gluu.erasmus.utils.JWTUtils;
+
+import org.json.JSONObject;
 
 public class DisplayBadgeActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int RC_BARCODE_CAPTURE = 101;
     private static final String TAG = "DisplayBadgeActivity";
+
     TextView mTvBadgeName, mTvUserName, mTvId, mTvExpiresAt;
 
     @Override
@@ -33,6 +41,21 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
 
         mTvBadgeName.setText(Application.displayBadge.getBadgeTitle());
         mTvExpiresAt.setText(Application.displayBadge.getExpiresAt());
+
+        Recipient recipient = Application.displayBadge.getRecipient();
+        if (recipient != null) {
+            try {
+                String userInfo = JWTUtils.decoded(recipient.getIdentity());
+                Log.v("TAG", "User info is:" + userInfo);
+                if (userInfo != null && userInfo.length() > 0) {
+                    JSONObject jObj = new JSONObject(userInfo);
+                    JSONObject jsonObject = jObj.getJSONObject("userinfo");
+                    mTvUserName.setText(jsonObject.getString("name") == null ? "" : jsonObject.getString("name"));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void initToolbar() {
