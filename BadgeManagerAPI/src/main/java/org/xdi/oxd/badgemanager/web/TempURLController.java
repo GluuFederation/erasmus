@@ -26,8 +26,6 @@ import java.io.IOException;
 @RequestMapping("/tmp")
 public class TempURLController {
 
-    private static final Logger logger = LoggerFactory.getLogger(BadgeController.class);
-
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
 
@@ -36,14 +34,15 @@ public class TempURLController {
 
         JsonObject jsonResponse = new JsonObject();
 
-        if (redisTemplate.opsForValue().get(id) == null) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "Oops!! Badge link expired");
-            return jsonResponse.toString();
-        }
-
         try {
+
+            if (redisTemplate.opsForValue().get(id) == null) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "Oops!! Badge link expired");
+                return jsonResponse.toString();
+            }
+
             final String url = String.valueOf(redisTemplate.opsForValue().get(id));
             if (url != null)
                 response.sendRedirect(url);
