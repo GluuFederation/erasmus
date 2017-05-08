@@ -28,6 +28,7 @@ import net.gluu.erasmus.model.Badge;
 import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.Issuer;
+import net.gluu.erasmus.model.PrivacyRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -116,14 +117,18 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
             }
         });
 
+        holder.mTbPrivacy.setText("Make Private");
+
         holder.mTbPrivacy.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // The toggle is enabled
-                    holder.mTbPrivacy.setText("private");
+                    // The toggle is enabled-make private
+                    setBadgePrivacy(badgeRequest, "Private");
+                    holder.mTbPrivacy.setTextOn("Make Public");
                 } else {
-                    // The toggle is disabled
-                    holder.mTbPrivacy.setText("public");
+                    // The toggle is disabled-make public
+                    setBadgePrivacy(badgeRequest, "Public");
+                    holder.mTbPrivacy.setTextOff("Make Private");
                 }
             }
         });
@@ -145,7 +150,7 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
             mView = view;
             mBadgeName = (TextView) view.findViewById(R.id.tv_badge_name);
             ivDelete = (ImageView) view.findViewById(R.id.iv_delete_badge);
-            mTbPrivacy= (ToggleButton) view.findViewById(R.id.tb_privacy);
+            mTbPrivacy = (ToggleButton) view.findViewById(R.id.tb_privacy);
         }
     }
 
@@ -241,6 +246,49 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
 
             @Override
             public void onFailure(Call<DisplayBadge> call, Throwable t) {
+                Log.v("TAG", "Response retrieving badge templates failure" + t.getMessage());
+                hideProgressBar();
+            }
+        });
+    }
+
+    private void setBadgePrivacy(BadgeRequest badgeRequest, String privacy) {
+        showProgressBar("Changing privacy..");
+        PrivacyRequest privacyRequest = new PrivacyRequest(badgeRequest.getInum(), privacy);
+        Call<BadgeRequest> call = mObjAPI.setPrivacy(privacyRequest);
+        call.enqueue(new Callback<BadgeRequest>() {
+            @Override
+            public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
+                hideProgressBar();
+                if (response.errorBody() == null && response.body() != null) {
+                    BadgeRequest objResponse = response.body();
+
+                    if (objResponse != null) {
+                        if (objResponse.getError()) {
+                            Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
+                        } else {
+                            Application.showAutoDismissAlertDialog(mContext, objResponse.getMessage());
+                        }
+                    }
+                } else {
+                    Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                    try {
+                        String error = response.errorBody().string();
+                        Log.v("TAG", "Error in creating badge request is:" + error);
+                        JSONObject jsonObjectError = new JSONObject(error);
+                        if (jsonObjectError.getBoolean("error")) {
+                            Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<BadgeRequest> call, Throwable t) {
                 Log.v("TAG", "Response retrieving badge templates failure" + t.getMessage());
                 hideProgressBar();
             }
