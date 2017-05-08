@@ -19,18 +19,18 @@ public class LDAPService {
     }
 
     public static boolean isConnected() {
-        if (ldapEntryManager != null && connected) {
-            ldapEntryManager.destroy();
-        }
-        new LDAPInitializer(new LDAPInitializer.ldapConnectionListner() {
-            @Override
-            public void ldapConnected(boolean isConnected, LdapEntryManager ldapEntryManager) {
-                if (isConnected) {
-                    LDAPService.ldapEntryManager = ldapEntryManager;
-                    connected = isConnected;
+        if (ldapEntryManager == null || !connected) {
+            new LDAPInitializer(new LDAPInitializer.ldapConnectionListner() {
+                @Override
+                public void ldapConnected(boolean isConnected, LdapEntryManager ldapEntryManager) {
+                    if (isConnected) {
+                        LDAPService.ldapEntryManager = ldapEntryManager;
+                        connected = isConnected;
+                    }
                 }
-            }
-        });
+            });
+        }
+
         return connected;
     }
 
