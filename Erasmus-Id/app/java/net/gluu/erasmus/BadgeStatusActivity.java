@@ -125,6 +125,10 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
                 Log.e(TAG, "Failed to parse saved user info JSON, discarding", ex);
             }
         }
+
+//        Intent i=new Intent(BadgeStatusActivity.this,U2FActivity.class);
+//        startActivity(i);
+
         initViews();
         initListeners();
         init();
