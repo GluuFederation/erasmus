@@ -30,6 +30,7 @@ public class LDAPService {
                 }
             });
         }
+
         return connected;
     }
 

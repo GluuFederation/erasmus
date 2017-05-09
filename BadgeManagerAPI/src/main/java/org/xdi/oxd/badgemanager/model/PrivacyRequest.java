@@ -4,7 +4,7 @@ package org.xdi.oxd.badgemanager.model;
  * Created by Arvind Tomar on 3/5/17.
  */
 public class PrivacyRequest {
-    private String badgeRequestInum, privacy;
+    private String badgeRequestInum, privacy, opHost;
 
     public String getBadgeRequestInum() {
         return badgeRequestInum;
@@ -20,5 +20,13 @@ public class PrivacyRequest {
 
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
+    }
+
+    public String getOpHost() {
+        return opHost;
+    }
+
+    public void setOpHost(String opHost) {
+        this.opHost = opHost;
     }
 }

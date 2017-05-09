@@ -55,7 +55,8 @@ public class BadgeRequestController {
 
         try {
 
-            if (accessToken == null || badgeRequest.getOpHost() == null) {
+            if (accessToken == null || accessToken.length() == 0 || badgeRequest == null
+                    || badgeRequest.getOpHost() == null || badgeRequest.getOpHost().length() == 0) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
@@ -65,13 +66,13 @@ public class BadgeRequestController {
 //            retrieve user info
             UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
             if (userInfo == null) {
-                response.setStatus(HttpServletResponse.SC_OK);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 return jsonResponse.toString();
             } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
-                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 return jsonResponse.toString();
             }
@@ -91,7 +92,7 @@ public class BadgeRequestController {
                     jsonResponse.addProperty("error", false);
                 } else {
                     jsonResponse.addProperty("error", true);
-                    jsonResponse.addProperty("errorMsg", "You have already requested for same badge");
+                    jsonResponse.addProperty("errorMsg", "You have already requested same badge");
                 }
 
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -118,15 +119,16 @@ public class BadgeRequestController {
 
         JsonObject jsonResponse = new JsonObject();
 
-        if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
-            jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-            response.setStatus(HttpServletResponse.SC_OK);
-            return jsonResponse.toString();
-        }
+        try {
 
-        if (LDAPService.isConnected()) {
-            try {
+            if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_OK);
+                return jsonResponse.toString();
+            }
+
+            if (LDAPService.isConnected()) {
                 List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getPendingBadgeRequestsNew(LDAPService.ldapEntryManager, participant, "Pending");
                 if (lstBadgeRequests.size() > 0) {
                     jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
@@ -137,16 +139,16 @@ public class BadgeRequestController {
                 }
                 response.setStatus(HttpServletResponse.SC_OK);
                 return jsonResponse.toString();
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", e.getMessage());
+                jsonResponse.addProperty("errorMsg", "Please try after some time");
                 return jsonResponse.toString();
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "Please try after some time");
+            jsonResponse.addProperty("errorMsg", e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -156,15 +158,15 @@ public class BadgeRequestController {
 
         JsonObject jsonResponse = new JsonObject();
 
-        if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-            return jsonResponse.toString();
-        }
+        try {
+            if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                return jsonResponse.toString();
+            }
 
-        if (LDAPService.isConnected()) {
-            try {
+            if (LDAPService.isConnected()) {
                 BadgeRequests badgeRequest = new BadgeRequests();
                 badgeRequest.setInum(approveBadge.getInum());
                 badgeRequest.setStatus("Approved");
@@ -183,16 +185,16 @@ public class BadgeRequestController {
                 jsonResponse.addProperty("error", false);
                 response.setStatus(HttpServletResponse.SC_OK);
                 return jsonResponse.toString();
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", e.getMessage());
+                jsonResponse.addProperty("errorMsg", "Please try after some time");
                 return jsonResponse.toString();
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "Please try after some time");
+            jsonResponse.addProperty("errorMsg", e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -202,29 +204,41 @@ public class BadgeRequestController {
 
         JsonObject jsonResponse = new JsonObject();
 
-        if (!badgeRequest.getStatus().equalsIgnoreCase("all") || !badgeRequest.getStatus().equalsIgnoreCase("approved") || !badgeRequest.getStatus().equalsIgnoreCase("pending")) {
-            jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "Invalid status");
-            response.setStatus(HttpServletResponse.SC_OK);
-            return jsonResponse.toString();
-        }
+        try {
 
-        UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
-        if (userInfo == null) {
-            jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-            response.setStatus(HttpServletResponse.SC_OK);
-            return jsonResponse.toString();
-        } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
-            jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-            response.setStatus(HttpServletResponse.SC_OK);
-            return jsonResponse.toString();
-        }
-        String email = userInfo.getEmail();
+            if (accessToken == null || accessToken.length() == 0 || badgeRequest == null
+                    || badgeRequest.getOpHost() == null || badgeRequest.getStatus() == null
+                    || badgeRequest.getOpHost().length() == 0 || badgeRequest.getStatus().length() == 0) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                return jsonResponse.toString();
+            }
 
-        if (LDAPService.isConnected()) {
-            try {
+            if (!badgeRequest.getStatus().equalsIgnoreCase("all")
+                    && !badgeRequest.getStatus().equalsIgnoreCase("approved")
+                    && !badgeRequest.getStatus().equalsIgnoreCase("pending")) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "Invalid status");
+                response.setStatus(HttpServletResponse.SC_OK);
+                return jsonResponse.toString();
+            }
+
+            UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
+            if (userInfo == null) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_OK);
+                return jsonResponse.toString();
+            } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_OK);
+                return jsonResponse.toString();
+            }
+            String email = userInfo.getEmail();
+
+            if (LDAPService.isConnected()) {
                 if (badgeRequest.getStatus().equalsIgnoreCase("all")) {
                     BadgeRequestResponse badgeRequests = new BadgeRequestResponse();
                     List<CreateBadgeResponse> lstApprovedBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, "Approved");
@@ -255,27 +269,51 @@ public class BadgeRequestController {
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 return jsonResponse.toString();
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", e.getMessage());
+                jsonResponse.addProperty("errorMsg", "Please try after some time");
                 return jsonResponse.toString();
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "Please try after some time");
+            jsonResponse.addProperty("errorMsg", e.getMessage());
             return jsonResponse.toString();
         }
     }
 
     @RequestMapping(value = "delete/{inum:.+}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String removeBadgeRequest(@PathVariable String inum, HttpServletResponse response) {
+    public String removeBadgeRequest(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody BadgeRequestDetail badgeRequest, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
         try {
+
+            if (accessToken == null || accessToken.length() == 0 || badgeRequest == null
+                    || badgeRequest.getOpHost() == null || badgeRequest.getBadgeRequestInum() == null
+                    || badgeRequest.getOpHost().length() == 0 || badgeRequest.getBadgeRequestInum().length() == 0) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return jsonResponse.toString();
+            }
+
+            UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
+            if (userInfo == null) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return jsonResponse.toString();
+            } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                return jsonResponse.toString();
+            }
+            String email = userInfo.getEmail();
+
             if (LDAPService.isConnected()) {
-                boolean isDeleted = BadgeRequestCommands.deleteBadgeRequestByInum(LDAPService.ldapEntryManager, inum);
+                boolean isDeleted = BadgeRequestCommands.deleteUserBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequest.getBadgeRequestInum(), email);
                 if (isDeleted) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", false);

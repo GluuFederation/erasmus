@@ -1,6 +1,8 @@
 package org.xdi.oxd.badgemanager.web;
 
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
@@ -18,26 +20,27 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/badgeClass/")
 public class BadgeClassController {
 
+    private static final Logger logger = LoggerFactory.getLogger(BadgeClassController.class);
+
     @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getBadgeClass(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
-        if (LDAPService.isConnected()) {
-            try {
+        try {
+            if (LDAPService.isConnected()) {
                 BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(LDAPService.ldapEntryManager, id, key);
                 return returnResponse(badge, response);
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", e.getMessage());
-                e.printStackTrace();
+                jsonResponse.addProperty("errorMsg", "Please try after some time");
                 return jsonResponse.toString();
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (Exception ex) {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
             jsonResponse.addProperty("error", true);
-            jsonResponse.addProperty("errorMsg", "Please try after some time");
+            jsonResponse.addProperty("errorMsg", ex.getMessage());
             return jsonResponse.toString();
         }
     }
