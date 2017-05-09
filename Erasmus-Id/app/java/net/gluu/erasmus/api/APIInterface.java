@@ -1,5 +1,6 @@
 package net.gluu.erasmus.api;
 
+import net.gluu.erasmus.model.APIBadgeDetail;
 import net.gluu.erasmus.model.APIBadgeRequest;
 import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.BadgeRequests;
@@ -7,6 +8,7 @@ import net.gluu.erasmus.model.BadgeTemplates;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.ParticipantsResponse;
 import net.gluu.erasmus.model.PrivacyRequest;
+import net.gluu.erasmus.model.ScanResponse;
 import net.gluu.erasmus.model.TemplateBadgeRequest;
 
 import retrofit2.Call;
@@ -34,10 +36,13 @@ public interface APIInterface {
     @DELETE("badges/request/delete/{inum}")
     Call<BadgeRequest> deleteBadge(@Path("inum") String inum);
 
-    @GET("badges/details/{badgeRequestInum}")
-    Call<DisplayBadge> getBadge(@Path("badgeRequestInum") String badgeRequestInum);
+    @POST("badges/details")
+    Call<DisplayBadge> getBadge(@Header("AccessToken") String accessToken, @Body APIBadgeDetail badgeDetail);
 
     @POST("badges/setPrivacy")
     Call<BadgeRequest> setPrivacy(@Body PrivacyRequest privacy);
+
+    @GET("tmp/{id}")
+    Call<ScanResponse> getScanResult(@Path("id") String id);
 
 }

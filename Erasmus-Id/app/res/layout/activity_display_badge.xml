@@ -10,9 +10,14 @@
         android:orientation="vertical"
         tools:context="DisplayBadgeActivity">
 
+
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -157,6 +162,6 @@
 
         </RelativeLayout>
 
-
+    </ScrollView>
     </LinearLayout>
 <!--</layout>-->

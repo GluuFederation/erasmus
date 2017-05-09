@@ -41,8 +41,11 @@ import net.gluu.appauth.ClientAuthentication;
 import net.gluu.appauth.TokenRequest;
 import net.gluu.appauth.TokenResponse;
 import net.gluu.erasmus.adapters.BagdePagerAdapter;
+import net.gluu.erasmus.api.APIInterface;
+import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.fragments.ApproveBadgeFragment;
 import net.gluu.erasmus.fragments.PendingBadgeFragment;
+import net.gluu.erasmus.model.ScanResponse;
 
 import org.joda.time.format.DateTimeFormat;
 import org.json.JSONException;
@@ -60,6 +63,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 import okio.Okio;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by lcom16 on 20/4/17.
@@ -555,7 +561,29 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CODE) {
-                Log.e(TAG, "onActivityResult: data" + data);
+
+                String id = data.getStringExtra("barcode").substring(data.getStringExtra("barcode").lastIndexOf("/")+1);
+                Call<ScanResponse> call = APIService.createService(APIInterface.class).getScanResult(id);
+                call.enqueue(new Callback<ScanResponse>() {
+                    @Override
+                    public void onResponse(Call<ScanResponse> call, Response<ScanResponse> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body().getError()) {
+                                Toast.makeText(getApplicationContext(), response.body().getErrorMsg(), Toast.LENGTH_SHORT).show();
+                            }else {
+                                Intent i = new Intent(BadgeStatusActivity.this,ScanSuccessActivity.class);
+                                startActivity(i);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ScanResponse> call, Throwable t) {
+                        Log.e(TAG, "onFailure: ", t.getCause());
+                    }
+                });
+
+
             }
         }
     }

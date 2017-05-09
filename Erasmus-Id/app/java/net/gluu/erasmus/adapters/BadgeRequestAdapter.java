@@ -1,11 +1,9 @@
 package net.gluu.erasmus.adapters;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,16 +16,13 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import net.gluu.erasmus.Application;
-import net.gluu.erasmus.BadgeStatusActivity;
 import net.gluu.erasmus.DisplayBadgeActivity;
 import net.gluu.erasmus.R;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
-import net.gluu.erasmus.model.APIBadgeRequest;
-import net.gluu.erasmus.model.Badge;
+import net.gluu.erasmus.model.APIBadgeDetail;
 import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.DisplayBadge;
-import net.gluu.erasmus.model.Issuer;
 import net.gluu.erasmus.model.PrivacyRequest;
 
 import org.json.JSONException;
@@ -214,7 +209,10 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
 
     private void getBadgeDetails(BadgeRequest badgeRequest) {
         showProgressBar("Requesting badge..");
-        Call<DisplayBadge> call = mObjAPI.getBadge(badgeRequest.getInum());
+        APIBadgeDetail badgeDetail = new APIBadgeDetail();
+        badgeDetail.setBadgeRequestInum(badgeRequest.getInum());
+        badgeDetail.setOpHost(Application.participant.getOpHost());
+        Call<DisplayBadge> call = mObjAPI.getBadge(Application.AccessToken, badgeDetail);
         call.enqueue(new Callback<DisplayBadge>() {
             @Override
             public void onResponse(Call<DisplayBadge> call, Response<DisplayBadge> response) {
