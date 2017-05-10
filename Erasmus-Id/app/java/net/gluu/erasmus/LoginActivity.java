@@ -315,7 +315,7 @@ public final class LoginActivity extends AppCompatActivity {
             authRequestBuilder.setLoginHint(loginHint);
         }
 
-        Intent completionIntent = new Intent(this, BadgeStatusActivity.class);
+        Intent completionIntent = new Intent(this, U2FActivity.class);
         Intent cancelIntent = new Intent(this, LoginActivity.class);
         cancelIntent.putExtra(EXTRA_FAILED, true);
         cancelIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

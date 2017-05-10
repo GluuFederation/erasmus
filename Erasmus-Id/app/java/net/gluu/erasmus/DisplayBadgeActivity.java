@@ -49,7 +49,7 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
                 Log.v("TAG", "User info is:" + userInfo);
                 if (userInfo != null && userInfo.length() > 0) {
                     JSONObject jObj = new JSONObject(userInfo);
-                    JSONObject jsonObject = jObj.getJSONObject("userinfo");
+                    JSONObject jsonObject = new JSONObject(jObj.getString("userinfo"));
                     mTvUserName.setText(jsonObject.getString("name") == null ? "" : jsonObject.getString("name"));
                 }
             } catch (Exception ex) {

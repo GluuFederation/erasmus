@@ -8,7 +8,9 @@ package net.gluu.erasmus.fragments.u2f;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +20,9 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import net.gluu.erasmus.BadgeStatusActivity;
 import net.gluu.erasmus.BuildConfig;
+import net.gluu.erasmus.DisplayBadgeActivity;
 import net.gluu.erasmus.R;
 import net.gluu.erasmus.listener.OxPush2RequestListener;
 import net.gluu.erasmus.model.u2f.OxPush2Request;
@@ -130,6 +134,13 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
         switch(v.getId()){
             case R.id.button_approve:
                 onOxPushApproveRequest(false);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i=new Intent(getActivity(), BadgeStatusActivity.class);
+                        startActivity(i);
+                    }
+                }, 2000);
                 break;
             case R.id.button_decline:
                 onOxPushApproveRequest(true);
@@ -374,6 +385,13 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
         } else {
             setFinalStatus(R.string.auth_result_failed);
         }
-    }
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent i=new Intent(getActivity(), BadgeStatusActivity.class);
+                startActivity(i);
+            }
+        }, 2000);
+    }
 }
