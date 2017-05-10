@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatDelegate;
 
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.Participant;
+import net.gluu.erasmus.model.ScanResponseSuccess;
 
 /**
  * Application object; ensures that the support library is correctly configured for use of
@@ -33,7 +34,7 @@ public final class Application extends android.app.Application {
     public static Participant participant;
     public static String wellknownurl = "/.well-known/openid-configuration";
     public static DisplayBadge displayBadge;
-
+    public static ScanResponseSuccess scanResponseSuccess;
     @Override
     public void onCreate() {
         super.onCreate();

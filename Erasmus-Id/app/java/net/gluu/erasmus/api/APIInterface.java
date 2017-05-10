@@ -9,6 +9,7 @@ import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.ParticipantsResponse;
 import net.gluu.erasmus.model.PrivacyRequest;
 import net.gluu.erasmus.model.ScanResponse;
+import net.gluu.erasmus.model.ScanResponseSuccess;
 import net.gluu.erasmus.model.TemplateBadgeRequest;
 
 import retrofit2.Call;
@@ -18,6 +19,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Url;
 
 public interface APIInterface {
 
@@ -43,6 +45,9 @@ public interface APIInterface {
     Call<BadgeRequest> setPrivacy(@Body PrivacyRequest privacy);
 
     @GET("tmp/{id}")
-    Call<ScanResponse> getScanResult(@Path("id") String id);
+    Call<ScanResponseSuccess> getScanResult(@Path("id") String id);
+
+    @GET
+    Call<ScanResponseSuccess> getScanAllResult(@Url String url);
 
 }
