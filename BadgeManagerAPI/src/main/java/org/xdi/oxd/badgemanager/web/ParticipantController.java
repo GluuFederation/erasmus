@@ -3,6 +3,8 @@ package org.xdi.oxd.badgemanager.web;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,6 +28,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/participants")
 public class ParticipantController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ParticipantController.class);
 
     @RequestMapping(value = "/{state:.+}/{city:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getParticipants(@PathVariable String state, @PathVariable String city, HttpServletResponse response) {
@@ -85,9 +89,11 @@ public class ParticipantController {
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "Please try after some time");
+            logger.error("Exception in retrieving participant in getParticipants:"+e.getMessage());
             return jsonResponse.toString();
         }
     }

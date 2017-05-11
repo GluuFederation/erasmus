@@ -102,14 +102,15 @@ public class BadgeRequestController {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting database:");
+                logger.error("Error in connecting database in createBadgeRequest():");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
-            logger.error("Exception in adding badge request entry:" + e.getMessage());
+            logger.error("Exception in adding badge request entry in createBadgeRequest():" + e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -141,14 +142,17 @@ public class BadgeRequestController {
                 return jsonResponse.toString();
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                logger.error("Error in connecting database in getPendingBadgeRequestsByParticipant():");
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
+            logger.error("Exception in retrieving pending badge requests in getPendingBadgeRequestsByParticipant():"+e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -189,12 +193,15 @@ public class BadgeRequestController {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
+                logger.error("Error in connecting database in approveBadgeRequest():");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
+            logger.error("Exception in approving badge request in approveBadgeRequest():"+e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -273,12 +280,15 @@ public class BadgeRequestController {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
+                logger.error("Error in connecting database in getBadgeRequestsByStatus():");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
+            logger.error("Exception in retrieving badge requests getBadgeRequestsByStatus():"+e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -328,12 +338,15 @@ public class BadgeRequestController {
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", "Please try after some time");
+                logger.error("Error in connecting database in removeBadgeRequest():");
                 return jsonResponse.toString();
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", ex.getMessage());
+            logger.error("Exception in removing badge request in removeBadgeRequest():"+ex.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -393,11 +406,11 @@ public class BadgeRequestController {
                     }
                 }
             } else {
-                logger.error("Unable to persist badge class entry.Not connected with LDAP");
+                logger.error("Unable to persist badge class entry.Not connected with LDAP in createBadgeClass()");
                 return false;
             }
         } catch (Exception ex) {
-            logger.error("Exception in insert badge assertion entry:" + ex.getMessage());
+            logger.error("Exception in insert badge assertion entry in createBadgeClass():" + ex.getMessage());
             ex.printStackTrace();
             return false;
         }
@@ -427,7 +440,8 @@ public class BadgeRequestController {
 
             return BadgeCommands.createBadge(LDAPService.ldapEntryManager, objBadge);
         } catch (Exception ex) {
-            logger.error("Exception in persist badge entry." + ex.getMessage());
+            ex.printStackTrace();
+            logger.error("Exception in persist badge entry in createBadge()" + ex.getMessage());
         }
         return objBadge;
     }

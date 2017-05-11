@@ -13,6 +13,7 @@ import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.BadgeResponse;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,11 +27,16 @@ import java.io.IOException;
 @RequestMapping("/tmp")
 public class TempURLController {
 
+    private static final Logger logger = LoggerFactory.getLogger(TempURLController.class);
+
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
 
+    @Inject
+    public BadgeController badgeController;
+
     @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String redirect(@PathVariable String id, HttpServletResponse response) {
+    public String redirect(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
@@ -39,18 +45,58 @@ public class TempURLController {
             if (redisTemplate.opsForValue().get(id) == null) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Oops!! Badge link expired");
+                jsonResponse.addProperty("errorMsg", "Oops!! Badge expired");
                 return jsonResponse.toString();
             }
 
             final String url = String.valueOf(redisTemplate.opsForValue().get(id));
-            if (url != null)
-                response.sendRedirect(url);
-            else
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException e) {
+            System.out.println("URL:" + url);
+            if (url != null) {
+                String strId, strKey;
+                String[] arURL = url.split("/");
+                if (arURL.length > 0) {
+                    String strURL = arURL[arURL.length - 1];
+                    if (strURL.indexOf("key") > 0) {
+                        //private
+                        String[] arURL1 = strURL.split("\\?key=");
+                        if (arURL1.length > 0) {
+                            strId = arURL1[0];
+                            strKey = arURL1[1];
+                            System.out.println("Id is:" + strId);
+                            System.out.println("Key is:" + strKey);
+                            return badgeController.verifyPrivateBadge(strId, strKey, request, response);
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            jsonResponse.addProperty("error", true);
+                            jsonResponse.addProperty("errorMsg", "No such badge found");
+                            return jsonResponse.toString();
+                        }
+                    } else {
+                        strId = strURL;
+                        System.out.println("Id is:" + strId);
+                        //public
+                        return badgeController.verifyBadge(strId, request, response);
+                    }
+                } else {
+                    //no badge found
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "No such badge found");
+                    return jsonResponse.toString();
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "No such badge found");
+                return jsonResponse.toString();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", "No such badge found");
+            logger.error("Exception in retrieve badge using temp url: " + e.getMessage());
+            return jsonResponse.toString();
         }
-        return "";
     }
 }

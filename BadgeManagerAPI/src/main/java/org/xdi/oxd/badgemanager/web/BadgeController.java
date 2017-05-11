@@ -131,47 +131,25 @@ public class BadgeController {
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "Please try after some time");
+            logger.error("Exception in retrieving data:" + e.getMessage());
             return jsonResponse.toString();
         }
     }
 
     @RequestMapping(value = "verify/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String verifyBadge(@PathVariable String id, @RequestParam(value = "key", required = false) String key, HttpServletRequest request, HttpServletResponse response) {
+    public String verifyBadge(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
         try {
             if (LDAPService.isConnected()) {
-                Badges badge = BadgeCommands.getBadgeById(LDAPService.ldapEntryManager, id, utils, request);
-                if (badge != null && badge.getInum() != null) {
-                    if (badge.getBadgePrivacy().equalsIgnoreCase("public")) {
-                        BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, utils, request);
-                        return returnBadgeResponse(badgeResponse, response);
-                    } else if (badge.getBadgePrivacy().equalsIgnoreCase("private")) {
-                        if (key != null && key.length() > 0) {
-                            if (redisTemplate.opsForValue().get(key) == null) {
-                                jsonResponse.addProperty("error", true);
-                                jsonResponse.addProperty("errorMsg", "Oops!! Badge expired");
-                                return jsonResponse.toString();
-                            } else {
-                                BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
-                                return returnBadgeResponse(badgeResponse, response);
-                            }
-                        } else {
-                            response.setStatus(HttpServletResponse.SC_CONFLICT);
-                            jsonResponse.addProperty("error", true);
-                            jsonResponse.addProperty("errorMsg", "Oops! Unauthorized access");
-                            return jsonResponse.toString();
-                        }
-                    } else {
-                        response.setStatus(HttpServletResponse.SC_CONFLICT);
-                        jsonResponse.addProperty("error", true);
-                        jsonResponse.addProperty("errorMsg", "No such badge found");
-                        return jsonResponse.toString();
-                    }
+                BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, utils, request);
+                if (badgeResponse != null) {
+                    return returnBadgeResponse(badgeResponse, response);
                 } else {
                     response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", true);
@@ -182,12 +160,48 @@ public class BadgeController {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
+                logger.error("Error in connecting database in verifyBadge():");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
+            logger.error("Exception in verifying badge in verifyBadge():" + e.getMessage());
+            return jsonResponse.toString();
+        }
+    }
+
+    @RequestMapping(value = "verify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String verifyPrivateBadge(@RequestParam String id, @RequestParam String key, HttpServletRequest request, HttpServletResponse response) {
+
+        JsonObject jsonResponse = new JsonObject();
+
+        try {
+            if (LDAPService.isConnected()) {
+                BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
+                if (badgeResponse != null) {
+                    return returnBadgeResponse(badgeResponse, response);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "No such badge found");
+                    return jsonResponse.toString();
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "Please try after some time");
+                logger.error("Error in connecting database in verifyPrivateBadge():");
+                return jsonResponse.toString();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", e.getMessage());
+            logger.error("Exception in verifying badge in verifyPrivateBadge():" + e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -220,12 +234,15 @@ public class BadgeController {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
+                logger.error("Error in connecting database in getBadge():");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
             response.setStatus(HttpServletResponse.SC_CONFLICT);
+            logger.error("Exception in retrieving badge in getBadge():" + e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -247,14 +264,14 @@ public class BadgeController {
 
             UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
             if (userInfo == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return jsonResponse.toString();
             } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
                 jsonResponse.addProperty("error", true);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return jsonResponse.toString();
             }
             String email = userInfo.getEmail();
@@ -267,6 +284,9 @@ public class BadgeController {
                         Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
 
+                            String tempURLBase = utils.getBaseURL(request);
+                            String tempURL = tempURLBase + "/badges/" + badges.getGuid();
+
                             if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
                                 setRedisData(badges.getKey(), badges.getId(), 95);
                                 Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
@@ -274,10 +294,9 @@ public class BadgeController {
                                 badges.setExpires(calendar.getTime());
                                 boolean isUpdated = BadgeCommands.updateBadge(LDAPService.ldapEntryManager, badges);
                                 logger.info("Badge updated after expires set:" + isUpdated);
+                                tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
                             }
 
-                            String tempURLBase = utils.getBaseURL(request);
-                            String tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
                             String redisKey = badges.getGuid() + badges.getKey();
                             setRedisData(redisKey, tempURL, 95);
                             final String id = Hashing.murmur3_32().hashString(tempURL, StandardCharsets.UTF_8).toString();
@@ -333,6 +352,7 @@ public class BadgeController {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
+                logger.error("Error in connecting database in getBadgeByBadgeRequestInum():");
                 return jsonResponse.toString();
             }
         } catch (Exception ex) {
@@ -340,6 +360,7 @@ public class BadgeController {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", ex.getMessage());
+            logger.error("Error in retrieving badge details in getBadgeByBadgeRequestInum(): " + ex.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -429,12 +450,15 @@ public class BadgeController {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
+                logger.error("Error in connecting database in setBadgePrivacy():");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
+            logger.error("Exception in set badge privacy in setBadgePrivacy():" + e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -484,9 +508,9 @@ public class BadgeController {
             //location of barcode
             String fileName = System.currentTimeMillis() + ".png";
             //Server
-            String imagesPath = utils.getStaticResourcePath(context);
+//            String imagesPath = utils.getStaticResourcePath(context);
             //Local
-//            String imagesPath = "src/main/resources/static/images";
+            String imagesPath = "src/main/resources/static/images";
             System.out.println("path :" + imagesPath);
             if (new File(imagesPath).exists()) {
                 System.out.println("Directory exists:" + imagesPath);

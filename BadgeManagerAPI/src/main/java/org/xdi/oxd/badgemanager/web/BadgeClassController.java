@@ -35,12 +35,15 @@ public class BadgeClassController {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
+                logger.error("Error in connecting database in getBadgeClass():");
                 return jsonResponse.toString();
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", ex.getMessage());
+            logger.error("Exception in retrieving badge class in getBadgeClass(): "+ex.getMessage());
             return jsonResponse.toString();
         }
     }
