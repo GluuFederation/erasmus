@@ -8,15 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
-import org.xdi.oxd.badgemanager.ldap.service.GsonService;
-import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
-import org.xdi.oxd.badgemanager.model.BadgeResponse;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * Created by Arvind Tomar on 1/5/17.
@@ -50,7 +45,6 @@ public class TempURLController {
             }
 
             final String url = String.valueOf(redisTemplate.opsForValue().get(id));
-            System.out.println("URL:" + url);
             if (url != null) {
                 String strId, strKey;
                 String[] arURL = url.split("/");
@@ -62,8 +56,6 @@ public class TempURLController {
                         if (arURL1.length > 0) {
                             strId = arURL1[0];
                             strKey = arURL1[1];
-                            System.out.println("Id is:" + strId);
-                            System.out.println("Key is:" + strKey);
                             return badgeController.verifyPrivateBadge(strId, strKey, request, response);
                         } else {
                             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -73,7 +65,6 @@ public class TempURLController {
                         }
                     } else {
                         strId = strURL;
-                        System.out.println("Id is:" + strId);
                         //public
                         return badgeController.verifyBadge(strId, request, response);
                     }
