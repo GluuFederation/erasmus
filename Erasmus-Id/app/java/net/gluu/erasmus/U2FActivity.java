@@ -74,7 +74,7 @@ import okio.Okio;
 
 /**
  * Main activity
- *
+ * <p>
  * Created by Yuriy Movchan on 12/28/2015.
  */
 public class U2FActivity extends AppCompatActivity implements OxPush2RequestListener, KeyFragmentListFragment.OnListFragmentInteractionListener, PushNotificationRegistrationListener, KeyHandleInfoFragment.OnDeleteKeyHandleListener {
@@ -178,14 +178,14 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 //        onQrRequest(getRequestData());
     }
 
-    private String getRequestData(){
+    private String getRequestData() {
 
-        JsonObject jsonObject=new JsonObject();
-        jsonObject.addProperty("username","test");
-        jsonObject.addProperty("issuer","https://ce-release.gluu.org");
-        jsonObject.addProperty("state","900bea6a-6b8e-4d04-ad40-2475882389b9");
-        jsonObject.addProperty("method","authenticate");
-        jsonObject.addProperty("app","https://ce-release.gluu.org/identity/authentication/authcode");
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("username", Application.U2F_Username);
+        jsonObject.addProperty("issuer", Application.U2F_Issuer);
+        jsonObject.addProperty("state", Application.U2F_State);
+        jsonObject.addProperty("method", Application.U2F_Method);
+        jsonObject.addProperty("app", Application.U2F_App);
 
         return jsonObject.toString();
     }
@@ -259,7 +259,8 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
             boolean isTwoStep = Utils.areAllNotEmpty(oxPush2Request.getUserName(), oxPush2Request.getIssuer(), oxPush2Request.getApp(),
                     oxPush2Request.getState(), oxPush2Request.getMethod());
 
-            if (BuildConfig.DEBUG) Log.d(TAG, "isOneStep: " + isOneStep + " isTwoStep: " + isTwoStep);
+            if (BuildConfig.DEBUG)
+                Log.d(TAG, "isOneStep: " + isOneStep + " isTwoStep: " + isTwoStep);
 
             if (isOneStep || isTwoStep) {
                 // Valid authentication method should be used
@@ -307,11 +308,11 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
         dataStore.deleteTokenEntry(keyHandle);
     }
 
-    public static String getResourceString(int resourceID){
+    public static String getResourceString(int resourceID) {
         return context.getString(resourceID);
     }
 
-    private void checkUserCameraPermission(){
+    private void checkUserCameraPermission() {
         Log.i(TAG, "Show camera button pressed. Checking permission.");
         // BEGIN_INCLUDE(camera_permission)
         // Check if the Camera permission is already available.
@@ -659,7 +660,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
                 String response = Okio.buffer(Okio.source(conn.getInputStream()))
                         .readString(Charset.forName("UTF-8"));
                 mUserInfoJson.set(new JSONObject(response));
-                Log.v("TAG", "userinfo:"+ response);
+                Log.v("TAG", "userinfo:" + response);
             } catch (IOException ioEx) {
                 Log.e(TAG, "Network error when querying userinfo endpoint", ioEx);
                 showSnackbar("Fetching user info failed");
@@ -689,11 +690,15 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
     }
 
     @MainThread
-    private void displayU2FDetails(){
+    private void displayU2FDetails() {
         findViewById(R.id.authorized).setVisibility(View.VISIBLE);
         findViewById(R.id.not_authorized).setVisibility(View.GONE);
         findViewById(R.id.loading_container).setVisibility(View.GONE);
 
         onQrRequest(getRequestData());
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 }

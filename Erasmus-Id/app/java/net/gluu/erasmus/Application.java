@@ -35,6 +35,14 @@ public final class Application extends android.app.Application {
     public static String wellknownurl = "/.well-known/openid-configuration";
     public static DisplayBadge displayBadge;
     public static ScanResponseSuccess scanResponseSuccess;
+
+    //    U2F
+    public static String U2F_Username = "test";
+    public static String U2F_Issuer = "https://ce-release.gluu.org";
+    public static String U2F_State = "900bea6a-6b8e-4d04-ad40-2475882389b9";
+    public static String U2F_Method = "authenticate";
+    public static String U2F_App = "https://ce-release.gluu.org/identity/authentication/authcode";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -42,7 +50,7 @@ public final class Application extends android.app.Application {
         mApplicationContext = getApplicationContext();
     }
 
-    public static void showAutoDismissAlertDialog(Context ctx,String msg){
+    public static void showAutoDismissAlertDialog(Context ctx, String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
         builder.setTitle("Badge Manager");
         builder.setMessage(msg);
