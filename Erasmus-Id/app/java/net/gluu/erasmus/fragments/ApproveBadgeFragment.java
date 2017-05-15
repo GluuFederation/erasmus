@@ -153,6 +153,7 @@ public class ApproveBadgeFragment extends Fragment {
                     if (objResponse != null) {
                         if (objResponse.getError()) {
                             Log.v("TAG", "Error in retrieving approved badge requests");
+                            Application.showAutoDismissAlertDialog(getActivity(), objResponse.getErrorMsg());
                         } else {
                             Log.v("TAG", "approved badge requests retrieved:" + objResponse.getBadgeRequests().size());
                             mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), true));

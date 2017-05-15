@@ -13,6 +13,9 @@ public class BadgeTemplates {
     @SerializedName("error")
     @Expose
     private Boolean error;
+    @SerializedName("errorMsg")
+    @Expose
+    private String errorMsg;
 
     public List<Badge> getBadges() {
         return badges;
@@ -40,4 +43,16 @@ public class BadgeTemplates {
         return this;
     }
 
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
+    public BadgeTemplates withErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+        return this;
+    }
 }

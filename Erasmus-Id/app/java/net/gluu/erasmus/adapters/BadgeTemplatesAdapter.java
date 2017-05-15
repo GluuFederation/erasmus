@@ -104,7 +104,7 @@ public class BadgeTemplatesAdapter extends RecyclerView.Adapter<BadgeTemplatesAd
             mView = view;
             mBadgeName = (TextView) view.findViewById(R.id.tv_badge_name);
             ivDelete = (ImageView) view.findViewById(R.id.iv_delete_badge);
-            mTbPrivacy= (ToggleButton) view.findViewById(R.id.tb_privacy);
+            mTbPrivacy = (ToggleButton) view.findViewById(R.id.tb_privacy);
         }
     }
 
@@ -144,6 +144,7 @@ public class BadgeTemplatesAdapter extends RecyclerView.Adapter<BadgeTemplatesAd
                     if (objResponse != null) {
                         if (objResponse.getError()) {
                             Log.v("TAG", "Error in making badge request.");
+                            Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
                         } else {
                             Application.showAutoDismissAlertDialog(mContext, "Badge requested successfully");
                             new Handler().postDelayed(new Runnable() {

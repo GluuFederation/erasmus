@@ -412,4 +412,8 @@ public final class LoginActivity extends AppCompatActivity {
         if (mProgress != null && mProgress.isShowing())
             mProgress.dismiss();
     }
+
+    @Override
+    public void onBackPressed() {
+    }
 }

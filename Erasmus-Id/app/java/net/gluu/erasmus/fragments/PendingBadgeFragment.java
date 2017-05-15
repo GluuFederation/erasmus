@@ -153,6 +153,7 @@ public class PendingBadgeFragment extends Fragment {
                     if (objResponse != null) {
                         if (objResponse.getError()) {
                             Log.v("TAG", "Error in retrieving pending badge requests");
+                            Application.showAutoDismissAlertDialog(getActivity(), objResponse.getErrorMsg());
                         } else {
                             Log.v("TAG", "pending badge requests retrieved:" + objResponse.getBadgeRequests().size());
                             mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), false));

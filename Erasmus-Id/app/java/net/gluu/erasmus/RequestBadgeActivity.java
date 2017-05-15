@@ -68,6 +68,7 @@ public class RequestBadgeActivity extends AppCompatActivity {
                     if (objResponse != null) {
                         if (objResponse.getError()) {
                             Log.v("TAG", "Error in retrieving badge templates");
+                            Application.showAutoDismissAlertDialog(RequestBadgeActivity.this, objResponse.getErrorMsg());
                         } else {
                             Log.v("TAG", "badge requests retrieved:" + objResponse.getBadges().size());
                             adapter = new BadgeTemplatesAdapter(RequestBadgeActivity.this, objResponse.getBadges());

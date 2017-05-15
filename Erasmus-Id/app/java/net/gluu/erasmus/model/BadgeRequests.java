@@ -10,6 +10,9 @@ public class BadgeRequests {
     @SerializedName("error")
     @Expose
     private Boolean error;
+    @SerializedName("errorMsg")
+    @Expose
+    private String errorMsg;
     @SerializedName("badgeRequests")
     @Expose
     private List<BadgeRequest> badgeRequests = null;
@@ -37,6 +40,19 @@ public class BadgeRequests {
 
     public BadgeRequests withBadgeRequests(List<BadgeRequest> badgeRequests) {
         this.badgeRequests = badgeRequests;
+        return this;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
+    public BadgeRequests withErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
         return this;
     }
 

@@ -268,4 +268,7 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    @Override
+    public void onBackPressed() {
+    }
 }

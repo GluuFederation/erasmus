@@ -45,9 +45,9 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
     @Override
     public void handleResult(Result rawResult) {
         // Do something with the result here
-        Log.v("SimpleScannerActivity", rawResult.getText()); // Prints scan results
-        Log.v("SimpleScannerActivity", rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode, pdf417 etc.)
-        sendDataBack(rawResult);
+        Log.v("TAG", "Scan result: "+rawResult.getText()); // Prints scan results
+        Log.v("TAG", rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode, pdf417 etc.)
+//        sendDataBack(rawResult);
 
         String url=rawResult.getText();
 
