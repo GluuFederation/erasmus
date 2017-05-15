@@ -45,7 +45,6 @@ import net.gluu.appauth.TokenRequest;
 import net.gluu.erasmus.device.DeviceUuidManager;
 import net.gluu.erasmus.fragments.u2f.KeyFragmentListFragment;
 import net.gluu.erasmus.fragments.u2f.KeyHandleInfoFragment;
-import net.gluu.erasmus.fragments.u2f.MainActivityFragment;
 import net.gluu.erasmus.fragments.u2f.ProcessFragment;
 import net.gluu.erasmus.listener.OxPush2RequestListener;
 import net.gluu.erasmus.listener.PushNotificationRegistrationListener;
@@ -492,7 +491,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
             viewProfileButton.setVisibility(View.GONE);
         } else {
             fetchUserInfo();
-            viewProfileButton.setVisibility(View.VISIBLE);
+            viewProfileButton.setVisibility(View.GONE);
             viewProfileButton.setOnClickListener((View view) -> fetchUserInfo());
         }
 
@@ -518,7 +517,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
                 }
 
                 ((TextView) findViewById(R.id.userinfo_json)).setText(mUserInfoJson.toString());
-                userInfoCard.setVisibility(View.VISIBLE);
+                userInfoCard.setVisibility(View.GONE);
             } catch (JSONException ex) {
                 Log.e(TAG, "Failed to read userinfo JSON", ex);
             }

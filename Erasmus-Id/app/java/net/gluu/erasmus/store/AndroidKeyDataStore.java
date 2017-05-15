@@ -44,14 +44,14 @@ public class AndroidKeyDataStore implements DataStore {
         final SharedPreferences keySettings = context.getSharedPreferences(U2F_KEY_PAIR_FILE, Context.MODE_PRIVATE);
         if (keySettings.getAll().size() == 0) {
             if (BuildConfig.DEBUG) Log.d(TAG, "Creating empty U2K key pair store");
-            keySettings.edit().commit();
+            keySettings.edit().apply();
         }
 
         // Prepare empty U2F key counter store
         final SharedPreferences keyCounts = context.getSharedPreferences(U2F_KEY_COUNT_FILE, Context.MODE_PRIVATE);
         if (keyCounts.getAll().size() == 0) {
             if (BuildConfig.DEBUG) Log.d(TAG, "Creating empty U2K key counter store");
-            keyCounts.edit().commit();
+            keyCounts.edit().apply();
         }
     }
 
@@ -64,10 +64,10 @@ public class AndroidKeyDataStore implements DataStore {
 
         final SharedPreferences keySettings = context.getSharedPreferences(U2F_KEY_PAIR_FILE, Context.MODE_PRIVATE);
 
-        keySettings.edit().putString(keyHandleKey, tokenEntryString).commit();
+        keySettings.edit().putString(keyHandleKey, tokenEntryString).apply();
 
         final SharedPreferences keyCounts = context.getSharedPreferences(U2F_KEY_COUNT_FILE, Context.MODE_PRIVATE);
-        keyCounts.edit().putInt(keyHandleKey, 0).commit();
+        keyCounts.edit().putInt(keyHandleKey, 0).apply();
     }
 
     @Override
@@ -97,7 +97,7 @@ public class AndroidKeyDataStore implements DataStore {
         int currentCounter = keyCounts.getInt(keyHandleKey, -1);
         currentCounter++;
 
-        keyCounts.edit().putInt(keyHandleKey, currentCounter).commit();
+        keyCounts.edit().putInt(keyHandleKey, currentCounter).apply();
 
         if (BuildConfig.DEBUG) Log.d(TAG, "Counter is " + currentCounter + " for keyHandle: " + keyHandleKey + " counter");
 
@@ -160,7 +160,7 @@ public class AndroidKeyDataStore implements DataStore {
     public void deleteTokenEntry(byte[] keyHandle) {
         String keyHandleKey = keyHandleToKey(keyHandle);
         final SharedPreferences keySettings = context.getSharedPreferences(U2F_KEY_PAIR_FILE, Context.MODE_PRIVATE);
-        keySettings.edit().remove(keyHandleKey).commit();
+        keySettings.edit().remove(keyHandleKey).apply();
     }
 
     private String keyHandleToKey(byte[] keyHandle) {
