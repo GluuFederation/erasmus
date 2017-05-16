@@ -79,7 +79,7 @@ public class BadgeRequestController {
             String email = userInfo.getEmail();
 
             if (LDAPService.isConnected()) {
-
+                logger.info("LDAP connected in createBadgeRequest()");
                 BadgeRequests objBadgeRequest = new BadgeRequests();
                 objBadgeRequest.setGluuBadgeRequester(email);
                 objBadgeRequest.setParticipant(badgeRequest.getParticipant());
@@ -130,13 +130,14 @@ public class BadgeRequestController {
             }
 
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getPendingBadgeRequestsByParticipant()");
                 List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getPendingBadgeRequestsNew(LDAPService.ldapEntryManager, participant, "Pending");
                 if (lstBadgeRequests.size() > 0) {
                     jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
                     jsonResponse.addProperty("error", false);
                 } else {
                     jsonResponse.addProperty("error", true);
-                    jsonResponse.addProperty("errorMsg", "No pending badge requests found");
+                    jsonResponse.addProperty("errorMsg", "No pe nding badge requests found");
                 }
                 response.setStatus(HttpServletResponse.SC_OK);
                 return jsonResponse.toString();
@@ -152,7 +153,7 @@ public class BadgeRequestController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
-            logger.error("Exception in retrieving pending badge requests in getPendingBadgeRequestsByParticipant():"+e.getMessage());
+            logger.error("Exception in retrieving pending badge requests in getPendingBadgeRequestsByParticipant():" + e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -171,6 +172,7 @@ public class BadgeRequestController {
             }
 
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in approveBadgeRequest()");
                 BadgeRequests badgeRequest = new BadgeRequests();
                 badgeRequest.setInum(approveBadge.getInum());
                 badgeRequest.setStatus("Approved");
@@ -201,7 +203,7 @@ public class BadgeRequestController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
-            logger.error("Exception in approving badge request in approveBadgeRequest():"+e.getMessage());
+            logger.error("Exception in approving badge request in approveBadgeRequest():" + e.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -246,6 +248,7 @@ public class BadgeRequestController {
             String email = userInfo.getEmail();
 
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadgeRequestsByStatus()");
                 if (badgeRequest.getStatus().equalsIgnoreCase("all")) {
                     BadgeRequestResponse badgeRequests = new BadgeRequestResponse();
                     List<CreateBadgeResponse> lstApprovedBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, "Approved");
@@ -256,7 +259,7 @@ public class BadgeRequestController {
                     if (lstApprovedBadgeRequests.size() > 0) {
                         badgeRequests.setApprovedBadgerequests(lstApprovedBadgeRequests);
                     }
-                    if (badgeRequests.getApprovedBadgerequests().size() == 0 && badgeRequests.getPendingBadgeRequests().size() == 0) {
+                    if ((badgeRequests.getApprovedBadgerequests() == null || badgeRequests.getApprovedBadgerequests().size() == 0) && (badgeRequests.getPendingBadgeRequests() == null || badgeRequests.getPendingBadgeRequests().size() == 0)) {
                         jsonResponse.addProperty("error", true);
                         jsonResponse.addProperty("errorMsg", "No badge requests found");
                     } else {
@@ -288,12 +291,12 @@ public class BadgeRequestController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", e.getMessage());
-            logger.error("Exception in retrieving badge requests getBadgeRequestsByStatus():"+e.getMessage());
+            logger.error("Exception in retrieving badge requests getBadgeRequestsByStatus():" + e.getMessage());
             return jsonResponse.toString();
         }
     }
 
-    @RequestMapping(value = "delete/{inum:.+}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "delete", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String removeBadgeRequest(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody BadgeRequestDetail badgeRequest, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
@@ -323,6 +326,7 @@ public class BadgeRequestController {
             String email = userInfo.getEmail();
 
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in removeBadgeRequest()");
                 boolean isDeleted = BadgeRequestCommands.deleteUserBadgeRequestByInum(LDAPService.ldapEntryManager, badgeRequest.getBadgeRequestInum(), email);
                 if (isDeleted) {
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -346,7 +350,7 @@ public class BadgeRequestController {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", ex.getMessage());
-            logger.error("Exception in removing badge request in removeBadgeRequest():"+ex.getMessage());
+            logger.error("Exception in removing badge request in removeBadgeRequest():" + ex.getMessage());
             return jsonResponse.toString();
         }
     }
@@ -354,6 +358,7 @@ public class BadgeRequestController {
     private boolean createBadgeClass(HttpServletRequest servletRequest, ApproveBadge approveBadgeRequest) {
         try {
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in createBadgeClass()");
                 BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, approveBadgeRequest.getInum());
                 if (objBadgeRequest != null) {
 

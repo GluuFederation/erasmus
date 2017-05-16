@@ -45,10 +45,11 @@ public class BadgeClassesCommands {
             String inum = InumService.getInum(InumService.badgeInstancePrefix);
             badges.setDn("inum=" + inum + ",ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
             badges.setInum(inum);
-
+            logger.info("LDAP started making badge class entry");
             if (!(ldapEntryManager.contains("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeClass.class, Filter.create("(inum=" + badges.getInum() + ")")))) {
                 if (!ldapEntryManager.contains("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu", BadgeClass.class, Filter.create("(&(gluuBadgeRequestInum=" + badges.getBadgeRequestInum() + ")(gluuTemplateBadgeId=" + badges.getTemplateBadgeId() + "))"))) {
                     ldapEntryManager.persist(badges);
+                    logger.info("LDAP completed making badge class entry");
                     logger.info("New badge class entry");
                     return badges;
                 } else {
@@ -59,7 +60,7 @@ public class BadgeClassesCommands {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Exception in badge class entry: " + e.getMessage());
+            logger.error("Exception in badge class entry in LDAP: " + e.getMessage());
             throw new Exception("There was error creating badge class");
         }
         throw new Exception("There was error in persist a badge class");
@@ -77,8 +78,10 @@ public class BadgeClassesCommands {
             BadgeClass badges = new BadgeClass();
             badges.setDn("inum=" + inum + ",ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
             badges.setInum(inum);
+            logger.info("Started remove badge class in LDAP");
             if (ldapEntryManager.contains(badges.getDn(), BadgeClass.class, Filter.create("(inum=" + badges.getInum() + ")"))) {
                 ldapEntryManager.remove(badges);
+                logger.info("Completed remove badge class in LDAP");
                 logger.info("Deleted badge class entry ");
                 return true;
             } else {
@@ -86,6 +89,7 @@ public class BadgeClassesCommands {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("Exception in remove badge class in LDAP: " + e.getMessage());
             return false;
         }
     }
@@ -101,12 +105,13 @@ public class BadgeClassesCommands {
         try {
             BadgeClass badges = new BadgeClass();
             badges.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
-
+            logger.info("Started remove badge class in LDAP");
             if (ldapEntryManager.contains(badges.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + inum + ")"))) {
                 BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(ldapEntryManager, inum);
                 if (badgeClass != null && badgeClass.getInum() != null) {
                     if (BadgeCommands.deleteBadgeByBadgeClassInum(ldapEntryManager, badgeClass.getInum())) {
                         if (BadgeClassesCommands.deleteBadgeClassByInum(ldapEntryManager, badgeClass.getInum())) {
+                            logger.info("Completed remove badge class in LDAP");
                             logger.info("Badge class entry deleted successfully");
                             return true;
                         } else {
@@ -127,6 +132,7 @@ public class BadgeClassesCommands {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("Exception in remove badge class in LDAP: " + e.getMessage());
             return false;
         }
     }
@@ -172,9 +178,10 @@ public class BadgeClassesCommands {
 
             BadgeClass badge = new BadgeClass();
             badge.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
-
+            logger.info("LDAP started retrieving badge class");
             if (ldapEntryManager.contains(badge.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + Inum + ")"))) {
                 List<BadgeClass> badges = ldapEntryManager.findEntries(badge.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + Inum + ")"));
+                logger.info("LDAP completed retrieving badge class");
                 if (badges.size() > 0)
                     return badges.get(0);
                 else
@@ -184,6 +191,7 @@ public class BadgeClassesCommands {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("Exception in retrieving badge class in LDAP: " + e.getMessage());
             throw new NotFoundException("No such badge class found");
         }
     }
@@ -201,14 +209,16 @@ public class BadgeClassesCommands {
 
             BadgeClass badge = new BadgeClass();
             badge.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
-
+            logger.info("LDAP Started retrieving badge class");
             List<BadgeClass> badges = ldapEntryManager.findEntries(badge.getDn(), BadgeClass.class, Filter.create("(&(gluuBadgeClassId=" + id + ")(gluuBadgeClassKey=" + key + "))"));
+            logger.info("LDAP Completed retrieving badge class");
             if (badges.size() > 0)
                 return GetBadgeClassResponse(badges.get(0));
             else
                 return null;
         } catch (Exception e) {
             e.printStackTrace();
+            logger.info("Exception in retrieving badge class from LDAP: " + e.getMessage());
             throw new NotFoundException("No such badge instance found");
         }
     }
@@ -226,9 +236,10 @@ public class BadgeClassesCommands {
             BadgeClass badge = new BadgeClass();
             badge.setInum(Inum);
             badge.setDn("inum=" + Inum + ",ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
-
+            logger.info("LDAP started retrieving badge class");
             if (ldapEntryManager.contains(badge.getDn(), BadgeClass.class, Filter.create("(inum=" + badge.getInum() + ")"))) {
                 List<BadgeClass> badges = ldapEntryManager.findEntries(badge.getDn(), BadgeClass.class, Filter.create("(inum=" + badge.getInum() + ")"));
+                logger.info("LDAP completed retrieving badge class");
                 if (badges.size() > 0) {
                     badge = badges.get(0);
                     return GetBadgeClassResponse(badge);
@@ -239,6 +250,7 @@ public class BadgeClassesCommands {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("Exception in retrieving badge class in LDAP: " + e.getMessage());
             throw new NotFoundException("No such badge class found");
         }
     }

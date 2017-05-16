@@ -147,6 +147,7 @@ public class BadgeController {
 
         try {
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in verifyBadge()");
                 BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, utils, request);
                 if (badgeResponse != null) {
                     return returnBadgeResponse(badgeResponse, response);
@@ -180,6 +181,7 @@ public class BadgeController {
 
         try {
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in verifyPrivateBadge()");
                 BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
                 if (badgeResponse != null) {
                     return returnBadgeResponse(badgeResponse, response);
@@ -206,7 +208,7 @@ public class BadgeController {
         }
     }
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletRequest request, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
@@ -219,6 +221,7 @@ public class BadgeController {
             }
 
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadge()");
                 BadgeResponse badge = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
                 if (badge != null) {
                     jsonResponse.addProperty("error", false);
@@ -277,6 +280,7 @@ public class BadgeController {
             String email = userInfo.getEmail();
 
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadgeByBadgeRequestInum()");
                 BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(LDAPService.ldapEntryManager, badgeRequest.getBadgeRequestInum(), email);
                 if (badgeRequests != null && badgeRequests.getInum() != null) {
                     BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
@@ -396,6 +400,7 @@ public class BadgeController {
             String email = userInfo.getEmail();
 
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in setBadgePrivacy()");
                 BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(LDAPService.ldapEntryManager, privacy.getBadgeRequestInum(), email);
                 if (badgeRequests != null && badgeRequests.getInum() != null) {
                     BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
@@ -508,9 +513,9 @@ public class BadgeController {
             //location of barcode
             String fileName = System.currentTimeMillis() + ".png";
             //Server
-//            String imagesPath = utils.getStaticResourcePath(context);
+            String imagesPath = utils.getStaticResourcePath(context);
             //Local
-            String imagesPath = "src/main/resources/static/images";
+//            String imagesPath = "src/main/resources/static/images";
             System.out.println("path :" + imagesPath);
             if (new File(imagesPath).exists()) {
                 System.out.println("Directory exists:" + imagesPath);

@@ -29,13 +29,14 @@ public class BadgeClassController {
 
         try {
             if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadgeClass()");
                 BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(LDAPService.ldapEntryManager, id, key);
                 return returnResponse(badge, response);
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting database in getBadgeClass():");
+                logger.error("Error in connecting LDAP in getBadgeClass():");
                 return jsonResponse.toString();
             }
         } catch (Exception ex) {
