@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Created by lcom16 on 9/5/17.
+ * Created by Meghna Joshi on 9/5/17.
  */
 
 public class APIBadgeDetail {

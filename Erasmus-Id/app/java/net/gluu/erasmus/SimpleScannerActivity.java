@@ -3,6 +3,7 @@ package net.gluu.erasmus;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -62,8 +63,13 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
 
                         if (scanResponseObj != null) {
                             Application.scanResponseSuccess = scanResponseObj;
-                            Intent i = new Intent(SimpleScannerActivity.this, ScanSuccessActivity.class);
-                            startActivity(i);
+                            if(!scanResponseObj.getError()){
+                                Intent i = new Intent(SimpleScannerActivity.this, ScanSuccessActivity.class);
+                                startActivity(i);
+                            } else {
+                                Application.showAutoDismissAlertDialog(SimpleScannerActivity.this,scanResponseObj.getErrorMsg());
+                                resumeCameraPreview();
+                            }
                         }
                     }
                 }
@@ -72,14 +78,9 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
             @Override
             public void onFailure(Call<ScanResponseSuccess> call, Throwable t) {
                 Log.e(TAG, "onFailure: ", t.getCause());
+                resumeCameraPreview();
             }
         });
-
-
-
-
-        // If you would like to resume scanning, call this method below:
-        mScannerView.resumeCameraPreview(this);
     }
 
     private void sendDataBack(Result barcode) {
@@ -93,4 +94,14 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
         }
     }
 
+    private void resumeCameraPreview(){
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mScannerView.resumeCameraPreview(SimpleScannerActivity.this);
+            }
+        }, 2000);
+        // If you would like to resume scanning, call this method below:
+    }
 }

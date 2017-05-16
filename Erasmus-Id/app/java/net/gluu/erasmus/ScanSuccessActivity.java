@@ -48,6 +48,6 @@ public class ScanSuccessActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         TextView mTvTitle = (TextView) toolbar.findViewById(R.id.tv_title);
         mTvTitle.setVisibility(View.VISIBLE);
-        mTvTitle.setText(R.string.select_organization);
+        mTvTitle.setText(R.string.badge_detail);
     }
 }

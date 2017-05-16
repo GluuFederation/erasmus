@@ -5,10 +5,11 @@ package net.gluu.erasmus.model;
  */
 
 public class PrivacyRequest {
-    private String badgeRequestInum, privacy;
+    private String badgeRequestInum, opHost, privacy;
 
-    public PrivacyRequest(String strBadgeRequestInum, String strPrivacy) {
+    public PrivacyRequest(String strBadgeRequestInum, String strOpHost, String strPrivacy) {
         this.badgeRequestInum = strBadgeRequestInum;
+        this.opHost = strOpHost;
         this.privacy = strPrivacy;
     }
 
@@ -26,5 +27,13 @@ public class PrivacyRequest {
 
     public void setPrivacy(String privacy) {
         this.privacy = privacy;
+    }
+
+    public String getOpHost() {
+        return opHost;
+    }
+
+    public void setOpHost(String opHost) {
+        this.opHost = opHost;
     }
 }

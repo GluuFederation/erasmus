@@ -25,8 +25,8 @@
 
                 <ImageView
                     android:id="@+id/iv_user_img"
-                    android:layout_width="@dimen/value_200"
-                    android:layout_height="@dimen/value_200"
+                    android:layout_width="@dimen/value_150"
+                    android:layout_height="@dimen/value_150"
                     android:layout_centerHorizontal="true"
                     android:layout_margin="@dimen/value_10"
                     android:src="@drawable/avatar" />
@@ -39,7 +39,9 @@
                     android:layout_gravity="center"
                     android:layout_margin="@dimen/value_10"
                     android:text="Basic Firefighter"
-                    android:textColor="@android:color/holo_red_dark"
+                    android:textColor="@android:color/white"
+                    android:background="@color/colorPrimary"
+                    android:padding="@dimen/value_15"
                     android:textSize="@dimen/text_22" />
 
             </LinearLayout>

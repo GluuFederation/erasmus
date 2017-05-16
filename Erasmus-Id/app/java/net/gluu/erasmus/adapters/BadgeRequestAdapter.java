@@ -87,9 +87,9 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
         });
 
         if (!isFromRequest) {
-            holder.ivDelete.setVisibility(View.VISIBLE);
+            holder.mTbPrivacy.setVisibility(View.GONE);
         } else {
-            holder.ivDelete.setVisibility(View.GONE);
+            holder.mTbPrivacy.setVisibility(View.VISIBLE);
         }
 
         holder.ivDelete.setOnClickListener(new View.OnClickListener() {
@@ -164,7 +164,10 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
 
     private void deleteBadgeRequest(BadgeRequest badgeRequest, int position) {
         showProgressBar("Deleting..");
-        Call<BadgeRequest> call = mObjAPI.deleteBadge(badgeRequest.getInum());
+        APIBadgeDetail badgeDetail = new APIBadgeDetail();
+        badgeDetail.setBadgeRequestInum(badgeRequest.getInum());
+        badgeDetail.setOpHost(Application.participant.getOpHost());
+        Call<BadgeRequest> call = mObjAPI.deleteBadge(Application.AccessToken, badgeDetail);
         call.enqueue(new Callback<BadgeRequest>() {
             @Override
             public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
@@ -186,7 +189,7 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
                     Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                     try {
                         String error = response.errorBody().string();
-                        Log.v("TAG", "Error in creating badge request is:" + error);
+                        Log.v("TAG", "Error in deleting badge request is:" + error);
                         JSONObject jsonObjectError = new JSONObject(error);
                         if (jsonObjectError.getBoolean("error")) {
                             Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
@@ -252,8 +255,8 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
 
     private void setBadgePrivacy(BadgeRequest badgeRequest, String privacy) {
         showProgressBar("Changing privacy..");
-        PrivacyRequest privacyRequest = new PrivacyRequest(badgeRequest.getInum(), privacy);
-        Call<BadgeRequest> call = mObjAPI.setPrivacy(privacyRequest);
+        PrivacyRequest privacyRequest = new PrivacyRequest(badgeRequest.getInum(), Application.participant.getOpHost(), privacy);
+        Call<BadgeRequest> call = mObjAPI.setPrivacy(Application.AccessToken, privacyRequest);
         call.enqueue(new Callback<BadgeRequest>() {
             @Override
             public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {

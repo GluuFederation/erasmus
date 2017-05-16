@@ -96,4 +96,5 @@
     <string name="keyHandle_created">Pairing Date</string>
     <string name="confirm_delete">Confirm delete</string>
     <string name="approve_delete">Are you sure you want to delete this keyHandle?</string>
+    <string name="badge_detail">Badge Details</string>
 </resources>

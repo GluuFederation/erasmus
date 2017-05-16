@@ -28,7 +28,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:padding="@dimen/value_10"
-            android:src="@mipmap/ic_action_cancel"
-            android:visibility="gone" />
+            android:src="@mipmap/ic_action_cancel" />
     </LinearLayout>
 </LinearLayout>
