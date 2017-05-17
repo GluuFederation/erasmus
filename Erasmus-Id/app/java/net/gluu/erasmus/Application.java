@@ -18,10 +18,16 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.Participant;
+import net.gluu.erasmus.model.Recipient;
 import net.gluu.erasmus.model.ScanResponseSuccess;
+import net.gluu.erasmus.model.UserInfo;
+import net.gluu.erasmus.utils.JWTUtils;
+
+import org.json.JSONObject;
 
 /**
  * Application object; ensures that the support library is correctly configured for use of
@@ -64,5 +70,44 @@ public final class Application extends android.app.Application {
                 alert.dismiss();
             }
         }, 2000);
+    }
+
+    public static UserInfo getUserInfo(Recipient recipient) {
+        UserInfo userInfo1 = null;
+
+        try{
+            if (recipient != null) {
+                try {
+                    String userInfo = JWTUtils.decoded(recipient.getIdentity());
+                    Log.v("TAG", "User info is:" + userInfo);
+                    if (userInfo != null && userInfo.length() > 0) {
+                        JSONObject jObj = new JSONObject(userInfo);
+                        JSONObject jsonObject = new JSONObject(jObj.getString("userinfo"));
+                        userInfo1=new UserInfo();
+                        userInfo1.setEmail(jsonObject.getString("email") == null ? "" : jsonObject.getString("email"));
+                        userInfo1.setZoneInfo(jsonObject.getString("zoneinfo") == null ? "" : jsonObject.getString("zoneinfo"));
+                        userInfo1.setNickName(jsonObject.getString("nickname") == null ? "" : jsonObject.getString("nickname"));
+                        userInfo1.setWebsite(jsonObject.getString("website") == null ? "" : jsonObject.getString("website"));
+                        userInfo1.setMiddleName(jsonObject.getString("middle_name") == null ? "" : jsonObject.getString("middle_name"));
+                        userInfo1.setLocale(jsonObject.getString("locale") == null ? "" : jsonObject.getString("locale"));
+                        userInfo1.setPreferredUsername(jsonObject.getString("preferred_username") == null ? "" : jsonObject.getString("preferred_username"));
+                        userInfo1.setGivenName(jsonObject.getString("given_name") == null ? "" : jsonObject.getString("given_name"));
+                        userInfo1.setPicture(jsonObject.getString("picture") == null ? "" : jsonObject.getString("picture"));
+                        userInfo1.setName(jsonObject.getString("name") == null ? "" : jsonObject.getString("name"));
+                        userInfo1.setBirthdate(jsonObject.getString("birthdate") == null ? "" : jsonObject.getString("birthdate"));
+                        userInfo1.setFamilyName(jsonObject.getString("family_name") == null ? "" : jsonObject.getString("family_name"));
+                        userInfo1.setGender(jsonObject.getString("gender") == null ? "" : jsonObject.getString("gender"));
+                        userInfo1.setProfile(jsonObject.getString("profile") == null ? "" : jsonObject.getString("profile"));
+                        return userInfo1;
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return userInfo1;
     }
 }

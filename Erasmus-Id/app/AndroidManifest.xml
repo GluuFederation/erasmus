@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  * Copyright 2015 The AppAuth for Android Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -11,26 +11,23 @@
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
 -->
-<manifest
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        package="net.gluu.erasmus" >
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="net.gluu.erasmus">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-            android:allowBackup="false"
-            android:fullBackupContent="false"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name_short"
-            android:theme="@style/AppTheme"
-            android:supportsRtl="false"
-
-            android:name="net.gluu.erasmus.Application">
-
+        android:name=".Application"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name_short"
+        android:supportsRtl="false"
+        android:theme="@style/AppTheme">
         <activity
-            android:name="net.gluu.erasmus.SplashActivity"
+            android:name=".SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,46 +38,45 @@
 
         <!-- Main activity -->
         <activity
-                android:name="net.gluu.erasmus.LoginActivity"
-                android:label="@string/app_name_short"
-                android:theme="@style/AppTheme"
-                android:windowSoftInputMode="stateHidden" >
-        </activity>
-
+            android:name=".LoginActivity"
+            android:label="@string/app_name_short"
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name="net.gluu.erasmus.MainActivity"
+            android:name=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="net.gluu.erasmus.BadgeStatusActivity"
+            android:name=".BadgeStatusActivity"
             android:label="@string/title_activity_badge_status"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="net.gluu.erasmus.RequestBadgeActivity"
+            android:name=".RequestBadgeActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="net.gluu.erasmus.DisplayBadgeActivity"
+            android:name=".DisplayBadgeActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name="net.gluu.erasmus.SimpleScannerActivity"
+            android:name=".SimpleScannerActivity"
             android:screenOrientation="portrait" />
-        <activity android:name="net.gluu.erasmus.ScanSuccessActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name="net.gluu.erasmus.SelectOpActivity"
-            android:screenOrientation="portrait"/>
-
         <activity
-                android:name="net.gluu.erasmus.TokenActivity"
-                android:label="@string/app_name_short"
-                android:theme="@style/AppTheme"
-                android:windowSoftInputMode="stateHidden" >
-        </activity>
-
+            android:name=".ScanSuccessActivity"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="net.gluu.erasmus.U2FActivity"
+            android:name=".SelectOpActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TokenActivity"
+            android:label="@string/app_name_short"
+            android:theme="@style/AppTheme"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".U2FActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <!--
         This activity declaration is merged with the version from the library manifest.
@@ -100,13 +96,19 @@
         -->
         <activity android:name="net.gluu.appauth.RedirectUriReceiverActivity">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https"
-                  android:host="appauth.demo-app.io"
-                  android:path="/oauth2redirect"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="appauth.demo-app.io"
+                    android:path="/oauth2redirect"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
+        <activity android:name=".ScanFailureActivity"
+            android:screenOrientation="portrait"/>
     </application>
+
 </manifest>

@@ -23,6 +23,7 @@ import retrofit2.Response;
 public class SimpleScannerActivity extends Activity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView mScannerView;
     private static final String TAG = "SimpleScannerActivity";
+
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -46,11 +47,11 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
     @Override
     public void handleResult(Result rawResult) {
         // Do something with the result here
-        Log.v("TAG", "Scan result: "+rawResult.getText()); // Prints scan results
+        Log.v("TAG", "Scan result: " + rawResult.getText()); // Prints scan results
         Log.v("TAG", rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode, pdf417 etc.)
 //        sendDataBack(rawResult);
 
-        String url=rawResult.getText();
+        String url = rawResult.getText();
 
         Call<ScanResponseSuccess> call = APIService.createService(APIInterface.class).getScanAllResult(url);
         call.enqueue(new Callback<ScanResponseSuccess>() {
@@ -59,20 +60,25 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
 
                 if (response.isSuccessful()) {
                     if (response.errorBody() == null && response.body() != null) {
-                        ScanResponseSuccess scanResponseObj=response.body();
+                        ScanResponseSuccess scanResponseObj = response.body();
 
                         if (scanResponseObj != null) {
                             Application.scanResponseSuccess = scanResponseObj;
-                            if(!scanResponseObj.getError()){
+                            if (scanResponseObj.getError() == null || !scanResponseObj.getError()) {
                                 Intent i = new Intent(SimpleScannerActivity.this, ScanSuccessActivity.class);
                                 startActivity(i);
+                                finish();
                             } else {
-                                Application.showAutoDismissAlertDialog(SimpleScannerActivity.this,scanResponseObj.getErrorMsg());
-                                resumeCameraPreview();
+                                Intent i = new Intent(SimpleScannerActivity.this, ScanFailureActivity.class);
+                                startActivity(i);
+//                                Application.showAutoDismissAlertDialog(SimpleScannerActivity.this, scanResponseObj.getErrorMsg());
+//                                resumeCameraPreview();
                             }
                         }
                     }
                 }
+
+                resumeCameraPreview();
             }
 
             @Override
@@ -94,14 +100,14 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
         }
     }
 
-    private void resumeCameraPreview(){
+    private void resumeCameraPreview() {
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 mScannerView.resumeCameraPreview(SimpleScannerActivity.this);
             }
-        }, 2000);
+        }, 3000);
         // If you would like to resume scanning, call this method below:
     }
 }

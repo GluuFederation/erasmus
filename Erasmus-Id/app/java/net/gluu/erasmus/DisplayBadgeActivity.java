@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import net.gluu.erasmus.model.Recipient;
+import net.gluu.erasmus.model.UserInfo;
 import net.gluu.erasmus.utils.JWTUtils;
 
 import org.json.JSONObject;
@@ -42,19 +43,9 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
         mTvBadgeName.setText(Application.displayBadge.getBadgeTitle());
         mTvExpiresAt.setText(Application.displayBadge.getExpiresAt());
 
-        Recipient recipient = Application.displayBadge.getRecipient();
-        if (recipient != null) {
-            try {
-                String userInfo = JWTUtils.decoded(recipient.getIdentity());
-                Log.v("TAG", "User info is:" + userInfo);
-                if (userInfo != null && userInfo.length() > 0) {
-                    JSONObject jObj = new JSONObject(userInfo);
-                    JSONObject jsonObject = new JSONObject(jObj.getString("userinfo"));
-                    mTvUserName.setText(jsonObject.getString("name") == null ? "" : jsonObject.getString("name"));
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        UserInfo userInfo = Application.getUserInfo(Application.displayBadge.getRecipient());
+        if (userInfo != null) {
+            mTvUserName.setText(userInfo.getName());
         }
     }
 
