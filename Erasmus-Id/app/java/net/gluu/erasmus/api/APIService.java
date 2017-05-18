@@ -6,9 +6,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIService {
     //Live
-  public static final String API_BASE_URL = "https://erasmusdev.gluu.org/badge-mgr/";
+//  public static final String API_BASE_URL = "https://erasmusdev.gluu.org/badge-mgr/";
     //Local
-//  public static final String API_BASE_URL = "http://192.168.200.78:8080/badge-mgr/";
+  public static final String API_BASE_URL = "http://192.168.200.78:8080/badge-mgr/";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 

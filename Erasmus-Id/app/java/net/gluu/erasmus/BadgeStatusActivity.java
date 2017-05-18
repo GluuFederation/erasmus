@@ -39,7 +39,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Created by lcom16 on 20/4/17.
+ * Created by Meghna Joshi on 20/4/17.
  */
 
 public class BadgeStatusActivity extends AppCompatActivity implements View.OnClickListener {

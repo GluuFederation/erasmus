@@ -137,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             JSONObject jObject = new JSONObject(byteArrayOutputStream.toString());
-            Log.v("TAG", "States data: " + jObject.toString());
             Iterator<?> keys = jObject.keys();
             arStates = new ArrayList<>();
             State obj;

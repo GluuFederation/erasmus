@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -50,6 +51,7 @@ public class ApproveBadgeFragment extends Fragment {
     RecyclerView mRvBadges;
     APIInterface mObjAPI;
     ProgressDialog mProgress;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     public ApproveBadgeFragment() {
         // Required empty public constructor
@@ -95,9 +97,24 @@ public class ApproveBadgeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mSwipeRefreshLayout= (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         mRvBadges = (RecyclerView) view.findViewById(R.id.rv_badges);
         mRvBadges.setLayoutManager(new LinearLayoutManager(getActivity()));
         getApprovedBadgeRequests();
+
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        Log.v("TAG", "onRefresh called from SwipeRefreshLayout");
+
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        getApprovedBadgeRequests();
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+        );
     }
 
     // TODO: Rename method, update argument and hook method into UI event
