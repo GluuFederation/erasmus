@@ -107,7 +107,7 @@ public class BadgeClassesCommands {
             badges.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
             logger.info("Started remove badge class in LDAP");
             if (ldapEntryManager.contains(badges.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + inum + ")"))) {
-                BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(ldapEntryManager, inum);
+                BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(inum);
                 if (badgeClass != null && badgeClass.getInum() != null) {
                     if (BadgeCommands.deleteBadgeByBadgeClassInum(ldapEntryManager, badgeClass.getInum())) {
                         if (BadgeClassesCommands.deleteBadgeClassByInum(ldapEntryManager, badgeClass.getInum())) {
@@ -169,24 +169,30 @@ public class BadgeClassesCommands {
     /**
      * Reterived a badge class by badge request Inum.
      *
-     * @param ldapEntryManager ldapEntryManager.
      * @param Inum             Inum of the badge request.
      * @return
      */
-    public static BadgeClass getBadgeClassByBadgeRequestInum(LdapEntryManager ldapEntryManager, String Inum) throws Exception {
+    public static BadgeClass getBadgeClassByBadgeRequestInum(String Inum) throws Exception {
         try {
 
-            BadgeClass badge = new BadgeClass();
-            badge.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
-            logger.info("LDAP started retrieving badge class");
-            if (ldapEntryManager.contains(badge.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + Inum + ")"))) {
-                List<BadgeClass> badges = ldapEntryManager.findEntries(badge.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + Inum + ")"));
-                logger.info("LDAP completed retrieving badge class");
-                if (badges.size() > 0)
-                    return badges.get(0);
-                else
+            if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadgeClassByBadgeRequestInum() in BadgeClassesCommands");
+
+                BadgeClass badge = new BadgeClass();
+                badge.setDn("ou=badgeClasses,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+                logger.info("LDAP started retrieving badge class");
+                if (LDAPService.ldapEntryManager.contains(badge.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + Inum + ")"))) {
+                    List<BadgeClass> badges = LDAPService.ldapEntryManager.findEntries(badge.getDn(), BadgeClass.class, Filter.create("(gluuBadgeRequestInum=" + Inum + ")"));
+                    logger.info("LDAP completed retrieving badge class");
+                    if (badges.size() > 0)
+                        return badges.get(0);
+                    else
+                        return null;
+                } else {
                     return null;
+                }
             } else {
+                logger.error("Error in connecting database in getBadgeClassByBadgeRequestInum() in BadgeClassesCommands");
                 return null;
             }
         } catch (Exception e) {

@@ -180,6 +180,7 @@ public class BadgeController {
         JsonObject jsonResponse = new JsonObject();
 
         try {
+
             if (LDAPService.isConnected()) {
                 logger.info("LDAP connected in verifyPrivateBadge()");
                 BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
@@ -279,13 +280,13 @@ public class BadgeController {
             }
             String email = userInfo.getEmail();
 
-            if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in getBadgeByBadgeRequestInum()");
-                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(LDAPService.ldapEntryManager, badgeRequest.getBadgeRequestInum(), email);
+//            if (LDAPService.isConnected()) {
+//                logger.info("LDAP connected in getBadgeByBadgeRequestInum()");
+                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(badgeRequest.getBadgeRequestInum(), email);
                 if (badgeRequests != null && badgeRequests.getInum() != null) {
-                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
+                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
                     if (badgeClass != null && badgeClass.getInum() != null) {
-                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
+                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
 
                             String tempURLBase = utils.getBaseURL(request);
@@ -296,7 +297,7 @@ public class BadgeController {
                                 Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
                                 calendar.add(Calendar.SECOND, 95);
                                 badges.setExpires(calendar.getTime());
-                                boolean isUpdated = BadgeCommands.updateBadge(LDAPService.ldapEntryManager, badges);
+                                boolean isUpdated = BadgeCommands.updateBadge(badges);
                                 logger.info("Badge updated after expires set:" + isUpdated);
                                 tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
                             }
@@ -352,13 +353,13 @@ public class BadgeController {
                     jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
                 }
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting database in getBadgeByBadgeRequestInum():");
-                return jsonResponse.toString();
-            }
+//            } else {
+//                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//                jsonResponse.addProperty("error", true);
+//                jsonResponse.addProperty("errorMsg", "Please try after some time");
+//                logger.error("Error in connecting database in getBadgeByBadgeRequestInum():");
+//                return jsonResponse.toString();
+//            }
         } catch (Exception ex) {
             ex.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -399,29 +400,29 @@ public class BadgeController {
             }
             String email = userInfo.getEmail();
 
-            if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in setBadgePrivacy()");
-                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(LDAPService.ldapEntryManager, privacy.getBadgeRequestInum(), email);
+//            if (LDAPService.isConnected()) {
+//                logger.info("LDAP connected in setBadgePrivacy()");
+                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(privacy.getBadgeRequestInum(), email);
                 if (badgeRequests != null && badgeRequests.getInum() != null) {
-                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
+                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
                     if (badgeClass != null && badgeClass.getInum() != null) {
-                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
+                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
 
                             badges.setBadgePrivacy(privacy.getPrivacy());
+                            badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());
+//                            if (badges.getBadgePrivacy().equalsIgnoreCase("public")) {
+//                                badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());
+//                            } else if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
+//                                badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid() + "?key=" + badges.getKey());
+//                            } else {
+//                                response.setStatus(HttpServletResponse.SC_OK);
+//                                jsonResponse.addProperty("error", true);
+//                                jsonResponse.addProperty("errorMsg", "Failed to set badge privacy");
+//                                return jsonResponse.toString();
+//                            }
 
-                            if (badges.getBadgePrivacy().equalsIgnoreCase("public")) {
-                                badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());
-                            } else if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
-                                badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid() + "?key=" + badges.getKey());
-                            } else {
-                                response.setStatus(HttpServletResponse.SC_OK);
-                                jsonResponse.addProperty("error", true);
-                                jsonResponse.addProperty("errorMsg", "Failed to set badge privacy");
-                                return jsonResponse.toString();
-                            }
-
-                            boolean isUpdated = BadgeCommands.updateBadge(LDAPService.ldapEntryManager, badges);
+                            boolean isUpdated = BadgeCommands.updateBadge(badges);
                             if (isUpdated) {
                                 response.setStatus(HttpServletResponse.SC_OK);
                                 jsonResponse.addProperty("error", false);
@@ -451,13 +452,13 @@ public class BadgeController {
                     jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
                 }
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting database in setBadgePrivacy():");
-                return jsonResponse.toString();
-            }
+//            } else {
+//                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//                jsonResponse.addProperty("error", true);
+//                jsonResponse.addProperty("errorMsg", "Please try after some time");
+//                logger.error("Error in connecting database in setBadgePrivacy():");
+//                return jsonResponse.toString();
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);

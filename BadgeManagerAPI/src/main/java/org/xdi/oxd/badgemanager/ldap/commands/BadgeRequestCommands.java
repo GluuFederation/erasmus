@@ -8,7 +8,6 @@ import org.xdi.oxd.badgemanager.config.DefaultConfig;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.models.Badges;
-import org.xdi.oxd.badgemanager.ldap.models.Organizations;
 import org.xdi.oxd.badgemanager.ldap.service.InumService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.ldap.service.MergeService;
@@ -17,7 +16,6 @@ import org.xdi.oxd.badgemanager.model.CreateBadgeResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Arvind Tomar on 14/10/16.
@@ -239,18 +237,23 @@ public class BadgeRequestCommands {
     /**
      * Get approved badge request for user
      *
-     * @param ldapEntryManager ldapEntryManager
-     * @param email            user email
-     * @param status           status
+     * @param email  user email
+     * @param status status
      * @return
      */
-    public static List<CreateBadgeResponse> getBadgeRequestsByStatusNew(LdapEntryManager ldapEntryManager, String email, String status) throws Exception {
-        BadgeRequests badgeRequest = new BadgeRequests();
-        badgeRequest.setDn("ou=badgeRequests, ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
-        logger.info("LDAP Search for " + status + " badges for user " + email);
-        List<BadgeRequests> lstBadgeRequests = (ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(gluuStatus=" + status + "))")));
-        logger.info("Search complete: " + status + " badges found for user " + email + " from LDAP are: " + lstBadgeRequests.size());
-        return GetResponseList(lstBadgeRequests);
+    public static List<CreateBadgeResponse> getBadgeRequestsByStatusNew(String email, String status) throws Exception {
+        if (LDAPService.isConnected()) {
+            logger.info("LDAP connected in getBadgeRequestsByStatusNew() in BadgeRequestCommands");
+            BadgeRequests badgeRequest = new BadgeRequests();
+            badgeRequest.setDn("ou=badgeRequests, ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+            logger.info("LDAP Search for " + status + " badges for user " + email);
+            List<BadgeRequests> lstBadgeRequests = (LDAPService.ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(gluuStatus=" + status + "))")));
+            logger.info("Search complete: " + status + " badges found for user " + email + " from LDAP are: " + lstBadgeRequests.size());
+            return GetResponseList(lstBadgeRequests);
+        } else {
+            logger.error("Error in connecting database in getBadgeRequestsByStatusNew() in BadgeRequestCommands");
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -302,28 +305,35 @@ public class BadgeRequestCommands {
     /**
      * Retrieves a badge request by Inum
      *
-     * @param ldapEntryManager ldapEntryManager
      * @param Inum             Inum of the badge request that is to be retrieved.
      * @param email            Email of the badge requester.
      * @return
      */
-    public static BadgeRequests getBadgeRequestForUserByInum(LdapEntryManager ldapEntryManager, String Inum, String email) {
+    public static BadgeRequests getBadgeRequestForUserByInum(String Inum, String email) {
         try {
 
-            BadgeRequests badgeRequest = new BadgeRequests();
-            badgeRequest.setInum(Inum);
-            badgeRequest.setDn("inum=" + Inum + ",ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+            if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadgeRequestForUserByInum() in BadgeRequestCommands");
 
-            if (ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")"))) {
-                List<BadgeRequests> badgeRequests = ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(inum=" + badgeRequest.getInum() + "))"));
-                if (badgeRequests.size() > 0)
-                    return badgeRequests.get(0);
-                else
+                BadgeRequests badgeRequest = new BadgeRequests();
+                badgeRequest.setInum(Inum);
+                badgeRequest.setDn("inum=" + Inum + ",ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+                if (LDAPService.ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")"))) {
+                    List<BadgeRequests> badgeRequests = LDAPService.ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(inum=" + badgeRequest.getInum() + "))"));
+                    if (badgeRequests.size() > 0)
+                        return badgeRequests.get(0);
+                    else
+                        return null;
+                } else {
                     return null;
+                }
             } else {
+                logger.error("Error in connecting database in getBadgeRequestForUserByInum() in BadgeRequestCommands");
                 return null;
             }
         } catch (Exception e) {
+            logger.error("Exception in getBadgeRequestForUserByInum() in BadgeRequestCommands:" + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -344,9 +354,9 @@ public class BadgeRequestCommands {
             try {
                 BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(LDAPService.ldapEntryManager, obj.getInum());
                 if (badgeRequests != null && badgeRequests.getInum() != null) {
-                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(LDAPService.ldapEntryManager, badgeRequests.getInum());
+                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
                     if (badgeClass != null && badgeClass.getInum() != null) {
-                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(LDAPService.ldapEntryManager, badgeClass.getInum());
+                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
                             objResponse.setPrivacy(badges.getBadgePrivacy());
                         }

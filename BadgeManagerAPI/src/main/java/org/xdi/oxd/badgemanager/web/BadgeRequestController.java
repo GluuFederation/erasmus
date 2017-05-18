@@ -214,6 +214,12 @@ public class BadgeRequestController {
         JsonObject jsonResponse = new JsonObject();
 
         try {
+//            Client client = new HttpE3DBClientBuilder()
+//                    .setClientId(clientId)
+//                    .setApiKeyId(apiKeyId)
+//                    .setApiSecret(apiSecret)
+//                    .setKeyPair(keyPair)
+//                    .build();
 
             if (accessToken == null || accessToken.length() == 0 || badgeRequest == null
                     || badgeRequest.getOpHost() == null || badgeRequest.getStatus() == null
@@ -247,12 +253,12 @@ public class BadgeRequestController {
             }
             String email = userInfo.getEmail();
 
-            if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in getBadgeRequestsByStatus()");
+//            if (LDAPService.isConnected()) {
+//                logger.info("LDAP connected in getBadgeRequestsByStatus()");
                 if (badgeRequest.getStatus().equalsIgnoreCase("all")) {
                     BadgeRequestResponse badgeRequests = new BadgeRequestResponse();
-                    List<CreateBadgeResponse> lstApprovedBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, "Approved");
-                    List<CreateBadgeResponse> lstPendingBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, "Pending");
+                    List<CreateBadgeResponse> lstApprovedBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(email, "Approved");
+                    List<CreateBadgeResponse> lstPendingBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(email, "Pending");
                     if (lstPendingBadgeRequests.size() > 0) {
                         badgeRequests.setPendingBadgeRequests(lstPendingBadgeRequests);
                     }
@@ -267,7 +273,7 @@ public class BadgeRequestController {
                         jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(badgeRequests));
                     }
                 } else {
-                    List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(LDAPService.ldapEntryManager, email, badgeRequest.getStatus());
+                    List<CreateBadgeResponse> lstBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(email, badgeRequest.getStatus());
                     if (lstBadgeRequests.size() == 0) {
                         jsonResponse.addProperty("error", true);
                         jsonResponse.addProperty("errorMsg", "No " + badgeRequest.getStatus() + " badge requests found");
@@ -279,13 +285,13 @@ public class BadgeRequestController {
 
                 response.setStatus(HttpServletResponse.SC_OK);
                 return jsonResponse.toString();
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting database in getBadgeRequestsByStatus():");
-                return jsonResponse.toString();
-            }
+//            } else {
+//                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//                jsonResponse.addProperty("error", true);
+//                jsonResponse.addProperty("errorMsg", "Please try after some time");
+//                logger.error("Error in connecting database in getBadgeRequestsByStatus():");
+//                return jsonResponse.toString();
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
