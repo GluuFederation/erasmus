@@ -16,6 +16,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -35,14 +36,15 @@ public interface APIInterface {
     @POST("badges/request")
     Call<BadgeRequest> makeBadgeRequest(@Header("AccessToken") String accessToken, @Body APIBadgeRequest badgeRequest);
 
-    @DELETE("badges/request/delete/{inum}")
-    Call<BadgeRequest> deleteBadge(@Path("inum") String inum);
+//    @DELETE("badges/request/delete/{inum}")
+    @HTTP(method = "DELETE", path = "badges/request/delete", hasBody = true)
+    Call<BadgeRequest> deleteBadge(@Header("AccessToken") String accessToken, @Body APIBadgeDetail badgeDetail);
 
     @POST("badges/details")
     Call<DisplayBadge> getBadge(@Header("AccessToken") String accessToken, @Body APIBadgeDetail badgeDetail);
 
     @POST("badges/setPrivacy")
-    Call<BadgeRequest> setPrivacy(@Body PrivacyRequest privacy);
+    Call<BadgeRequest> setPrivacy(@Header("AccessToken") String accessToken, @Body PrivacyRequest privacy);
 
     @GET("tmp/{id}")
     Call<ScanResponseSuccess> getScanResult(@Path("id") String id);

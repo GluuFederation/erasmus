@@ -1,7 +1,7 @@
 package net.gluu.erasmus.model;
 
 /**
- * Created by lcom53 on 10/5/17.
+ * Created by Meghna Joshi on 10/5/17.
  */
 
 import com.google.gson.annotations.Expose;
@@ -57,7 +57,6 @@ public class ScanResponseSuccess {
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
     }
-
 
     public String getContext() {
         return context;
@@ -121,49 +120,6 @@ public class ScanResponseSuccess {
 
     public void setBadge(Badge badge) {
         this.badge = badge;
-    }
-
-    public class Recipient {
-
-        @SerializedName("type")
-        @Expose
-        private String type;
-        @SerializedName("identity")
-        @Expose
-        private String identity;
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getIdentity() {
-            return identity;
-        }
-
-        public void setIdentity(String identity) {
-            this.identity = identity;
-        }
-
-    }
-
-    public class Verification {
-
-        @SerializedName("type")
-        @Expose
-        private String type;
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
     }
 
     public class Badge {

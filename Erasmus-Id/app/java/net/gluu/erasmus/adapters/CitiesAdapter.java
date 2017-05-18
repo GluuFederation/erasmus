@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.gluu.erasmus.Application;
@@ -33,7 +34,7 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.ViewHolder
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.city_item, parent, false);
+                .inflate(R.layout.city_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -42,11 +43,15 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.ViewHolder
         final City city = mValues.get(position);
         holder.mCityName.setText(city.getCityName());
 
-        holder.mCityName.setTag(mContext.getString(R.string.app_name));
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        holder.mLLMain.setTag(R.string.app_name, position);
+        holder.mLLMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Application.City = holder.mCityName.getText().toString();
+                LinearLayout ll= (LinearLayout) v;
+                int pos= (int) ll.getTag(R.string.app_name);
+                City obj=mValues.get(pos);
+
+                Application.City = obj.getCityName();
                 Intent i = new Intent(mContext, SelectOpActivity.class);
                 mContext.startActivity(i);
             }
@@ -61,10 +66,12 @@ public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mCityName;
+        public final LinearLayout mLLMain;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
+            mLLMain = (LinearLayout) view.findViewById(R.id.llMain_city);
             mCityName = (TextView) view.findViewById(R.id.tv_cityname);
         }
 
