@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.xdi.oxd.badgemanager.ldap.LDAPInitializer;
-import org.xdi.oxd.badgemanager.web.BadgeRequestController;
 
 /**
  * Created by Arvind Tomar on 22/4/17.
@@ -41,7 +40,6 @@ public class LDAPService {
                 }
             }
         });
-
         return connected;
     }
 

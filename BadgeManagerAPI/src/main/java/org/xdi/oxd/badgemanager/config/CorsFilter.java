@@ -1,5 +1,6 @@
 package org.xdi.oxd.badgemanager.config;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -26,6 +27,7 @@ public class CorsFilter implements Filter {
     }
 
     public void destroy() {
+        System.out.println(" Filter destroy");
     }
 
 }
