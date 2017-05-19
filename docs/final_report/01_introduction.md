@@ -2,6 +2,8 @@
 
 In the field of emergency management it is widely known that crisis situations consistently overwhelm the resources of the jurisdictions they affect.   To build the next generation of tools to respond to crisis situations--either man-made or natural--we need increased capability to identify and authenticate first responders.
 
+Blah blah blah
+
 This is a daunting task--in the US, there are over 65,000 law enforcement, fire and EMS organizations and approximately three million individuals. While centralized identity management processes can achieve a high level of security, a decentralized process may offer less security, but enable wider participation.
 
 With the chaos, threat, and uncertainty that accompany such disasters, allowing unauthorized people to access an emergency site not only puts them in danger, but may endanger fellow emergency responders. Conversely, turning away qualified people is also a problem.  
