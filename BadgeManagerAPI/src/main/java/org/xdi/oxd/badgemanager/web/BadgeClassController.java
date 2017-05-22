@@ -7,7 +7,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
-import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -28,23 +27,14 @@ public class BadgeClassController {
         JsonObject jsonResponse = new JsonObject();
 
         try {
-            if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in getBadgeClass()");
-                BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(LDAPService.ldapEntryManager, id, key);
-                return returnResponse(badge, response);
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting LDAP in getBadgeClass():");
-                return jsonResponse.toString();
-            }
+            BadgeClassResponse badge = BadgeClassesCommands.getBadgeClassResponseById(id, key);
+            return returnResponse(badge, response);
         } catch (Exception ex) {
             ex.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", ex.getMessage());
-            logger.error("Exception in retrieving badge class in getBadgeClass(): "+ex.getMessage());
+            logger.error("Exception in retrieving badge class in getBadgeClass(): " + ex.getMessage());
             return jsonResponse.toString();
         }
     }

@@ -66,7 +66,7 @@ public class TempURLController {
                     } else {
                         strId = strURL;
                         //public
-                        return badgeController.verifyBadge(strId, request, response);
+                        return badgeController.verifyBadge(strId, response);
                     }
                 } else {
                     //no badge found

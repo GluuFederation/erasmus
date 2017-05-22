@@ -46,6 +46,9 @@ public class BadgeRequests {
     @LdapAttribute(name = "updatedAt")
     Date updatedAt;
 
+    @LdapAttribute(name = "gluuFIDESAccess")
+    boolean fidesAccess;
+
     public BadgeRequests() {
     }
 
@@ -127,5 +130,13 @@ public class BadgeRequests {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public boolean getFidesAccess() {
+        return fidesAccess;
+    }
+
+    public void setFidesAccess(boolean fidesAccess) {
+        this.fidesAccess = fidesAccess;
     }
 }

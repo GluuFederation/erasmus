@@ -17,6 +17,17 @@
             <name>Gluu repository</name>
             <url>http://ox.gluu.org/maven</url>
         </repository>
+
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>tozny-repo</id>
+            <name>Tozny Repository</name>
+            <url>https://maven.tozny.com/repo</url>
+        </repository>
+
     </repositories>
 
     <parent>
@@ -53,7 +64,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jetty</artifactId>
-            <scope>provided</scope>
+            <!--<scope>provided</scope>-->
         </dependency>
 
         <!--Test-->
@@ -205,6 +216,13 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.7.2</version>
+        </dependency>
+
+        <!--Tozny-->
+        <dependency>
+            <groupId>com.tozny.e3db</groupId>
+            <artifactId>e3db-client</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
     </dependencies>

@@ -26,7 +26,6 @@ import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
-import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
 import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
@@ -119,7 +118,7 @@ public class BadgeController {
             String result = strResponse.getBody();
 
             JsonArray jObjResponse = new JsonParser().parse(result).getAsJsonArray();
-            if (jObjResponse != null) {
+            if (jObjResponse != null && jObjResponse.size() > 0) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.add("badges", GsonService.getGson().toJsonTree(jObjResponse));
                 jsonResponse.addProperty("error", false);
@@ -135,33 +134,24 @@ public class BadgeController {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "Please try after some time");
-            logger.error("Exception in retrieving data:" + e.getMessage());
+            logger.error("Exception in retrieving template badges:" + e.getMessage());
             return jsonResponse.toString();
         }
     }
 
     @RequestMapping(value = "verify/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String verifyBadge(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
+    public String verifyBadge(@PathVariable String id, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
         try {
-            if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in verifyBadge()");
-                BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(LDAPService.ldapEntryManager, id, utils, request);
-                if (badgeResponse != null) {
-                    return returnBadgeResponse(badgeResponse, response);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    jsonResponse.addProperty("error", true);
-                    jsonResponse.addProperty("errorMsg", "No such badge found");
-                    return jsonResponse.toString();
-                }
+            BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(id);
+            if (badgeResponse != null) {
+                return returnBadgeResponse(badgeResponse, response);
             } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting database in verifyBadge():");
+                jsonResponse.addProperty("errorMsg", "No such badge found");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
@@ -181,22 +171,13 @@ public class BadgeController {
 
         try {
 
-            if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in verifyPrivateBadge()");
-                BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
-                if (badgeResponse != null) {
-                    return returnBadgeResponse(badgeResponse, response);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    jsonResponse.addProperty("error", true);
-                    jsonResponse.addProperty("errorMsg", "No such badge found");
-                    return jsonResponse.toString();
-                }
+            BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(id, key);
+            if (badgeResponse != null) {
+                return returnBadgeResponse(badgeResponse, response);
             } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting database in verifyPrivateBadge():");
+                jsonResponse.addProperty("errorMsg", "No such badge found");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
@@ -209,36 +190,49 @@ public class BadgeController {
         }
     }
 
-//    @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getBadge(@PathVariable String id, @RequestParam(value = "key") String key, HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "{badgeRequestInum:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getBadge(@RequestHeader(value = "Authorization") String authorization, @PathVariable String badgeRequestInum, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
         try {
-            if (redisTemplate.opsForValue().get(id + key) == null) {
+            if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Oops!! Badge link expired");
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 return jsonResponse.toString();
             }
 
-            if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in getBadge()");
-                BadgeResponse badge = BadgeCommands.getBadgeResponseByIdAndKey(LDAPService.ldapEntryManager, id, key, utils, request);
-                if (badge != null) {
-                    jsonResponse.addProperty("error", false);
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    return GsonService.getGson().toJson(badge);
+            BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(badgeRequestInum);
+            if (badgeRequests != null && badgeRequests.getInum() != null) {
+                BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
+                if (badgeClass != null && badgeClass.getInum() != null) {
+                    Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
+                    if (badges != null && badges.getInum() != null) {
+                        BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(badges.getGuid());
+                        if (badgeResponse != null) {
+                            return returnBadgeResponse(badgeResponse, response);
+                        }
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        jsonResponse.addProperty("error", true);
+                        jsonResponse.addProperty("errorMsg", "No such badge found");
+                        return jsonResponse.toString();
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        jsonResponse.addProperty("error", true);
+                        jsonResponse.addProperty("errorMsg", "No such badge found");
+                        return jsonResponse.toString();
+                    }
                 } else {
+                    response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "No such badge found");
-                    response.setStatus(HttpServletResponse.SC_OK);
                     return jsonResponse.toString();
                 }
             } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "Please try after some time");
-                logger.error("Error in connecting database in getBadge():");
+                jsonResponse.addProperty("errorMsg", "No such badge found");
                 return jsonResponse.toString();
             }
         } catch (Exception e) {
@@ -267,75 +261,71 @@ public class BadgeController {
             }
 
             UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
-            if (userInfo == null) {
+            if (userInfo == null || userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return jsonResponse.toString();
-            } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
-                jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return jsonResponse.toString();
             }
             String email = userInfo.getEmail();
 
-//            if (LDAPService.isConnected()) {
-//                logger.info("LDAP connected in getBadgeByBadgeRequestInum()");
-                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(badgeRequest.getBadgeRequestInum(), email);
-                if (badgeRequests != null && badgeRequests.getInum() != null) {
-                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
-                    if (badgeClass != null && badgeClass.getInum() != null) {
-                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
-                        if (badges != null && badges.getInum() != null) {
+            BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(badgeRequest.getBadgeRequestInum(), email);
+            if (badgeRequests != null && badgeRequests.getInum() != null) {
+                BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
+                if (badgeClass != null && badgeClass.getInum() != null) {
+                    Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
+                    if (badges != null && badges.getInum() != null) {
 
-                            String tempURLBase = utils.getBaseURL(request);
-                            String tempURL = tempURLBase + "/badges/" + badges.getGuid();
+                        String tempURLBase = utils.getBaseURL(request);
+                        String tempURL = tempURLBase + "/badges/" + badges.getGuid();
 
+                        if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
+                            setRedisData(badges.getKey(), badges.getId(), 95);
+                            Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
+                            calendar.add(Calendar.SECOND, 95);
+                            badges.setExpires(calendar.getTime());
+                            boolean isUpdated = BadgeCommands.updateBadge(badges);
+                            logger.info("Badge updated after expires set:" + isUpdated);
+                            tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
+                        }
+
+                        String redisKey = badges.getGuid() + badges.getKey();
+                        setRedisData(redisKey, tempURL, 95);
+                        final String id = Hashing.murmur3_32().hashString(tempURL, StandardCharsets.UTF_8).toString();
+                        System.out.println("Shortern url id:" + id);
+                        String shortenURL = tempURLBase + "/tmp/" + id;
+                        System.out.println("Shortern url:" + shortenURL);
+                        setRedisData(id, tempURL, 95);
+
+                        if (generateQrCode(badges, badgeClass.getImage(), shortenURL, 250, "png")) {
+                            logger.info("QR Code generated successfully");
+
+                            BadgeRequests objBadgeRequest = new BadgeRequests();
+                            objBadgeRequest.setInum(badgeRequests.getInum());
+                            objBadgeRequest.setFidesAccess(false);
+                            BadgeRequestCommands.updateBadgeRequest(objBadgeRequest);
+
+                            DisplayBadge badge = new DisplayBadge();
+                            badge.setQrCode(utils.getBaseURL(request) + File.separator + "images" + File.separator + badges.getImage());
+                            badge.setBadgePublicURL(badges.getId());
                             if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
-                                setRedisData(badges.getKey(), badges.getId(), 95);
-                                Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
-                                calendar.add(Calendar.SECOND, 95);
-                                badges.setExpires(calendar.getTime());
-                                boolean isUpdated = BadgeCommands.updateBadge(badges);
-                                logger.info("Badge updated after expires set:" + isUpdated);
-                                tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
+                                badge.setBadgePublicURL("");
                             }
+                            badge.setBadgeTitle(badgeRequests.getTemplateBadgeTitle());
 
-                            String redisKey = badges.getGuid() + badges.getKey();
-                            setRedisData(redisKey, tempURL, 95);
-                            final String id = Hashing.murmur3_32().hashString(tempURL, StandardCharsets.UTF_8).toString();
-                            System.out.println("Shortern url id:" + id);
-                            String shortenURL = tempURLBase + "/tmp/" + id;
-                            System.out.println("Shortern url:" + shortenURL);
-                            setRedisData(id, tempURL, 95);
+                            Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
+                            calendar.add(Calendar.SECOND, 95);
+                            badge.setExpiresAt(calendar.getTime().toString());
 
-                            if (generateQrCode(badges, badgeClass.getImage(), shortenURL, 250, "png")) {
-                                logger.info("QR Code generated successfully");
-                                DisplayBadge badge = new DisplayBadge();
-                                badge.setQrCode(utils.getBaseURL(request) + File.separator + "images" + File.separator + badges.getImage());
-                                badge.setBadgePublicURL(badges.getId());
-                                badge.setBadgeTitle(badgeRequests.getTemplateBadgeTitle());
+                            Recipient recipient = new Recipient();
+                            recipient.setType(badges.getRecipientType());
+                            recipient.setIdentity(badges.getRecipientIdentity());
+                            badge.setRecipient(recipient);
 
-                                Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
-                                calendar.add(Calendar.SECOND, 95);
-                                badge.setExpiresAt(calendar.getTime().toString());
-
-                                Recipient recipient = new Recipient();
-                                recipient.setType(badges.getRecipientType());
-                                recipient.setIdentity(badges.getRecipientIdentity());
-                                badge.setRecipient(recipient);
-
-                                response.setStatus(HttpServletResponse.SC_OK);
-                                return GsonService.getGson().toJson(badge);
-                            } else {
-                                logger.error("Failed to generate QR Code");
-                                response.setStatus(HttpServletResponse.SC_OK);
-                                jsonResponse.addProperty("error", true);
-                                jsonResponse.addProperty("errorMsg", "No such badge found");
-                                return jsonResponse.toString();
-                            }
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            return GsonService.getGson().toJson(badge);
                         } else {
+                            logger.error("Failed to generate QR Code");
                             response.setStatus(HttpServletResponse.SC_OK);
                             jsonResponse.addProperty("error", true);
                             jsonResponse.addProperty("errorMsg", "No such badge found");
@@ -353,13 +343,12 @@ public class BadgeController {
                     jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
                 }
-//            } else {
-//                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//                jsonResponse.addProperty("error", true);
-//                jsonResponse.addProperty("errorMsg", "Please try after some time");
-//                logger.error("Error in connecting database in getBadgeByBadgeRequestInum():");
-//                return jsonResponse.toString();
-//            }
+            } else {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "No such badge found");
+                return jsonResponse.toString();
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -387,12 +376,7 @@ public class BadgeController {
             }
 
             UserInfo userInfo = userInfoService.getUserInfo(privacy.getOpHost(), accessToken);
-            if (userInfo == null) {
-                jsonResponse.addProperty("error", true);
-                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return jsonResponse.toString();
-            } else if (userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
+            if (userInfo == null || userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -400,48 +384,40 @@ public class BadgeController {
             }
             String email = userInfo.getEmail();
 
-//            if (LDAPService.isConnected()) {
-//                logger.info("LDAP connected in setBadgePrivacy()");
-                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(privacy.getBadgeRequestInum(), email);
-                if (badgeRequests != null && badgeRequests.getInum() != null) {
-                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
-                    if (badgeClass != null && badgeClass.getInum() != null) {
-                        Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
-                        if (badges != null && badges.getInum() != null) {
+            BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestForUserByInum(privacy.getBadgeRequestInum(), email);
+            if (badgeRequests != null && badgeRequests.getInum() != null) {
+                BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
+                if (badgeClass != null && badgeClass.getInum() != null) {
+                    Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
+                    if (badges != null && badges.getInum() != null) {
 
-                            badges.setBadgePrivacy(privacy.getPrivacy());
+                        badges.setBadgePrivacy(privacy.getPrivacy());
+                        badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());
+                        if (badges.getBadgePrivacy().equalsIgnoreCase("public")) {
                             badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());
-//                            if (badges.getBadgePrivacy().equalsIgnoreCase("public")) {
-//                                badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid());
-//                            } else if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
-//                                badges.setId(utils.getBaseURL(request) + "/badges/verify/" + badges.getGuid() + "?key=" + badges.getKey());
-//                            } else {
-//                                response.setStatus(HttpServletResponse.SC_OK);
-//                                jsonResponse.addProperty("error", true);
-//                                jsonResponse.addProperty("errorMsg", "Failed to set badge privacy");
-//                                return jsonResponse.toString();
-//                            }
-
-                            boolean isUpdated = BadgeCommands.updateBadge(badges);
-                            if (isUpdated) {
-                                response.setStatus(HttpServletResponse.SC_OK);
-                                jsonResponse.addProperty("error", false);
-                                jsonResponse.addProperty("message", "Badge privacy set to " + badges.getBadgePrivacy() + " successfully");
-                                return jsonResponse.toString();
-                            } else {
-                                response.setStatus(HttpServletResponse.SC_OK);
-                                jsonResponse.addProperty("error", true);
-                                jsonResponse.addProperty("errorMsg", "Failed to set badge privacy");
-                                return jsonResponse.toString();
-                            }
+                        } else if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
+                            badges.setId("");
                         } else {
                             response.setStatus(HttpServletResponse.SC_OK);
                             jsonResponse.addProperty("error", true);
-                            jsonResponse.addProperty("errorMsg", "No such badge found");
+                            jsonResponse.addProperty("errorMsg", "Failed to set badge privacy");
+                            return jsonResponse.toString();
+                        }
+
+                        boolean isUpdated = BadgeCommands.updateBadge(badges);
+                        if (isUpdated) {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            jsonResponse.addProperty("error", false);
+                            jsonResponse.addProperty("message", "Badge privacy set to " + badges.getBadgePrivacy() + " successfully");
+                            return jsonResponse.toString();
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            jsonResponse.addProperty("error", true);
+                            jsonResponse.addProperty("errorMsg", "Failed to set badge privacy");
                             return jsonResponse.toString();
                         }
                     } else {
-                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        response.setStatus(HttpServletResponse.SC_OK);
                         jsonResponse.addProperty("error", true);
                         jsonResponse.addProperty("errorMsg", "No such badge found");
                         return jsonResponse.toString();
@@ -452,13 +428,12 @@ public class BadgeController {
                     jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
                 }
-//            } else {
-//                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//                jsonResponse.addProperty("error", true);
-//                jsonResponse.addProperty("errorMsg", "Please try after some time");
-//                logger.error("Error in connecting database in setBadgePrivacy():");
-//                return jsonResponse.toString();
-//            }
+            } else {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "No such badge found");
+                return jsonResponse.toString();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -514,9 +489,9 @@ public class BadgeController {
             //location of barcode
             String fileName = System.currentTimeMillis() + ".png";
             //Server
-            String imagesPath = utils.getStaticResourcePath(context);
+//            String imagesPath = utils.getStaticResourcePath(context);
             //Local
-//            String imagesPath = "src/main/resources/static/images";
+            String imagesPath = "src/main/resources/static/images";
             System.out.println("path :" + imagesPath);
             if (new File(imagesPath).exists()) {
                 System.out.println("Directory exists:" + imagesPath);
