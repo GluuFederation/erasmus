@@ -66,6 +66,11 @@ router.post('/getBadgeTemplatesByIssuer', (req, res, next) => {
 
   Badges.getBadgeByIssuer(req.body.issuer)
     .then((org) => {
+
+      if (!org) {
+        return res.status(httpStatus.OK).send([]);
+      }
+
       let lstbadge = [];
       org.approvedBadges.forEach(function (item) {
         const cat = {

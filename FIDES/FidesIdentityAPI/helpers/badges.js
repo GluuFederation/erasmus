@@ -175,6 +175,9 @@ let getBadgeByIssuer = (discoveryUrl) => {
       discoveryUrl: new RegExp('^' + discoveryUrl + '$', 'i')
     })
     .then((oEntity) => {
+      if (!oEntity) {
+        return Promise.resolve(null);
+      }
       return Participant.findById(oEntity.participant._id).populate('approvedBadges');
     })
     .catch((err) => Promise.reject(err));
