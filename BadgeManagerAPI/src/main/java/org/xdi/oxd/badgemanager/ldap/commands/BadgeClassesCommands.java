@@ -191,7 +191,7 @@ public class BadgeClassesCommands {
     }
 
     /**
-     * Reterived a badge class by badge request Inum.
+     * Retrieved a badge class by badge request Inum.
      *
      * @param Inum Inum of the badge request.
      * @return
@@ -227,7 +227,7 @@ public class BadgeClassesCommands {
     }
 
     /**
-     * Reterived a badge class by Id.
+     * Retrieved a badge class by Id.
      *
      * @param id  GUID of the badge class
      * @param key key of the badge class that is to be retrieved.

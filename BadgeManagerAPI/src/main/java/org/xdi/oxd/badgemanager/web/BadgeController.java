@@ -209,7 +209,7 @@ public class BadgeController {
                 if (badgeClass != null && badgeClass.getInum() != null) {
                     Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
                     if (badges != null && badges.getInum() != null) {
-                        BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(badges.getGuid());
+                        BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdNew(badges.getGuid());
                         if (badgeResponse != null) {
                             return returnBadgeResponse(badgeResponse, response);
                         }
@@ -299,11 +299,6 @@ public class BadgeController {
 
                         if (generateQrCode(badges, badgeClass.getImage(), shortenURL, 250, "png")) {
                             logger.info("QR Code generated successfully");
-
-                            BadgeRequests objBadgeRequest = new BadgeRequests();
-                            objBadgeRequest.setInum(badgeRequests.getInum());
-                            objBadgeRequest.setFidesAccess(false);
-                            BadgeRequestCommands.updateBadgeRequest(objBadgeRequest);
 
                             DisplayBadge badge = new DisplayBadge();
                             badge.setQrCode(utils.getBaseURL(request) + File.separator + "images" + File.separator + badges.getImage());
@@ -489,9 +484,9 @@ public class BadgeController {
             //location of barcode
             String fileName = System.currentTimeMillis() + ".png";
             //Server
-//            String imagesPath = utils.getStaticResourcePath(context);
+            String imagesPath = utils.getStaticResourcePath(context);
             //Local
-            String imagesPath = "src/main/resources/static/images";
+//            String imagesPath = "src/main/resources/static/images";
             System.out.println("path :" + imagesPath);
             if (new File(imagesPath).exists()) {
                 System.out.println("Directory exists:" + imagesPath);

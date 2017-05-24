@@ -5,15 +5,13 @@ import org.gluu.site.ldap.persistence.LdapEntryManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xdi.oxd.badgemanager.config.DefaultConfig;
+import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.service.InumService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.ldap.service.MergeService;
-import org.xdi.oxd.badgemanager.model.BadgeClassResponse;
-import org.xdi.oxd.badgemanager.model.BadgeResponse;
-import org.xdi.oxd.badgemanager.model.BadgeVerification;
-import org.xdi.oxd.badgemanager.model.Recipient;
+import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.util.Utils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -228,11 +226,43 @@ public class BadgeCommands {
                 List<Badges> lstBadges = LDAPService.ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + "))"));
                 logger.info("LDAP completed retrieving badge");
                 if (lstBadges.size() > 0) {
+                    revokeBadgeAccess(lstBadges.get(0).getBadgeClassInum());
                     return GetBadgeResponse(lstBadges.get(0));
                 } else
                     return null;
             } else {
                 logger.error("Error in connecting database in getBadgeResponseById() in BadgeCommands");
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("Exception in retrieving badge LDAP: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves a badge by Id
+     *
+     * @param id GUID of the badge
+     * @return
+     */
+    public static BadgeResponse getBadgeResponseByIdNew(String id) {
+        try {
+
+            if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadgeResponseByIdNew() in BadgeCommands");
+                Badges objBadges = new Badges();
+                objBadges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+                logger.info("LDAP started retrieving badge");
+                List<Badges> lstBadges = LDAPService.ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + "))"));
+                logger.info("LDAP completed retrieving badge");
+                if (lstBadges.size() > 0) {
+                    return GetBadgeResponse(lstBadges.get(0));
+                } else
+                    return null;
+            } else {
+                logger.error("Error in connecting database in getBadgeResponseByIdNew() in BadgeCommands");
                 return null;
             }
         } catch (Exception e) {
@@ -260,6 +290,7 @@ public class BadgeCommands {
                 List<Badges> lstBadges = LDAPService.ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + ")(gluuBadgeAssertionKey=" + key + "))"));
                 logger.info("LDAP completed retrieving badge");
                 if (lstBadges.size() > 0) {
+                    revokeBadgeAccess(lstBadges.get(0).getBadgeClassInum());
                     return GetBadgeResponse(lstBadges.get(0));
                 } else
                     return null;
@@ -425,7 +456,7 @@ public class BadgeCommands {
             objBadge.setIssuedOn(objBadges.getIssuedOn().toString());
             objBadge.setExpires("");
 
-            if (objBadges.getBadgePrivacy().equalsIgnoreCase("private")) {
+            if (objBadges.getBadgePrivacy().equalsIgnoreCase("private") && objBadges.getExpires() != null) {
                 objBadge.setExpires(objBadges.getExpires().toString());
             }
 
@@ -442,6 +473,33 @@ public class BadgeCommands {
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
+        }
+    }
+
+    private static boolean revokeBadgeAccess(String inum) {
+        try {
+            BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByInum(inum);
+            if (badgeClass != null && badgeClass.getInum() != null) {
+                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(badgeClass.getBadgeRequestInum());
+                if (badgeRequests != null && badgeRequests.getInum() != null) {
+                    badgeRequests.setFidesAccess(false);
+                    if (BadgeRequestCommands.updateBadgeRequest(badgeRequests)) {
+                        logger.info("Access revoked successfully");
+                        return true;
+                    } else {
+                        logger.info("Access revoke failed");
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("Exception in revoking badge access: " + e.getMessage());
+            return false;
         }
     }
 }
