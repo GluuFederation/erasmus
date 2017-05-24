@@ -1,46 +1,100 @@
 <div class="widgets">
   <div class="row">
     <div class="col-lg-8 col-md-8">
-      <div ba-panel ba-panel-class="with-scroll">
-        <table st-safe-src="vm.badges" st-table="vm.displayedCollection"
-               class="table table-hover table-condensed">
-          <thead>
-          <tr class="sortable">
-            <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
-            <th class="col-lg-6" st-sort="gluuBadgeRequester">User</th>
-            <th class="col-lg-6" st-sort="templateBadgeTitle">Badge</th>
-            <th>Action</th>
-          </tr>
-          <tr>
-            <th style="display: none;"></th>
-            <th ng-show="vm.badges"><input st-search="name" placeholder="Search name"
-                                                  class="input-sm form-control search-input col-lg-3" type="search"/>
-            </th>
-            <th></th>
-            <th></th>
-            <th colspan="3" ng-show="!vm.badges" style="color: #e85656;">There are no records to display.</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr ng-repeat="badge in vm.displayedCollection track by $index"
-              style="background: {{badge.isApproved ? '#fff' : '#ffcdd2'}}">
-            <td style="display: none;"></td>
-            <td>{{badge.requesterEmail}}</td>
-            <td>{{badge.templateBadgeTitle}}</td>
-            <td>
-              <button class="btn btn-primary btn-icon"
-                      ng-click="vm.openBadgeApproveModel(badge)" title="Approve"><i class="ion-checkmark-round"></i></button>
-            </td>
-          </tr>
-          </tbody>
-          <tfoot>
-          <tr>
-            <td colspan="3" class="text-center">
-              <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
-            </td>
-          </tr>
-          </tfoot>
-        </table>
+      <div ba-panel ba-panel-class="with-scroll horizontal-tabs tabs-panel medium-panel">
+        <uib-tabset active="$tabSetStatus.activeTab">
+          <uib-tab heading="Approved">
+            <table st-safe-src="vm.approvedBadges" st-table="vm.displayedApprovedCollection"
+                   class="table table-hover table-condensed">
+              <thead>
+              <tr class="sortable">
+                <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
+                <th class="col-lg-6" st-sort="gluuBadgeRequester">User</th>
+                <th class="col-lg-6" st-sort="templateBadgeTitle">Badge</th>
+                <th>Action</th>
+              </tr>
+              <tr>
+                <th style="display: none;"></th>
+                <th ng-show="vm.approvedBadges"><input st-search="requesterEmail" placeholder="Search email"
+                                                       class="input-sm form-control search-input col-lg-3"
+                                                       type="search"/>
+                </th>
+                <th ng-show="vm.approvedBadges"><input st-search="templateBadgeTitle" placeholder="Search badge"
+                                                       class="input-sm form-control search-input col-lg-3"
+                                                       type="search"/>
+                </th>
+                <th colspan="3" ng-show="!vm.approvedBadges" style="color: #e85656;">There are no records to display.
+                </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="badge in vm.displayedApprovedCollection track by $index">
+                <td style="display: none;"></td>
+                <td>{{badge.requesterEmail}}</td>
+                <td>{{badge.templateBadgeTitle}}</td>
+                <td>
+                  <button class="btn btn-primary btn-icon"
+                          ng-click="vm.openBadgeInfoModel(badge)" title="Badge Information"><i class="ion-ios-eye"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+              <tfoot>
+              <tr>
+                <td colspan="3" class="text-center">
+                  <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
+                </td>
+              </tr>
+              </tfoot>
+            </table>
+          </uib-tab>
+          <uib-tab heading="Pending">
+            <table st-safe-src="vm.pendingBadges" st-table="vm.displayedPendingCollection"
+                   class="table table-hover table-condensed">
+              <thead>
+              <tr class="sortable">
+                <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
+                <th class="col-lg-6" st-sort="gluuBadgeRequester">User</th>
+                <th class="col-lg-6" st-sort="templateBadgeTitle">Badge</th>
+                <th>Action</th>
+              </tr>
+              <tr>
+                <th style="display: none;"></th>
+                <th ng-show="vm.pendingBadges"><input st-search="requesterEmail" placeholder="Search email"
+                                                       class="input-sm form-control search-input col-lg-3"
+                                                       type="search"/>
+                </th>
+                <th ng-show="vm.pendingBadges"><input st-search="templateBadgeTitle" placeholder="Search badge"
+                                                       class="input-sm form-control search-input col-lg-3"
+                                                       type="search"/>
+                </th>
+                <th colspan="3" ng-show="!vm.pendingBadges" style="color: #e85656;">There are no records to display.
+                </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="badge in vm.displayedPendingCollection track by $index"
+                  style="background: {{badge.isApproved ? '#fff' : '#ffcdd2'}}">
+                <td style="display: none;"></td>
+                <td>{{badge.requesterEmail}}</td>
+                <td>{{badge.templateBadgeTitle}}</td>
+                <td>
+                  <button class="btn btn-primary btn-icon"
+                          ng-click="vm.openBadgeApproveModel(badge)" title="Approve"><i class="ion-checkmark-round"></i>
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+              <tfoot>
+              <tr>
+                <td colspan="3" class="text-center">
+                  <div st-pagination="" st-items-by-page="10" st-displayed-pages="10"></div>
+                </td>
+              </tr>
+              </tfoot>
+            </table>
+          </uib-tab>
+        </uib-tabset>
       </div>
     </div>
   </div>

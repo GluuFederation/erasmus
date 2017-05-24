@@ -17,18 +17,6 @@
                      ng-model="vm.validity" ng-required="true"/>
             </div>
           </div>
-          <div class="form-group"
-               ng-class="{'has-error': vm.badgeForm.privacy.$invalid && (vm.badgeForm.privacy.$dirty || vm.badgeForm.$submitted)}">
-            <label for="privacy" class="col-sm-1 control-label">Privacy</label>
-            <div class="col-sm-4">
-              <select name="privacy" class="form-control col-sm-4" id="privacy" title="--- Select ---"
-                      ng-required="true" ng-model="vm.privacy">
-                <option value="">--- Select ---</option>
-                <option value="public">Public</option>
-                <option value="private">Private</option>
-              </select>
-            </div>
-          </div>
           <div class="form-group">
             <div class="col-sm-offset-1 col-sm-10">
               <button type="submit" class="btn btn-primary" ng-click="vm.badgeApprove(vm.badgeForm.$valid)"><i class="fa fa-check"></i>&nbsp;Approve
