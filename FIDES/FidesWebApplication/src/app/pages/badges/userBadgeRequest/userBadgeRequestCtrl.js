@@ -5,23 +5,26 @@
     .controller('userBadgeRequestCtrl', userBadgeRequestCtrl);
 
   /** @ngInject */
-  function userBadgeRequestCtrl(toastr, $uibModal, userBadgeRequestService, $localStorage) {
+  function userBadgeRequestCtrl($timeout, toastr, $uibModal, userBadgeRequestService, $localStorage) {
     var vm = this;
     vm.tablePageSize = 10;
-    vm.badges = [];
-    vm.displayedCollection = [];
+    vm.pendingBadges = [];
+    vm.approvedBadges = [];
+    vm.displayedPendingCollection = [];
+    vm.displayedApprovedCollection = [];
     vm.category = 0;
     vm.participant = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.participant : null;
 
     vm.activate = activate;
     vm.openBadgeApproveModel = openBadgeApproveModel;
-    vm.getPendingBadges = getPendingBadges;
+    vm.openBadgeInfoModel = openBadgeInfoModel;
+    vm.getBadges = getBadges;
     vm.activate();
 
     function openBadgeApproveModel(badge) {
       vm.badgeModal = $uibModal.open({
         animation: true,
-        templateUrl: 'app/pages/badges/userBadgeRequest/userBadgeRequest.modal.html',
+        templateUrl: 'app/pages/badges/userBadgeRequest/badgeApproved.modal.html',
         size: 'lg',
         controller: ['$uibModalInstance', 'badge', 'userBadgeRequestService', badgeApproveCtrl],
         controllerAs: 'vm',
@@ -34,10 +37,10 @@
 
       vm.badgeModal.result.then(function (newBadgeModal) {
         if (!newBadgeModal) return;
-        vm.badges = vm.badges.filter(function (item) {
+        vm.pendingBadges = vm.pendingBadges.filter(function (item) {
           return item.inum != newBadgeModal.inum;
         });
-        vm.displayedCollection = angular.copy(vm.badges);
+        vm.displayedPendingCollection = angular.copy(vm.pendingBadges);
       });
     }
 
@@ -60,7 +63,7 @@
         var formData = {
           inum: badge.inum,
           validity: vm.validity,
-          privacy: vm.privacy
+          privacy: 'Public'
         };
         userBadgeRequestService.badgeApprove(formData).then(onSuccess).catch(onError);
 
@@ -76,21 +79,83 @@
       }
     }
 
+    function openBadgeInfoModel(badge) {
+      vm.badgeModal = $uibModal.open({
+        animation: true,
+        templateUrl: 'app/pages/badges/userBadgeRequest/badgeDetail.modal.html',
+        size: 'lg',
+        controller: ['$uibModalInstance', 'badge', 'userBadgeRequestService', badgeInfoCtrl],
+        controllerAs: 'vm',
+        resolve: {
+          badge: function () {
+            return badge;
+          }
+        }
+      });
+    }
+
+    function badgeInfoCtrl($uibModalInstance, badge, userBadgeRequestService) {
+      var vm = this;
+      vm.badge = null;
+
+      function badgeApprove() {
+        userBadgeRequestService.badgeInfo(badge.inum).then(onSuccess).catch(onError);
+
+        function onSuccess(response) {
+          vm.badge = response.data;
+          var recipient = parseJwt(vm.badge.recipient.identity);
+          vm.badge.userInfo = JSON.parse(recipient.userinfo);
+        }
+
+        function onError(error) {
+          toastr.error('Internal server error', 'Badges', {});
+          $uibModalInstance.close(null);
+        }
+
+        function parseJwt (token) {
+          var base64Url = token.split('.')[1];
+          var base64 = base64Url.replace('-', '+').replace('_', '/');
+          return JSON.parse(window.atob(base64));
+        }
+
+      }
+
+      badgeApprove();
+    }
+
+    function getBadges() {
+      getApprovedBadges();
+      $timeout(getPendingBadges, 500);
+    }
+
     function getPendingBadges() {
-      userBadgeRequestService.getPendingBadges(vm.participant._id).then(onSuccess).catch(onError);
+      userBadgeRequestService.getBadges(vm.participant._id, 'Pending').then(onSuccess).catch(onError);
       function onSuccess(response) {
-        vm.badges = response.data.badgeRequests;
-        vm.displayedCollection = angular.copy(vm.badges);
+        vm.pendingBadges = response.data.badgeRequests;
+        vm.displayedPendingCollection = angular.copy(vm.pendingBadges);
       }
 
       function onError(error) {
-        vm.badges = [];
-        vm.displayedCollection = [];
+        vm.pendingBadges = [];
+        vm.displayedPendingCollection = [];
+      }
+    }
+
+    function getApprovedBadges() {
+      userBadgeRequestService.getBadges(vm.participant._id, 'Approved').then(onSuccess).catch(onError);
+      function onSuccess(response) {
+        vm.approvedBadges = response.data.badgeRequests;
+        vm.displayedApprovedCollection = angular.copy(vm.pendingBadges);
+      }
+
+      function onError(error) {
+        vm.pendingBadges = [];
+        vm.displayedApprovedCollection = [];
       }
     }
 
     function activate() {
-      vm.getPendingBadges();
+      vm.getBadges();
     }
   }
 })();

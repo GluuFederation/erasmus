@@ -6,8 +6,7 @@
     'FidesWebApplication.pages.badges.badgeCategory',
     'FidesWebApplication.pages.badges.badgeRequest',
     'FidesWebApplication.pages.badges.badgeApprove',
-    'FidesWebApplication.pages.badges.userBadgeRequest',
-    'FidesWebApplication.pages.badges.userActualBadge'
+    'FidesWebApplication.pages.badges.userBadgeRequest'
   ])
     .config(routeConfig);
 
