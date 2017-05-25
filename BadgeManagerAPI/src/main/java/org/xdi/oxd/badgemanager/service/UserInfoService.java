@@ -50,6 +50,7 @@ public class UserInfoService {
                 userInfo.setIssuer(GsonService.getValueFromJson("issuer", jObjClaims));
                 userInfo.setEmail(GsonService.getValueFromJson("email", jObjClaims));
                 userInfo.setName(GsonService.getValueFromJson("name", jObjClaims));
+                userInfo.setUserName(GsonService.getValueFromJson("user_name", jObjClaims));
 
                 return userInfo;
             }
