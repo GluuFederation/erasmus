@@ -167,7 +167,7 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
         APIBadgeDetail badgeDetail = new APIBadgeDetail();
         badgeDetail.setBadgeRequestInum(badgeRequest.getInum());
         badgeDetail.setOpHost(Application.participant.getOpHost());
-        Call<BadgeRequest> call = mObjAPI.deleteBadge(Application.AccessToken, badgeDetail);
+        Call<BadgeRequest> call = mObjAPI.deleteBadge(Application.getAccessToken(), badgeDetail);
         call.enqueue(new Callback<BadgeRequest>() {
             @Override
             public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
@@ -215,7 +215,7 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
         APIBadgeDetail badgeDetail = new APIBadgeDetail();
         badgeDetail.setBadgeRequestInum(badgeRequest.getInum());
         badgeDetail.setOpHost(Application.participant.getOpHost());
-        Call<DisplayBadge> call = mObjAPI.getBadge(Application.AccessToken, badgeDetail);
+        Call<DisplayBadge> call = mObjAPI.getBadge(Application.getAccessToken(), badgeDetail);
         call.enqueue(new Callback<DisplayBadge>() {
             @Override
             public void onResponse(Call<DisplayBadge> call, Response<DisplayBadge> response) {
@@ -256,7 +256,7 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
     private void setBadgePrivacy(BadgeRequest badgeRequest, String privacy) {
         showProgressBar("Changing privacy..");
         PrivacyRequest privacyRequest = new PrivacyRequest(badgeRequest.getInum(), Application.participant.getOpHost(), privacy);
-        Call<BadgeRequest> call = mObjAPI.setPrivacy(Application.AccessToken, privacyRequest);
+        Call<BadgeRequest> call = mObjAPI.setPrivacy(Application.getAccessToken(), privacyRequest);
         call.enqueue(new Callback<BadgeRequest>() {
             @Override
             public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {

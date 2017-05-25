@@ -57,7 +57,7 @@ public class RequestBadgeActivity extends AppCompatActivity {
         showProgressBar();
         Log.v("TAG", "Access token in getBadgeTemplates(): " + Application.AccessToken);
         TemplateBadgeRequest templateBadgeRequest = new TemplateBadgeRequest(Application.participant.getOpHost(), "all");
-        Call<BadgeTemplates> call = mObjAPI.getBadgeTemplates(Application.AccessToken, templateBadgeRequest);
+        Call<BadgeTemplates> call = mObjAPI.getBadgeTemplates(Application.getAccessToken(), templateBadgeRequest);
         call.enqueue(new Callback<BadgeTemplates>() {
             @Override
             public void onResponse(Call<BadgeTemplates> call, Response<BadgeTemplates> response) {

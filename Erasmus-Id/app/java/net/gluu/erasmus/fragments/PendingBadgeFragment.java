@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +22,8 @@ import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.model.APIBadgeRequest;
 import net.gluu.erasmus.model.Badge;
 import net.gluu.erasmus.model.BadgeRequests;
+
+import org.androidannotations.annotations.App;
 
 import java.util.ArrayList;
 
@@ -50,6 +53,7 @@ public class PendingBadgeFragment extends Fragment {
     RecyclerView mRvBadges;
     APIInterface mObjAPI;
     ProgressDialog mProgress;
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     public PendingBadgeFragment() {
         // Required empty public constructor
@@ -97,7 +101,22 @@ public class PendingBadgeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mRvBadges = (RecyclerView) view.findViewById(R.id.rv_badges);
         mRvBadges.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mSwipeRefreshLayout= (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         getPendingBadgeRequests();
+
+        mSwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        Log.v("TAG", "onRefresh called from SwipeRefreshLayout");
+
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        getPendingBadgeRequests();
+                        mSwipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+        );
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -142,7 +161,7 @@ public class PendingBadgeFragment extends Fragment {
     private void getPendingBadgeRequests() {
         showProgressBar();
         APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "Pending");
-        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.AccessToken, badgeRequest);
+        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.getAccessToken(), badgeRequest);
         call.enqueue(new Callback<BadgeRequests>() {
             @Override
             public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {

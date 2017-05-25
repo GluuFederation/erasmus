@@ -36,7 +36,6 @@ public interface APIInterface {
     @POST("badges/request")
     Call<BadgeRequest> makeBadgeRequest(@Header("AccessToken") String accessToken, @Body APIBadgeRequest badgeRequest);
 
-//    @DELETE("badges/request/delete/{inum}")
     @HTTP(method = "DELETE", path = "badges/request/delete", hasBody = true)
     Call<BadgeRequest> deleteBadge(@Header("AccessToken") String accessToken, @Body APIBadgeDetail badgeDetail);
 
@@ -46,10 +45,6 @@ public interface APIInterface {
     @POST("badges/setPrivacy")
     Call<BadgeRequest> setPrivacy(@Header("AccessToken") String accessToken, @Body PrivacyRequest privacy);
 
-    @GET("tmp/{id}")
-    Call<ScanResponseSuccess> getScanResult(@Path("id") String id);
-
     @GET
     Call<ScanResponseSuccess> getScanAllResult(@Url String url);
-
 }

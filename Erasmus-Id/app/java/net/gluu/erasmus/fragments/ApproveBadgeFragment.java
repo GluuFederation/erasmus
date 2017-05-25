@@ -159,7 +159,7 @@ public class ApproveBadgeFragment extends Fragment {
     private void getApprovedBadgeRequests() {
         showProgressBar();
         APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "Approved");
-        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.AccessToken, badgeRequest);
+        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.getAccessToken(), badgeRequest);
         call.enqueue(new Callback<BadgeRequests>() {
             @Override
             public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {

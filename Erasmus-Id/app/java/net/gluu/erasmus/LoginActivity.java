@@ -90,6 +90,7 @@ public final class LoginActivity extends AppCompatActivity {
         mAuthStateManager = AuthStateManager.getInstance(this);
         mConfiguration = Configuration.getInstance(this);
         mConfiguration.setDiscoveryUri(Application.participant.getOpHost() + Application.wellknownurl);
+//        mConfiguration.setDiscoveryUri("https://erasmusdev.gluu.org" + Application.wellknownurl);
 
         if (mAuthStateManager.getCurrent().isAuthorized()
             && !mConfiguration.hasConfigurationChanged()) {

@@ -34,7 +34,7 @@ public class OPAdapter extends RecyclerView.Adapter<OPAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-            .inflate(R.layout.city_item, parent, false);
+                .inflate(R.layout.city_item, parent, false);
         return new ViewHolder(view);
     }
 

@@ -133,7 +133,7 @@ public class BadgeTemplatesAdapter extends RecyclerView.Adapter<BadgeTemplatesAd
         }
         showProgressBar();
         APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), participant, templateBadgeId, badgeTemplate.getName());
-        Call<BadgeRequest> call = mObjAPI.makeBadgeRequest(Application.AccessToken, badgeRequest);
+        Call<BadgeRequest> call = mObjAPI.makeBadgeRequest(Application.getAccessToken(), badgeRequest);
         call.enqueue(new Callback<BadgeRequest>() {
             @Override
             public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
