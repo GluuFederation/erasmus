@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 
 import net.gluu.erasmus.BadgeStatusActivity;
 import net.gluu.erasmus.BuildConfig;
-import net.gluu.erasmus.DisplayBadgeActivity;
 import net.gluu.erasmus.R;
 import net.gluu.erasmus.listener.OxPush2RequestListener;
 import net.gluu.erasmus.model.u2f.OxPush2Request;
@@ -57,7 +56,7 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
 
     SimpleDateFormat userDateTimeFormat = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
 
-    private static final String TAG = "process-fragment";
+    private static final String TAG = "TAG";
 
     private static final String ARG_PARAM1 = "oxPush2Request";
 

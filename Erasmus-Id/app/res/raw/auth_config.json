@@ -1,7 +1,7 @@
 {
   "client_id": "",
   "redirect_uri": "appscheme://client.example.com",
-  "authorization_scope": "openid email profile",
+  "authorization_scope": "openid email profile user_name",
   "discovery_uri": "https://ce-dev.gluu.org/oxauth/.well-known/openid-configuration",
   "authorization_endpoint_uri": "",
   "token_endpoint_uri": "",

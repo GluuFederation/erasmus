@@ -660,6 +660,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
                 String response = Okio.buffer(Okio.source(conn.getInputStream()))
                         .readString(Charset.forName("UTF-8"));
                 mUserInfoJson.set(new JSONObject(response));
+                Application.U2F_Username = mUserInfoJson.get().getString("user_name");
                 Log.v("TAG", "userinfo:" + response);
             } catch (IOException ioEx) {
                 Log.e(TAG, "Network error when querying userinfo endpoint", ioEx);
