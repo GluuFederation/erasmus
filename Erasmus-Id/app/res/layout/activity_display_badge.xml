@@ -10,7 +10,6 @@
         android:orientation="vertical"
         tools:context="DisplayBadgeActivity">
 
-
         <include
             android:id="@+id/toolbar"
             layout="@layout/toolbar" />
@@ -21,7 +20,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/iv_user_img"
@@ -29,6 +28,7 @@
                 android:layout_height="@dimen/value_150"
                 android:layout_centerHorizontal="true"
                 android:layout_margin="@dimen/value_10"
+                android:contentDescription="@string/app_name"
                 android:src="@drawable/avatar"/>
 
             <ImageView
@@ -41,6 +41,7 @@
                 android:contentDescription="@string/app_name"/>
 
             <LinearLayout
+                android:id="@+id/llUserInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/iv_qrcode"
@@ -107,7 +108,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:padding="@dimen/value_10">
+                    android:padding="@dimen/value_10"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="0dp"
@@ -159,6 +161,19 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvURL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@+id/llUserInfo"
+                android:layout_marginTop="@dimen/value_10"
+                android:layout_marginBottom="@dimen/value_20"
+                android:gravity="center"
+                android:text="@string/copy_public_url"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="@dimen/text_22" />
 
         </RelativeLayout>
 

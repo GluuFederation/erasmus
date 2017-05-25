@@ -1,29 +1,23 @@
 package net.gluu.erasmus;
 
-import android.content.Intent;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
-import net.gluu.erasmus.model.Recipient;
 import net.gluu.erasmus.model.UserInfo;
-import net.gluu.erasmus.utils.JWTUtils;
-
-import org.json.JSONObject;
 
 public class DisplayBadgeActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final int RC_BARCODE_CAPTURE = 101;
-    private static final String TAG = "DisplayBadgeActivity";
-
-    TextView mTvBadgeName, mTvUserName, mTvId, mTvExpiresAt;
+    TextView mTvBadgeName, mTvUserName, mTvId, mTvExpiresAt, mTvCopyURL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +28,7 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
         mTvUserName = (TextView) findViewById(R.id.tv_user_name);
         mTvId = (TextView) findViewById(R.id.tv_id);
         mTvExpiresAt = (TextView) findViewById(R.id.tv_exprire_date);
+        mTvCopyURL = (TextView) findViewById(R.id.tvURL);
 
         Glide.with(DisplayBadgeActivity.this)
                 .load(Uri.parse(Application.displayBadge.getQrCode()))
@@ -46,6 +41,18 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
         UserInfo userInfo = Application.getUserInfo(Application.displayBadge.getRecipient());
         if (userInfo != null) {
             mTvUserName.setText(userInfo.getName());
+            Glide.with(DisplayBadgeActivity.this)
+                    .load(Uri.parse(userInfo.getPicture()))
+                    .fitCenter()
+                    .into((ImageView) findViewById(R.id.iv_user_img));
+        }
+
+        copyURLToClipboard("");
+        if (Application.displayBadge.getBadgePublicURL() == null || Application.displayBadge.getBadgePublicURL().equalsIgnoreCase("")) {
+            mTvCopyURL.setVisibility(View.GONE);
+        } else {
+            mTvCopyURL.setVisibility(View.VISIBLE);
+            mTvCopyURL.setOnClickListener(this);
         }
     }
 
@@ -62,33 +69,16 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
         switch (v.getId()) {
             default:
                 break;
-//            case R.id.btn_scan:
-//                Intent intent = new Intent(getApplicationContext(), SimpleScannerActivity.class);
-////                intent.putExtra(QRCaptureActivity.AutoFocus, true);
-////                intent.putExtra(QRCaptureActivity.UseFlash, false);
-//                startActivityForResult(intent, RC_BARCODE_CAPTURE);
-//                break;
+            case R.id.tvURL:
+                copyURLToClipboard(Application.displayBadge.getBadgePublicURL());
+                Snackbar.make(mTvCopyURL,"URL copied",Snackbar.LENGTH_SHORT).show();
+                break;
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_BARCODE_CAPTURE) {
-//            if (resultCode == CommonStatusCodes.SUCCESS_CACHE) {
-//                if (data != null) {
-//                    Barcode barcode = data.getParcelableExtra(QRCaptureActivity.BarcodeObject);
-//                    String strResponse = barcode.displayValue;
-//                    if (strResponse != null) {
-//
-//                    }
-//                } else {
-//                    Log.d(TAG, "No barcode captured, intent data is null");
-//                }
-//            } else {
-//            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+    private void copyURLToClipboard(String url){
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("URL", url);
+        clipboard.setPrimaryClip(clip);
     }
 }

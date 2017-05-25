@@ -32,6 +32,9 @@ public class BadgeRequest {
     @SerializedName("errorMsg")
     @Expose
     private String errorMsg;
+    @SerializedName("privacy")
+    @Expose
+    private String privacy;
 
     public String getInum() {
         return inum;
@@ -147,6 +150,19 @@ public class BadgeRequest {
 
     public BadgeRequest withErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+        return this;
+    }
+
+    public String getPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(String privacy) {
+        this.privacy = privacy;
+    }
+
+    public BadgeRequest withPrivacy(String privacy) {
+        this.privacy = privacy;
         return this;
     }
 }

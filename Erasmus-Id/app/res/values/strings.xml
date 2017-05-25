@@ -104,4 +104,5 @@
     <string name="profile">Profile</string>
     <string name="erasmus">ERASMUS</string>
     <string name="erasmus_full">Emergency Responder Authentication System for Mobile Users</string>
+    <string name="copy_public_url"><u>copy public URL</u></string>
 </resources>

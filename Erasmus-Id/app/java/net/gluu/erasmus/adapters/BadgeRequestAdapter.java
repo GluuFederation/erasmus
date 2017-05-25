@@ -112,7 +112,11 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
             }
         });
 
-        holder.mTbPrivacy.setText("Make Private");
+        if(badgeRequest.getPrivacy().equalsIgnoreCase("Public")){
+            holder.mTbPrivacy.setText("Make Private");
+        } else {
+            holder.mTbPrivacy.setText("Make Public");
+        }
 
         holder.mTbPrivacy.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
