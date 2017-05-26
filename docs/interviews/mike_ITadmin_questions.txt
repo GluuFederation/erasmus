@@ -1,9 +1,13 @@
 --------------------------------------------------------------
 I.  INTRODUCTION
 --------------------------------------------------------------
+
 ADD boiler language to introduce purpose of this interview:
-"We are gathering background information to understand digital identiy in emergency responder community.
+"We are gathering background information to understand digital identiy in
+emergency responder community.
+
 We want to find out how different organizations are approaching"
+
 a)
 b)
 C)
@@ -11,60 +15,66 @@ C)
 ------------------------------------------------------------
 PURPOSE
 --------------------------------------------------------------
-We want to find out:
+
+From you, we were hoping to learn:
 a)
-b) 
 b)
+c)
 
 --------------------------------------------------------------
 II.  QUESTIONS FOR END USER (e.g. __________, __________, ________)
 --------------------------------------------------------------
+
 1. Tell us about yourself and your organization:
-   
+
+   Tell us about the purpose of your organization?
    What is your role?
-   How many people are in your organization?
    What is the size and structure of your organization?
 
 2. Tell us about your IT staff:
 
    Is there a dedicated IT staff?
-   Is there IT staff dedicated to user and access management? 
+   Is there IT staff dedicated to user and access management?
 
 --------------------------------------------------------------
 III.  QUESTIONS FOR IT STAFF PERSON WHO IS RESPONSIBLE FOR USER MGT
 --------------------------------------------------------------
 
-1. Tell us abour policy?
-   
-   a. How many usernames and passwords (or other creds) do you have? 
-   b. For which systems?  Where does the organization store usernames and passwords?
+1. Tell us about identity practices?
 
+   a. In rough terms, how many usernames and passwords (or other types
+   of authentication) do you have? What are some of the systems people need
+   to access? Does your organization have a single sign-on system that
+   provides access to multiple websites?
+
+   b. (IT Question) Do you know where the organization stores usernames
+   and passwords?
       1. Microsoft Active Directory
-      2. SaaS Identity Provider (Okta, OneLogin, Microsoft Azure, Google, Salesforce, other SaaS)
+      2. SaaS Identity Provider (Okta, OneLogin, Microsoft Azure, Google,
+      Salesforce, other SaaS)
       3. Other LDAP (Sun, Oracle, IBM, CA, OpenLDAP)
       4. Relational database (MySQL, Postgress, Oracle, MS SQL)
       5. Other: please explain __________________
 
-Do you need #2 or #3 below if you asked 1a?)
-2. How many passwords does a first responder need to access the minimum required systems for the organization?
-3. How many different usernames?
+4. Does the first responder have a smart card that complies with federal
+standards? Can you share your thoughts on these credentials? Do you think
+usage should be extended to more people? What are some of the challenges
+for issuing more smart cards (or using them)?
 
-4. Does the first responder have a smart card that complies with federal standards?
+5. What would you think about a mobile identity card for first responders?
 
-5. Does the organization allow the use of personal smart phones to access organizational systems?
+6. Do you think people in your organization would object to using to using
+their person smart phone to apply for a first responder mobile identity card?
 
-6. Do you see the need for better identity management infrastructure to better organize the response to a large, multi-jurisdictional disaster?
+7. When responding to a large, multi-jurisdictional disaster, can you share
+your thoughts or concerns about the process for identifying people either in
+person, or when they use certain digital tools (mobile applications, websites)?
 
-7.  Rate the following from 0-10, 0 being "not interested", 10 being "very interested"
-(Feedback:  This could be made sharper --"How interested would your oganization be in implementing this, also rating at this stage is premature. My advice is to save a more comprehensive survey for Phase II (because you want the assistance of DHS to distibute and get a strong response rate). Get the validlation first and report that in this report)
+8. Are there standard certifications that you think would be important to
+convey via the mobile identity card. Is interoperability an issue?
 
-   a. A national mobile identity card for first responders?
-   b. The ability of the mobile identity to convey a standard classifications for skills?
-   c. Single Sign-on to multiple websites
-   d. Moving to credentials which are more secure then passwords to access organizational resources
-   e. A standards mechanism to convey identity information for the organization to SaaS providers.
+9. Can you share your thoughts about using credentials other then passwords
+(or smartcards) to access websites or mobile applications?
 
-8. Why or why not (to 7a-7e above)
-
-Extra Credit:
-What are the most important organizational applications that your organization sees the need to upgrade within the next five years?
+10. What are the most important organizational applications that your
+organization sees the need to upgrade within the next five years?

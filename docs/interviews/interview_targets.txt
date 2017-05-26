@@ -1,12 +1,20 @@
 Target Interviews
 
 Mobile PD: http://gomobilepd.com/
+Writes a mobile app for 100 police departments, including Austin.
+Initial feedback is that identity infrastructure at PD's is messy.
 
 Mark43: http://www.mark43.com
+Peter Alcock <peter.alcock@mark43.com>
 
-Nief: https://nief.org
+Evidence.Com
 
-Strac: http://www.strac.org/ 
+John Wandelt, Nief: https://nief.org
 
+Eric Epley, Strac: http://www.strac.org/
 
+Carly , Hayes County
 
+Dave Smith: Director of EMS for San Marcos
+
+Anthony Buck, State Emergency Responder
