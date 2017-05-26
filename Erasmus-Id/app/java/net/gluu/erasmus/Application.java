@@ -30,6 +30,7 @@ import net.gluu.appauth.AuthorizationService;
 import net.gluu.appauth.ClientAuthentication;
 import net.gluu.appauth.TokenRequest;
 import net.gluu.appauth.TokenResponse;
+import net.gluu.erasmus.api.AccessToken;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.Participant;
 import net.gluu.erasmus.model.Recipient;
@@ -43,10 +44,10 @@ import org.json.JSONObject;
  * Application object; ensures that the support library is correctly configured for use of
  * vector drawables.
  */
+
 public final class Application extends android.app.Application {
     public static Context mApplicationContext;
     public static String State, City;
-    public static String AccessToken;
     public static Participant participant;
     public static String wellknownurl = "/.well-known/openid-configuration";
     public static DisplayBadge displayBadge;
@@ -130,19 +131,20 @@ public final class Application extends android.app.Application {
         return userInfo1;
     }
 
-    public static String getAccessToken() {
+    public static void getAccessToken(net.gluu.erasmus.api.AccessToken accessToken) {
         AuthState state = mStateManager.getCurrent();
-        Long expiresAt = state.getAccessTokenExpirationTime();
-        Application.AccessToken = state.getAccessToken();
-        if (expiresAt != null && expiresAt < System.currentTimeMillis()) {
+        if ((state.getAccessTokenExpirationTime() != null && state.getAccessTokenExpirationTime() < System.currentTimeMillis()) || state.getAccessToken() == null || state.getAccessToken().length() == 0) {
             //refresh token
             Log.v("TAG", "Access token expired");
-            refreshAccessToken();
+            refreshAccessToken(accessToken);
+        } else if (state.getAccessToken() != null && state.getAccessToken().length() > 0) {
+            accessToken.onAccessTokenSuccess(state.getAccessToken());
+        } else {
+            accessToken.onAccessTokenFailure();
         }
-        return Application.AccessToken;
     }
 
-    public static void refreshAccessToken() {
+    public static void refreshAccessToken(net.gluu.erasmus.api.AccessToken accessToken) {
         performTokenRequest(
                 mStateManager.getCurrent().createTokenRefreshRequest(),
                 new AuthorizationService.TokenResponseCallback() {
@@ -150,8 +152,12 @@ public final class Application extends android.app.Application {
                     public void onTokenRequestCompleted(@Nullable TokenResponse response, @Nullable AuthorizationException ex) {
                         mStateManager.updateAfterTokenResponse(response, ex);
                         AuthState state = mStateManager.getCurrent();
-                        Application.AccessToken = state.getAccessToken();
-                        Log.v("TAG", "Access token after refresh: " + Application.AccessToken);
+                        Log.v("TAG", "Access token after refresh: " + state.getAccessToken());
+                        if (state.getAccessToken() != null && state.getAccessToken().length() > 0) {
+                            accessToken.onAccessTokenSuccess(state.getAccessToken());
+                        } else {
+                            accessToken.onAccessTokenFailure();
+                        }
                     }
                 });
     }

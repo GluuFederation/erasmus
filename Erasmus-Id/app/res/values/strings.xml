@@ -105,4 +105,11 @@
     <string name="erasmus">ERASMUS</string>
     <string name="erasmus_full">Emergency Responder Authentication System for Mobile Users</string>
     <string name="copy_public_url"><u>copy public URL</u></string>
+    <string name="unable_to_process"><u>Unable to process request</u></string>
+    <string name="expires_at">Expires At:</string>
+    <string name="expires_at_dummy">May 15,2018</string>
+    <string name="name">Name:</string>
+    <string name="name_dummy">John smith</string>
+    <string name="badge">Badge:</string>
+    <string name="badge_dummy">Basic fire fighter</string>
 </resources>

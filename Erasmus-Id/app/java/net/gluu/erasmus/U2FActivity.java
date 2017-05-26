@@ -464,8 +464,6 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
         if (state.getAccessToken() == null) {
             accessTokenInfoView.setText(R.string.no_access_token_returned);
         } else {
-            Application.AccessToken = state.getAccessToken();
-            Log.v("TAG", "Access token:" + Application.AccessToken);
             Long expiresAt = state.getAccessTokenExpirationTime();
             if (expiresAt == null) {
                 accessTokenInfoView.setText(R.string.no_access_token_expiry);

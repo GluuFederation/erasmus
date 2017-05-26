@@ -19,8 +19,10 @@ import android.widget.ToggleButton;
 import net.gluu.erasmus.Application;
 import net.gluu.erasmus.BadgeStatusActivity;
 import net.gluu.erasmus.R;
+import net.gluu.erasmus.RequestBadgeActivity;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
+import net.gluu.erasmus.api.AccessToken;
 import net.gluu.erasmus.model.APIBadgeRequest;
 import net.gluu.erasmus.model.Badge;
 import net.gluu.erasmus.model.BadgeRequest;
@@ -132,52 +134,67 @@ public class BadgeTemplatesAdapter extends RecyclerView.Adapter<BadgeTemplatesAd
             return;
         }
         showProgressBar();
-        APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), participant, templateBadgeId, badgeTemplate.getName());
-        Call<BadgeRequest> call = mObjAPI.makeBadgeRequest(Application.getAccessToken(), badgeRequest);
-        call.enqueue(new Callback<BadgeRequest>() {
-            @Override
-            public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
-                hideProgressBar();
-                if (response.errorBody() == null && response.body() != null) {
-                    BadgeRequest objResponse = response.body();
 
-                    if (objResponse != null) {
-                        if (objResponse.getError()) {
-                            Log.v("TAG", "Error in making badge request.");
-                            Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
-                        } else {
-                            Application.showAutoDismissAlertDialog(mContext, "Badge requested successfully");
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Intent i = new Intent(mContext, BadgeStatusActivity.class);
-                                    mContext.startActivity(i);
-                                    ((Activity) mContext).finish();
+        APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), participant, templateBadgeId, badgeTemplate.getName());
+
+        Application.getAccessToken(new AccessToken() {
+            @Override
+            public void onAccessTokenSuccess(String accessToken) {
+                Log.v("TAG", "Access token in createBadgeRequest(): " + accessToken);
+                Call<BadgeRequest> call = mObjAPI.makeBadgeRequest(accessToken, badgeRequest);
+                call.enqueue(new Callback<BadgeRequest>() {
+                    @Override
+                    public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
+                        hideProgressBar();
+                        if (response.errorBody() == null && response.body() != null) {
+                            BadgeRequest objResponse = response.body();
+
+                            if (objResponse != null) {
+                                if (objResponse.getError()) {
+                                    Log.v("TAG", "Error in making badge request.");
+                                    Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
+                                } else {
+                                    Application.showAutoDismissAlertDialog(mContext, "Badge requested successfully");
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Intent i = new Intent(mContext, BadgeStatusActivity.class);
+                                            mContext.startActivity(i);
+                                            ((Activity) mContext).finish();
+                                        }
+                                    }, 2000);
                                 }
-                            }, 2000);
+                            }
+                        } else {
+                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                            try {
+                                String error = response.errorBody().string();
+                                Log.v("TAG", "Error in creating badge request is:" + error);
+                                JSONObject jsonObjectError = new JSONObject(error);
+                                if (jsonObjectError.getBoolean("error")) {
+                                    Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                } else {
-                    Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
-                    try {
-                        String error = response.errorBody().string();
-                        Log.v("TAG", "Error in creating badge request is:" + error);
-                        JSONObject jsonObjectError = new JSONObject(error);
-                        if (jsonObjectError.getBoolean("error")) {
-                            Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+
+                    @Override
+                    public void onFailure(Call<BadgeRequest> call, Throwable t) {
+                        Log.v("TAG", "Response retrieving badge templates failure" + t.getMessage());
+                        hideProgressBar();
                     }
-                }
+                });
             }
 
             @Override
-            public void onFailure(Call<BadgeRequest> call, Throwable t) {
-                Log.v("TAG", "Response retrieving badge templates failure" + t.getMessage());
+            public void onAccessTokenFailure() {
+                Log.v("TAG", "Failed to get access token in createBadgeRequest()");
                 hideProgressBar();
+                Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.unable_to_process));
             }
         });
     }

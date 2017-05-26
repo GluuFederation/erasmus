@@ -16,9 +16,11 @@ import android.view.ViewGroup;
 
 import net.gluu.erasmus.Application;
 import net.gluu.erasmus.R;
+import net.gluu.erasmus.RequestBadgeActivity;
 import net.gluu.erasmus.adapters.BadgeRequestAdapter;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
+import net.gluu.erasmus.api.AccessToken;
 import net.gluu.erasmus.model.APIBadgeRequest;
 import net.gluu.erasmus.model.Badge;
 import net.gluu.erasmus.model.BadgeRequests;
@@ -158,34 +160,48 @@ public class ApproveBadgeFragment extends Fragment {
 
     private void getApprovedBadgeRequests() {
         showProgressBar();
-        APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "Approved");
-        Call<BadgeRequests> call = mObjAPI.getBadgeRequests(Application.getAccessToken(), badgeRequest);
-        call.enqueue(new Callback<BadgeRequests>() {
-            @Override
-            public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {
-                hideProgressBar();
-                if (response.errorBody() == null && response.body() != null) {
-                    BadgeRequests objResponse = response.body();
 
-                    if (objResponse != null) {
-                        if (objResponse.getError()) {
-                            Log.v("TAG", "Error in retrieving approved badge requests");
-                            Application.showAutoDismissAlertDialog(getActivity(), objResponse.getErrorMsg());
+        Application.getAccessToken(new AccessToken() {
+            @Override
+            public void onAccessTokenSuccess(String accessToken) {
+                Log.v("TAG", "Access token in getApprovedBadgeRequests(): " + accessToken);
+                APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "Approved");
+                Call<BadgeRequests> call = mObjAPI.getBadgeRequests(accessToken, badgeRequest);
+                call.enqueue(new Callback<BadgeRequests>() {
+                    @Override
+                    public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {
+                        hideProgressBar();
+                        if (response.errorBody() == null && response.body() != null) {
+                            BadgeRequests objResponse = response.body();
+
+                            if (objResponse != null) {
+                                if (objResponse.getError()) {
+                                    Log.v("TAG", "Error in retrieving approved badge requests");
+                                    Application.showAutoDismissAlertDialog(getActivity(), objResponse.getErrorMsg());
+                                } else {
+                                    Log.v("TAG", "approved badge requests retrieved:" + objResponse.getBadgeRequests().size());
+                                    mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), true));
+                                }
+                            }
                         } else {
-                            Log.v("TAG", "approved badge requests retrieved:" + objResponse.getBadgeRequests().size());
-                            mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), true));
+                            Log.v("TAG", "Error from server in retrieving approved badge requests:" + response.errorBody());
+                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                         }
                     }
-                } else {
-                    Log.v("TAG", "Error from server in retrieving approved badge requests:" + response.errorBody());
-                    Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
-                }
+
+                    @Override
+                    public void onFailure(Call<BadgeRequests> call, Throwable t) {
+                        Log.v("TAG", "Response retrieving approved badge requests failure" + t.getMessage());
+                        hideProgressBar();
+                    }
+                });
             }
 
             @Override
-            public void onFailure(Call<BadgeRequests> call, Throwable t) {
-                Log.v("TAG", "Response retrieving approved badge requests failure" + t.getMessage());
+            public void onAccessTokenFailure() {
+                Log.v("TAG", "Failed to get access token in getApprovedBadgeRequests()");
                 hideProgressBar();
+                Application.showAutoDismissAlertDialog(getActivity(), getString(R.string.unable_to_process));
             }
         });
     }
