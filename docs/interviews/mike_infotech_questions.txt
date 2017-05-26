@@ -1,4 +1,23 @@
+--------------------------------------------------------------
+QUESTIONS FOR END USER
+--------------------------------------------------------------
+How many people are in your organization?
+
+Can you explain the size and structure of your organization?
+
+Is there a dedicated IT staff?
+
+Is there IT staff dedicated to user and access management? 
+
+How many usernames and passwords (or other creds) do you have? 
+For which systems? 
+
+--------------------------------------------------------------
+QUESTIONS FOR IT STAFF PERSON WHO IS RESPONSIBLE FOR USER MGT
+--------------------------------------------------------------
+
 1. Where does the organization store usernames and passwords?
+
    1. Microsoft Active Directory
    2. SaaS Identity Provider (Okta, OneLogin, Microsoft Azure, Google, Salesforce, other SaaS)
    3. Other LDAP (Sun, Oracle, IBM, CA, OpenLDAP)
