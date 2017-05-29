@@ -38,7 +38,7 @@ Below is WEB UI for User registration
 ## 3.2 Login
 - FIDES use OXD Server for used to send a user for authentication and gather identity information about the user. The oxd server supports the OpenID Connect and UMA profiles of OAuth 2.0. Here admin and user both can use same login.
 1. List and Add Federation
-![List and Add Federation](../fides_flow_image/login.png)
+![Login](../fides_flow_image/login.png)
 
 ## 3.3 Added Federation
 - Federation admin added new federation.
