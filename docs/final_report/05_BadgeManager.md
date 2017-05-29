@@ -70,7 +70,7 @@ Badge Manager retrieve participants from FIDES based on city and state provided 
  ```
 
 ### (2) List of template badges
-`Template badges are defines and managed in FIDES.` 
+`Template badges are defined and managed in FIDES.` 
 
 Badge Manager retrieve template badges from FIDES by providing participant(retrieved from mobile app) and returns template badges list to mobile app
  
@@ -640,7 +640,7 @@ As soon as badge get verified by verifier in mobile app, Badge manager will revo
     }
     ```
  
-`Important notes`
+#### Important note
 - APIs which are exposing to mobile app will require `AccessToken` as a header which is the access token retrieved using app auth in mobile app and this access token will be used in Badge Manager to verify user and retrieving user info from oxd. 
 - APIs which are exposing to FIDES are secure with static access token(for now).
   
