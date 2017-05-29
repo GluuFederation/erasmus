@@ -37,7 +37,7 @@ Below is WEB UI for User registration
 
 ## 3.2 Login
 - FIDES use OXD Server for used to send a user for authentication and gather identity information about the user. The oxd server supports the OpenID Connect and UMA profiles of OAuth 2.0. Here admin and user both can use same login.
-1. List and Add Federation
+1. Login
 ![Login](../fides_flow_image/login.png)
 
 ## 3.3 Added Federation
@@ -57,7 +57,7 @@ Below is WEB UI for User registration
 
 ## 3.6 Request for Badge Template
 - Organization admin request for the badge templates.
-1. Badge Request Status List
+1. Badge Request Status
 ![Badge Request Status List](../fides_flow_image/badge-request-status-list.png)
 2. Badge Request By Organization admin
 ![Badge Request By Organization admin](../fides_flow_image/badge-request-orgadmin.png)
