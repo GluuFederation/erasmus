@@ -13,7 +13,7 @@ Can a decentralized identity infrastructure convey the identity, skills and auth
 ## Scope of Pilot
 Phase I of the ErasmErasmus Project was a 6-month pilot project (February -August 2017) that would test whether technology is available to make this security versus adoption trade-off. The goal of the pilot was to develop a proof of concept that would:
 
-    1.  Demonstrate how a decentralized identity federation could provide an inclusive, flexible infrastructure.
+    1.      Demonstrate how a decentralized identity federation could provide an inclusive, flexible infrastructure.
     2.	Leverage the latest identity standards to meet the need of applications for electronic verification of identity, skills, and authorizations while simultaneously allowing for greater accountability on the scene of a disaster.
     3.	Use trustmarks to enable organizations to convey security risks in a machine readable format
     4.	Develop a proof of concept mobile application that demonstrates the potential to access real time information.
