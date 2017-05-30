@@ -1,0 +1,15 @@
+title FIDES Badge Flow for Federation Admin
+
+Fed Admin->FIDES: Login
+FIDES->FIDES: Validate
+FIDES->Fed Admin: Return success with user information
+note right of Fed Admin: If federation not exist
+Fed Admin->FIDES: Request for Add New Federation
+FIDES->Fed Admin: Add Federation and Return Federation List
+Fed Admin->FIDES: Request for approve organization
+FIDES->Fed Admin: Return success with approved organization
+Fed Admin->FIDES: Create Badge template
+FIDES->Fed Admin: Return success with badge template list
+Org Admin->FIDES: Request for badge template
+Fed Admin->FIDES: Approved Badge template Request
+FIDES->Fed Admin: Return success with approved badge template

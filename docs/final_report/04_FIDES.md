@@ -69,7 +69,7 @@ Below is WEB UI for User registration
 2. Approve Badges
 ![Approve Badges](../fides_flow_image/approved-badge-request-model.png)
 
-## 3.7 Badge Review
+## 3.8 Badge Review
 - Organization admin see all the approved and pending badges which is requested by mobile users who request for actual badges. FIDES call the badge manager apis for fetch all the pending and approved badges. In Pending badge list, their is approved option and Federation admin can approve the particular actual badge request. Federation admin can also see the actual badge until access is granted by badge manager.
 1. Approved Badge List
 ![Approved Badge List](../fides_flow_image/approved-actual-badge.png)

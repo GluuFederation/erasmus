@@ -1,0 +1,26 @@
+title FIDES Badge Flow for Organization Admin
+
+Org Admin->FIDES: Request for Registration
+FIDES->FIDES: Validate
+FIDES->Org Admin: Return success message
+Org Admin->FIDES: Request for Login
+FIDES->FIDES: Validate
+FIDES->Org Admin: Return success with user information
+Org Admin->FIDES: Request for Badge(Badge Template)
+FIDES->FIDES: Review By Federation admin
+FIDES->Org Admin: Return success with approved status
+note over Org Admin: Actual badge approval process
+Org Admin->FIDES: Request for actual badges
+FIDES->Badge Mgr: Request for badges
+Badge Mgr->FIDES: Return success with badges
+FIDES->Org Admin: Return success with badges
+Org Admin->FIDES: Request for Approved a pending badge
+FIDES->Badge Mgr: Request for Approved a pending badge
+Badge Mgr->FIDES: Return success with approved status
+FIDES->Org Admin: Return success with approved status
+
+Org Admin->FIDES: Request for badge info of Approved badge
+FIDES->Badge Mgr: Request for badge info of Approved badge
+note right of Badge Mgr: until access is granted by badge manager
+Badge Mgr->FIDES: Return success with badge Info
+FIDES->Org Admin: Return success with badge Info
