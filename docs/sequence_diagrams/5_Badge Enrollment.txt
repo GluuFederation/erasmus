@@ -1,0 +1,20 @@
+title ERASMUS Badge Enrollment
+
+Asserter->Badge Mgr: Request badge templates
+Badge Mgr -> FIDES: Request badge templates
+FIDES -> Badge Mgr: Returns badge templates
+Badge Mgr->Asserter : Returns badge templates
+Asserter -> Badge Mgr: Request Badge 
+Badge Mgr->Badge Mgr: Badge request persist
+FIDES->Badge Mgr: Request pending badge requests for participant in order to approve
+Badge Mgr->FIDES : Returns pending badge request for participant
+FIDES -> Badge Mgr : Request for approving badge request
+Badge Mgr->Badge Mgr : Approves badge request and persist badge entry
+Badge Mgr -> E3DB:  Create encrypted identity assertion record
+E3DB -> Badge Mgr: Success
+Asserter->Badge Mgr: Requests Approved/Pending badge requests
+Badge Mgr->Asserter: Returns Approved/Pending badge requests
+Asserter->Badge Mgr: Request badge(URL)
+Badge Mgr->Badge Mgr: Generates QR code of the badge
+Badge Mgr -> Asserter: Returns badge URL with identity object
+
