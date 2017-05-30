@@ -1,5 +1,4 @@
 title ERASMUS Badge Verification
-
 Asserter->Validator: Present badge(QR code)
 Validator-> Badge Mgr: Scan QR code and request for badge verification
 Badge Mgr-> Badge Mgr: Verifying badge

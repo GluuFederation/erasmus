@@ -1,5 +1,4 @@
 title ERASMUS Badge Enrollment
-
 Asserter->Badge Mgr: Request badge templates
 Badge Mgr -> FIDES: Request badge templates
 FIDES -> Badge Mgr: Returns badge templates
