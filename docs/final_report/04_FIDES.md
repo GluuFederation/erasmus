@@ -2,21 +2,80 @@
 
 [Web site](https://erasmusdev.gluu.org/fides) 
 
-## 1. Introduction
+## 1. Overview
 FIDES Web application responsible for managing organization and their openid providers. The organization admin can registered into the FIDES application and take facility of badges. The Federation admin can manage all the organization which is registered into the FIDES and provide the badge templates for organization admin.
 
-## 2. Technologies
-- Server Side Technologies
-    1. Node JS: Create server and apis endpoint
-    2. Mongodb: Database for store data
-    3. SCIM Node: Used to dynamic registration of user into gluu server 	 	
-    4. OXD Node: The oxd server supports the OpenID Connect and UMA profiles of OAuth 	2.0. OpenID Connect can be used to send a user for authentication 	and gather 	identity information about the user. UMA can be used to 	manage what digital 	resources the user should have access to.
-	
-    	
-- Client Side Technologies
-    1. Angular JS
+- Federation: A group of autonomous organizations that agree to abide the authority of a central organization to reduce the cost of collaboration.
+[Federation Schema model](https://github.com/GluuFederation/erasmus/blob/master/FIDES/FidesIdentityAPI/models/federation.js)
+
+- Participant: An organization that registers with a Registration Authority for the purpose of joining a Federation.
+[Participant Schema model](https://github.com/GluuFederation/erasmus/blob/master/FIDES/FidesIdentityAPI/models/participant.js)
+
+- Entity: A techincal service operated by a Particpant, such as an identity provider.
+[Entity Schema model](https://github.com/GluuFederation/erasmus/blob/master/FIDES/FidesIdentityAPI/models/entity.js)
+
+## 2. Installation and Deploy
+   1. [Node js](https://nodejs.org/)
+   2. [Mongo DB](https://docs.mongodb.com/manual/installation/)
+   3. [Gluu Server](https://gluu.org/docs/ce/3.0.1/installation-guide/install/)
+   4. [OXD Server](https://gluu.org/docs/oxd/install/)
+   5. Clone repository [ERASMUS](https://github.com/GluuFederation/erasmus)
+   6. Start FIDES API
+   
+   - For Start API go to erasmus/FIDES/FidesIdentityAPI
+   - Install node package. 
+   
+    $ npm install
+    
+   - Start Node API. You can change port by changing base URL in .env-dev file.
+    
+    $ gulp
+   
+   - For Start Web project go to erasmus/FIDES/FidesWebApplication
+   - Install node package. 
+      
+    $ npm install
+       
+   - Start Web project. You can change API endpoints by urls in src/app/app.js file.
+       
+    $ gulp serve    
+
+   1. For deploy Node API, you can use [pm2](http://pm2.keymetrics.io/docs/usage/quick-start/) package.
+      If you want to run api on https then, you need to yous https package for that.
+    
+    var express = require('express'),
+    app = express(),
+    https = require('https'),
+    fs = require('fs');
+    
+    var options = {
+      key: fs.readFileSync('privkey.pem'),
+      cert: fs.readFileSync('cert.pem')
+    };
+   
+    // Create an HTTPS service.
+    https.createServer(options, app).listen(process.env.PORT, () => {
+        // Console.log('Server started successfully');
+    });
+    
+   2. For Angular Project deployment, you need to build project using gulp build task
+   
+    gulp build
+    
+   This above command gulp all the files and make release folder.
+   You just need to deploy this release folder on server (example: In apache, /var/www/html directory).
     
 ## 3. Flow of Application
+
+1. FIDES Sequence diagram
+![FIDES Flow](../sequence_diagrams/7_FIDES_flow.png)
+
+2. FIDES Federation admin Sequence diagram
+![FIDES Federation admin flow](../sequence_diagrams/8_FIDES_Badge_flow_for_Federation_admin.png)
+
+3. FIDES Organization admin Sequence diagram
+![FIDES Organization admin flow](../sequence_diagrams/9_FIDES_Badge_flow_for_Organization_admin.png)
+ 
 ### 3.1 User (Organization admin) registration
 
 - In this stage following things is happens
