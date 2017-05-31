@@ -189,8 +189,6 @@ router.get('/approveEntity/:id', (req, res, next) => {
 
       dataJson.id = dataJson.issuer;
       dataJson.name = entity.name;
-      dataJson.client_id = entity.clientId;
-      dataJson.client_secret = entity.clientSecret;
       dataJson.keys = keysJson.keys;
 
       entity.id = dataJson.issuer;

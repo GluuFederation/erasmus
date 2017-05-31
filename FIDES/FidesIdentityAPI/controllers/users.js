@@ -130,8 +130,6 @@ router.post('/login', (req, res, next) => {
 
       let data = {};
       data.discoveryMetadata = discoveryMetadata;
-      data.client_id = user.entity.clientId;
-      data.client_secret = user.entity.clientSecret;
       data.redirect_uri = req.body.redirectUri;
       data.code = req.body.code;
 
@@ -802,10 +800,7 @@ router.post('/registerDetail', (req, res, next) => {
       data.entityInfo = {};
       data.entityInfo.name = entityInfo.participantName;
       data.entityInfo.discoveryUrl = entityInfo.discoveryUrl;
-      data.entityInfo.clientId = clientMetadata.client_id;
-      data.entityInfo.clientSecret = clientMetadata.client_secret;
       data.entityInfo.oxdId = clientInfo.oxd_id;
-      data.entityInfo.authorizationEndpoint = discoveryMetadata.authorization_endpoint;
       data.entityInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
       data.entityInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
       data.entityInfo.isApproved = false;

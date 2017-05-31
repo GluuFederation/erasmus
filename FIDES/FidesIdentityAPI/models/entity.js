@@ -39,71 +39,7 @@ const entitySchema = mongoose.Schema({
     type: String
     //unique: true
   },
-  keys: {
-    type: String,
-    required: false
-  },
-  trustMarks: {
-    type: String,
-    required: false
-  },
-  clientId: {
-    type: String,
-    required: false
-  },
-  clientSecret: {
-    type: String,
-    required: false
-  },
   oxdId: {
-    type: String,
-    required: false
-  },
-  scope: {
-    type: String,
-    required: false
-  },
-  state: {
-    type: String,
-    required: false //true
-  },
-  error: {
-    type: String,
-    required: false
-  },
-  errorDescription: {
-    type: String,
-    required: false
-  },
-  errorUri: {
-    type: String,
-    required: false
-  },
-  grantType: {
-    type: String,
-    required: false //true
-  },
-  code: {
-    type: String,
-    required: false //true
-  },
-  accessToken: {
-    type: String,
-    required: false
-  },
-  tokenType: {
-    type: String,
-    required: false
-  },
-  expiresIn: {
-    type: String,
-    required: false
-  },
-  refreshToken: {
-    type: String,
-    required: false
-  },
-  authorizationEndpoint: {
     type: String,
     required: false
   },
@@ -124,9 +60,6 @@ const entitySchema = mongoose.Schema({
     required: false
   },
   type : {
-    type: String
-  },
-  issuer: {
     type: String
   },
   signedJwksUri: {
