@@ -1,7 +1,11 @@
 title ERASMUS Badge Verification
+Validator -> Badge Mgr : Clicks "Validate" button from the app
+Badge Mgr ->Asserter: Send notification asking for the permission
+Asserter -> Badge Mgr: Responds with choice (Allow or Deny)
+Badge Mgr -> Badge Mgr: Set permission as per asserter's choice 
 Asserter->Validator: Present badge(QR code)
 Validator-> Badge Mgr: Scan QR code and request for badge verification
-Badge Mgr-> Badge Mgr: Verifying badge
+Badge Mgr-> Badge Mgr: Verifying badge along with permission for validator
 Badge Mgr -> E3DB: Encrypted identity assertion record lookup
 E3DB -> Badge Mgr: Returns encrypted identity assertion 
 Badge Mgr->Validator: Returns actual badge(badge assertion)
