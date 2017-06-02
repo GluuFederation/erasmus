@@ -31,8 +31,7 @@ However, feedback from the emergency responder community suggest that the rules 
 An overarching challenge is that  emergency responder ecosystem in the US is highly decentralized--there are over 65,000 organizations, with  millions of affiliated people.  There is currently no universal, interoperable identity infrastructure.  The dimensions of the problem are threefold.  The first concerns center mainly around identity requirements.
 
 For example:
-  * Who are you? What skills do you have? Are you authorized? What is your jurisdiction?
-  For example:
+  * 	Who are you? What skills do you have? Are you authorized? What is your jurisdiction?
   *	Is this first responder who they say they are?
   *	What is the first responder’s qualified to do? (hazmat tech, FF, EMT, LE, types and kinds of resources qualified to operate)
   *	How can the first responder be accounted for?
