@@ -306,6 +306,38 @@ public class BadgeCommands {
     }
 
     /**
+     * Retrieves a badge by Id and key
+     *
+     * @param id  GUID of the badge
+     * @param key key of the badge that is to be retrieved.
+     * @return
+     */
+    public static Badges getBadgeByIdAndKey(String id, String key) {
+        try {
+
+            if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadgeResponseByIdAndKey() in BadgeCommands");
+                Badges objBadges = new Badges();
+                objBadges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+                logger.info("LDAP started retrieving badge");
+                List<Badges> lstBadges = LDAPService.ldapEntryManager.findEntries(objBadges.getDn(), Badges.class, Filter.create("(&(gluuBadgeAssertionId=" + id + ")(gluuBadgeAssertionKey=" + key + "))"));
+                logger.info("LDAP completed retrieving badge");
+                if (lstBadges.size() > 0) {
+                    return lstBadges.get(0);
+                } else
+                    return null;
+            } else {
+                logger.error("Error in connecting database in getBadgeResponseByIdAndKey() in BadgeCommands");
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("Exception in retrieving badge in LDAP: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Retrieves a badge by Id
      *
      * @param id GUID of the badge
@@ -314,7 +346,7 @@ public class BadgeCommands {
     public static Badges getBadgeById(String id) {
         try {
             if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in getBadgeResponseByIdAndKey() in BadgeCommands");
+                logger.info("LDAP connected in getBadgeById() in BadgeCommands");
                 Badges objBadges = new Badges();
                 objBadges.setDn("ou=badgeAssertions,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
@@ -325,7 +357,7 @@ public class BadgeCommands {
                 } else
                     return null;
             } else {
-                logger.error("Error in connecting database in getBadgeResponseByIdAndKey() in BadgeCommands");
+                logger.error("Error in connecting database in getBadgeById() in BadgeCommands");
                 return null;
             }
         } catch (Exception e) {

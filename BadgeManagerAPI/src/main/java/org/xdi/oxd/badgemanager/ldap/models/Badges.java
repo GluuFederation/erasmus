@@ -61,6 +61,9 @@ public class Badges  {
     @LdapAttribute(name = "gluuBadgePrivacy")
     String badgePrivacy;
 
+    @LdapAttribute(name = "gluuValidatorAccess")
+    String gluuValidatorAccess;
+
     public Badges() {
     }
 
@@ -182,5 +185,13 @@ public class Badges  {
 
     public void setBadgePrivacy(String badgePrivacy) {
         this.badgePrivacy = badgePrivacy;
+    }
+
+    public String getGluuValidatorAccess() {
+        return gluuValidatorAccess;
+    }
+
+    public void setGluuValidatorAccess(String gluuValidatorAccess) {
+        this.gluuValidatorAccess = gluuValidatorAccess;
     }
 }

@@ -145,9 +145,25 @@ public class BadgeController {
         JsonObject jsonResponse = new JsonObject();
 
         try {
-            BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(id);
-            if (badgeResponse != null) {
-                return returnBadgeResponse(badgeResponse, response);
+            Badges badges = BadgeCommands.getBadgeById(id);
+            if (badges != null && badges.getGuid() != null) {
+
+                if(!badges.getGluuValidatorAccess().equalsIgnoreCase("true")){
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "You're not authorized to see this badge");
+                    return jsonResponse.toString();
+                }
+
+                BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(id);
+                if (badgeResponse != null) {
+                    return returnBadgeResponse(badgeResponse, response);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "No such badge found");
+                    return jsonResponse.toString();
+                }
             } else {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
@@ -171,9 +187,25 @@ public class BadgeController {
 
         try {
 
-            BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(id, key);
-            if (badgeResponse != null) {
-                return returnBadgeResponse(badgeResponse, response);
+            Badges badges=BadgeCommands.getBadgeByIdAndKey(id,key);
+            if (badges != null && badges.getGuid() != null) {
+
+                if(!badges.getGluuValidatorAccess().equalsIgnoreCase("true")){
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "You're not authorized to see this badge");
+                    return jsonResponse.toString();
+                }
+
+                BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(id, key);
+                if (badgeResponse != null) {
+                    return returnBadgeResponse(badgeResponse, response);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    jsonResponse.addProperty("error", true);
+                    jsonResponse.addProperty("errorMsg", "No such badge found");
+                    return jsonResponse.toString();
+                }
             } else {
                 response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
