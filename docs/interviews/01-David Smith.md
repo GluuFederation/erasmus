@@ -20,6 +20,7 @@ information you're sharing:
 ### Tell us about the purpose of your organization?
 
    - San Marcos Hays County EMS
+   - Website http://smhcems.com
    - 501(c)(3) non-profit public charity providing 911 emergency medical response
    to San Marcos, Kyle, Driftwood, Dripping Springs, Henly, and to portions of
    unincorporated Hays County.
