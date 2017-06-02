@@ -41,4 +41,5 @@ ERASMUS offers a comprehensive solution to the most significant challenges by of
 ## Mobile & Identity Technology
  ERASMUS is designed to enhance the federated credentials with the cryptographic capabilities of a smartphone.  The ERASMUS prototype leverage badges – digitally signed documents embedded in an image, as described throughout the  report and detailed in Section II.  It enables cryptographic verification of a first responder’s credentials.  The mobile interface will allow first responders  and other emergency personnel from all jurisdictions to align with open standards that can be adapted and used in a variety of settings and conditions, in real time.
 
-Current system is Inadequate for current needs, emergency responder community needs faster, inter-agency, skills, security.
+Current system is inadequate for current needs, emergency responder community needs faster, inter-agency, skills, security. 
+The creation of ERASMUS as a federation and a digital identiy system will solve multiple problems for the emergency responder community. ERASMUS could potentially provide a comprehensive infrastructure that would further enable the construction of a next generation of identity aware digital services.
