@@ -33,7 +33,6 @@ An overarching challenge is that  emergency responder ecosystem in the US is hig
 For example:
   * Who are you? What skills do you have? Are you authorized? What is your jurisdiction?
   For example:
-  *	Who are you? What skills do you have? Are you authorized? What is your jurisdiction?
   *	Is this first responder who they say they are?
   *	What is the first responder’s qualified to do? (hazmat tech, FF, EMT, LE, types and kinds of resources qualified to operate)
   *	How can the first responder be accounted for?
