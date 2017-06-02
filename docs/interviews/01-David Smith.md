@@ -37,38 +37,31 @@ information you're sharing:
  - What do you do spend the largest amount of your time doing?
 
 ### IT Operations
-   Is there a dedicated IT staff?
-   Are you concerned about getting hacked?
-   If you were hacked, what could the range of impacts?
-   How much do you rely on IT to deliver the core service?
+   - Is there a dedicated IT staff?
+   - Are you concerned about getting hacked?
+   - If you were hacked, what could the range of impacts?
+  - How much do you rely on IT to deliver the core service?
 
 ## USER MGT
 
 ### Tell us about identity practices?
-
-   a. In rough terms, how many usernames and passwords (or other types
+  - In rough terms, how many usernames and passwords (or other types
    of authentication) do you have? What are some of the systems people need
    to access?
 
-### Does your organization have a single sign-on system that provides access
-to multiple websites?
+### Does your organization have a single sign-on system that provides access to multiple websites?
 
 ### On the website it said "Normal" and "LDAP". Do you know what that means?
 
-### Do all 57/20 EMT/parametics have STRAC cards? How are they used? Are there
-any mis-uses of the cards? Any places you'd like to use them, but you can't?
+### Do all 57/20 EMT/parametics have STRAC cards? How are they used? Are there any mis-uses of the cards? Any places you'd like to use them, but you can't?
 
-### Can you share your thoughts about using credentials other then passwords
-(or smartcards) to access websites or mobile applications?
+### Can you share your thoughts about using credentials other then passwords (or smartcards) to access websites or mobile applications?
 
 ### What would you think about a mobile identity card for first responders?
 
-### Do you think people in your organization would object to using to using
-their person smart phone to apply for a first responder mobile identity card?
+### Do you think people in your organization would object to using to using their person smart phone to apply for a first responder mobile identity card?
 
-### EMS San Marcos responded to a large, multi-jurisdictional disaster?
-From an identity management perspective, can you share some thoughts about
-how that went? How were people identified? Were any not turned away?
+### EMS San Marcos responded to a large, multi-jurisdictional disaster? From an identity management perspective, can you share some thoughts about how that went? How were people identified? Were any not turned away?
 
 ### Can you talk a little about the certifications for EMTs and Paramedics:
  - Texas EMS certification
@@ -80,5 +73,4 @@ how that went? How were people identified? Were any not turned away?
  ### Is conveying training, certifications a challenge? How about in a
  multi-jurisdictional disaster?
 
-### What are the most important organizational applications that your
-organization sees the need to upgrade within the next five years?
+### What are the most important organizational applications that your organization sees the need to upgrade within the next five years?
