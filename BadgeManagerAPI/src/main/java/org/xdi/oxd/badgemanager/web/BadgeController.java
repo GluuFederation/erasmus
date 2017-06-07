@@ -12,19 +12,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.xdi.oxauth.model.fido.u2f.protocol.DeviceData;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeRequestCommands;
+import org.xdi.oxd.badgemanager.ldap.commands.PersonCommands;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.models.Badges;
+import org.xdi.oxd.badgemanager.ldap.models.Person;
+import org.xdi.oxd.badgemanager.ldap.models.fido.u2f.DeviceRegistration;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
@@ -43,7 +44,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.xdi.oxd.badgemanager.qrcode.decorator.ColoredQRCode.colorizeQRCode;
@@ -70,6 +72,9 @@ public class BadgeController {
 
     private final ServletContext context;
 
+    @Inject
+    public NotificationController notificationController;
+
     @Autowired
     public BadgeController(ServletContext context) {
         this.context = context;
@@ -78,6 +83,10 @@ public class BadgeController {
     public void setRedisData(String key, String value, int timeout) throws IOException {
         redisTemplate.opsForValue().set(key, value);
         redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
+    }
+
+    public void setRedisData(String key, String value) throws IOException {
+        redisTemplate.opsForValue().set(key, value);
     }
 
     @RequestMapping(value = "templates", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -148,7 +157,7 @@ public class BadgeController {
             Badges badges = BadgeCommands.getBadgeById(id);
             if (badges != null && badges.getGuid() != null) {
 
-                if(!badges.getGluuValidatorAccess().equalsIgnoreCase("true")){
+                if (badges.getGluuValidatorAccess() == null || !badges.getGluuValidatorAccess().equalsIgnoreCase("true")) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "You're not authorized to see this badge");
@@ -157,6 +166,7 @@ public class BadgeController {
 
                 BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(id);
                 if (badgeResponse != null) {
+                    notifyAsserter(badges.getGuid());
                     return returnBadgeResponse(badgeResponse, response);
                 } else {
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -187,10 +197,10 @@ public class BadgeController {
 
         try {
 
-            Badges badges=BadgeCommands.getBadgeByIdAndKey(id,key);
+            Badges badges = BadgeCommands.getBadgeByIdAndKey(id, key);
             if (badges != null && badges.getGuid() != null) {
 
-                if(!badges.getGluuValidatorAccess().equalsIgnoreCase("true")){
+                if (badges.getGluuValidatorAccess() == null || !badges.getGluuValidatorAccess().equalsIgnoreCase("true")) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "You're not authorized to see this badge");
@@ -199,6 +209,7 @@ public class BadgeController {
 
                 BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseByIdAndKey(id, key);
                 if (badgeResponse != null) {
+                    notifyAsserter(badges.getGuid());
                     return returnBadgeResponse(badgeResponse, response);
                 } else {
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -308,28 +319,7 @@ public class BadgeController {
                     Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
                     if (badges != null && badges.getInum() != null) {
 
-                        String tempURLBase = utils.getBaseURL(request);
-                        String tempURL = tempURLBase + "/badges/" + badges.getGuid();
-
-                        if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
-                            setRedisData(badges.getKey(), badges.getId(), 95);
-                            Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
-                            calendar.add(Calendar.SECOND, 95);
-                            badges.setExpires(calendar.getTime());
-                            boolean isUpdated = BadgeCommands.updateBadge(badges);
-                            logger.info("Badge updated after expires set:" + isUpdated);
-                            tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
-                        }
-
-                        String redisKey = badges.getGuid() + badges.getKey();
-                        setRedisData(redisKey, tempURL, 95);
-                        final String id = Hashing.murmur3_32().hashString(tempURL, StandardCharsets.UTF_8).toString();
-                        System.out.println("Shortern url id:" + id);
-                        String shortenURL = tempURLBase + "/tmp/" + id;
-                        System.out.println("Shortern url:" + shortenURL);
-                        setRedisData(id, tempURL, 95);
-
-                        if (generateQrCode(badges, badgeClass.getImage(), shortenURL, 250, "png")) {
+                        if (generateQrCode(badges, badgeClass.getImage(), badges.getGuid(), 250, "png")) {
                             logger.info("QR Code generated successfully");
 
                             DisplayBadge badge = new DisplayBadge();
@@ -471,6 +461,178 @@ public class BadgeController {
         }
     }
 
+    @RequestMapping(value = "setPermission", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String setBadgePermission(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody AccessRequest accessRequest, HttpServletRequest request, HttpServletResponse response) {
+
+        JsonObject jsonResponse = new JsonObject();
+        String strTempURL = "", msg;
+        try {
+
+            if (accessToken == null || accessToken.length() == 0 || accessRequest == null
+                    || accessRequest.getOpHost() == null || accessRequest.getOpHost().length() == 0
+                    || accessRequest.getAccess() == null || accessRequest.getAccess().length() == 0
+                    || accessRequest.getBadge() == null || accessRequest.getBadge().length() == 0) {
+                jsonResponse.addProperty("error", true);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. Missing required details");
+                return jsonResponse.toString();
+            }
+
+            UserInfo userInfo = userInfoService.getUserInfo(accessRequest.getOpHost(), accessToken);
+            if (userInfo == null || userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. Invalid user");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return jsonResponse.toString();
+            }
+            String email = userInfo.getEmail();
+
+            if (redisTemplate.opsForValue().get(accessRequest.getBadge()) == null) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "Unable to set permission");
+                return jsonResponse.toString();
+            }
+
+            String linkedData = (String) redisTemplate.opsForValue().get(accessRequest.getBadge());
+            JsonObject jObjLinkedData = new JsonParser().parse(linkedData).getAsJsonObject();
+            if (jObjLinkedData == null) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "Unable to set permission");
+                return jsonResponse.toString();
+            }
+            String toEmail = jObjLinkedData.get("Validator").toString();
+            logger.info("Redis data: " + jObjLinkedData);
+            logger.info("Validator: " + toEmail);
+
+            Person person = PersonCommands.getPersonByEmail(toEmail);
+            if (person == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. Validator entry not found");
+                return jsonResponse.toString();
+            }
+            java.util.List<DeviceRegistration> deviceRegistrations = PersonCommands.getDeviceRegistrationByPerson(person.getInum());
+            logger.info("Device registration counts in setBadgePermission: " + deviceRegistrations.size());
+            if (deviceRegistrations.size() == 0) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. Device entry not found");
+                return jsonResponse.toString();
+            }
+            DeviceRegistration deviceRegistration = deviceRegistrations.get(0);
+            logger.info("Device data in setBadgePermission: " + deviceRegistration.getDeviceData());
+            DeviceData deviceData = deviceRegistration.getDeviceData();
+            if (!deviceData.getPlatform().equalsIgnoreCase("android")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. Device entry not found");
+                return jsonResponse.toString();
+            }
+
+            Badges badges = BadgeCommands.getBadgeById(accessRequest.getBadge());
+            if (badges == null) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "No such badge found");
+                return jsonResponse.toString();
+            }
+
+            badges.setGluuValidatorAccess(accessRequest.getAccess());
+
+            boolean isUpdated = BadgeCommands.updateBadge(badges);
+            if (isUpdated) {
+
+                response.setStatus(HttpServletResponse.SC_OK);
+                String access = accessRequest.getAccess().equalsIgnoreCase("true") ? "granted" : "revoked";
+                jsonResponse.addProperty("error", false);
+
+                if (access.equalsIgnoreCase("granted")) {
+                    String tempURLBase = utils.getBaseURL(request);
+                    String tempURL = tempURLBase + "/badges/" + badges.getGuid();
+
+                    if (badges.getBadgePrivacy().equalsIgnoreCase("private")) {
+                        setRedisData(badges.getKey(), badges.getId(), 95);
+                        Calendar calendar = Calendar.getInstance(); // gets a calendar using the default time zone and locale.
+                        calendar.add(Calendar.SECOND, 95);
+                        badges.setExpires(calendar.getTime());
+                        boolean isBadgeUpdated = BadgeCommands.updateBadge(badges);
+                        logger.info("Badge updated after expires set:" + isBadgeUpdated);
+                        tempURL = tempURLBase + "/badges/" + badges.getGuid() + "?key=" + badges.getKey();
+                    }
+
+                    String redisKey = badges.getGuid() + badges.getKey();
+                    setRedisData(redisKey, tempURL, 95);
+                    final String id = Hashing.murmur3_32().hashString(tempURL, StandardCharsets.UTF_8).toString();
+                    System.out.println("Shortern url id:" + id);
+                    String shortenURL = tempURLBase + "/tmp/" + id;
+                    System.out.println("Shortern url:" + shortenURL);
+                    strTempURL = shortenURL;
+                    setRedisData(id, tempURL, 95);
+                }
+
+                msg = "Permission to see this badge " + access + " successfully";
+
+                sendNotification(msg, email, deviceData.getPushToken(), strTempURL);
+
+                jsonResponse.addProperty("message", msg);
+                return jsonResponse.toString();
+            } else {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "Failed to set badge access");
+                return jsonResponse.toString();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            jsonResponse.addProperty("error", true);
+            jsonResponse.addProperty("errorMsg", e.getMessage());
+            logger.error("Exception in set badge permission in setBadgePermission():" + e.getMessage());
+            return jsonResponse.toString();
+        }
+    }
+
+    private void sendNotification(String msg, String fromEmail, String toDeviceToken, String tempURL) {
+
+//        String toDeviceToken = "e_ZEo4DHlqE:APA91bFo6BDgrQQzU4xkHpAgiLDhVlMOq1ivpjNh0X8tViqNuxZnVjKHLjgG0uMqZYsup1_MU_VkOzDO-nplW7QNa9wlYaoB_eoj3-Xdt-QCeIXOgCgoDdzeT1mnOEhBZoX00FzCKBkO";
+
+        JsonObject data = new JsonObject();
+        data.addProperty("fromAsserter", fromEmail);
+        data.addProperty("tempUrl", tempURL);
+
+        notificationController.send(msg, toDeviceToken, data);
+    }
+
+    private void notifyAsserter(String id) {
+        try {
+            if (redisTemplate.opsForValue().get(id) != null) {
+                String linkedData = (String) redisTemplate.opsForValue().get(id);
+                JsonObject jObjLinkedData = new JsonParser().parse(linkedData).getAsJsonObject();
+                if (jObjLinkedData != null && jObjLinkedData.get("Asserter") != null) {
+
+                    Person person = PersonCommands.getPersonByEmail(jObjLinkedData.get("Asserter").toString());
+                    if (person != null) {
+                        List<DeviceRegistration> deviceRegistrations = PersonCommands.getDeviceRegistrationByPerson(person.getInum());
+                        logger.info("Device registration counts: " + deviceRegistrations.size());
+                        if (deviceRegistrations.size() > 0) {
+                            DeviceRegistration deviceRegistration = deviceRegistrations.get(0);
+                            logger.info("Device data: " + deviceRegistration.getDeviceData());
+                            DeviceData deviceData = deviceRegistration.getDeviceData();
+                            if (deviceData.getPlatform().equalsIgnoreCase("android") && deviceData.getPushToken() != null) {
+                                sendNotification("Badge verified successfully", "", deviceData.getPushToken(), "");
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            logger.error("Exception in notify asserter " + ex.getMessage());
+        }
+    }
+
     /**
      * Call this method to create a QR-code image. You must provide the
      * OutputStream where the image data can be written.
@@ -488,7 +650,7 @@ public class BadgeController {
 
             float TRANSPARENCY = 0.75f;
             float OVERLAY_RATIO = 0.25f;
-            logger.info("Logo file url:" + logoFileURL);
+//            logger.info("Logo file url:" + logoFileURL);
 
             //logo file
 //            String logoFileName = + System.currentTimeMillis() + ".png";

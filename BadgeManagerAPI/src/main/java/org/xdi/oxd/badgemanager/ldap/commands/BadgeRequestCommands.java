@@ -432,6 +432,39 @@ public class BadgeRequestCommands {
         }
     }
 
+    /**
+     * Retrieves a badge request by Inum
+     *
+     * @param email Email of the badge requester.
+     * @param title Title of the badge.
+     * @return
+     */
+    public static BadgeRequests getUserBadgeRequestByTitle(String email, String title) {
+        try {
+
+            if (LDAPService.isConnected()) {
+                logger.info("LDAP connected in getBadgeRequestForUserByInum() in BadgeRequestCommands");
+
+                BadgeRequests badgeRequest = new BadgeRequests();
+                badgeRequest.setGluuBadgeRequester(email);
+                badgeRequest.setDn("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+
+                List<BadgeRequests> badgeRequests = LDAPService.ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(gluuTemplateBadgeTitle=" + title + "))"));
+                if (badgeRequests.size() > 0)
+                    return badgeRequests.get(0);
+                else
+                    return null;
+            } else {
+                logger.error("Error in connecting database in getBadgeRequestForUserByInum() in BadgeRequestCommands");
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("Exception in getBadgeRequestForUserByInum() in BadgeRequestCommands:" + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     private static List<CreateBadgeResponse> GetResponseList(List<BadgeRequests> lstBadgeRequests) {
         List<CreateBadgeResponse> lstBadgeResponse = new ArrayList<>();
         for (BadgeRequests obj : lstBadgeRequests) {

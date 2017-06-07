@@ -93,7 +93,7 @@ public class ParticipantController {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "Please try after some time");
-            logger.error("Exception in retrieving participant in getParticipants:"+e.getMessage());
+            logger.error("Exception in retrieving participant in getParticipants:" + e.getMessage());
             return jsonResponse.toString();
         }
     }
