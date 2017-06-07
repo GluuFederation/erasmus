@@ -2,36 +2,29 @@
 I.  INTRODUCTION
 --------------------------------------------------------------
 
-ADD boiler language to introduce purpose of this interview:
 "We are gathering background information to understand digital identiy in
 emergency responder community.
 
 We want to find out how different organizations are approaching"
 
-a)
-b)
-C)
-
-------------------------------------------------------------
-PURPOSE
---------------------------------------------------------------
-
-From you, we were hoping to learn:
-a)
-b)
-c)
+a) What kinds of digital and in person credenitals FR's are using.
+b) What kinds of websites and mobile applications FR's are using for work.
+C) How much friction exists accessing digital resources.
 
 --------------------------------------------------------------
 II.  QUESTIONS FOR END USER (e.g. __________, __________, ________)
 --------------------------------------------------------------
 
-1. Tell us about yourself and your organization:
+The first few questions are contextual, so we better understand the
+information you're sharing:
+
+1. Person / Organization
 
    Tell us about the purpose of your organization?
    What is your role?
    What is the size and structure of your organization?
 
-2. Tell us about your IT staff:
+2. IT staff:
 
    Is there a dedicated IT staff?
    Is there IT staff dedicated to user and access management?
