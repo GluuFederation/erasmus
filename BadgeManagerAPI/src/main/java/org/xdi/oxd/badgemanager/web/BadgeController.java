@@ -502,7 +502,7 @@ public class BadgeController {
                 jsonResponse.addProperty("errorMsg", "Unable to set permission");
                 return jsonResponse.toString();
             }
-            String toEmail = jObjLinkedData.get("Validator").toString();
+            String toEmail = GsonService.getValueFromJson("Validator", jObjLinkedData);
             logger.info("Redis data: " + jObjLinkedData);
             logger.info("Validator: " + toEmail);
 
@@ -565,9 +565,9 @@ public class BadgeController {
                     String redisKey = badges.getGuid() + badges.getKey();
                     setRedisData(redisKey, tempURL, 95);
                     final String id = Hashing.murmur3_32().hashString(tempURL, StandardCharsets.UTF_8).toString();
-                    System.out.println("Shortern url id:" + id);
+                    logger.info("Shortern url id:" + id);
                     String shortenURL = tempURLBase + "/tmp/" + id;
-                    System.out.println("Shortern url:" + shortenURL);
+                    logger.info("Shortern url:" + shortenURL);
                     strTempURL = shortenURL;
                     setRedisData(id, tempURL, 95);
                 }
@@ -612,7 +612,7 @@ public class BadgeController {
                 JsonObject jObjLinkedData = new JsonParser().parse(linkedData).getAsJsonObject();
                 if (jObjLinkedData != null && jObjLinkedData.get("Asserter") != null) {
 
-                    Person person = PersonCommands.getPersonByEmail(jObjLinkedData.get("Asserter").toString());
+                    Person person = PersonCommands.getPersonByEmail(GsonService.getValueFromJson("Asserter", jObjLinkedData));
                     if (person != null) {
                         List<DeviceRegistration> deviceRegistrations = PersonCommands.getDeviceRegistrationByPerson(person.getInum());
                         logger.info("Device registration counts: " + deviceRegistrations.size());
@@ -659,13 +659,13 @@ public class BadgeController {
 //            String logoPath = utils.getStaticResourceLogoPath(context);
 //            //Local
 ////            String logoPath = "src/main/resources/static/logo";
-//            System.out.println("logo file path :" + logoPath);
+//            logger.info("logo file path :" + logoPath);
 //            if (new File(logoPath).exists()) {
-//                System.out.println("Directory exists:" + logoPath);
+//                logger.info("Directory exists:" + logoPath);
 //                FileUtils.cleanDirectory(new File(logoPath));
 //            }
 //            String logoFilePath = logoPath + File.separator + logoFileName;
-//            System.out.println("logo file path:" + logoFilePath);
+//            logger.info("logo file path:" + logoFilePath);
 //            if(!downloadUsingStream(logoFileURL, logoFilePath)){
 //                return false;
 //            }
@@ -681,13 +681,13 @@ public class BadgeController {
             String imagesPath = utils.getStaticResourcePath(context);
             //Local
 //            String imagesPath = "src/main/resources/static/images";
-            System.out.println("path :" + imagesPath);
+            logger.info("path :" + imagesPath);
             if (new File(imagesPath).exists()) {
-                System.out.println("Directory exists:" + imagesPath);
+                logger.info("Directory exists:" + imagesPath);
                 FileUtils.cleanDirectory(new File(imagesPath));
             }
             String filePath = imagesPath + File.separator + fileName;
-            System.out.println("file path:" + filePath);
+            logger.info("file path:" + filePath);
 
             QRCBuilder<BufferedImage> qrCodeBuilder = new ZXingQRCodeBuilder();
             qrCodeBuilder.newQRCode()

@@ -18,22 +18,5 @@ public class OxdSpringApplication extends SpringBootServletInitializer{
 
 	public static void main(String[] args) {
 		SpringApplication.run(OxdSpringApplication.class, args);
-//		LDAPInitializer ldapInitializer = new LDAPInitializer(new LDAPInitializer.ldapConnectionListner() {
-//			@Override
-//			public void ldapConnected(boolean connected, LdapEntryManager ldapEntryManager) {
-//				if (connected) {
-//					try {
-//						DefaultConfig.config_organization = ServerCommands.getRootOrgranizationInum(ldapEntryManager);
-//						if (DefaultConfig.config_organization == null || DefaultConfig.config_organization.equals("")) {
-//							System.out.println("server closed because we can't find organization dn configured properly in LDAP");
-//							SpringApplication.run(OxdSpringApplication.class, args).close();
-//						}
-//					} catch (Exception e) {
-//						System.out.println("server closed because we can't find organization dn configured properly in LDAP");
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		});
 	}
 }
