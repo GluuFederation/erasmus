@@ -1,10 +1,5 @@
 # Conclusion
 
-  *	Challenges
-  *	Implications, Takeaways
-  *	Recommendations
-  *	Call to Action: Phase II Blueprint
-
 In this section we summarize the results and work completed thus far.   We conclude that ERASMUS is beyond a prototype and MVP, meets the requirements of the field, and is ready for field testing.  There are challenges to adoption, these are discussed in this section. A solution to the problem of emergency responder identification seems close at hand--in fact it seems so frustrating close but yet out of reach. Researching both the tools and the rules, leveraging both old and new technologies, and integrating a mobile and backend solution--we believe this pilot will get us a little closer. By providing data, assembling the feedback of many experts, and delivering free open source software based on open standards, the ERASMUS pilot is also likely to result in actual solutions that will be useful to both government and industry.
 
 The fragmented, decentralized nature of the current emergency responder ecosystem in the US, long and thoroughly documented by the policy and research literature can no longer provide the level of security, reliability, scalability necessary for the 64,000 organizations that are part of  the emergency responder community. Put simply: There is currently no universal, interoperable identity infrastructure.
