@@ -92,4 +92,5 @@ The consequences of a fragmented and outdated system are highly problematic for 
 
 The most significant hurdle is not technical, it’s organizational. How to get a diverse network of autonomous organizations to keep the identity information and skills of their people up-to-date and available. And subsequently, how to enable these organizations to share this information in a standard manner that can be communicated to a person in the field who deciding whether to allow entry or assign a task to a person who has responded to an emergency.  
 
-The future hope, expressed through community feedbak, is for a centralized system and a more seamless way of issuing and updating badges. The solution is clear. The implementation and adoptions will require more technical development, research, collaboration, and buy-in from the first responder community.  We are confident that Phase II provides a vehicle for this in the future.
+The future hope, as expresssed through community feedback, is for a centralized system, clear standards, and a more seamless way of issuing and updating badges. The solution is clear. Adoptions will require more technical development, research, collaboration, and buy-in from the first responder community.  Phase II paves the way and provides a vehicle toward the development and ipelmentation of a much needed solution.
+.
