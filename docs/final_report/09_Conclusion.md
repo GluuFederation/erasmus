@@ -42,10 +42,7 @@ Phase II would seek to prove the feasibility of this platform by continuing to g
 We propose five sets of activities: 1) Governance; 2) Technical development; 3) Pilot & User Testing; 4) Marketing & education; 5) Community outreach and stakeholder engagement
 
 ## Governance for ERASMUS.  
-
-The most significant hurdle is not technical, it’s organizational. How to get a diverse network of autonomous organizations to keep the identity information and skills of their people up-to-date and available. And subsequently, how to enable these organizations to share this information in a standard manner that can be communicated to a person in the field who deciding whether to allow entry or assign a task to a person who has responded to an emergency.
-
-Strategy is to form a pilot federation, we build on NIEF or we invite RFP.  A federation offers a coherent and transparent solution. Challenge is creating the governance for ERASMUS.   ERASMUS requires a governance structure that would be representative, sustainable, market responsive.  Governance - would set policies and provide central services to support Trustmark binding to OIDC endpoints in accordance with the spec's trust model.  
+Strategy is to form a pilot federation, e.g. by building or partnering with an existing NIEF or through an RFP process. A federation offers a coherent and transparent solution. Challenge is creating the governance for ERASMUS.  ERASMUS requires a governance structure that would be representative, sustainable, market responsive.  Governance - would set policies and provide central services to support Trustmark binding to OIDC endpoints in accordance with the spec's trust model.  
 
 Loose Federation The pilot would propose the deployment of a lightweight Federation Operator infrastructure that would support signing of Badges, skills, authorizations, and trustmarks asserted by jurisdictions. The pilot would use OAuth2 profiles to secure connections between the mobile device, the jurisdiction services and the Federation Operator.
 
@@ -86,3 +83,13 @@ Create consortium of stakeholders to support 1, 2, 3 and to drive ubiquitous ado
 ●	https://www.gridmenow.com/
 ●	http://www.responsegroupinc.com/  The Response Group or (TRG) is another company out there who has tried to digitize or mobilize the Incident Action Plan (IAP).  I’ve never used them myself but I generally don’t hear many good things about them.
 industry.
+
+## Closing Remarks
+
+The fragmented, decentralized nature of the current emergency responder ecosystem in the US, long and thoroughly documented by the policy and research literature can no longer provide the level of security, reliability, scalability necessary for the 64,000 organizations that are part of the emergency responder community. The community feedback we received by conducting expert interviews provided additional data and explaining through first hand accounts and current experiences, confirm that a solution is needed, urgenty.
+
+The consequences of a fragmented and outdated system are highly problematic for the first responder themselves as well for the entire emergency community. There are, as one first responder said, “No other options out there.” The lack of a solution puts at risk the safety, security, and accessibility to first responders who are qualified. 
+
+The most significant hurdle is not technical, it’s organizational. How to get a diverse network of autonomous organizations to keep the identity information and skills of their people up-to-date and available. And subsequently, how to enable these organizations to share this information in a standard manner that can be communicated to a person in the field who deciding whether to allow entry or assign a task to a person who has responded to an emergency.  
+
+The future hope, expressed through community feedbak, is for a centralized system and a more seamless way of issuing and updating badges. The solution is clear. The implementation and adoptions will require more technical development, research, collaboration, and buy-in from the first responder community.  We are confident that Phase II provides a vehicle for this in the future.
