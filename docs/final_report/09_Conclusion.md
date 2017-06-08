@@ -1,4 +1,4 @@
-# Conculsion
+# Conclusion
 
   *	Challenges
   *	Implications, Takeaways
@@ -31,8 +31,11 @@ Gluu would be prepared to commercialize the software and trust framework that re
   3.      Standards
   4.     Specific requirements for efficiency
 
-## Recommendations for Phase II
-Phase II will enable the piloting necessary to show how ERASMUS can transform how first responders and other emergency personnel are authenticated With evidence of its efficacy and scalability, plans could be made to widen the adoption of ERASMUS, and applications could be built on top of it to provide the next generation of emergency responder digital services.  For example, making ERASMUS digital badges becomes easy to present as any other kind of credential. The integration of these standards into ERASMUS platform provides a member jurisdiction’s the security and audit capabilities required for a high level of assurance transaction.
+## Recommendations
+
+We recommend a second phase of work to develop ERASMUS. This work would include the creation of a federation, continued technical development, additional user research, expanded pilot testing, and targeted outreach to engage the first responder community.  
+
+Phase II would enable the piloting necessary to show how ERASMUS can transform how first responders and other emergency personnel are authenticated With evidence of its efficacy and scalability. Plans could be made to widen the adoption of ERASMUS. Applications could be built on top of it to provide the next generation of emergency responder digital services. For example, making ERASMUS digital badges becomes easy to present as any other kind of credential. The integration of these standards into ERASMUS platform provides a member jurisdiction’s the security and audit capabilities required for a high level of assurance transaction.
 
 Phase II would seek to prove the feasibility of this platform by continuing to gathering feedback from jurisdictions, piloting a proof-of-concept software stack, and drafting rules for trust management in collaboration with <organizations you propose partnerships>.  Proposed work would also involve several strategies aimed at addressing the core barriers to adoption – governance, technology, and stakeholder buy-in.  
 
