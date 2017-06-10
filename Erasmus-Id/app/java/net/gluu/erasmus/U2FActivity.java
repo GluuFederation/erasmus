@@ -6,8 +6,10 @@
 
 package net.gluu.erasmus;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -31,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -50,11 +54,13 @@ import net.gluu.erasmus.listener.OxPush2RequestListener;
 import net.gluu.erasmus.listener.PushNotificationRegistrationListener;
 import net.gluu.erasmus.model.u2f.OxPush2Request;
 import net.gluu.erasmus.net.CommunicationService;
+import net.gluu.erasmus.push.Config;
 import net.gluu.erasmus.store.AndroidKeyDataStore;
 import net.gluu.erasmus.u2f.v2.SoftwareDevice;
 import net.gluu.erasmus.u2f.v2.exception.U2FException;
 import net.gluu.erasmus.u2f.v2.model.TokenResponse;
 import net.gluu.erasmus.u2f.v2.store.DataStore;
+import net.gluu.erasmus.utils.NotificationUtils;
 import net.gluu.erasmus.utils.Utils;
 
 import org.joda.time.format.DateTimeFormat;
@@ -101,6 +107,8 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
     private final AtomicReference<JSONObject> mUserInfoJson = new AtomicReference<>();
     private ExecutorService mExecutor;
 
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,8 +121,29 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
         deviceUuidFactory.init(this);
 
         // Init GCM service
-//        PushNotificationManager pushNotificationManager = new PushNotificationManager(BuildConfig.PROJECT_NUMBER);
+//        PushNotificationManager pushNotificationManager = new PushNotificationManager();
 //        pushNotificationManager.registerIfNeeded(this, this);
+
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                // checking for type intent filter
+                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+                    // gcm successfully registered
+                    // now subscribe to `global` topic to receive app wide notifications
+                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
+
+                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    // new push notification is received
+
+                    String message = intent.getStringExtra("message");
+
+                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
+                    Log.v("TAG", "Notification received: " + message);
+                }
+            }
+        };
 
         context = getApplicationContext();
         this.dataStore = new AndroidKeyDataStore(context);
@@ -185,7 +214,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
         jsonObject.addProperty("issuer", Application.U2F_Issuer);
         jsonObject.addProperty("state", Application.U2F_State);
         jsonObject.addProperty("method", Application.U2F_Method);
-        jsonObject.addProperty("app", Application.U2F_App);
+        jsonObject.addProperty("app", Application.U2F_Issuer + Application.U2F_App);
 
         return jsonObject.toString();
     }
@@ -296,6 +325,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 
     @Override
     public void onPushRegistrationSuccess(String registrationId, boolean isNewRegistration) {
+        Log.v("TAG", "Registration successful. registration id is: " + registrationId);
     }
 
     @Override
@@ -525,6 +555,8 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 
     @MainThread
     private void exchangeAuthorizationCode(AuthorizationResponse authorizationResponse) {
+        Log.v("TAG", "state: " + authorizationResponse.state);
+        Application.U2F_State = authorizationResponse.state;
         displayLoading("Exchanging authorization code");
         performTokenRequest(
                 authorizationResponse.createTokenExchangeRequest(),
@@ -695,6 +727,29 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
         findViewById(R.id.loading_container).setVisibility(View.GONE);
 
         onQrRequest(getRequestData());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register GCM registration complete receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.REGISTRATION_COMPLETE));
+
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+
+        // clear the notification area when the app is opened
+        NotificationUtils.clearNotifications(getApplicationContext());
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
     }
 
     @Override

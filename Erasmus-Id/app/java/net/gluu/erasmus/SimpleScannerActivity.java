@@ -11,9 +11,18 @@ import com.google.zxing.Result;
 
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
+import net.gluu.erasmus.api.AccessToken;
+import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.DisplayBadge;
+import net.gluu.erasmus.model.NotificationRequest;
 import net.gluu.erasmus.model.ScanResponse;
 import net.gluu.erasmus.model.ScanResponseSuccess;
+import net.gluu.erasmus.model.SetPermissionRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import retrofit2.Call;
@@ -22,11 +31,13 @@ import retrofit2.Response;
 
 public class SimpleScannerActivity extends Activity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView mScannerView;
-    private static final String TAG = "SimpleScannerActivity";
+    private static final String TAG = "TAG";
+    APIInterface mObjAPI;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
+        mObjAPI = APIService.createService(APIInterface.class);
         mScannerView = new ZXingScannerView(this);   // Programmatically initialize the scanner view
         setContentView(mScannerView);                // Set the scanner view as the content view
     }
@@ -52,41 +63,7 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
 //        sendDataBack(rawResult);
 
         String url = rawResult.getText();
-
-        Call<ScanResponseSuccess> call = APIService.createService(APIInterface.class).getScanAllResult(url);
-        call.enqueue(new Callback<ScanResponseSuccess>() {
-            @Override
-            public void onResponse(Call<ScanResponseSuccess> call, Response<ScanResponseSuccess> response) {
-
-                if (response.isSuccessful()) {
-                    if (response.errorBody() == null && response.body() != null) {
-                        ScanResponseSuccess scanResponseObj = response.body();
-
-                        if (scanResponseObj != null) {
-                            Application.scanResponseSuccess = scanResponseObj;
-                            if (scanResponseObj.getError() == null || !scanResponseObj.getError()) {
-                                Intent i = new Intent(SimpleScannerActivity.this, ScanSuccessActivity.class);
-                                startActivity(i);
-                                finish();
-                            } else {
-                                Intent i = new Intent(SimpleScannerActivity.this, ScanFailureActivity.class);
-                                startActivity(i);
-//                                Application.showAutoDismissAlertDialog(SimpleScannerActivity.this, scanResponseObj.getErrorMsg());
-//                                resumeCameraPreview();
-                            }
-                        }
-                    }
-                }
-
-                resumeCameraPreview();
-            }
-
-            @Override
-            public void onFailure(Call<ScanResponseSuccess> call, Throwable t) {
-                Log.e(TAG, "onFailure: ", t.getCause());
-                resumeCameraPreview();
-            }
-        });
+        sendNotification(rawResult.getText());
     }
 
     private void sendDataBack(Result barcode) {
@@ -109,5 +86,57 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
             }
         }, 3000);
         // If you would like to resume scanning, call this method below:
+    }
+
+    private void sendNotification(String badge) {
+        Application.getAccessToken(new AccessToken() {
+            @Override
+            public void onAccessTokenSuccess(String accessToken) {
+                Log.v("TAG", "Access token in sendNotification(): " + accessToken);
+                NotificationRequest notificationRequest = new NotificationRequest(badge, Application.participant.getOpHost(), Application.participant.getName());
+                Call<BadgeRequest> call = mObjAPI.sendNotification(accessToken, notificationRequest);
+                call.enqueue(new Callback<BadgeRequest>() {
+                    @Override
+                    public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
+                        if (response.errorBody() == null && response.body() != null) {
+                            BadgeRequest objResponse = response.body();
+
+                            if (objResponse != null) {
+                                if (objResponse.getError()) {
+                                    Log.v("TAG", "send notification response:" + objResponse.getErrorMsg());
+                                } else {
+                                    Log.v("TAG", "send notification response:" + objResponse.getMessage());
+                                }
+                            }
+                        } else {
+                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                            try {
+                                String error = response.errorBody().string();
+                                Log.v("TAG", "Error in sending notification :" + error);
+                                JSONObject jsonObjectError = new JSONObject(error);
+                                if (jsonObjectError.getBoolean("error")) {
+                                    Log.v("TAG", "Error in sending notification :" + jsonObjectError.getString("errorMsg"));
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BadgeRequest> call, Throwable t) {
+                        Log.v("TAG", "Response send notification failure" + t.getMessage());
+                    }
+                });
+            }
+
+            @Override
+            public void onAccessTokenFailure() {
+                Log.v("TAG", "Failed to get access token in sendNotification()");
+                Application.showAutoDismissAlertDialog(SimpleScannerActivity.this, getString(R.string.unable_to_process));
+            }
+        });
     }
 }

@@ -1,8 +1,11 @@
 package net.gluu.erasmus;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,6 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import net.gluu.erasmus.adapters.BagdePagerAdapter;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
@@ -30,6 +36,8 @@ import net.gluu.erasmus.fragments.ApproveBadgeFragment;
 import net.gluu.erasmus.fragments.PendingBadgeFragment;
 import net.gluu.erasmus.model.ScanResponse;
 import net.gluu.erasmus.model.ScanResponseSuccess;
+import net.gluu.erasmus.push.Config;
+import net.gluu.erasmus.utils.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +61,7 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
     TextView tvScan, tvLog, tvSetting, tvAbout;
     private static final int REQUEST_CODE = 121;
 
-    private static final String TAG = "TokenActivity";
+    private static final String TAG = "TAG";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

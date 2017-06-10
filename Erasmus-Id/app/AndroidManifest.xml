@@ -40,8 +40,8 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name_short"
-            android:theme="@style/AppTheme"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".MainActivity"
@@ -69,8 +69,8 @@
         <activity
             android:name=".TokenActivity"
             android:label="@string/app_name_short"
-            android:theme="@style/AppTheme"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".U2FActivity"
@@ -107,8 +107,27 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
-        <activity android:name=".ScanFailureActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ScanFailureActivity"
+            android:screenOrientation="portrait" />
+
+        <!-- Firebase Notifications -->
+        <service android:name=".push.service.PushNotificationService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".push.service.PushNotificationInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <!-- ./Firebase Notifications -->
+
+        <activity
+            android:name=".BadgeAccessDialog"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.Light.Dialog"/>
     </application>
 
 </manifest>

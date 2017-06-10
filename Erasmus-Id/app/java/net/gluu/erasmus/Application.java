@@ -16,9 +16,7 @@ package net.gluu.erasmus;
 
 import android.content.Context;
 import android.os.Handler;
-import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
@@ -30,7 +28,6 @@ import net.gluu.appauth.AuthorizationService;
 import net.gluu.appauth.ClientAuthentication;
 import net.gluu.appauth.TokenRequest;
 import net.gluu.appauth.TokenResponse;
-import net.gluu.erasmus.api.AccessToken;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.Participant;
 import net.gluu.erasmus.model.Recipient;
@@ -56,11 +53,12 @@ public final class Application extends android.app.Application {
     //    U2F
     public static String U2F_Username = "test";
     public static String U2F_Issuer = "https://ce-release.gluu.org";
-    public static String U2F_State = "900bea6a-6b8e-4d04-ad40-2475882389b9";
+    public static String U2F_State = "27218b33-20bd-40f9-b881-beda2f73a92f";
     public static String U2F_Method = "authenticate";
-    public static String U2F_App = "https://ce-release.gluu.org/identity/authentication/authcode";
+    public static String U2F_App = "/identity/authentication/authcode";
     private static AuthStateManager mStateManager;
     private static AuthorizationService mAuthService;
+    public static Handler applicationHandler;
 
     @Override
     public void onCreate() {
@@ -74,11 +72,12 @@ public final class Application extends android.app.Application {
                 new AppAuthConfiguration.Builder()
                         .setConnectionBuilder(config.getConnectionBuilder())
                         .build());
+        applicationHandler = new Handler(this.getMainLooper());
     }
 
     public static void showAutoDismissAlertDialog(Context ctx, String msg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
-        builder.setTitle("Badge Manager");
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx, R.style.Theme_AppCompat_Dialog);
+        builder.setTitle("ERASMUS");
         builder.setMessage(msg);
 
         AlertDialog alert = builder.create();
@@ -178,5 +177,17 @@ public final class Application extends android.app.Application {
                 request,
                 clientAuthentication,
                 callback);
+    }
+
+    public static void runOnUIThread(Runnable runnable) {
+        runOnUIThread(runnable, 0);
+    }
+
+    public static void runOnUIThread(Runnable runnable, long delay) {
+        if (delay == 0) {
+            applicationHandler.post(runnable);
+        } else {
+            applicationHandler.postDelayed(runnable, delay);
+        }
     }
 }

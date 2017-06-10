@@ -6,10 +6,12 @@ import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.BadgeRequests;
 import net.gluu.erasmus.model.BadgeTemplates;
 import net.gluu.erasmus.model.DisplayBadge;
+import net.gluu.erasmus.model.NotificationRequest;
 import net.gluu.erasmus.model.ParticipantsResponse;
 import net.gluu.erasmus.model.PrivacyRequest;
 import net.gluu.erasmus.model.ScanResponse;
 import net.gluu.erasmus.model.ScanResponseSuccess;
+import net.gluu.erasmus.model.SetPermissionRequest;
 import net.gluu.erasmus.model.TemplateBadgeRequest;
 
 import retrofit2.Call;
@@ -47,4 +49,10 @@ public interface APIInterface {
 
     @GET
     Call<ScanResponseSuccess> getScanAllResult(@Url String url);
+
+    @POST("notification/send")
+    Call<BadgeRequest> sendNotification(@Header("AccessToken") String accessToken, @Body NotificationRequest notificationRequest);
+
+    @POST("badges/setPermission")
+    Call<BadgeRequest> setsetPermission(@Header("AccessToken") String accessToken, @Body SetPermissionRequest permissionRequest);
 }
