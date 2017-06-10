@@ -1,5 +1,20 @@
 # Interview with Dave Smith, Chief of EMS San Marcos
 
+Good quotes to incorporate:
+
+STANDARDS
+“If there is no push to adopt the standard, it won’t happen…it has to be put out at a federal level.  Right now there’s no common standard for third parties to write to that standard.”
+
+SECURITY
+Are you worried about security?
+“I’m always worried. It’s a best effort on our end."
+
+BADGES
+“Problem with [the] badge is the physical aspects. Your badge is everything — physical identity is tied to that. how does it expire. once you lose it, you have to order.  what happened to the others?”
+
+NEED FOR FEDERAL STANDARD
+“Applications are out there, they are just not tied together.  At some point there has to be some agreement, this is what [3rd party] applications have to meet.  I don’t see another solution. There needs to be a standard — a federal standard.
+
 # INTRODUCTION
 
 "We are gathering background information to understand digital identiy in

@@ -1,5 +1,8 @@
 # Reference List
 
+Adds:
+https://view.joomag.com/rapport-volume-2-issue-1-rapport-issue-1-version4finalso/0823412001495630900
+
 (2014) “DC tests ID management for first responders”
 https://gcn.com/articles/2014/09/17/first-responder-id-management.aspx
 

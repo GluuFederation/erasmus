@@ -1,9 +1,4 @@
-# Conculsion
-
-  *	Challenges
-  *	Implications, Takeaways
-  *	Recommendations
-  *	Call to Action: Phase II Blueprint
+# Conclusion
 
 In this section we summarize the results and work completed thus far.   We conclude that ERASMUS is beyond a prototype and MVP, meets the requirements of the field, and is ready for field testing.  There are challenges to adoption, these are discussed in this section. A solution to the problem of emergency responder identification seems close at hand--in fact it seems so frustrating close but yet out of reach. Researching both the tools and the rules, leveraging both old and new technologies, and integrating a mobile and backend solution--we believe this pilot will get us a little closer. By providing data, assembling the feedback of many experts, and delivering free open source software based on open standards, the ERASMUS pilot is also likely to result in actual solutions that will be useful to both government and industry.
 
@@ -31,18 +26,18 @@ Gluu would be prepared to commercialize the software and trust framework that re
   3.      Standards
   4.     Specific requirements for efficiency
 
-## Recommendations for Phase II
-Phase II will enable the piloting necessary to show how ERASMUS can transform how first responders and other emergency personnel are authenticated With evidence of its efficacy and scalability, plans could be made to widen the adoption of ERASMUS, and applications could be built on top of it to provide the next generation of emergency responder digital services.  For example, making ERASMUS digital badges becomes easy to present as any other kind of credential. The integration of these standards into ERASMUS platform provides a member jurisdiction’s the security and audit capabilities required for a high level of assurance transaction.
+## Recommendations
+
+We recommend a second phase of work to develop ERASMUS. This work would include the creation of a federation, continued technical development, additional user research, expanded pilot testing, and targeted outreach to engage the first responder community.  
+
+Phase II would enable the piloting necessary to show how ERASMUS can transform how first responders and other emergency personnel are authenticated With evidence of its efficacy and scalability. Plans could be made to widen the adoption of ERASMUS. Applications could be built on top of it to provide the next generation of emergency responder digital services. For example, making ERASMUS digital badges becomes easy to present as any other kind of credential. The integration of these standards into ERASMUS platform provides a member jurisdiction’s the security and audit capabilities required for a high level of assurance transaction.
 
 Phase II would seek to prove the feasibility of this platform by continuing to gathering feedback from jurisdictions, piloting a proof-of-concept software stack, and drafting rules for trust management in collaboration with <organizations you propose partnerships>.  Proposed work would also involve several strategies aimed at addressing the core barriers to adoption – governance, technology, and stakeholder buy-in.  
 
 We propose five sets of activities: 1) Governance; 2) Technical development; 3) Pilot & User Testing; 4) Marketing & education; 5) Community outreach and stakeholder engagement
 
 ## Governance for ERASMUS.  
-
-The most significant hurdle is not technical, it’s organizational. How to get a diverse network of autonomous organizations to keep the identity information and skills of their people up-to-date and available. And subsequently, how to enable these organizations to share this information in a standard manner that can be communicated to a person in the field who deciding whether to allow entry or assign a task to a person who has responded to an emergency.
-
-Strategy is to form a pilot federation, we build on NIEF or we invite RFP.  A federation offers a coherent and transparent solution. Challenge is creating the governance for ERASMUS.   ERASMUS requires a governance structure that would be representative, sustainable, market responsive.  Governance - would set policies and provide central services to support Trustmark binding to OIDC endpoints in accordance with the spec's trust model.  
+Strategy is to form a pilot federation, e.g. by building or partnering with an existing NIEF or through an RFP process. A federation offers a coherent and transparent solution. Challenge is creating the governance for ERASMUS.  ERASMUS requires a governance structure that would be representative, sustainable, market responsive.  Governance - would set policies and provide central services to support Trustmark binding to OIDC endpoints in accordance with the spec's trust model.  
 
 Loose Federation The pilot would propose the deployment of a lightweight Federation Operator infrastructure that would support signing of Badges, skills, authorizations, and trustmarks asserted by jurisdictions. The pilot would use OAuth2 profiles to secure connections between the mobile device, the jurisdiction services and the Federation Operator.
 
@@ -83,3 +78,14 @@ Create consortium of stakeholders to support 1, 2, 3 and to drive ubiquitous ado
 ●	https://www.gridmenow.com/
 ●	http://www.responsegroupinc.com/  The Response Group or (TRG) is another company out there who has tried to digitize or mobilize the Incident Action Plan (IAP).  I’ve never used them myself but I generally don’t hear many good things about them.
 industry.
+
+## Closing Remarks
+
+The fragmented, decentralized nature of the current emergency responder ecosystem in the US, long and thoroughly documented by the policy and research literature can no longer provide the level of security, reliability, scalability necessary for the 64,000 organizations that are part of the emergency responder community. The community feedback we received by conducting expert interviews provided additional data and explaining through first hand accounts and current experiences, confirm that a solution is needed, urgenty.
+
+The consequences of a fragmented and outdated system are highly problematic for the first responder themselves as well for the entire emergency community. There are, as one first responder said, “No other options out there.” The lack of a solution puts at risk the safety, security, and accessibility to first responders who are qualified. 
+
+The most significant hurdle is not technical, it’s organizational. How to get a diverse network of autonomous organizations to keep the identity information and skills of their people up-to-date and available is a herculean task. How to enable these organizations to share this information in a standard manner that can be communicated to a person in the field who must decide whether to allow entry or assign a task to a person who has responded to an emergency is also a multi-jurisdictional challenge with multiple dimensions.  
+
+The future hope, as expresssed through community feedback, is for a centralized system, clear standards, and a more seamless way of issuing and updating badges. The solution is clear. Adoptions will require more technical development, research, collaboration, and buy-in from the first responder community.  Phase II paves the way and provides a vehicle toward the development and ipelmentation of a much needed solution.
+.
