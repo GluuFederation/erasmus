@@ -4,15 +4,7 @@ package org.xdi.oxd.badgemanager.model;
  * Created by Arvind Tomar on 5/6/17.
  */
 public class NotificationRequest {
-    private String email, badge, opHost, participant, badgeVerificationStatus;
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    private String badge, opHost, participant;
 
     public String getBadge() {
         return badge;
@@ -36,13 +28,5 @@ public class NotificationRequest {
 
     public void setParticipant(String participant) {
         this.participant = participant;
-    }
-
-    public String getBadgeVerificationStatus() {
-        return badgeVerificationStatus;
-    }
-
-    public void setBadgeVerificationStatus(String badgeVerificationStatus) {
-        this.badgeVerificationStatus = badgeVerificationStatus;
     }
 }
