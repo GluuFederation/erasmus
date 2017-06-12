@@ -574,7 +574,7 @@ public class BadgeController {
 
                 msg = "Permission to see this badge " + access + " successfully";
 
-                sendNotification(msg, email, deviceData.getPushToken(), strTempURL);
+                sendNotification(msg, email, deviceData.getPushToken(), strTempURL,2);
 
                 jsonResponse.addProperty("message", msg);
                 return jsonResponse.toString();
@@ -594,13 +594,14 @@ public class BadgeController {
         }
     }
 
-    private void sendNotification(String msg, String fromEmail, String toDeviceToken, String tempURL) {
+    private void sendNotification(String msg, String fromEmail, String toDeviceToken, String tempURL, int type) {
 
 //        String toDeviceToken = "e_ZEo4DHlqE:APA91bFo6BDgrQQzU4xkHpAgiLDhVlMOq1ivpjNh0X8tViqNuxZnVjKHLjgG0uMqZYsup1_MU_VkOzDO-nplW7QNa9wlYaoB_eoj3-Xdt-QCeIXOgCgoDdzeT1mnOEhBZoX00FzCKBkO";
 
         JsonObject data = new JsonObject();
         data.addProperty("fromAsserter", fromEmail);
         data.addProperty("tempUrl", tempURL);
+        data.addProperty("notifyType", type);
 
         notificationController.send(msg, toDeviceToken, data);
     }
@@ -621,7 +622,7 @@ public class BadgeController {
                             logger.info("Device data: " + deviceRegistration.getDeviceData());
                             DeviceData deviceData = deviceRegistration.getDeviceData();
                             if (deviceData.getPlatform().equalsIgnoreCase("android") && deviceData.getPushToken() != null) {
-                                sendNotification("Badge verified successfully", "", deviceData.getPushToken(), "");
+                                sendNotification("Badge verified successfully", "", deviceData.getPushToken(), "",3);
                             }
                         }
                     }

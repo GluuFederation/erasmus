@@ -131,6 +131,7 @@ public class NotificationController {
             data.addProperty("fromEmail", fromEmail);
             data.addProperty("badge", badges.getGuid());
             data.addProperty("badgeTitle", badgeRequests.getTemplateBadgeTitle());
+            data.addProperty("notifyType", 1);
 
             return notificationResponse(send(msg, toDeviceToken, data), jsonResponse, response);
         } catch (Exception e) {
