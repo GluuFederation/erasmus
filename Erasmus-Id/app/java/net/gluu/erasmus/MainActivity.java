@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
         initToolbar();
         initSpinner();
-//        initRecyclerView();
     }
 
     private void initToolbar() {
@@ -82,8 +80,6 @@ public class MainActivity extends AppCompatActivity {
     private void initSpinner() {
         getStateCityList();
 
-//        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.state)); //selected item will look like a spinner set from XML
-//        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         StateAdapter adapter = new StateAdapter(MainActivity.this, arStates);
         mSpState = (Spinner) findViewById(R.id.sp_state);
         mSpState.setAdapter(adapter);
@@ -168,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
     private class SearchCloseListener implements SearchView.OnCloseListener {
         @Override
         public boolean onClose() {
-//            adapter.notifyDataSetChanged();
             return false;
         }
     }

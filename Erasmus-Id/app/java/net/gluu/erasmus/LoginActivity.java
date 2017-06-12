@@ -105,8 +105,6 @@ public final class LoginActivity extends AppCompatActivity {
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Loading..");
 
-//        findViewById(R.id.retry).setOnClickListener((View view) ->
-//            mExecutor.submit(this::initializeAppAuth));
         ((TextView) findViewById(R.id.tv_organization)).setText(Application.participant.getName());
         findViewById(R.id.tv_change_organization).setOnClickListener((View view) -> finish());
         findViewById(R.id.start_auth).setOnClickListener((View view) -> startAuth());

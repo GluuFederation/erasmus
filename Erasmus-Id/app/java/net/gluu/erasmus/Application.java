@@ -15,6 +15,8 @@
 package net.gluu.erasmus;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -189,5 +191,14 @@ public final class Application extends android.app.Application {
         } else {
             applicationHandler.postDelayed(runnable, delay);
         }
+    }
+
+    public static boolean checkInternetConnection(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+        return ((netInfo != null) && netInfo.isAvailable() && netInfo
+                .isConnected());
     }
 }

@@ -55,53 +55,57 @@ public class RequestBadgeActivity extends AppCompatActivity {
     }
 
     private void getBadgeTemplates() {
-        showProgressBar();
+        if (Application.checkInternetConnection(RequestBadgeActivity.this)) {
+            showProgressBar();
 
-        Application.getAccessToken(new AccessToken() {
+            Application.getAccessToken(new AccessToken() {
 
-            @Override
-            public void onAccessTokenSuccess(String accessToken) {
-                Log.v("TAG", "Access token in getBadgeTemplates(): " + accessToken);
-                TemplateBadgeRequest templateBadgeRequest = new TemplateBadgeRequest(Application.participant.getOpHost(), "all");
-                Call<BadgeTemplates> call = mObjAPI.getBadgeTemplates(accessToken, templateBadgeRequest);
-                call.enqueue(new Callback<BadgeTemplates>() {
-                    @Override
-                    public void onResponse(Call<BadgeTemplates> call, Response<BadgeTemplates> response) {
-                        hideProgressBar();
-                        if (response.errorBody() == null && response.body() != null) {
-                            BadgeTemplates objResponse = response.body();
+                @Override
+                public void onAccessTokenSuccess(String accessToken) {
+                    Log.v("TAG", "Access token in getBadgeTemplates(): " + accessToken);
+                    TemplateBadgeRequest templateBadgeRequest = new TemplateBadgeRequest(Application.participant.getOpHost(), "all");
+                    Call<BadgeTemplates> call = mObjAPI.getBadgeTemplates(accessToken, templateBadgeRequest);
+                    call.enqueue(new Callback<BadgeTemplates>() {
+                        @Override
+                        public void onResponse(Call<BadgeTemplates> call, Response<BadgeTemplates> response) {
+                            hideProgressBar();
+                            if (response.errorBody() == null && response.body() != null) {
+                                BadgeTemplates objResponse = response.body();
 
-                            if (objResponse != null) {
-                                if (objResponse.getError()) {
-                                    Log.v("TAG", "Error in retrieving badge templates");
-                                    Application.showAutoDismissAlertDialog(RequestBadgeActivity.this, objResponse.getErrorMsg());
-                                } else {
-                                    Log.v("TAG", "badge requests retrieved:" + objResponse.getBadges().size());
-                                    adapter = new BadgeTemplatesAdapter(RequestBadgeActivity.this, objResponse.getBadges());
-                                    mRvBadges.setAdapter(adapter);
+                                if (objResponse != null) {
+                                    if (objResponse.getError()) {
+                                        Log.v("TAG", "Error in retrieving badge templates");
+                                        Application.showAutoDismissAlertDialog(RequestBadgeActivity.this, objResponse.getErrorMsg());
+                                    } else {
+                                        Log.v("TAG", "badge requests retrieved:" + objResponse.getBadges().size());
+                                        adapter = new BadgeTemplatesAdapter(RequestBadgeActivity.this, objResponse.getBadges());
+                                        mRvBadges.setAdapter(adapter);
+                                    }
                                 }
+                            } else {
+                                Log.v("TAG", "Error from server in retrieving badge templates:" + response.errorBody());
+                                Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                             }
-                        } else {
-                            Log.v("TAG", "Error from server in retrieving badge templates:" + response.errorBody());
-                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<BadgeTemplates> call, Throwable t) {
-                        Log.v("TAG", "Response retrieving badge templates failure" + t.getMessage());
-                        hideProgressBar();
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure(Call<BadgeTemplates> call, Throwable t) {
+                            Log.v("TAG", "Response retrieving badge templates failure" + t.getMessage());
+                            hideProgressBar();
+                        }
+                    });
+                }
 
-            @Override
-            public void onAccessTokenFailure() {
-                Log.v("TAG", "Failed to get access token in getBadgeTemplates()");
-                hideProgressBar();
-                Application.showAutoDismissAlertDialog(RequestBadgeActivity.this, getString(R.string.unable_to_process));
-            }
-        });
+                @Override
+                public void onAccessTokenFailure() {
+                    Log.v("TAG", "Failed to get access token in getBadgeTemplates()");
+                    hideProgressBar();
+                    Application.showAutoDismissAlertDialog(RequestBadgeActivity.this, getString(R.string.unable_to_process));
+                }
+            });
+        } else {
+            Application.showAutoDismissAlertDialog(RequestBadgeActivity.this, getString(R.string.no_internet));
+        }
     }
 
     private void showProgressBar() {

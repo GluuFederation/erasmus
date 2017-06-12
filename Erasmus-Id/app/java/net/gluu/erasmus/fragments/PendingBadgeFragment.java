@@ -103,7 +103,7 @@ public class PendingBadgeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mRvBadges = (RecyclerView) view.findViewById(R.id.rv_badges);
         mRvBadges.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mSwipeRefreshLayout= (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         getPendingBadgeRequests();
 
         mSwipeRefreshLayout.setOnRefreshListener(
@@ -161,51 +161,56 @@ public class PendingBadgeFragment extends Fragment {
     }
 
     private void getPendingBadgeRequests() {
-        showProgressBar();
+        if (Application.checkInternetConnection(getActivity())) {
 
-        Application.getAccessToken(new AccessToken() {
-            @Override
-            public void onAccessTokenSuccess(String accessToken) {
-                Log.v("TAG", "Access token in getPendingBadgeRequests(): " + accessToken);
-                APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "Pending");
-                Call<BadgeRequests> call = mObjAPI.getBadgeRequests(accessToken, badgeRequest);
-                call.enqueue(new Callback<BadgeRequests>() {
-                    @Override
-                    public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {
-                        hideProgressBar();
-                        if (response.errorBody() == null && response.body() != null) {
-                            BadgeRequests objResponse = response.body();
+            showProgressBar();
 
-                            if (objResponse != null) {
-                                if (objResponse.getError()) {
-                                    Log.v("TAG", "Error in retrieving pending badge requests");
-                                    Application.showAutoDismissAlertDialog(getActivity(), objResponse.getErrorMsg());
-                                } else {
-                                    Log.v("TAG", "pending badge requests retrieved:" + objResponse.getBadgeRequests().size());
-                                    mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), false));
+            Application.getAccessToken(new AccessToken() {
+                @Override
+                public void onAccessTokenSuccess(String accessToken) {
+                    Log.v("TAG", "Access token in getPendingBadgeRequests(): " + accessToken);
+                    APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "Pending");
+                    Call<BadgeRequests> call = mObjAPI.getBadgeRequests(accessToken, badgeRequest);
+                    call.enqueue(new Callback<BadgeRequests>() {
+                        @Override
+                        public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {
+                            hideProgressBar();
+                            if (response.errorBody() == null && response.body() != null) {
+                                BadgeRequests objResponse = response.body();
+
+                                if (objResponse != null) {
+                                    if (objResponse.getError()) {
+                                        Log.v("TAG", "Error in retrieving pending badge requests");
+                                        Application.showAutoDismissAlertDialog(getActivity(), objResponse.getErrorMsg());
+                                    } else {
+                                        Log.v("TAG", "pending badge requests retrieved:" + objResponse.getBadgeRequests().size());
+                                        mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), false));
+                                    }
                                 }
+                            } else {
+                                Log.v("TAG", "Error from server in retrieving pending badge requests:" + response.errorBody());
+                                Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                             }
-                        } else {
-                            Log.v("TAG", "Error from server in retrieving pending badge requests:" + response.errorBody());
-                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<BadgeRequests> call, Throwable t) {
-                        Log.v("TAG", "Response retrieving pending badge requests failure" + t.getMessage());
-                        hideProgressBar();
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure(Call<BadgeRequests> call, Throwable t) {
+                            Log.v("TAG", "Response retrieving pending badge requests failure" + t.getMessage());
+                            hideProgressBar();
+                        }
+                    });
+                }
 
-            @Override
-            public void onAccessTokenFailure() {
-                Log.v("TAG", "Failed to get access token in getPendingBadgeRequests()");
-                hideProgressBar();
-                Application.showAutoDismissAlertDialog(getActivity(), getString(R.string.unable_to_process));
-            }
-        });
+                @Override
+                public void onAccessTokenFailure() {
+                    Log.v("TAG", "Failed to get access token in getPendingBadgeRequests()");
+                    hideProgressBar();
+                    Application.showAutoDismissAlertDialog(getActivity(), getString(R.string.unable_to_process));
+                }
+            });
+        } else {
+            Application.showAutoDismissAlertDialog(getActivity(), getString(R.string.no_internet));
+        }
     }
 
     private void showProgressBar() {

@@ -1,11 +1,8 @@
 package net.gluu.erasmus;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,38 +10,23 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-
-import net.gluu.erasmus.adapters.BagdePagerAdapter;
-import net.gluu.erasmus.api.APIInterface;
-import net.gluu.erasmus.api.APIService;
+import net.gluu.erasmus.adapters.BadgePagerAdapter;
 import net.gluu.erasmus.fragments.ApproveBadgeFragment;
 import net.gluu.erasmus.fragments.PendingBadgeFragment;
-import net.gluu.erasmus.model.ScanResponse;
-import net.gluu.erasmus.model.ScanResponseSuccess;
-import net.gluu.erasmus.push.Config;
-import net.gluu.erasmus.utils.NotificationUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * Created by Meghna Joshi on 20/4/17.
@@ -53,15 +35,12 @@ import retrofit2.Response;
 public class BadgeStatusActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int MY_REQUEST_CODE = 111;
-    BagdePagerAdapter pagerAdapter;
+    BadgePagerAdapter pagerAdapter;
     private List<Fragment> fragments;
     TabLayout mTabLayout;
     ViewPager mViewPager;
     LinearLayout llBottomMenu;
     TextView tvScan, tvLog, tvSetting, tvAbout;
-    private static final int REQUEST_CODE = 121;
-
-    private static final String TAG = "TAG";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,7 +66,6 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
             startActivity(i);
         }
         return super.onOptionsItemSelected(item);
-
     }
 
     private void initListeners() {
@@ -127,7 +105,7 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
 
     private void initViewPager() {
         getFragments();
-        pagerAdapter = new BagdePagerAdapter(getSupportFragmentManager(), fragments);
+        pagerAdapter = new BadgePagerAdapter(getSupportFragmentManager(), fragments);
         mViewPager.setAdapter(pagerAdapter);
     }
 
@@ -143,7 +121,6 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_scan:
-
                 checkPermission();
                 break;
         }
@@ -166,47 +143,13 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_CODE) {
-
-                String id = data.getStringExtra("barcode");
-                Call<ScanResponseSuccess> call = APIService.createService(APIInterface.class).getScanAllResult(id);
-                call.enqueue(new Callback<ScanResponseSuccess>() {
-                    @Override
-                    public void onResponse(Call<ScanResponseSuccess> call, Response<ScanResponseSuccess> response) {
-                        if (response.isSuccessful()) {
-                            if (response.body().getError()) {
-                                Toast.makeText(getApplicationContext(), response.body().getErrorMsg(), Toast.LENGTH_SHORT).show();
-                            } else {
-                                Application.scanResponseSuccess = response.body();
-                                Intent i = new Intent(BadgeStatusActivity.this, ScanSuccessActivity.class);
-                                startActivity(i);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ScanResponseSuccess> call, Throwable t) {
-                        Log.e(TAG, "onFailure: ", t.getCause());
-                    }
-                });
-            }
-        }
-    }
-
     private void checkPermission() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if ((checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
-
                 Intent i = new Intent(BadgeStatusActivity.this, SimpleScannerActivity.class);
-                startActivityForResult(i, REQUEST_CODE);
-
+                startActivity(i);
             } else if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-
                 ArrayList<String> strings = new ArrayList<String>();
 
                 if ((checkSelfPermission(Manifest.permission.CAMERA)
@@ -223,20 +166,15 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
                 requestPermissions(strs, MY_REQUEST_CODE);
             }
         } else {
-
             Intent i = new Intent(BadgeStatusActivity.this, SimpleScannerActivity.class);
-            startActivityForResult(i, REQUEST_CODE);
+            startActivity(i);
         }
-
-        return;
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         boolean permissionDenied = false;
         if (requestCode == MY_REQUEST_CODE) {
-
             if (grantResults.length > 0) {
                 for (int i = 0; i < grantResults.length; i++) {
                     if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
@@ -246,17 +184,14 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
                 }
             }
             if (!permissionDenied) {
-
                 Intent i = new Intent(BadgeStatusActivity.this, SimpleScannerActivity.class);
-                startActivityForResult(i, REQUEST_CODE);
-
+                startActivity(i);
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(getResources().getString(R.string.app_name) + getString(R.string.require_permission));
                 builder.setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         checkPermission();
                     }
                 });
@@ -270,10 +205,8 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
                 });
 
                 builder.show();
-
             }
         }
-
     }
 
     @Override

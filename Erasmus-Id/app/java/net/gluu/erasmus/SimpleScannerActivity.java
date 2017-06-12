@@ -86,54 +86,58 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
     }
 
     private void sendNotification(String badge) {
-        Application.getAccessToken(new AccessToken() {
-            @Override
-            public void onAccessTokenSuccess(String accessToken) {
-                Log.v("TAG", "Access token in sendNotification(): " + accessToken);
-                NotificationRequest notificationRequest = new NotificationRequest(badge, Application.participant.getOpHost(), Application.participant.getName());
-                Call<BadgeRequest> call = mObjAPI.sendNotification(accessToken, notificationRequest);
-                call.enqueue(new Callback<BadgeRequest>() {
-                    @Override
-                    public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
-                        if (response.errorBody() == null && response.body() != null) {
-                            BadgeRequest objResponse = response.body();
+        if (Application.checkInternetConnection(SimpleScannerActivity.this)) {
+            Application.getAccessToken(new AccessToken() {
+                @Override
+                public void onAccessTokenSuccess(String accessToken) {
+                    Log.v("TAG", "Access token in sendNotification(): " + accessToken);
+                    NotificationRequest notificationRequest = new NotificationRequest(badge, Application.participant.getOpHost(), Application.participant.getName());
+                    Call<BadgeRequest> call = mObjAPI.sendNotification(accessToken, notificationRequest);
+                    call.enqueue(new Callback<BadgeRequest>() {
+                        @Override
+                        public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
+                            if (response.errorBody() == null && response.body() != null) {
+                                BadgeRequest objResponse = response.body();
 
-                            if (objResponse != null) {
-                                if (objResponse.getError()) {
-                                    Log.v("TAG", "send notification response:" + objResponse.getErrorMsg());
-                                } else {
-                                    Log.v("TAG", "send notification response:" + objResponse.getMessage());
+                                if (objResponse != null) {
+                                    if (objResponse.getError()) {
+                                        Log.v("TAG", "send notification response:" + objResponse.getErrorMsg());
+                                    } else {
+                                        Log.v("TAG", "send notification response:" + objResponse.getMessage());
+                                    }
                                 }
-                            }
-                        } else {
-                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
-                            try {
-                                String error = response.errorBody().string();
-                                Log.v("TAG", "Error in sending notification :" + error);
-                                JSONObject jsonObjectError = new JSONObject(error);
-                                if (jsonObjectError.getBoolean("error")) {
-                                    Log.v("TAG", "Error in sending notification :" + jsonObjectError.getString("errorMsg"));
+                            } else {
+                                Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                                try {
+                                    String error = response.errorBody().string();
+                                    Log.v("TAG", "Error in sending notification :" + error);
+                                    JSONObject jsonObjectError = new JSONObject(error);
+                                    if (jsonObjectError.getBoolean("error")) {
+                                        Log.v("TAG", "Error in sending notification :" + jsonObjectError.getString("errorMsg"));
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<BadgeRequest> call, Throwable t) {
-                        Log.v("TAG", "Response send notification failure" + t.getMessage());
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure(Call<BadgeRequest> call, Throwable t) {
+                            Log.v("TAG", "Response send notification failure" + t.getMessage());
+                        }
+                    });
+                }
 
-            @Override
-            public void onAccessTokenFailure() {
-                Log.v("TAG", "Failed to get access token in sendNotification()");
-                Application.showAutoDismissAlertDialog(SimpleScannerActivity.this, getString(R.string.unable_to_process));
-            }
-        });
+                @Override
+                public void onAccessTokenFailure() {
+                    Log.v("TAG", "Failed to get access token in sendNotification()");
+                    Application.showAutoDismissAlertDialog(SimpleScannerActivity.this, getString(R.string.unable_to_process));
+                }
+            });
+        } else {
+            Log.v("TAG", getString(R.string.no_internet));
+        }
     }
 }

@@ -10,6 +10,7 @@ import com.google.firebase.messaging.RemoteMessage;
 import net.gluu.erasmus.Application;
 import net.gluu.erasmus.BadgeAccessDialog;
 import net.gluu.erasmus.R;
+import net.gluu.erasmus.RequestBadgeActivity;
 import net.gluu.erasmus.ScanFailureActivity;
 import net.gluu.erasmus.ScanSuccessActivity;
 import net.gluu.erasmus.api.APIInterface;
@@ -128,35 +129,39 @@ public class PushNotificationService extends com.google.firebase.messaging.Fireb
     }
 
     private void verifyBadge(String url) {
-        Call<ScanResponseSuccess> call = APIService.createService(APIInterface.class).getScanAllResult(url);
-        call.enqueue(new Callback<ScanResponseSuccess>() {
-            @Override
-            public void onResponse(Call<ScanResponseSuccess> call, Response<ScanResponseSuccess> response) {
+        if (Application.checkInternetConnection(getApplicationContext())) {
+            Call<ScanResponseSuccess> call = APIService.createService(APIInterface.class).getScanAllResult(url);
+            call.enqueue(new Callback<ScanResponseSuccess>() {
+                @Override
+                public void onResponse(Call<ScanResponseSuccess> call, Response<ScanResponseSuccess> response) {
 
-                if (response.isSuccessful()) {
-                    if (response.errorBody() == null && response.body() != null) {
-                        ScanResponseSuccess scanResponseObj = response.body();
+                    if (response.isSuccessful()) {
+                        if (response.errorBody() == null && response.body() != null) {
+                            ScanResponseSuccess scanResponseObj = response.body();
 
-                        if (scanResponseObj != null) {
-                            Application.scanResponseSuccess = scanResponseObj;
-                            if (scanResponseObj.getError() == null || !scanResponseObj.getError()) {
-                                Intent i = new Intent(getApplicationContext(), ScanSuccessActivity.class);
-                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(i);
-                            } else {
-                                Intent i = new Intent(getApplicationContext(), ScanFailureActivity.class);
-                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(i);
+                            if (scanResponseObj != null) {
+                                Application.scanResponseSuccess = scanResponseObj;
+                                if (scanResponseObj.getError() == null || !scanResponseObj.getError()) {
+                                    Intent i = new Intent(getApplicationContext(), ScanSuccessActivity.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
+                                } else {
+                                    Intent i = new Intent(getApplicationContext(), ScanFailureActivity.class);
+                                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ScanResponseSuccess> call, Throwable t) {
-                Log.e(TAG, "onFailure: ", t.getCause());
-            }
-        });
+                @Override
+                public void onFailure(Call<ScanResponseSuccess> call, Throwable t) {
+                    Log.e(TAG, "onFailure: ", t.getCause());
+                }
+            });
+        } else {
+            Log.v("TAG", getString(R.string.no_internet));
+        }
     }
 }

@@ -95,36 +95,41 @@ public class SelectOpActivity extends AppCompatActivity {
     }
 
     private void getOp() {
-        showProgressBar();
-        Call<ParticipantsResponse> call = mObjAPI.getParticipants("all", "all");
-        call.enqueue(new Callback<ParticipantsResponse>() {
-            @Override
-            public void onResponse(Call<ParticipantsResponse> call, Response<ParticipantsResponse> response) {
-                hideProgressBar();
-                if (response.errorBody() == null && response.body() != null) {
-                    ParticipantsResponse objResponse = response.body();
+        if (Application.checkInternetConnection(SelectOpActivity.this)) {
 
-                    if (objResponse != null) {
-                        if (objResponse.getError()) {
-                            Log.v("TAG", "Error in retrieving participants");
-                        } else {
-                            Log.v("TAG", "Participants retrieved:" + objResponse.getParticipants().size());
-                            adapter = new OPAdapter(SelectOpActivity.this, objResponse.getParticipants());
-                            mRvOrganization.setAdapter(adapter);
+            showProgressBar();
+            Call<ParticipantsResponse> call = mObjAPI.getParticipants("all", "all");
+            call.enqueue(new Callback<ParticipantsResponse>() {
+                @Override
+                public void onResponse(Call<ParticipantsResponse> call, Response<ParticipantsResponse> response) {
+                    hideProgressBar();
+                    if (response.errorBody() == null && response.body() != null) {
+                        ParticipantsResponse objResponse = response.body();
+
+                        if (objResponse != null) {
+                            if (objResponse.getError()) {
+                                Log.v("TAG", "Error in retrieving participants");
+                            } else {
+                                Log.v("TAG", "Participants retrieved:" + objResponse.getParticipants().size());
+                                adapter = new OPAdapter(SelectOpActivity.this, objResponse.getParticipants());
+                                mRvOrganization.setAdapter(adapter);
+                            }
                         }
+                    } else {
+                        Log.v("TAG", "Error from server in retrieving participants:" + response.errorBody());
+                        Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                     }
-                } else {
-                    Log.v("TAG", "Error from server in retrieving participants:" + response.errorBody());
-                    Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ParticipantsResponse> call, Throwable t) {
-                Log.v("TAG", "Response retrieving participants failure" + t.getMessage());
-                hideProgressBar();
-            }
-        });
+                @Override
+                public void onFailure(Call<ParticipantsResponse> call, Throwable t) {
+                    Log.v("TAG", "Response retrieving participants failure" + t.getMessage());
+                    hideProgressBar();
+                }
+            });
+        } else {
+            Application.showAutoDismissAlertDialog(SelectOpActivity.this, getString(R.string.no_internet));
+        }
     }
 
     private void showProgressBar() {

@@ -82,63 +82,67 @@ public class BadgeAccessDialog extends Activity implements View.OnClickListener 
     }
 
     private void setBadgePermission(String access) {
-        showProgressBar();
+        if (Application.checkInternetConnection(BadgeAccessDialog.this)) {
+            showProgressBar();
 
-        Application.getAccessToken(new AccessToken() {
-            @Override
-            public void onAccessTokenSuccess(String accessToken) {
-                Log.v("TAG", "Access token in setBadgePermission(): " + accessToken);
-                SetPermissionRequest setPermissionRequest = new SetPermissionRequest(access, badge, Application.participant.getOpHost());
-                Call<BadgeRequest> call = mObjAPI.setsetPermission(accessToken, setPermissionRequest);
-                call.enqueue(new Callback<BadgeRequest>() {
-                    @Override
-                    public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
-                        hideProgressBar();
-                        if (response.errorBody() == null && response.body() != null) {
-                            BadgeRequest objResponse = response.body();
+            Application.getAccessToken(new AccessToken() {
+                @Override
+                public void onAccessTokenSuccess(String accessToken) {
+                    Log.v("TAG", "Access token in setBadgePermission(): " + accessToken);
+                    SetPermissionRequest setPermissionRequest = new SetPermissionRequest(access, badge, Application.participant.getOpHost());
+                    Call<BadgeRequest> call = mObjAPI.setBadgePermission(accessToken, setPermissionRequest);
+                    call.enqueue(new Callback<BadgeRequest>() {
+                        @Override
+                        public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
+                            hideProgressBar();
+                            if (response.errorBody() == null && response.body() != null) {
+                                BadgeRequest objResponse = response.body();
 
-                            if (objResponse != null) {
-                                if (objResponse.getError()) {
-                                    Application.showAutoDismissAlertDialog(BadgeAccessDialog.this, objResponse.getErrorMsg());
-                                } else {
-                                    Application.showAutoDismissAlertDialog(BadgeAccessDialog.this, objResponse.getMessage());
+                                if (objResponse != null) {
+                                    if (objResponse.getError()) {
+                                        Application.showAutoDismissAlertDialog(BadgeAccessDialog.this, objResponse.getErrorMsg());
+                                    } else {
+                                        Application.showAutoDismissAlertDialog(BadgeAccessDialog.this, objResponse.getMessage());
+                                    }
+                                }
+                            } else {
+                                Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                                try {
+                                    String error = response.errorBody().string();
+                                    Log.v("TAG", "Error in setting badge permission :" + error);
+                                    JSONObject jsonObjectError = new JSONObject(error);
+                                    if (jsonObjectError.getBoolean("error")) {
+                                        Application.showAutoDismissAlertDialog(BadgeAccessDialog.this, jsonObjectError.getString("errorMsg"));
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
                             }
-                        } else {
-                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
-                            try {
-                                String error = response.errorBody().string();
-                                Log.v("TAG", "Error in setting badge permission :" + error);
-                                JSONObject jsonObjectError = new JSONObject(error);
-                                if (jsonObjectError.getBoolean("error")) {
-                                    Application.showAutoDismissAlertDialog(BadgeAccessDialog.this, jsonObjectError.getString("errorMsg"));
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                            dismissDialog();
                         }
-                        dismissDialog();
-                    }
 
-                    @Override
-                    public void onFailure(Call<BadgeRequest> call, Throwable t) {
-                        Log.v("TAG", "Response setting badge permission failure" + t.getMessage());
-                        hideProgressBar();
-                        dismissDialog();
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure(Call<BadgeRequest> call, Throwable t) {
+                            Log.v("TAG", "Response setting badge permission failure" + t.getMessage());
+                            hideProgressBar();
+                            dismissDialog();
+                        }
+                    });
+                }
 
-            @Override
-            public void onAccessTokenFailure() {
-                Log.v("TAG", "Failed to get access token in setBadgePermission()");
-                hideProgressBar();
-                Application.showAutoDismissAlertDialog(BadgeAccessDialog.this, getString(R.string.unable_to_process));
-                dismissDialog();
-            }
-        });
+                @Override
+                public void onAccessTokenFailure() {
+                    Log.v("TAG", "Failed to get access token in setBadgePermission()");
+                    hideProgressBar();
+                    Application.showAutoDismissAlertDialog(BadgeAccessDialog.this, getString(R.string.unable_to_process));
+                    dismissDialog();
+                }
+            });
+        } else {
+            Log.v("TAG", getString(R.string.no_internet));
+        }
     }
 
     private void showProgressBar() {

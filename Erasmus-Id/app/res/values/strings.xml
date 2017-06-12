@@ -115,6 +115,7 @@
     <string name="allow">Allow</string>
     <string name="deny">Deny</string>
     <string name="badge_permission_denied">Permission to see this badge is denied by asserter</string>
+    <string name="no_internet">No internet connection!!!</string>
 
     <!--data passing keys-->
     <string name="key_message">message</string>

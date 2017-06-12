@@ -27,6 +27,7 @@ import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.PrivacyRequest;
 
+import org.androidannotations.annotations.App;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -170,178 +171,190 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
     }
 
     private void deleteBadgeRequest(BadgeRequest badgeRequest, int position) {
-        showProgressBar("Deleting..");
+        if (Application.checkInternetConnection(mContext)) {
+            showProgressBar("Deleting..");
 
-        Application.getAccessToken(new AccessToken() {
-            @Override
-            public void onAccessTokenSuccess(String accessToken) {
-                Log.v("TAG", "Access token in deleteBadgeRequest(): " + accessToken);
-                APIBadgeDetail badgeDetail = new APIBadgeDetail();
-                badgeDetail.setBadgeRequestInum(badgeRequest.getInum());
-                badgeDetail.setOpHost(Application.participant.getOpHost());
-                Call<BadgeRequest> call = mObjAPI.deleteBadge(accessToken, badgeDetail);
-                call.enqueue(new Callback<BadgeRequest>() {
-                    @Override
-                    public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
-                        hideProgressBar();
-                        if (response.errorBody() == null && response.body() != null) {
-                            BadgeRequest objResponse = response.body();
+            Application.getAccessToken(new AccessToken() {
+                @Override
+                public void onAccessTokenSuccess(String accessToken) {
+                    Log.v("TAG", "Access token in deleteBadgeRequest(): " + accessToken);
+                    APIBadgeDetail badgeDetail = new APIBadgeDetail();
+                    badgeDetail.setBadgeRequestInum(badgeRequest.getInum());
+                    badgeDetail.setOpHost(Application.participant.getOpHost());
+                    Call<BadgeRequest> call = mObjAPI.deleteBadge(accessToken, badgeDetail);
+                    call.enqueue(new Callback<BadgeRequest>() {
+                        @Override
+                        public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
+                            hideProgressBar();
+                            if (response.errorBody() == null && response.body() != null) {
+                                BadgeRequest objResponse = response.body();
 
-                            if (objResponse != null) {
-                                if (objResponse.getError()) {
-                                    Log.v("TAG", "Error in deleting badge request.");
-                                    Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
-                                } else {
-                                    mBadgeRequests.remove(position);
-                                    notifyItemRemoved(position);
-                                    Application.showAutoDismissAlertDialog(mContext, objResponse.getMessage());
+                                if (objResponse != null) {
+                                    if (objResponse.getError()) {
+                                        Log.v("TAG", "Error in deleting badge request.");
+                                        Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
+                                    } else {
+                                        mBadgeRequests.remove(position);
+                                        notifyItemRemoved(position);
+                                        Application.showAutoDismissAlertDialog(mContext, objResponse.getMessage());
+                                    }
                                 }
-                            }
-                        } else {
-                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
-                            try {
-                                String error = response.errorBody().string();
-                                Log.v("TAG", "Error in deleting badge request is:" + error);
-                                JSONObject jsonObjectError = new JSONObject(error);
-                                if (jsonObjectError.getBoolean("error")) {
-                                    Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
+                            } else {
+                                Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                                try {
+                                    String error = response.errorBody().string();
+                                    Log.v("TAG", "Error in deleting badge request is:" + error);
+                                    JSONObject jsonObjectError = new JSONObject(error);
+                                    if (jsonObjectError.getBoolean("error")) {
+                                        Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<BadgeRequest> call, Throwable t) {
-                        Log.v("TAG", "Response deleting badge request failure" + t.getMessage());
-                        hideProgressBar();
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure(Call<BadgeRequest> call, Throwable t) {
+                            Log.v("TAG", "Response deleting badge request failure" + t.getMessage());
+                            hideProgressBar();
+                        }
+                    });
+                }
 
-            @Override
-            public void onAccessTokenFailure() {
-                Log.v("TAG", "Failed to get access token in deleteBadgeRequest()");
-                hideProgressBar();
-                Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.unable_to_process));
-            }
-        });
+                @Override
+                public void onAccessTokenFailure() {
+                    Log.v("TAG", "Failed to get access token in deleteBadgeRequest()");
+                    hideProgressBar();
+                    Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.unable_to_process));
+                }
+            });
+        } else {
+            Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.no_internet));
+        }
     }
 
     private void getBadgeDetails(BadgeRequest badgeRequest) {
-        showProgressBar("Requesting badge..");
+        if (Application.checkInternetConnection(mContext)) {
+            showProgressBar("Requesting badge..");
 
-        Application.getAccessToken(new AccessToken() {
-            @Override
-            public void onAccessTokenSuccess(String accessToken) {
-                Log.v("TAG", "Access token in getBadgeDetails(): " + accessToken);
-                APIBadgeDetail badgeDetail = new APIBadgeDetail();
-                badgeDetail.setBadgeRequestInum(badgeRequest.getInum());
-                badgeDetail.setOpHost(Application.participant.getOpHost());
-                Call<DisplayBadge> call = mObjAPI.getBadge(accessToken, badgeDetail);
-                call.enqueue(new Callback<DisplayBadge>() {
-                    @Override
-                    public void onResponse(Call<DisplayBadge> call, Response<DisplayBadge> response) {
-                        hideProgressBar();
-                        if (response.errorBody() == null && response.body() != null) {
-                            DisplayBadge objResponse = response.body();
+            Application.getAccessToken(new AccessToken() {
+                @Override
+                public void onAccessTokenSuccess(String accessToken) {
+                    Log.v("TAG", "Access token in getBadgeDetails(): " + accessToken);
+                    APIBadgeDetail badgeDetail = new APIBadgeDetail();
+                    badgeDetail.setBadgeRequestInum(badgeRequest.getInum());
+                    badgeDetail.setOpHost(Application.participant.getOpHost());
+                    Call<DisplayBadge> call = mObjAPI.getBadge(accessToken, badgeDetail);
+                    call.enqueue(new Callback<DisplayBadge>() {
+                        @Override
+                        public void onResponse(Call<DisplayBadge> call, Response<DisplayBadge> response) {
+                            hideProgressBar();
+                            if (response.errorBody() == null && response.body() != null) {
+                                DisplayBadge objResponse = response.body();
 
-                            if (objResponse != null) {
-                                Application.displayBadge = objResponse;
-                                Intent i = new Intent(mContext, DisplayBadgeActivity.class);
-                                mContext.startActivity(i);
-                            }
-                        } else {
-                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
-                            try {
-                                String error = response.errorBody().string();
-                                Log.v("TAG", "Error in creating badge request is:" + error);
-                                JSONObject jsonObjectError = new JSONObject(error);
-                                if (jsonObjectError.getBoolean("error")) {
-                                    Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
+                                if (objResponse != null) {
+                                    Application.displayBadge = objResponse;
+                                    Intent i = new Intent(mContext, DisplayBadgeActivity.class);
+                                    mContext.startActivity(i);
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                            } else {
+                                Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                                try {
+                                    String error = response.errorBody().string();
+                                    Log.v("TAG", "Error in creating badge request is:" + error);
+                                    JSONObject jsonObjectError = new JSONObject(error);
+                                    if (jsonObjectError.getBoolean("error")) {
+                                        Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<DisplayBadge> call, Throwable t) {
-                        Log.v("TAG", "Response creating badge request failure" + t.getMessage());
-                        hideProgressBar();
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure(Call<DisplayBadge> call, Throwable t) {
+                            Log.v("TAG", "Response creating badge request failure" + t.getMessage());
+                            hideProgressBar();
+                        }
+                    });
+                }
 
-            @Override
-            public void onAccessTokenFailure() {
-                Log.v("TAG", "Failed to get access token in getBadgeDetails()");
-                hideProgressBar();
-                Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.unable_to_process));
-            }
-        });
+                @Override
+                public void onAccessTokenFailure() {
+                    Log.v("TAG", "Failed to get access token in getBadgeDetails()");
+                    hideProgressBar();
+                    Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.unable_to_process));
+                }
+            });
+        } else {
+            Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.no_internet));
+        }
     }
 
     private void setBadgePrivacy(BadgeRequest badgeRequest, String privacy) {
-        showProgressBar("Changing privacy..");
+        if (Application.checkInternetConnection(mContext)) {
+            showProgressBar("Changing privacy..");
 
-        Application.getAccessToken(new AccessToken() {
-            @Override
-            public void onAccessTokenSuccess(String accessToken) {
-                Log.v("TAG", "Access token in setBadgePrivacy(): " + accessToken);
-                PrivacyRequest privacyRequest = new PrivacyRequest(badgeRequest.getInum(), Application.participant.getOpHost(), privacy);
-                Call<BadgeRequest> call = mObjAPI.setPrivacy(accessToken, privacyRequest);
-                call.enqueue(new Callback<BadgeRequest>() {
-                    @Override
-                    public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
-                        hideProgressBar();
-                        if (response.errorBody() == null && response.body() != null) {
-                            BadgeRequest objResponse = response.body();
+            Application.getAccessToken(new AccessToken() {
+                @Override
+                public void onAccessTokenSuccess(String accessToken) {
+                    Log.v("TAG", "Access token in setBadgePrivacy(): " + accessToken);
+                    PrivacyRequest privacyRequest = new PrivacyRequest(badgeRequest.getInum(), Application.participant.getOpHost(), privacy);
+                    Call<BadgeRequest> call = mObjAPI.setPrivacy(accessToken, privacyRequest);
+                    call.enqueue(new Callback<BadgeRequest>() {
+                        @Override
+                        public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
+                            hideProgressBar();
+                            if (response.errorBody() == null && response.body() != null) {
+                                BadgeRequest objResponse = response.body();
 
-                            if (objResponse != null) {
-                                if (objResponse.getError()) {
-                                    Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
-                                } else {
-                                    Application.showAutoDismissAlertDialog(mContext, objResponse.getMessage());
+                                if (objResponse != null) {
+                                    if (objResponse.getError()) {
+                                        Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
+                                    } else {
+                                        Application.showAutoDismissAlertDialog(mContext, objResponse.getMessage());
+                                    }
                                 }
-                            }
-                        } else {
-                            Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
-                            try {
-                                String error = response.errorBody().string();
-                                Log.v("TAG", "Error in creating badge request is:" + error);
-                                JSONObject jsonObjectError = new JSONObject(error);
-                                if (jsonObjectError.getBoolean("error")) {
-                                    Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
+                            } else {
+                                Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                                try {
+                                    String error = response.errorBody().string();
+                                    Log.v("TAG", "Error in creating badge request is:" + error);
+                                    JSONObject jsonObjectError = new JSONObject(error);
+                                    if (jsonObjectError.getBoolean("error")) {
+                                        Application.showAutoDismissAlertDialog(mContext, jsonObjectError.getString("errorMsg"));
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
                             }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<BadgeRequest> call, Throwable t) {
-                        Log.v("TAG", "Response retrieving badge templates failure" + t.getMessage());
-                        hideProgressBar();
-                    }
-                });
-            }
+                        @Override
+                        public void onFailure(Call<BadgeRequest> call, Throwable t) {
+                            Log.v("TAG", "Response retrieving badge templates failure" + t.getMessage());
+                            hideProgressBar();
+                        }
+                    });
+                }
 
-            @Override
-            public void onAccessTokenFailure() {
-                Log.v("TAG", "Failed to get access token in setBadgePrivacy()");
-                hideProgressBar();
-                Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.unable_to_process));
-            }
-        });
+                @Override
+                public void onAccessTokenFailure() {
+                    Log.v("TAG", "Failed to get access token in setBadgePrivacy()");
+                    hideProgressBar();
+                    Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.unable_to_process));
+                }
+            });
+        } else {
+            Application.showAutoDismissAlertDialog(mContext, mContext.getString(R.string.no_internet));
+        }
     }
 }

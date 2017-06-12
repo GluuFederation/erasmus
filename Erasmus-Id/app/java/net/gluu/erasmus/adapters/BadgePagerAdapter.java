@@ -6,10 +6,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.List;
 
-public class BagdePagerAdapter extends FragmentPagerAdapter {
+public class BadgePagerAdapter extends FragmentPagerAdapter {
     private List<Fragment> fragments;
 
-    public BagdePagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+    public BadgePagerAdapter(FragmentManager fm, List<Fragment> fragments) {
         super(fm);
         this.fragments = fragments;
     }
