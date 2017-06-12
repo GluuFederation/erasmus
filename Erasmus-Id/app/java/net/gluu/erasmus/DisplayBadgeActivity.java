@@ -71,12 +71,12 @@ public class DisplayBadgeActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.tvURL:
                 copyURLToClipboard(Application.displayBadge.getBadgePublicURL());
-                Snackbar.make(mTvCopyURL,"URL copied",Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(mTvCopyURL, "URL copied", Snackbar.LENGTH_SHORT).show();
                 break;
         }
     }
 
-    private void copyURLToClipboard(String url){
+    private void copyURLToClipboard(String url) {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         ClipData clip = ClipData.newPlainText("URL", url);
         clipboard.setPrimaryClip(clip);

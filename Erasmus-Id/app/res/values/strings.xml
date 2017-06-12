@@ -114,9 +114,11 @@
     <string name="badge_dummy">Basic fire fighter</string>
     <string name="allow">Allow</string>
     <string name="deny">Deny</string>
+    <string name="badge_permission_denied">Permission to see this badge is denied by asserter</string>
 
     <!--data passing keys-->
     <string name="key_message">message</string>
     <string name="key_badge">badge</string>
     <string name="key_badge_title">badgeTitle</string>
+    <string name="key_type">notifyType</string>
 </resources>

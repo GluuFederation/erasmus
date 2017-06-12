@@ -1,14 +1,9 @@
 package net.gluu.erasmus.push.service;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -17,7 +12,6 @@ import net.gluu.erasmus.BadgeAccessDialog;
 import net.gluu.erasmus.R;
 import net.gluu.erasmus.ScanFailureActivity;
 import net.gluu.erasmus.ScanSuccessActivity;
-import net.gluu.erasmus.SimpleScannerActivity;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.model.ScanResponseSuccess;
@@ -47,15 +41,14 @@ public class PushNotificationService extends com.google.firebase.messaging.Fireb
         if (remoteMessage.getNotification() != null) {
             Log.v(TAG, "Notification Body: " + remoteMessage.getNotification().getBody());
             Log.v(TAG, "Notification Title: " + remoteMessage.getNotification().getTitle());
-//            handleNotification(remoteMessage.getNotification().getBody());
 
             // Check if message contains a data payload.
             if (remoteMessage.getData().size() > 0) {
                 Log.v(TAG, "Data Payload: " + remoteMessage.getData().toString());
                 Log.v(TAG, "Badge Id: " + remoteMessage.getData().get("badge"));
+                Log.v(TAG, "Type: " + remoteMessage.getData().get("notifyType"));
 
                 try {
-//                JSONObject json = new JSONObject(remoteMessage.getData().toString());
                     handleDataMessage(remoteMessage.getData(), remoteMessage.getNotification());
                 } catch (Exception e) {
                     Log.v(TAG, "Exception: " + e.getMessage());
@@ -80,32 +73,10 @@ public class PushNotificationService extends com.google.firebase.messaging.Fireb
     }
 
     private void handleDataMessage(Map<String, String> data, RemoteMessage.Notification notification) {
-//        Log.v(TAG, "push json: " + json.toString());
 
         try {
-//            JSONObject data = json.getJSONObject("data");
 
-//            boolean isBackground = data.getBoolean("is_background");
-            String imageUrl = "";
-            String timestamp = "";
-//            JSONObject payload = data.getJSONObject("payload");
-
-//            if (!NotificationUtils.isAppIsInBackground(getApplicationContext())) {
-//                // app is in foreground, broadcast the push message
-//                Intent pushNotification = new Intent(Config.PUSH_NOTIFICATION);
-//                pushNotification.putExtra("message", message);
-//                LocalBroadcastManager.getInstance(this).sendBroadcast(pushNotification);
-//
-//                // play notification sound
-//                NotificationUtils notificationUtils = new NotificationUtils(getApplicationContext());
-//                notificationUtils.playNotificationSound();
-//            } else {
-            // app is in background, show the notification in notification tray
-//            Intent resultIntent = new Intent(getApplicationContext(), U2FActivity.class);
-//            resultIntent.putExtra("message", notification.getBody());
-//            resultIntent.putExtra("title", notification.getTitle());
-
-            if (notification.getBody().contains("Someone")) {
+            if (data.get("notifyType").equals("1")) {
                 Log.v(TAG, "from email: " + data.get("fromEmail"));
                 Log.v(TAG, "badge: " + data.get("badge"));
                 Log.v(TAG, "badge title: " + data.get("badgeTitle"));
@@ -115,28 +86,24 @@ public class PushNotificationService extends com.google.firebase.messaging.Fireb
                 intent.putExtra(getString(R.string.key_badge_title), data.get("badgeTitle"));
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
-            } else if (notification.getBody().contains("Permission")) {
+            } else if (data.get("notifyType").equals("2")) {
                 Log.v(TAG, "from asserter: " + data.get("fromAsserter"));
                 Log.v(TAG, "temp url: " + data.get("tempUrl"));
                 if (data.get("tempUrl").length() > 0) {
                     verifyBadge(data.get("tempUrl"));
                 } else {
-                    Intent i = new Intent(getApplicationContext(), ScanFailureActivity.class);
+                    Intent i = new Intent(getApplicationContext(), BadgeAccessDialog.class);
+                    i.putExtra(getString(R.string.key_message), notification.getBody());
                     i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(i);
                 }
-            } else if (notification.getBody().contains("verified")) {
-                Application.showAutoDismissAlertDialog(getApplicationContext(), notification.getBody());
+            } else if (data.get("notifyType").equals("3")) {
+                Intent intent = new Intent(getApplicationContext(), BadgeAccessDialog.class);
+                intent.putExtra(getString(R.string.key_message), notification.getBody());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
 
-//            // check for image attachment
-//            if (TextUtils.isEmpty(imageUrl)) {
-//                showNotificationMessage(getApplicationContext(), notification.getTitle(), notification.getBody(), timestamp, resultIntent);
-//            } else {
-//                // image is present, show notification with image
-//                showNotificationMessageWithBigImage(getApplicationContext(), notification.getTitle(), notification.getBody(), timestamp, resultIntent, imageUrl);
-//            }
-//            }
         } catch (Exception e) {
             Log.v(TAG, "Exception: " + e.getMessage());
         }

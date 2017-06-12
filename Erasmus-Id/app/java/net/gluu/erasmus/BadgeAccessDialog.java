@@ -2,10 +2,12 @@ package net.gluu.erasmus;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import net.gluu.erasmus.api.APIInterface;
@@ -28,50 +30,50 @@ public class BadgeAccessDialog extends Activity implements View.OnClickListener 
     private String badge;
     APIInterface mObjAPI;
     ProgressDialog mProgress;
+    boolean mIsNotify = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.badge_access_dialog);
 
-        mObjAPI = APIService.createService(APIInterface.class);
-        mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Setting permission...");
-
         String message = getIntent().getStringExtra(getString(R.string.key_message));
-        String badgeTitle = getIntent().getStringExtra(getString(R.string.key_badge_title));
-        badge = getIntent().getStringExtra(getString(R.string.key_badge));
-        ((TextView) findViewById(R.id.tvMsg)).setText(message + " (" + badgeTitle + ")");
-        findViewById(R.id.btnAllow).setOnClickListener(this);
-        findViewById(R.id.btnDeny).setOnClickListener(this);
 
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-//        builder.setTitle("ERASMUS");
-//        builder.setMessage(message);
-//        builder.setPositiveButton("Allow", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.dismiss();
-//                Toast.makeText(getApplicationContext(), "Allowed", Toast.LENGTH_LONG).show();
-//            }
-//        });
-//        builder.setNegativeButton("Deny", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.dismiss();
-//                Toast.makeText(getApplicationContext(), "Denied", Toast.LENGTH_LONG).show();
-//            }
-//        });
-//
-//        AlertDialog alert = builder.create();
-//        alert.show();
+        if (message.contains("verified")) {
+            ((TextView) findViewById(R.id.tvMsg)).setText(message);
+            ((Button) findViewById(R.id.btnAllow)).setText(getString(R.string.ok));
+            findViewById(R.id.btnAllow).setOnClickListener(this);
+            findViewById(R.id.btnDeny).setVisibility(View.GONE);
+            mIsNotify = true;
+        } else if (message.contains("revoked")) {
+            ((TextView) findViewById(R.id.tvMsg)).setText(getString(R.string.badge_permission_denied));
+            ((Button) findViewById(R.id.btnAllow)).setText(getString(R.string.ok));
+            findViewById(R.id.btnAllow).setOnClickListener(this);
+            findViewById(R.id.btnDeny).setVisibility(View.GONE);
+            mIsNotify = true;
+        } else {
+            mIsNotify = false;
+            mObjAPI = APIService.createService(APIInterface.class);
+            mProgress = new ProgressDialog(this);
+            mProgress.setMessage("Setting permission...");
+
+            String badgeTitle = getIntent().getStringExtra(getString(R.string.key_badge_title));
+            badge = getIntent().getStringExtra(getString(R.string.key_badge));
+            ((TextView) findViewById(R.id.tvMsg)).setText(message + " (" + badgeTitle + ")");
+            findViewById(R.id.btnAllow).setOnClickListener(this);
+            findViewById(R.id.btnDeny).setOnClickListener(this);
+        }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnAllow:
-                setBadgePermission("true");
+                if (mIsNotify) {
+                    dismissDialog();
+                    startActivity(new Intent(BadgeAccessDialog.this, BadgeStatusActivity.class));
+                } else
+                    setBadgePermission("true");
                 break;
             case R.id.btnDeny:
                 setBadgePermission("false");
@@ -151,7 +153,7 @@ public class BadgeAccessDialog extends Activity implements View.OnClickListener 
             mProgress.dismiss();
     }
 
-    private void dismissDialog(){
+    private void dismissDialog() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
