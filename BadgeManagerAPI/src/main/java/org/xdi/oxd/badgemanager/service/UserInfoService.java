@@ -43,7 +43,7 @@ public class UserInfoService {
                 return null;
             } else {
                 GetUserInfoResponse objUserInfo = respUserInfo.dataAsResponse(GetUserInfoResponse.class);
-                logger.info("response userinfo claims:" + objUserInfo.getClaims());
+                logger.info("response user info claims:" + objUserInfo.getClaims());
                 String claims = GsonService.getGson().toJson(objUserInfo.getClaims());
                 JsonObject jObjClaims = new JsonParser().parse(claims).getAsJsonObject();
                 userInfo.setSub(GsonService.getValueFromJson("sub", jObjClaims));
@@ -51,6 +51,7 @@ public class UserInfoService {
                 userInfo.setEmail(GsonService.getValueFromJson("email", jObjClaims));
                 userInfo.setName(GsonService.getValueFromJson("name", jObjClaims));
                 userInfo.setUserName(GsonService.getValueFromJson("user_name", jObjClaims));
+                userInfo.setUserInfoJSON(jObjClaims.toString());
 
                 return userInfo;
             }

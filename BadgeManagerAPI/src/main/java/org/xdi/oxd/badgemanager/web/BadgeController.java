@@ -32,6 +32,7 @@ import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
 import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
 import org.xdi.oxd.badgemanager.service.UserInfoService;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
+import org.xdi.oxd.badgemanager.util.JWTUtil;
 import org.xdi.oxd.badgemanager.util.Utils;
 
 import javax.inject.Inject;
@@ -69,6 +70,9 @@ public class BadgeController {
 
     @Inject
     private Utils utils;
+
+    @Inject
+    private JWTUtil jwtUtil;
 
     private final ServletContext context;
 
@@ -304,7 +308,8 @@ public class BadgeController {
             }
 
             UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
-            if (userInfo == null || userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
+            if (userInfo == null || userInfo.getEmail() == null || userInfo.getEmail().length() == 0
+                    || userInfo.getUserInfoJSON() == null || userInfo.getUserInfoJSON().length() == 0) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
@@ -318,6 +323,14 @@ public class BadgeController {
                 if (badgeClass != null && badgeClass.getInum() != null) {
                     Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
                     if (badges != null && badges.getInum() != null) {
+
+                        badges.setRecipientIdentity(jwtUtil.generateJWT(userInfo.getUserInfoJSON()));
+                        if (!BadgeCommands.updateBadge(badges)) {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            jsonResponse.addProperty("error", true);
+                            jsonResponse.addProperty("errorMsg", "No such badge found");
+                            return jsonResponse.toString();
+                        }
 
                         if (generateQrCode(badges, badgeClass.getImage(), badges.getGuid(), 250, "png")) {
                             logger.info("QR Code generated successfully");
@@ -574,7 +587,7 @@ public class BadgeController {
 
                 msg = "Permission to see this badge " + access + " successfully";
 
-                sendNotification(msg, email, deviceData.getPushToken(), strTempURL,2);
+                sendNotification(msg, email, deviceData.getPushToken(), strTempURL, 2);
 
                 jsonResponse.addProperty("message", msg);
                 return jsonResponse.toString();
@@ -622,7 +635,7 @@ public class BadgeController {
                             logger.info("Device data: " + deviceRegistration.getDeviceData());
                             DeviceData deviceData = deviceRegistration.getDeviceData();
                             if (deviceData.getPlatform().equalsIgnoreCase("android") && deviceData.getPushToken() != null) {
-                                sendNotification("Badge verified successfully", "", deviceData.getPushToken(), "",3);
+                                sendNotification("Badge verified successfully", "", deviceData.getPushToken(), "", 3);
                             }
                         }
                     }

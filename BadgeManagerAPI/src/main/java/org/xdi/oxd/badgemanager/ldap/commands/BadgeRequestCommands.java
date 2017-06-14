@@ -371,11 +371,10 @@ public class BadgeRequestCommands {
                 logger.info("LDAP connected in getBadgeRequestByInum() in BadgeRequestCommands");
 
                 BadgeRequests badgeRequest = new BadgeRequests();
-                badgeRequest.setInum(Inum);
-                badgeRequest.setDn("inum=" + Inum + ",ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+                badgeRequest.setDn("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
                 logger.info("LDAP started retrieved badge request");
-                if (LDAPService.ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")"))) {
-                    List<BadgeRequests> badgeRequests = LDAPService.ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")"));
+                if (LDAPService.ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + Inum + ")"))) {
+                    List<BadgeRequests> badgeRequests = LDAPService.ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + Inum + ")"));
                     logger.info("LDAP completed retrieving badge request");
                     if (badgeRequests.size() > 0)
                         return badgeRequests.get(0);
@@ -409,11 +408,10 @@ public class BadgeRequestCommands {
                 logger.info("LDAP connected in getBadgeRequestForUserByInum() in BadgeRequestCommands");
 
                 BadgeRequests badgeRequest = new BadgeRequests();
-                badgeRequest.setInum(Inum);
-                badgeRequest.setDn("inum=" + Inum + ",ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
+                badgeRequest.setDn("ou=badgeRequests,ou=badges,o=" + DefaultConfig.config_organization + ",o=gluu");
 
-                if (LDAPService.ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(inum=" + badgeRequest.getInum() + ")"))) {
-                    List<BadgeRequests> badgeRequests = LDAPService.ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(inum=" + badgeRequest.getInum() + "))"));
+                if (LDAPService.ldapEntryManager.contains(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(inum=" + Inum + "))"))) {
+                    List<BadgeRequests> badgeRequests = LDAPService.ldapEntryManager.findEntries(badgeRequest.getDn(), BadgeRequests.class, Filter.create("(&(gluuBadgeRequester=" + email + ")(inum=" + Inum + "))"));
                     if (badgeRequests.size() > 0)
                         return badgeRequests.get(0);
                     else
@@ -443,7 +441,7 @@ public class BadgeRequestCommands {
         try {
 
             if (LDAPService.isConnected()) {
-                logger.info("LDAP connected in getBadgeRequestForUserByInum() in BadgeRequestCommands");
+                logger.info("LDAP connected in getUserBadgeRequestByTitle() in BadgeRequestCommands");
 
                 BadgeRequests badgeRequest = new BadgeRequests();
                 badgeRequest.setGluuBadgeRequester(email);
@@ -455,11 +453,11 @@ public class BadgeRequestCommands {
                 else
                     return null;
             } else {
-                logger.error("Error in connecting database in getBadgeRequestForUserByInum() in BadgeRequestCommands");
+                logger.error("Error in connecting database in getUserBadgeRequestByTitle() in BadgeRequestCommands");
                 return null;
             }
         } catch (Exception e) {
-            logger.error("Exception in getBadgeRequestForUserByInum() in BadgeRequestCommands:" + e.getMessage());
+            logger.error("Exception in getUserBadgeRequestByTitle() in BadgeRequestCommands:" + e.getMessage());
             e.printStackTrace();
             return null;
         }

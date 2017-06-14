@@ -7,7 +7,7 @@ package org.xdi.oxd.badgemanager.model;
 public class UserInfo {
     private String email, email_verified, sub, zoneinfo, nickname, website, middle_name, locale,
             preferred_username, given_name, picture, updated_at, name, birthdate, family_name, gender,
-            profile, issuer, userInfoJSON,userName;
+            profile, issuer, userInfoJSON, userName;
 
     public String getEmail() {
         return email;

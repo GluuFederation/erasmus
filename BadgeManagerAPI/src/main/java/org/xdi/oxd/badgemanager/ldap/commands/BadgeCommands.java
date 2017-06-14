@@ -12,9 +12,6 @@ import org.xdi.oxd.badgemanager.ldap.service.InumService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.ldap.service.MergeService;
 import org.xdi.oxd.badgemanager.model.*;
-import org.xdi.oxd.badgemanager.util.Utils;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -508,6 +505,11 @@ public class BadgeCommands {
         }
     }
 
+    /**
+     *
+     * Revoke badge access which was earlier granted to FIDES
+     *
+     */
     private static boolean revokeBadgeAccess(String inum) {
         try {
             BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByInum(inum);
