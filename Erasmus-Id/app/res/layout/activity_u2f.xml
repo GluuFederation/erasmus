@@ -205,8 +205,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:padding="25dp"
-                    android:text="@string/app_header"/>
+                    android:padding="25dp"/>
 
                 <LinearLayout
                     android:id="@+id/fragment_container"

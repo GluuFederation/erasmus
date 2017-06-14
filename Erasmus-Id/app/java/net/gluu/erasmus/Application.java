@@ -23,6 +23,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import net.gluu.appauth.AppAuthConfiguration;
 import net.gluu.appauth.AuthState;
 import net.gluu.appauth.AuthorizationException;
@@ -36,6 +39,7 @@ import net.gluu.erasmus.model.Recipient;
 import net.gluu.erasmus.model.ScanResponseSuccess;
 import net.gluu.erasmus.model.UserInfo;
 import net.gluu.erasmus.utils.JWTUtils;
+import net.gluu.erasmus.utils.JsonUtils;
 
 import org.json.JSONObject;
 
@@ -103,22 +107,22 @@ public final class Application extends android.app.Application {
                     Log.v("TAG", "User info is:" + userInfo);
                     if (userInfo != null && userInfo.length() > 0) {
                         JSONObject jObj = new JSONObject(userInfo);
-                        JSONObject jsonObject = new JSONObject(jObj.getString("userinfo"));
+                        JsonObject jsonObject = new JsonParser().parse(jObj.getString("userinfo")).getAsJsonObject();
                         userInfo1 = new UserInfo();
-                        userInfo1.setEmail(jsonObject.getString("email") == null ? "" : jsonObject.getString("email"));
-                        userInfo1.setZoneInfo(jsonObject.getString("zoneinfo") == null ? "" : jsonObject.getString("zoneinfo"));
-                        userInfo1.setNickName(jsonObject.getString("nickname") == null ? "" : jsonObject.getString("nickname"));
-                        userInfo1.setWebsite(jsonObject.getString("website") == null ? "" : jsonObject.getString("website"));
-                        userInfo1.setMiddleName(jsonObject.getString("middle_name") == null ? "" : jsonObject.getString("middle_name"));
-                        userInfo1.setLocale(jsonObject.getString("locale") == null ? "" : jsonObject.getString("locale"));
-                        userInfo1.setPreferredUsername(jsonObject.getString("preferred_username") == null ? "" : jsonObject.getString("preferred_username"));
-                        userInfo1.setGivenName(jsonObject.getString("given_name") == null ? "" : jsonObject.getString("given_name"));
-                        userInfo1.setPicture(jsonObject.getString("picture") == null ? "" : jsonObject.getString("picture"));
-                        userInfo1.setName(jsonObject.getString("name") == null ? "" : jsonObject.getString("name"));
-                        userInfo1.setBirthdate(jsonObject.getString("birthdate") == null ? "" : jsonObject.getString("birthdate"));
-                        userInfo1.setFamilyName(jsonObject.getString("family_name") == null ? "" : jsonObject.getString("family_name"));
-                        userInfo1.setGender(jsonObject.getString("gender") == null ? "" : jsonObject.getString("gender"));
-                        userInfo1.setProfile(jsonObject.getString("profile") == null ? "" : jsonObject.getString("profile"));
+                        userInfo1.setEmail(JsonUtils.getValueFromJson("email",jsonObject));
+                        userInfo1.setZoneInfo(JsonUtils.getValueFromJson("zoneinfo",jsonObject));
+                        userInfo1.setNickName(JsonUtils.getValueFromJson("nickname",jsonObject));
+                        userInfo1.setWebsite(JsonUtils.getValueFromJson("website",jsonObject));
+                        userInfo1.setMiddleName(JsonUtils.getValueFromJson("middle_name",jsonObject));
+                        userInfo1.setLocale(JsonUtils.getValueFromJson("locale",jsonObject));
+                        userInfo1.setPreferredUsername(JsonUtils.getValueFromJson("preferred_username",jsonObject));
+                        userInfo1.setGivenName(JsonUtils.getValueFromJson("given_name",jsonObject));
+                        userInfo1.setPicture(JsonUtils.getValueFromJson("picture",jsonObject));
+                        userInfo1.setName(JsonUtils.getValueFromJson("name",jsonObject));
+                        userInfo1.setBirthdate(JsonUtils.getValueFromJson("birthdate",jsonObject));
+                        userInfo1.setFamilyName(JsonUtils.getValueFromJson("family_name",jsonObject));
+                        userInfo1.setGender(JsonUtils.getValueFromJson("gender",jsonObject));
+                        userInfo1.setProfile(JsonUtils.getValueFromJson("profile",jsonObject));
                         return userInfo1;
                     }
                 } catch (Exception ex) {

@@ -6,22 +6,16 @@
 
 package net.gluu.erasmus;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -34,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -54,13 +47,11 @@ import net.gluu.erasmus.listener.OxPush2RequestListener;
 import net.gluu.erasmus.listener.PushNotificationRegistrationListener;
 import net.gluu.erasmus.model.u2f.OxPush2Request;
 import net.gluu.erasmus.net.CommunicationService;
-import net.gluu.erasmus.push.Config;
 import net.gluu.erasmus.store.AndroidKeyDataStore;
 import net.gluu.erasmus.u2f.v2.SoftwareDevice;
 import net.gluu.erasmus.u2f.v2.exception.U2FException;
 import net.gluu.erasmus.u2f.v2.model.TokenResponse;
 import net.gluu.erasmus.u2f.v2.store.DataStore;
-import net.gluu.erasmus.utils.NotificationUtils;
 import net.gluu.erasmus.utils.Utils;
 
 import org.joda.time.format.DateTimeFormat;
@@ -87,13 +78,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 
     private static final String TAG = "main-activity";
 
-    /**
-     * Id to identify a camera permission request.
-     */
-    private static final int REQUEST_CAMERA = 0;
-
     public static final String QR_CODE_PUSH_NOTIFICATION_MESSAGE = MainActivity.class.getPackage().getName() + ".QR_CODE_PUSH_NOTIFICATION_MESSAGE";
-    public static final int MESSAGE_NOTIFICATION_ID = 444555;
 
     private SoftwareDevice u2f;
     private AndroidKeyDataStore dataStore;
@@ -107,8 +92,6 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
     private final AtomicReference<JSONObject> mUserInfoJson = new AtomicReference<>();
     private ExecutorService mExecutor;
 
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,31 +102,6 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
         // Init device UUID service
         DeviceUuidManager deviceUuidFactory = new DeviceUuidManager();
         deviceUuidFactory.init(this);
-
-        // Init GCM service
-//        PushNotificationManager pushNotificationManager = new PushNotificationManager();
-//        pushNotificationManager.registerIfNeeded(this, this);
-
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                // checking for type intent filter
-                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
-                    // gcm successfully registered
-                    // now subscribe to `global` topic to receive app wide notifications
-                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
-
-                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
-                    // new push notification is received
-
-                    String message = intent.getStringExtra("message");
-
-                    Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
-                    Log.v("TAG", "Notification received: " + message);
-                }
-            }
-        };
 
         context = getApplicationContext();
         this.dataStore = new AndroidKeyDataStore(context);
@@ -182,29 +140,6 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
                 Log.e(TAG, "Failed to parse saved user info JSON, discarding", ex);
             }
         }
-
-//        MainActivityFragment mainActivityFragment = new MainActivityFragment();
-//        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, mainActivityFragment).commit();
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, getString(R.string.oxpush2_into_text), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        // Check if we get push notification
-        Intent intent = getIntent();
-        if (intent.hasExtra(QR_CODE_PUSH_NOTIFICATION_MESSAGE)) {
-            String requestJson = intent.getStringExtra(QR_CODE_PUSH_NOTIFICATION_MESSAGE);
-            onQrRequest(requestJson);
-        }
-
-//        checkUserCameraPermission();
-
-//        onQrRequest(getRequestData());
     }
 
     private String getRequestData() {
@@ -340,49 +275,6 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 
     public static String getResourceString(int resourceID) {
         return context.getString(resourceID);
-    }
-
-    private void checkUserCameraPermission() {
-        Log.i(TAG, "Show camera button pressed. Checking permission.");
-        // BEGIN_INCLUDE(camera_permission)
-        // Check if the Camera permission is already available.
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Camera permission has not been granted.
-
-            requestCameraPermission();
-
-        } else {
-
-            // Camera permissions is already available, show the camera preview.
-            Log.i(TAG,
-                    "CAMERA permission has already been granted. Displaying camera preview.");
-//            showCameraPreview();
-        }
-        // END_INCLUDE(camera_permission)
-    }
-
-    private void requestCameraPermission() {
-        Log.i(TAG, "CAMERA permission has NOT been granted. Requesting permission.");
-
-        // BEGIN_INCLUDE(camera_permission_request)
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                android.Manifest.permission.CAMERA)) {
-            // Provide an additional rationale to the user if the permission was not granted
-            // and the user would benefit from additional context for the use of the permission.
-            // For example if the user has previously denied the permission.
-            Log.i(TAG,
-                    "Displaying camera permission rationale to provide additional context.");
-            ActivityCompat.requestPermissions(U2FActivity.this,
-                    new String[]{android.Manifest.permission.CAMERA},
-                    REQUEST_CAMERA);
-        } else {
-
-            // Camera permission has not been granted yet. Request it directly.
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA},
-                    REQUEST_CAMERA);
-        }
-        // END_INCLUDE(camera_permission_request)
     }
 
     @Override
@@ -555,8 +447,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 
     @MainThread
     private void exchangeAuthorizationCode(AuthorizationResponse authorizationResponse) {
-        Log.v("TAG", "state: " + authorizationResponse.state);
-        Application.U2F_State = authorizationResponse.state;
+        Application.U2F_State = authorizationResponse.additionalParameters.get("session_state");
         displayLoading("Exchanging authorization code");
         performTokenRequest(
                 authorizationResponse.createTokenExchangeRequest(),
@@ -727,29 +618,6 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
         findViewById(R.id.loading_container).setVisibility(View.GONE);
 
         onQrRequest(getRequestData());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // register GCM registration complete receiver
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.REGISTRATION_COMPLETE));
-
-        // register new push message receiver
-        // by doing this, the activity will be notified each time a new message arrives
-        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
-                new IntentFilter(Config.PUSH_NOTIFICATION));
-
-        // clear the notification area when the app is opened
-        NotificationUtils.clearNotifications(getApplicationContext());
-    }
-
-    @Override
-    protected void onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
-        super.onPause();
     }
 
     @Override

@@ -133,13 +133,6 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
         switch(v.getId()){
             case R.id.button_approve:
                 onOxPushApproveRequest(false);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent i=new Intent(getActivity(), BadgeStatusActivity.class);
-                        startActivity(i);
-                    }
-                }, 2000);
                 break;
             case R.id.button_decline:
                 onOxPushApproveRequest(true);
