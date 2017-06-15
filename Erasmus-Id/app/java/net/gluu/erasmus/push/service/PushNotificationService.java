@@ -10,7 +10,6 @@ import com.google.firebase.messaging.RemoteMessage;
 import net.gluu.erasmus.Application;
 import net.gluu.erasmus.BadgeAccessDialog;
 import net.gluu.erasmus.R;
-import net.gluu.erasmus.RequestBadgeActivity;
 import net.gluu.erasmus.ScanFailureActivity;
 import net.gluu.erasmus.ScanSuccessActivity;
 import net.gluu.erasmus.api.APIInterface;
@@ -34,9 +33,6 @@ public class PushNotificationService extends com.google.firebase.messaging.Fireb
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Log.v(TAG, "From: " + remoteMessage.getFrom());
-
-        if (remoteMessage == null)
-            return;
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {

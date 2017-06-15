@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import net.gluu.erasmus.BuildConfig;
 import net.gluu.erasmus.device.DeviceUuidManager;
 import net.gluu.erasmus.model.u2f.OxPush2Request;
+import net.gluu.erasmus.push.service.PushNotificationManager;
 import net.gluu.erasmus.u2f.v2.cert.KeyPairGeneratorImpl;
 import net.gluu.erasmus.u2f.v2.codec.RawMessageCodec;
 import net.gluu.erasmus.u2f.v2.codec.RawMessageCodecImpl;
@@ -141,7 +142,7 @@ public class SoftwareDevice {
 
         DeviceData deviceData = new DeviceData();
         deviceData.setUuid(DeviceUuidManager.getDeviceUuid(context).toString());
-//        deviceData.setPushToken(PushNotificationManager.getRegistrationId(context));
+        deviceData.setPushToken(PushNotificationManager.getRegistrationId(context));
         deviceData.setType(deviceType);
         deviceData.setPlatform("android");
         deviceData.setName(Build.MODEL);

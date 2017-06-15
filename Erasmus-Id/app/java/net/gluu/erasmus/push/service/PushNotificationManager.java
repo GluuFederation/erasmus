@@ -13,9 +13,10 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 import net.gluu.erasmus.BuildConfig;
 import net.gluu.erasmus.push.Config;
+import net.gluu.erasmus.utils.Utils;
 
-public class PushNotificationInstanceIDService extends FirebaseInstanceIdService {
-    private static final String TAG = PushNotificationInstanceIDService.class.getSimpleName();
+public class PushNotificationManager extends FirebaseInstanceIdService {
+    private static final String TAG = PushNotificationManager.class.getSimpleName();
  
     @Override
     public void onTokenRefresh() {
@@ -64,5 +65,33 @@ public class PushNotificationInstanceIDService extends FirebaseInstanceIdService
 
     private static SharedPreferences getFCMPreferences(final Context context) {
         return context.getSharedPreferences(Config.SHARED_PREF, Context.MODE_PRIVATE);
+    }
+
+    /**
+     * Gets the current registration ID for application on GCM service.
+     *
+     * If result is empty, the app needs to register.
+     *
+     * @return registration ID, or empty string if there is no existing registration ID.
+     */
+    public static String getRegistrationId(final Context context) {
+        final SharedPreferences prefs = getFCMPreferences(context);
+        String registrationId = prefs.getString(Config.PROPERTY_REG_ID, null);
+        if (Utils.isEmpty(registrationId)) {
+            if (BuildConfig.DEBUG) Log.d(TAG, "Registration not found");
+            return null;
+        }
+
+        // Check if app was updated; if so, it must clear the registration ID
+        // since the existing regID is not guaranteed to work with the new
+        // app version.
+        int registeredVersion = prefs.getInt(Config.PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+        int currentVersion = getAppVersion(context);
+        if (registeredVersion != currentVersion) {
+            if (BuildConfig.DEBUG) Log.d(TAG, "App version changed");
+            return null;
+        }
+
+        return registrationId;
     }
 }
