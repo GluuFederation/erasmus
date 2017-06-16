@@ -474,10 +474,10 @@ public class BadgeRequestCommands {
             objResponse.setStatus(obj.getStatus());
             objResponse.setRequesterEmail(obj.getGluuBadgeRequester());
 
-            objResponse.setPrivacy("Public");
+            objResponse.setPrivacy("");
             try {
                 BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(obj.getInum());
-                if (badgeRequests != null && badgeRequests.getInum() != null) {
+                if (badgeRequests != null && badgeRequests.getInum() != null && badgeRequests.getStatus().equalsIgnoreCase("Approved")) {
                     BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
                     if (badgeClass != null && badgeClass.getInum() != null) {
                         Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
