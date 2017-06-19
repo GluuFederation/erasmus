@@ -25,10 +25,10 @@ public class TempURLController {
     private static final Logger logger = LoggerFactory.getLogger(TempURLController.class);
 
     @Autowired
-    public RedisTemplate<Object, Object> redisTemplate;
+    private RedisTemplate<Object, Object> redisTemplate;
 
     @Inject
-    public BadgeController badgeController;
+    private BadgeController badgeController;
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String redirect(@PathVariable String id, HttpServletRequest request, HttpServletResponse response) {
@@ -86,7 +86,7 @@ public class TempURLController {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             jsonResponse.addProperty("error", true);
             jsonResponse.addProperty("errorMsg", "No such badge found");
-            logger.error("Exception in retrieve badge using temp url: " + e.getMessage());
+            logger.error("Exception in retrieving badge using temp url: " + e.getMessage());
             return jsonResponse.toString();
         }
     }

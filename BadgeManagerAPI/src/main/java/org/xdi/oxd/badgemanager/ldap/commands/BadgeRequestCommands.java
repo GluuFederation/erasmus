@@ -476,9 +476,8 @@ public class BadgeRequestCommands {
 
             objResponse.setPrivacy("");
             try {
-                BadgeRequests badgeRequests = BadgeRequestCommands.getBadgeRequestByInum(obj.getInum());
-                if (badgeRequests != null && badgeRequests.getInum() != null && badgeRequests.getStatus().equalsIgnoreCase("Approved")) {
-                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(badgeRequests.getInum());
+                if (obj.getStatus().equalsIgnoreCase("Approved")) {
+                    BadgeClass badgeClass = BadgeClassesCommands.getBadgeClassByBadgeRequestInum(obj.getInum());
                     if (badgeClass != null && badgeClass.getInum() != null) {
                         Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
                         if (badges != null && badges.getInum() != null) {
