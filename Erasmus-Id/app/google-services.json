@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "649310821463",
+    "firebase_url": "https://erasmus-id.firebaseio.com",
+    "project_id": "erasmus-id",
+    "storage_bucket": "erasmus-id.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649310821463:android:eae2c43949a600ee",
+        "android_client_info": {
+          "package_name": "net.gluu.erasmus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "649310821463-nmlomk19khfqaas17hqvmtns6cc5nn7t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.gluu.erasmus",
+            "certificate_hash": "ca71c70ccec02e19779f7fd4cb5136b4ab116d67"
+          }
+        },
+        {
+          "client_id": "649310821463-4r5pe3fuua0h3tor8f1i1gs11um6b9nk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaUNcRLEiXX-kPOCxjp5a6ufNR_2xZMzg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "649310821463-4r5pe3fuua0h3tor8f1i1gs11um6b9nk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
