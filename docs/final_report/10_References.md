@@ -3,6 +3,9 @@
 Adds:
 https://view.joomag.com/rapport-volume-2-issue-1-rapport-issue-1-version4finalso/0823412001495630900
 
+from Allen (hand held mobile PTT industry but it is a history of how and why there is a standard):
+https://www.corp.att.com/stateandlocal/docs/Interop.pdf
+
 (2014) “DC tests ID management for first responders”
 https://gcn.com/articles/2014/09/17/first-responder-id-management.aspx
 
