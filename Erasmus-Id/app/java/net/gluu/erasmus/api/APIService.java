@@ -1,14 +1,16 @@
 package net.gluu.erasmus.api;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIService {
     //Live
-  public static final String API_BASE_URL = "https://erasmusdev.gluu.org/badge-mgr/";
+    public static final String API_BASE_URL = "https://erasmusdev.gluu.org/badge-mgr/";
     //Local
-//  public static final String API_BASE_URL = "http://192.168.200.78:8080/badge-mgr/";
+//    public static final String API_BASE_URL = "http://192.168.200.64:8088/";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
@@ -37,7 +39,12 @@ public class APIService {
 //                }
 //            });
 
+        httpClient.readTimeout(20, TimeUnit.SECONDS);
+        httpClient.connectTimeout(20, TimeUnit.SECONDS);
+        httpClient.writeTimeout(20, TimeUnit.SECONDS);
+        httpClient.retryOnConnectionFailure(true);
         OkHttpClient client = httpClient.build();
+
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
     }

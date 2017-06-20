@@ -22,10 +22,10 @@ public class LDAPInitializer {
     private static String configId = "";
     private static String userName = "cn=directory manager,o=gluu";
     private static String bindDN = "cn=directory manager,o=gluu";
-//    Server
-    private static String bindPassword = "ldapsu";
+    //    Server
+//    private static String bindPassword = "ldapsu";
 //    Local
-//    private static String bindPassword = "admin";
+    private static String bindPassword = "password";
     private static String servers = "localhost:1636";
     private static List<String> serversStringsList = new ArrayList<String>() {{
         add("localhost:1636");
@@ -60,7 +60,7 @@ public class LDAPInitializer {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                logger.error("Can't find organization dn configured properly in LDAP. Exception is:"+e.getMessage());
+                logger.error("Can't find organization dn configured properly in LDAP. Exception is:" + e.getMessage());
             }
             ldapConnection.ldapConnected(true, ldapEntryManager);
         } else {
@@ -77,7 +77,7 @@ public class LDAPInitializer {
 
         Properties properties = new Properties();
         if (ldapAuthConfig != null) {
-                properties.setProperty("servers", servers); //"localhost:1636");//buildServersString(ldapAuthConfig.getServers()));
+            properties.setProperty("servers", servers); //"localhost:1636");//buildServersString(ldapAuthConfig.getServers()));
 
             String bindDn = ldapAuthConfig.getBindDN();
             if (StringHelper.isNotEmpty(bindDn)) {

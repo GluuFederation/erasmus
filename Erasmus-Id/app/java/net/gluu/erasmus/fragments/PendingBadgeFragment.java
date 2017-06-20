@@ -23,6 +23,7 @@ import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.api.AccessToken;
 import net.gluu.erasmus.model.APIBadgeRequest;
 import net.gluu.erasmus.model.Badge;
+import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.BadgeRequests;
 
 import org.androidannotations.annotations.App;
@@ -104,6 +105,8 @@ public class PendingBadgeFragment extends Fragment {
         mRvBadges = (RecyclerView) view.findViewById(R.id.rv_badges);
         mRvBadges.setLayoutManager(new LinearLayoutManager(getActivity()));
         mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout.setNestedScrollingEnabled(true);
+        mSwipeRefreshLayout.setEnabled(true);
         getPendingBadgeRequests();
 
         mSwipeRefreshLayout.setOnRefreshListener(
@@ -182,6 +185,8 @@ public class PendingBadgeFragment extends Fragment {
                                     if (objResponse.getError()) {
                                         Log.v("TAG", "Error in retrieving pending badge requests");
                                         Application.showAutoDismissAlertDialog(getActivity(), objResponse.getErrorMsg());
+                                        mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), new ArrayList<BadgeRequest>(), false));
+
                                     } else {
                                         Log.v("TAG", "pending badge requests retrieved:" + objResponse.getBadgeRequests().size());
                                         mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), false));
@@ -190,12 +195,16 @@ public class PendingBadgeFragment extends Fragment {
                             } else {
                                 Log.v("TAG", "Error from server in retrieving pending badge requests:" + response.errorBody());
                                 Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                                mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), new ArrayList<BadgeRequest>(), false));
+
                             }
                         }
 
                         @Override
                         public void onFailure(Call<BadgeRequests> call, Throwable t) {
                             Log.v("TAG", "Response retrieving pending badge requests failure" + t.getMessage());
+                            mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), new ArrayList<BadgeRequest>(), false));
+
                             hideProgressBar();
                         }
                     });

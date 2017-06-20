@@ -4,13 +4,15 @@ apply from: 'config/keystore.gradle'
 buildscript {
     repositories {
         jcenter()
-        maven { url '/home/lcom58/androidsdk/extras/android/m2repository' }
+        maven { url '/media/lcom64/D/sdk' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'org.ajoberstar:gradle-git:1.5.1'
+        classpath 'com.google.gms:google-services:3.0.0'
+
     }
 }
 
@@ -18,6 +20,7 @@ subprojects {
     repositories {
         jcenter()
         maven { url "${rootProject.androidSdkDir}/extras/android/m2repository" }
+        maven { url "${rootProject.androidSdkDir}/extras/google/m2repository" }
         maven { url 'https://jitpack.io' }
     }
 }

@@ -9,14 +9,14 @@ import org.xdi.oxd.badgemanager.storage.StorageProperties;
 
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)
-public class OxdSpringApplication extends SpringBootServletInitializer{
+public class OxdSpringApplication extends SpringBootServletInitializer {
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(OxdSpringApplication.class);
-	}
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(OxdSpringApplication.class);
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(OxdSpringApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OxdSpringApplication.class, args);
+    }
 }

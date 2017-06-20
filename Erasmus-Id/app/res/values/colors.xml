@@ -7,4 +7,5 @@
     <color name="menu_bg">#EBEAF0</color>
     <color name="white">#FFFFFF</color>
     <color name="red">#FF0000</color>
+    <color name="tabSelected">#FF005879</color>
 </resources>

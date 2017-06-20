@@ -47,7 +47,7 @@
         <liquibase-slf4j.version>1.2.1</liquibase-slf4j.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
         <jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
-        <maven.test.skip>true</maven.test.skip>
+        <!--<maven.test.skip>false</maven.test.skip>-->
     </properties>
 
     <dependencies>
@@ -232,6 +232,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                >
             </plugin>
         </plugins>
     </build>
