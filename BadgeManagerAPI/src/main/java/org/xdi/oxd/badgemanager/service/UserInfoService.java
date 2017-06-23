@@ -5,8 +5,11 @@ import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.xdi.oxd.badgemanager.Settings;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.model.UserInfo;
@@ -19,6 +22,9 @@ import javax.inject.Inject;
  * Created by Arvind Tomar on 25/4/17.
  */
 @Component
+
+@ContextConfiguration(classes = RedisService.class, loader = AnnotationConfigContextLoader.class)
+@ComponentScan({"org.xdi.oxd.badgemanager.service","org.xdi.oxd.badgemanager.service","org.xdi.oxd.badgemanager"})
 public class UserInfoService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserInfoService.class);
@@ -26,7 +32,7 @@ public class UserInfoService {
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
 
-    @Inject
+    @Autowired
     private Settings settings;
 
     @Inject

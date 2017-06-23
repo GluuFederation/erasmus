@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.TestPropertySource;
 import org.xdi.oxd.client.CommandClient;
 import org.xdi.oxd.common.Command;
 import org.xdi.oxd.common.CommandResponse;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 @Component
+@SpringBootTest
 public class OxdServiceImpl implements OxdService {
 
     private static final Logger logger = LoggerFactory.getLogger(OxdServiceImpl.class);
@@ -48,7 +51,7 @@ public class OxdServiceImpl implements OxdService {
     }
 
     @Override
-    public CommandResponse registerSite(String opHost,String redirectUrl, String logoutUrl, String postLogoutRedirectUrl) {
+    public CommandResponse registerSite(String opHost, String redirectUrl, String logoutUrl, String postLogoutRedirectUrl) {
         final RegisterSiteParams commandParams = new RegisterSiteParams();
         commandParams.setOpHost(opHost);
         commandParams.setAuthorizationRedirectUri(redirectUrl);

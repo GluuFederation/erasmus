@@ -181,7 +181,7 @@ public class BadgeRequestController {
     @RequestMapping(value = "list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getBadgeRequestsByStatus(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody BadgeRequest badgeRequest, HttpServletResponse response) {
 
-        JsonObject jsonResponse = new JsonObject();
+         JsonObject jsonResponse = new JsonObject();
 
         try {
 //            Client client = new HttpE3DBClientBuilder()

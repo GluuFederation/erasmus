@@ -2,10 +2,15 @@ package org.xdi.oxd.badgemanager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.xdi.oxd.badgemanager.service.OxdService;
+import org.xdi.oxd.badgemanager.service.RedisService;
 import org.xdi.oxd.common.CommandResponse;
 import org.xdi.oxd.common.ResponseStatus;
 import org.xdi.oxd.common.response.RegisterSiteResponse;
@@ -14,6 +19,9 @@ import javax.inject.Inject;
 import java.io.IOException;
 
 @Component
+
+@ContextConfiguration(classes = RedisService.class, loader = AnnotationConfigContextLoader.class)
+@ComponentScan({"org.xdi.oxd.badgemanager.service"})
 public class Settings {
 
     private static final Logger logger = LoggerFactory.getLogger(Settings.class);
@@ -30,7 +38,7 @@ public class Settings {
     @Value("${oxd.client.post-logout-uri}")
     private String postLogoutUrl;
 
-    @Inject
+    @Autowired
     private OxdService oxdService;
 
     private String oxdId;

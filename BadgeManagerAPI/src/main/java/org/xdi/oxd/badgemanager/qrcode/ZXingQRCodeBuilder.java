@@ -103,11 +103,11 @@ public class ZXingQRCodeBuilder implements QRCBuilder<BufferedImage> {
 
     private void validateSize(Integer width, Integer height) {
         if (width <= 0) {
-            throw new InvalidSizeException("Width is to small should be > 0 is " + width);
+            throw new InvalidSizeException("Width is too small should be > 0 is " + width);
         }
 
         if (height <= 0) {
-            throw new InvalidSizeException("Height is to small should be > 0 is " + height);
+            throw new InvalidSizeException("Height is too small should be > 0 is " + height);
         }
     }
 

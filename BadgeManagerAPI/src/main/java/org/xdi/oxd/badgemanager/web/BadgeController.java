@@ -11,8 +11,11 @@ import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.xdi.oxauth.model.fido.u2f.protocol.DeviceData;
@@ -30,6 +33,7 @@ import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
 import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
+import org.xdi.oxd.badgemanager.service.RedisService;
 import org.xdi.oxd.badgemanager.service.UserInfoService;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 import org.xdi.oxd.badgemanager.util.JWTUtil;
@@ -58,6 +62,9 @@ import static org.xdi.oxd.badgemanager.qrcode.decorator.ColoredQRCode.colorizeQR
 @RestController
 @Api(basePath = "/badges", description = "badges apis")
 @RequestMapping("/badges")
+
+@ContextConfiguration(classes = RedisService.class, loader = AnnotationConfigContextLoader.class)
+@ComponentScan({"org.xdi.oxd.badgemanager.service"})
 public class BadgeController {
 
     private static final Logger logger = LoggerFactory.getLogger(BadgeController.class);
@@ -65,7 +72,7 @@ public class BadgeController {
     @Autowired
     public RedisTemplate<Object, Object> redisTemplate;
 
-    @Inject
+    @Autowired
     private UserInfoService userInfoService;
 
     @Inject
