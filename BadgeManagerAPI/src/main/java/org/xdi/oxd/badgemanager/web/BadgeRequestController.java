@@ -2,8 +2,6 @@ package org.xdi.oxd.badgemanager.web;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.tozny.e3db.client.Client;
-import com.tozny.e3db.client.HttpE3DBClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -12,13 +10,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.xdi.oxauth.model.fido.u2f.protocol.DeviceData;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeClassesCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeCommands;
 import org.xdi.oxd.badgemanager.ldap.commands.BadgeRequestCommands;
+import org.xdi.oxd.badgemanager.ldap.commands.PersonCommands;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeRequests;
 import org.xdi.oxd.badgemanager.ldap.models.Badges;
+import org.xdi.oxd.badgemanager.ldap.models.Person;
+import org.xdi.oxd.badgemanager.ldap.models.fido.u2f.DeviceRegistration;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.service.UserInfoService;
@@ -29,6 +31,7 @@ import org.xdi.oxd.badgemanager.util.Utils;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +52,9 @@ public class BadgeRequestController {
 
     @Inject
     private UserInfoService userInfoService;
+
+    @Inject
+    public NotificationController notificationController;
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String createBadgeRequest(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody CreateBadgeRequest badgeRequest, HttpServletResponse response) {
@@ -103,7 +109,7 @@ public class BadgeRequestController {
     }
 
     @RequestMapping(value = "list/{participant:.+}/{status:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getBadgeRequestsByParticipant(@RequestHeader(value = "Authorization") String authorization, @PathVariable String participant, @PathVariable String status,HttpServletResponse response) {
+    public String getBadgeRequestsByParticipant(@RequestHeader(value = "Authorization") String authorization, @PathVariable String participant, @PathVariable String status, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
@@ -143,8 +149,8 @@ public class BadgeRequestController {
 
         try {
             if (!authorization.equalsIgnoreCase(Global.AccessToken)) {
-                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 return jsonResponse.toString();
             }
@@ -157,6 +163,29 @@ public class BadgeRequestController {
 
             if (createBadgeClass(request, approveBadge)) {
                 if (BadgeRequestCommands.updateBadgeRequest(badgeRequest)) {
+                    Person person = PersonCommands.getPersonByEmail(badgeRequest.getGluuBadgeRequester());
+                    if (person != null) {
+                        List<DeviceRegistration> deviceRegistrations = PersonCommands.getDeviceRegistrationByPerson(person.getInum());
+                        logger.info("Device registration counts in approveBadgeRequest(): " + deviceRegistrations.size());
+                        if (deviceRegistrations.size() > 0) {
+                            DeviceRegistration deviceRegistration = deviceRegistrations.get(0);
+                            logger.info("Device data in approveBadgeRequest(): " + deviceRegistration.getDeviceData());
+                            DeviceData deviceData = deviceRegistration.getDeviceData();
+                            if (deviceData != null && deviceData.getPlatform().equalsIgnoreCase("android") && deviceData.getPushToken() != null && deviceData.getPushToken().length() > 0) {
+                                JsonObject data = new JsonObject();
+                                data.addProperty("notifyType", 4);
+
+                                notificationController.send("", deviceData.getPushToken(), data);
+                            } else {
+                                logger.info("No android device found in approveBadgeRequest()");
+                            }
+                        } else {
+                            logger.info("Device not found in approveBadgeRequest()");
+                        }
+                    } else {
+                        logger.info("Person not found in approveBadgeRequest() with email:" + badgeRequest.getGluuBadgeRequester());
+                    }
+
                     jsonResponse.addProperty("message", "Badge request approved successfully");
                 } else {
                     jsonResponse.addProperty("message", "Badge request approved failed");
@@ -181,14 +210,15 @@ public class BadgeRequestController {
     @RequestMapping(value = "list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getBadgeRequestsByStatus(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody BadgeRequest badgeRequest, HttpServletResponse response) {
 
-         JsonObject jsonResponse = new JsonObject();
+        JsonObject jsonResponse = new JsonObject();
 
         try {
+
 //            Client client = new HttpE3DBClientBuilder()
-//                    .setClientId(clientId)
-//                    .setApiKeyId(apiKeyId)
-//                    .setApiSecret(apiSecret)
-//                    .setKeyPair(keyPair)
+//                    .setClientId(UUID.fromString("d28ec291-3c17-41d6-a1ac-2f11c4cddd98"))
+//                    .setApiKeyId("8b537c6828bc9a09658fc7238d23ed5e71ef0d129d147d5f48cf6876a4cee667")
+//                    .setApiSecret("287f9b2e1792d335b0543912bcfff7023184cb27439bfaa753314ee66d67f0c9")
+//                    .setKeyPair(new KeyPair())
 //                    .build();
 
             if (accessToken == null || accessToken.length() == 0 || badgeRequest == null
@@ -218,17 +248,19 @@ public class BadgeRequestController {
             }
             String email = userInfo.getEmail();
 
+            BadgeRequestResponse badgeRequests = new BadgeRequestResponse();
+            badgeRequests.setApprovedBadgeRequests(new ArrayList<>());
+            badgeRequests.setPendingBadgeRequests(new ArrayList<>());
             if (badgeRequest.getStatus().equalsIgnoreCase("all")) {
-                BadgeRequestResponse badgeRequests = new BadgeRequestResponse();
                 List<CreateBadgeResponse> lstApprovedBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(email, "Approved");
                 List<CreateBadgeResponse> lstPendingBadgeRequests = BadgeRequestCommands.getBadgeRequestsByStatusNew(email, "Pending");
                 if (lstPendingBadgeRequests.size() > 0) {
                     badgeRequests.setPendingBadgeRequests(lstPendingBadgeRequests);
                 }
                 if (lstApprovedBadgeRequests.size() > 0) {
-                    badgeRequests.setApprovedBadgerequests(lstApprovedBadgeRequests);
+                    badgeRequests.setApprovedBadgeRequests(lstApprovedBadgeRequests);
                 }
-                if ((badgeRequests.getApprovedBadgerequests() == null || badgeRequests.getApprovedBadgerequests().size() == 0) && (badgeRequests.getPendingBadgeRequests() == null || badgeRequests.getPendingBadgeRequests().size() == 0)) {
+                if ((badgeRequests.getApprovedBadgeRequests() == null || badgeRequests.getApprovedBadgeRequests().size() == 0) && (badgeRequests.getPendingBadgeRequests() == null || badgeRequests.getPendingBadgeRequests().size() == 0)) {
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "No badge requests found");
                 } else {
@@ -241,8 +273,13 @@ public class BadgeRequestController {
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "No " + badgeRequest.getStatus() + " badge requests found");
                 } else {
+                    if (badgeRequest.getStatus().equalsIgnoreCase("Approved")) {
+                        badgeRequests.setApprovedBadgeRequests(lstBadgeRequests);
+                    } else if (badgeRequest.getStatus().equalsIgnoreCase("Pending")) {
+                        badgeRequests.setPendingBadgeRequests(lstBadgeRequests);
+                    }
                     jsonResponse.addProperty("error", false);
-                    jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(lstBadgeRequests));
+                    jsonResponse.add("badgeRequests", GsonService.getGson().toJsonTree(badgeRequests));
                 }
             }
 
@@ -266,7 +303,7 @@ public class BadgeRequestController {
 
             if (accessToken == null || accessToken.length() == 0 || badgeRequest == null
                     || badgeRequest.getOpHost() == null || badgeRequest.getBadgeRequestInum() == null
-                    || badgeRequest.getOpHost().length() == 0 || badgeRequest.getBadgeRequestInum().length() == 0) {
+                    || badgeRequest.getOpHost().isEmpty() || badgeRequest.getBadgeRequestInum().length() == 0) {
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

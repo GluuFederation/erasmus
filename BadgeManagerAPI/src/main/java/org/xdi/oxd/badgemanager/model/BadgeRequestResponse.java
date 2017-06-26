@@ -7,7 +7,7 @@ import java.util.List;
  */
 public class BadgeRequestResponse {
     private List<CreateBadgeResponse> pendingBadgeRequests;
-    private List<CreateBadgeResponse> approvedBadgerequests;
+    private List<CreateBadgeResponse> approvedBadgeRequests;
 
     public List<CreateBadgeResponse> getPendingBadgeRequests() {
         return pendingBadgeRequests;
@@ -17,11 +17,11 @@ public class BadgeRequestResponse {
         this.pendingBadgeRequests = pendingBadgeRequests;
     }
 
-    public List<CreateBadgeResponse> getApprovedBadgerequests() {
-        return approvedBadgerequests;
+    public List<CreateBadgeResponse> getApprovedBadgeRequests() {
+        return approvedBadgeRequests;
     }
 
-    public void setApprovedBadgerequests(List<CreateBadgeResponse> approvedBadgerequests) {
-        this.approvedBadgerequests = approvedBadgerequests;
+    public void setApprovedBadgeRequests(List<CreateBadgeResponse> approvedBadgeRequests) {
+        this.approvedBadgeRequests = approvedBadgeRequests;
     }
 }
