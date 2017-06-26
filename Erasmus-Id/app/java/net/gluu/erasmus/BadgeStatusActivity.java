@@ -1,7 +1,7 @@
 package net.gluu.erasmus;
 
 import android.Manifest;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,30 +23,44 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import net.gluu.erasmus.adapters.BadgePagerAdapter;
+import net.gluu.erasmus.api.APIInterface;
+import net.gluu.erasmus.api.APIService;
+import net.gluu.erasmus.api.AccessToken;
 import net.gluu.erasmus.fragments.ApproveBadgeFragment;
 import net.gluu.erasmus.fragments.PendingBadgeFragment;
+import net.gluu.erasmus.model.APIBadgeRequest;
+import net.gluu.erasmus.model.BadgeRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 /**
  * Created by Meghna Joshi on 20/4/17.
  */
-
 public class BadgeStatusActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int MY_REQUEST_CODE = 111;
     BadgePagerAdapter pagerAdapter;
-    private List<Fragment> fragments;
+    List<Fragment> fragments;
     TabLayout mTabLayout;
     ViewPager mViewPager;
     LinearLayout llBottomMenu;
     TextView tvScan, tvLog, tvSetting, tvAbout;
+    ProgressDialog mProgress;
+    APIInterface mObjAPI;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_badge_status);
+
+        mObjAPI = APIService.createService(APIInterface.class);
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("Loading badges..");
 
         initViews();
         initListeners();
@@ -69,8 +84,8 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initListeners() {
-
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        //noinspection deprecation
         mTabLayout.setOnTabSelectedListener(new TabSelectedListener());
     }
 
@@ -97,6 +112,7 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initTabs() {
+        //noinspection deprecation
         mTabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.colorPrimary));
         mTabLayout.addTab(mTabLayout.newTab().setText("Approved Badges"), 0, true);
         mTabLayout.addTab(mTabLayout.newTab().setText("Pending Bagdes"), 1, false);
@@ -104,9 +120,7 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initViewPager() {
-        getFragments();
-        pagerAdapter = new BadgePagerAdapter(getSupportFragmentManager(), fragments);
-        mViewPager.setAdapter(pagerAdapter);
+        getBadgeRequests();
     }
 
     private void getFragments() {
@@ -115,6 +129,9 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
         fragments = new ArrayList<>();
         fragments.add(approveBadgeFragment);
         fragments.add(pendingBadgeFragment);
+
+        pagerAdapter = new BadgePagerAdapter(getSupportFragmentManager(), fragments);
+        mViewPager.setAdapter(pagerAdapter);
     }
 
     @Override
@@ -150,7 +167,7 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
                 Intent i = new Intent(BadgeStatusActivity.this, SimpleScannerActivity.class);
                 startActivity(i);
             } else if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ArrayList<String> strings = new ArrayList<String>();
+                ArrayList<String> strings = new ArrayList<>();
 
                 if ((checkSelfPermission(Manifest.permission.CAMERA)
                         != PackageManager.PERMISSION_GRANTED)) {
@@ -176,8 +193,8 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
         boolean permissionDenied = false;
         if (requestCode == MY_REQUEST_CODE) {
             if (grantResults.length > 0) {
-                for (int i = 0; i < grantResults.length; i++) {
-                    if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
+                for (int grantResult : grantResults) {
+                    if (grantResult == PackageManager.PERMISSION_DENIED) {
                         permissionDenied = true;
                         break;
                     }
@@ -189,19 +206,11 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(getResources().getString(R.string.app_name) + getString(R.string.require_permission));
-                builder.setPositiveButton(R.string.retry, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        checkPermission();
-                    }
-                });
+                builder.setPositiveButton(R.string.retry, (dialog, which) -> checkPermission());
 
-                builder.setNegativeButton(R.string.exit, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        finish();
-                    }
+                builder.setNegativeButton(R.string.exit, (dialog, which) -> {
+                    dialog.dismiss();
+                    finish();
                 });
 
                 builder.show();
@@ -212,4 +221,74 @@ public class BadgeStatusActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onBackPressed() {
     }
+
+    private void getBadgeRequests() {
+        if (Application.checkInternetConnection(this)) {
+
+            showProgressBar();
+
+            Application.getAccessToken(new AccessToken() {
+                @Override
+                public void onAccessTokenSuccess(String accessToken) {
+                    Log.v("TAG", "Access token in getBadgeRequests(): " + accessToken);
+                    APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "All");
+                    Call<BadgeRequest> call = mObjAPI.getBadgeRequests(accessToken, badgeRequest);
+                    call.enqueue(new Callback<BadgeRequest>() {
+                        @Override
+                        public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
+                            hideProgressBar();
+                            if (response.errorBody() == null && response.body() != null) {
+                                BadgeRequest objResponse = response.body();
+
+                                if (objResponse != null) {
+                                    if (objResponse.getError()) {
+                                        Log.v("TAG", "Error in retrieving badge requests");
+                                        Application.showAutoDismissAlertDialog(BadgeStatusActivity.this, objResponse.getErrorMsg());
+                                    } else {
+                                        Log.v("TAG", "approved badge requests retrieved:" + objResponse.getBadgeRequests().getApprovedBadgeRequests().size());
+                                        Log.v("TAG", "pending badge requests retrieved:" + objResponse.getBadgeRequests().getPendingBadgeRequests().size());
+                                        Application.approvedBadgeRequests = objResponse.getBadgeRequests().getApprovedBadgeRequests();
+                                        Application.pendingBadgeRequests = objResponse.getBadgeRequests().getPendingBadgeRequests();
+                                    }
+                                }
+                            } else {
+                                Log.v("TAG", "Error from server in retrieving badge requests:" + response.errorBody());
+                                Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
+                            }
+                            getFragments();
+                        }
+
+                        @Override
+                        public void onFailure(Call<BadgeRequest> call, Throwable t) {
+                            Log.v("TAG", "Response retrieving badge requests failure" + t.getMessage());
+                            hideProgressBar();
+                            getFragments();
+                        }
+                    });
+                }
+
+                @Override
+                public void onAccessTokenFailure() {
+                    Log.v("TAG", "Failed to get access token in getBadgeRequests()");
+                    hideProgressBar();
+                    Application.showAutoDismissAlertDialog(BadgeStatusActivity.this, getString(R.string.unable_to_process));
+                }
+            });
+        } else {
+            Application.showAutoDismissAlertDialog(BadgeStatusActivity.this, getString(R.string.no_internet));
+        }
+    }
+
+    private void showProgressBar() {
+        if (mProgress == null)
+            return;
+
+        mProgress.show();
+    }
+
+    private void hideProgressBar() {
+        if (mProgress != null && mProgress.isShowing())
+            mProgress.dismiss();
+    }
+
 }

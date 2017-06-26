@@ -16,16 +16,12 @@ import android.view.ViewGroup;
 
 import net.gluu.erasmus.Application;
 import net.gluu.erasmus.R;
-import net.gluu.erasmus.RequestBadgeActivity;
-import net.gluu.erasmus.SelectOpActivity;
-import net.gluu.erasmus.adapters.BadgeRequestAdapter;
+import net.gluu.erasmus.adapters.ApprovedBadgeRequestAdapter;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.api.AccessToken;
 import net.gluu.erasmus.model.APIBadgeRequest;
-import net.gluu.erasmus.model.Badge;
 import net.gluu.erasmus.model.BadgeRequest;
-import net.gluu.erasmus.model.BadgeRequests;
 
 import java.util.ArrayList;
 
@@ -84,7 +80,7 @@ public class ApproveBadgeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mObjAPI = APIService.createService(APIInterface.class);
         mProgress = new ProgressDialog(getActivity());
-        mProgress.setMessage("Loading badges..");
+        mProgress.setMessage("Loading approved badges..");
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -101,13 +97,13 @@ public class ApproveBadgeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         mRvBadges = (RecyclerView) view.findViewById(R.id.rv_badges);
         mRvBadges.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setNestedScrollingEnabled(true);
         mSwipeRefreshLayout.setEnabled(true);
 
-        getApprovedBadgeRequests();
+        showApprovedBadgeRequests();
 
         mSwipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
@@ -122,6 +118,7 @@ public class ApproveBadgeFragment extends Fragment {
                     }
                 }
         );
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -134,12 +131,6 @@ public class ApproveBadgeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
     }
 
     @Override
@@ -163,6 +154,10 @@ public class ApproveBadgeFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    private void showApprovedBadgeRequests() {
+        mRvBadges.setAdapter(new ApprovedBadgeRequestAdapter(getActivity(), Application.approvedBadgeRequests));
+    }
+
     private void getApprovedBadgeRequests() {
         if (Application.checkInternetConnection(getActivity())) {
 
@@ -173,37 +168,37 @@ public class ApproveBadgeFragment extends Fragment {
                 public void onAccessTokenSuccess(String accessToken) {
                     Log.v("TAG", "Access token in getApprovedBadgeRequests(): " + accessToken);
                     APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), "Approved");
-                    Call<BadgeRequests> call = mObjAPI.getBadgeRequests(accessToken, badgeRequest);
-                    call.enqueue(new Callback<BadgeRequests>() {
+                    Call<BadgeRequest> call = mObjAPI.getBadgeRequests(accessToken, badgeRequest);
+                    call.enqueue(new Callback<BadgeRequest>() {
                         @Override
-                        public void onResponse(Call<BadgeRequests> call, Response<BadgeRequests> response) {
+                        public void onResponse(Call<BadgeRequest> call, Response<BadgeRequest> response) {
                             hideProgressBar();
                             if (response.errorBody() == null && response.body() != null) {
-                                BadgeRequests objResponse = response.body();
+                                BadgeRequest objResponse = response.body();
 
                                 if (objResponse != null) {
                                     if (objResponse.getError()) {
                                         Log.v("TAG", "Error in retrieving approved badge requests");
                                         Application.showAutoDismissAlertDialog(getActivity(), objResponse.getErrorMsg());
-                                        mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), new ArrayList<BadgeRequest>(), false));
+                                        mRvBadges.setAdapter(new ApprovedBadgeRequestAdapter(getActivity(), new ArrayList<>()));
 
                                     } else {
-                                        Log.v("TAG", "approved badge requests retrieved:" + objResponse.getBadgeRequests().size());
-                                        mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), objResponse.getBadgeRequests(), true));
+                                        Log.v("TAG", "approved badge requests retrieved:" + objResponse.getBadgeRequests().getApprovedBadgeRequests().size());
+                                        showApprovedBadgeRequests();
                                     }
                                 }
                             } else {
                                 Log.v("TAG", "Error from server in retrieving approved badge requests:" + response.errorBody());
                                 Log.v("TAG", "Error Code:" + response.code() + " Error message:" + response.message());
-                                mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), new ArrayList<BadgeRequest>(), false));
+                                mRvBadges.setAdapter(new ApprovedBadgeRequestAdapter(getActivity(), new ArrayList<>()));
 
                             }
                         }
 
                         @Override
-                        public void onFailure(Call<BadgeRequests> call, Throwable t) {
+                        public void onFailure(Call<BadgeRequest> call, Throwable t) {
                             Log.v("TAG", "Response retrieving approved badge requests failure" + t.getMessage());
-                            mRvBadges.setAdapter(new BadgeRequestAdapter(getActivity(), new ArrayList<BadgeRequest>(), false));
+                            mRvBadges.setAdapter(new ApprovedBadgeRequestAdapter(getActivity(), new ArrayList<>()));
 
                             hideProgressBar();
                         }

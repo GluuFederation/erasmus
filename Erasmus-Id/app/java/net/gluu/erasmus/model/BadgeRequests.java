@@ -7,52 +7,36 @@ import com.google.gson.annotations.SerializedName;
 
 public class BadgeRequests {
 
-    @SerializedName("error")
+    @SerializedName("pendingBadgeRequests")
     @Expose
-    private Boolean error;
-    @SerializedName("errorMsg")
+    private List<PendingBadgeRequest> pendingBadgeRequests = null;
+    @SerializedName("approvedBadgeRequests")
     @Expose
-    private String errorMsg;
-    @SerializedName("badgeRequests")
-    @Expose
-    private List<BadgeRequest> badgeRequests = null;
+    private List<ApprovedBadgeRequest> approvedBadgeRequests = null;
 
-    public Boolean getError() {
-        return error;
+    public List<PendingBadgeRequest> getPendingBadgeRequests() {
+        return pendingBadgeRequests;
     }
 
-    public void setError(Boolean error) {
-        this.error = error;
+    public void setPendingBadgeRequests(List<PendingBadgeRequest> pendingBadgeRequests) {
+        this.pendingBadgeRequests = pendingBadgeRequests;
     }
 
-    public BadgeRequests withError(Boolean error) {
-        this.error = error;
+    public BadgeRequests withPendingBadgeRequests(List<PendingBadgeRequest> pendingBadgeRequests) {
+        this.pendingBadgeRequests = pendingBadgeRequests;
         return this;
     }
 
-    public List<BadgeRequest> getBadgeRequests() {
-        return badgeRequests;
+    public List<ApprovedBadgeRequest> getApprovedBadgeRequests() {
+        return approvedBadgeRequests;
     }
 
-    public void setBadgeRequests(List<BadgeRequest> badgeRequests) {
-        this.badgeRequests = badgeRequests;
+    public void setApprovedBadgeRequests(List<ApprovedBadgeRequest> approvedBadgeRequests) {
+        this.approvedBadgeRequests = approvedBadgeRequests;
     }
 
-    public BadgeRequests withBadgeRequests(List<BadgeRequest> badgeRequests) {
-        this.badgeRequests = badgeRequests;
-        return this;
-    }
-
-    public String getErrorMsg() {
-        return errorMsg;
-    }
-
-    public void setErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
-    }
-
-    public BadgeRequests withErrorMsg(String errorMsg) {
-        this.errorMsg = errorMsg;
+    public BadgeRequests withApprovedBadgerequests(List<ApprovedBadgeRequest> approvedBadgeRequests) {
+        this.approvedBadgeRequests = approvedBadgeRequests;
         return this;
     }
 

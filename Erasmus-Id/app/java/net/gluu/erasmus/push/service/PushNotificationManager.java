@@ -16,7 +16,7 @@ import net.gluu.erasmus.push.Config;
 import net.gluu.erasmus.utils.Utils;
 
 public class PushNotificationManager extends FirebaseInstanceIdService {
-    private static final String TAG = PushNotificationManager.class.getSimpleName();
+    private static final String TAG = "TAG";
  
     @Override
     public void onTokenRefresh() {

@@ -18,16 +18,15 @@ import android.widget.ToggleButton;
 import net.gluu.erasmus.Application;
 import net.gluu.erasmus.DisplayBadgeActivity;
 import net.gluu.erasmus.R;
-import net.gluu.erasmus.RequestBadgeActivity;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.api.AccessToken;
 import net.gluu.erasmus.model.APIBadgeDetail;
+import net.gluu.erasmus.model.ApprovedBadgeRequest;
 import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.PrivacyRequest;
 
-import org.androidannotations.annotations.App;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,21 +38,19 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Created by Meghna Joshi on 20/4/17.
+ * Created by Arvind Tomar on 26/6/17.
  */
 
-public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapter.ViewHolder> {
+public class ApprovedBadgeRequestAdapter extends RecyclerView.Adapter<ApprovedBadgeRequestAdapter.ViewHolder> {
 
-    private final List<BadgeRequest> mBadgeRequests;
+    private final List<ApprovedBadgeRequest> mBadgeRequests;
     private Context mContext;
-    private boolean isFromRequest;
     private ProgressDialog mProgress;
     private APIInterface mObjAPI;
 
-    public BadgeRequestAdapter(Context context, List<BadgeRequest> items, boolean isFromRequest) {
+    public ApprovedBadgeRequestAdapter(Context context, List<ApprovedBadgeRequest> items) {
         mContext = context;
         mBadgeRequests = items;
-        this.isFromRequest = isFromRequest;
         mObjAPI = APIService.createService(APIInterface.class);
         mProgress = new ProgressDialog(mContext);
     }
@@ -67,33 +64,27 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final BadgeRequest badgeRequest = mBadgeRequests.get(position);
+        final ApprovedBadgeRequest badgeRequest = mBadgeRequests.get(position);
         holder.mBadgeName.setText(badgeRequest.getTemplateBadgeTitle());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isFromRequest) {
-                    new AlertDialog.Builder(mContext).setMessage("Do you want to Request " + badgeRequest.getTemplateBadgeTitle() + " Badge?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            getBadgeDetails(badgeRequest);
-                        }
-                    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).show();
-                }
+                new AlertDialog.Builder(mContext).setMessage("Do you want to Request " + badgeRequest.getTemplateBadgeTitle() + " Badge?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getBadgeDetails(badgeRequest);
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
             }
         });
 
-        if (!isFromRequest) {
-            holder.mTbPrivacy.setVisibility(View.GONE);
-        } else {
-            holder.mTbPrivacy.setVisibility(View.VISIBLE);
-        }
+        holder.mTbPrivacy.setVisibility(View.VISIBLE);
 
         holder.ivDelete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,7 +161,7 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
             mProgress.dismiss();
     }
 
-    private void deleteBadgeRequest(BadgeRequest badgeRequest, int position) {
+    private void deleteBadgeRequest(ApprovedBadgeRequest badgeRequest, int position) {
         if (Application.checkInternetConnection(mContext)) {
             showProgressBar("Deleting..");
 
@@ -236,7 +227,7 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
         }
     }
 
-    private void getBadgeDetails(BadgeRequest badgeRequest) {
+    private void getBadgeDetails(ApprovedBadgeRequest badgeRequest) {
         if (Application.checkInternetConnection(mContext)) {
             showProgressBar("Requesting badge..");
 
@@ -297,7 +288,7 @@ public class BadgeRequestAdapter extends RecyclerView.Adapter<BadgeRequestAdapte
         }
     }
 
-    private void setBadgePrivacy(BadgeRequest badgeRequest, String privacy) {
+    private void setBadgePrivacy(ApprovedBadgeRequest badgeRequest, String privacy) {
         if (Application.checkInternetConnection(mContext)) {
             showProgressBar("Changing privacy..");
 

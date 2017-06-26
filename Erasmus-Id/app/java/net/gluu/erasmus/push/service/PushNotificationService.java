@@ -9,6 +9,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import net.gluu.erasmus.Application;
 import net.gluu.erasmus.BadgeAccessDialog;
+import net.gluu.erasmus.BadgeStatusActivity;
 import net.gluu.erasmus.R;
 import net.gluu.erasmus.ScanFailureActivity;
 import net.gluu.erasmus.ScanSuccessActivity;
@@ -97,6 +98,10 @@ public class PushNotificationService extends com.google.firebase.messaging.Fireb
             } else if (data.get("notifyType").equals("3")) {
                 Intent intent = new Intent(getApplicationContext(), BadgeAccessDialog.class);
                 intent.putExtra(getString(R.string.key_message), notification.getBody());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            } else if (data.get("notifyType").equals("4")) {
+                Intent intent = new Intent(getApplicationContext(), BadgeStatusActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }

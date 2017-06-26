@@ -14,9 +14,9 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/AppTheme"
-        android:layout_below="@+id/toolbar"
         app:tabSelectedTextColor="@color/colorPrimary"
         app:tabTextColor="@android:color/black" />
 

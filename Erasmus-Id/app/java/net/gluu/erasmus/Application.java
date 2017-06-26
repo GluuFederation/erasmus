@@ -33,8 +33,10 @@ import net.gluu.appauth.AuthorizationService;
 import net.gluu.appauth.ClientAuthentication;
 import net.gluu.appauth.TokenRequest;
 import net.gluu.appauth.TokenResponse;
+import net.gluu.erasmus.model.ApprovedBadgeRequest;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.Participant;
+import net.gluu.erasmus.model.PendingBadgeRequest;
 import net.gluu.erasmus.model.Recipient;
 import net.gluu.erasmus.model.ScanResponseSuccess;
 import net.gluu.erasmus.model.UserInfo;
@@ -42,6 +44,8 @@ import net.gluu.erasmus.utils.JWTUtils;
 import net.gluu.erasmus.utils.JsonUtils;
 
 import org.json.JSONObject;
+
+import java.util.List;
 
 /**
  * Application object; ensures that the support library is correctly configured for use of
@@ -65,6 +69,8 @@ public final class Application extends android.app.Application {
     private static AuthStateManager mStateManager;
     private static AuthorizationService mAuthService;
     public static Handler applicationHandler;
+    public static List<ApprovedBadgeRequest> approvedBadgeRequests;
+    public static List<PendingBadgeRequest> pendingBadgeRequests;
 
     @Override
     public void onCreate() {

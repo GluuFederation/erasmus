@@ -28,7 +28,7 @@ public interface APIInterface {
     Call<ParticipantsResponse> getParticipants(@Path("state") String state, @Path("city") String city);
 
     @POST("badges/request/list")
-    Call<BadgeRequests> getBadgeRequests(@Header("AccessToken") String accessToken, @Body APIBadgeRequest badgeRequest);
+    Call<BadgeRequest> getBadgeRequests(@Header("AccessToken") String accessToken, @Body APIBadgeRequest badgeRequest);
 
     @POST("badges/templates")
     Call<BadgeTemplates> getBadgeTemplates(@Header("AccessToken") String accessToken, @Body TemplateBadgeRequest templateBadgeRequest);
