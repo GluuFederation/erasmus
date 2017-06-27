@@ -185,7 +185,7 @@ public class ApprovedBadgeRequestAdapter extends RecyclerView.Adapter<ApprovedBa
                                         Log.v("TAG", "Error in deleting badge request.");
                                         Application.showAutoDismissAlertDialog(mContext, objResponse.getErrorMsg());
                                     } else {
-                                        mBadgeRequests.remove(position);
+                                        mBadgeRequests.remove(badgeRequest);
                                         notifyItemRemoved(position);
                                         Application.showAutoDismissAlertDialog(mContext, objResponse.getMessage());
                                     }
