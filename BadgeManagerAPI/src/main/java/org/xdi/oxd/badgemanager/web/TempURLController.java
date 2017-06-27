@@ -29,9 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 public class TempURLController {
 
     private static final Logger logger = LoggerFactory.getLogger(TempURLController.class);
+
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
-
 
     @Inject
     private BadgeController badgeController;

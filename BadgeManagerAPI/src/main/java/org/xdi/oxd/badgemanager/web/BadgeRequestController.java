@@ -175,7 +175,9 @@ public class BadgeRequestController {
                                 JsonObject data = new JsonObject();
                                 data.addProperty("notifyType", 4);
 
-                                notificationController.send("", deviceData.getPushToken(), data);
+                                String msg = "Your badge " + badgeRequest.getTemplateBadgeTitle() + " approved successfully";
+
+                                notificationController.send(msg, deviceData.getPushToken(), data);
                             } else {
                                 logger.info("No android device found in approveBadgeRequest()");
                             }
@@ -431,6 +433,6 @@ public class BadgeRequestController {
             ex.printStackTrace();
             logger.error("Exception in persist badge entry in createBadge()" + ex.getMessage());
         }
-        return objBadge;
+       return objBadge;
     }
 }
