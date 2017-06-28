@@ -1,5 +1,6 @@
 package org.xdi.oxd.badgemanager.web;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class BadgeRequestController {
     private UserInfoService userInfoService;
 
     @Inject
-    public NotificationController notificationController;
+    private NotificationController notificationController;
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String createBadgeRequest(@RequestHeader(value = "AccessToken") String accessToken, @RequestBody CreateBadgeRequest badgeRequest, HttpServletResponse response) {
@@ -161,9 +162,18 @@ public class BadgeRequestController {
             badgeRequest.setValidity(approveBadge.getValidity());
             badgeRequest.setFidesAccess(true);
 
-            if (createBadgeClass(request, approveBadge)) {
+            BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(approveBadge.getInum());
+
+            if (objBadgeRequest == null || objBadgeRequest.getInum() == null) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                jsonResponse.addProperty("error", true);
+                jsonResponse.addProperty("errorMsg", "No such badge request found");
+            }
+
+            Person person = PersonCommands.getPersonByEmail(objBadgeRequest.getGluuBadgeRequester());
+
+            if (createBadgeClass(request, approveBadge, objBadgeRequest, person)) {
                 if (BadgeRequestCommands.updateBadgeRequest(badgeRequest)) {
-                    Person person = PersonCommands.getPersonByEmail(badgeRequest.getGluuBadgeRequester());
                     if (person != null) {
                         List<DeviceRegistration> deviceRegistrations = PersonCommands.getDeviceRegistrationByPerson(person.getInum());
                         logger.info("Device registration counts in approveBadgeRequest(): " + deviceRegistrations.size());
@@ -215,13 +225,6 @@ public class BadgeRequestController {
         JsonObject jsonResponse = new JsonObject();
 
         try {
-
-//            Client client = new HttpE3DBClientBuilder()
-//                    .setClientId(UUID.fromString("d28ec291-3c17-41d6-a1ac-2f11c4cddd98"))
-//                    .setApiKeyId("8b537c6828bc9a09658fc7238d23ed5e71ef0d129d147d5f48cf6876a4cee667")
-//                    .setApiSecret("287f9b2e1792d335b0543912bcfff7023184cb27439bfaa753314ee66d67f0c9")
-//                    .setKeyPair(new KeyPair())
-//                    .build();
 
             if (accessToken == null || accessToken.length() == 0 || badgeRequest == null
                     || badgeRequest.getOpHost() == null || badgeRequest.getStatus() == null
@@ -343,62 +346,57 @@ public class BadgeRequestController {
         }
     }
 
-    private boolean createBadgeClass(HttpServletRequest servletRequest, ApproveBadge approveBadgeRequest) {
+    private boolean createBadgeClass(HttpServletRequest servletRequest, ApproveBadge approveBadgeRequest, BadgeRequests objBadgeRequest, Person person) {
         try {
-            BadgeRequests objBadgeRequest = BadgeRequestCommands.getBadgeRequestByInum(approveBadgeRequest.getInum());
-            if (objBadgeRequest != null) {
 
-                final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + objBadgeRequest.getTemplateBadgeId();
+            final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + objBadgeRequest.getTemplateBadgeId();
 
-                DisableSSLCertificateCheckUtil.disableChecks();
-                RestTemplate restTemplate = new RestTemplate();
+            DisableSSLCertificateCheckUtil.disableChecks();
+            RestTemplate restTemplate = new RestTemplate();
 
-                HttpHeaders headers = new HttpHeaders();
-                headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
 
-                HttpEntity<String> request = new HttpEntity<>(headers);
-                HttpEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
+            HttpEntity<String> request = new HttpEntity<>(headers);
+            HttpEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
 
-                String result = response.getBody();
+            String result = response.getBody();
 
-                JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
-                if (jObjResponse != null) {
-                    if (jObjResponse.has("message") && jObjResponse.get("message").getAsString().equalsIgnoreCase("Badge not found")) {
-                        logger.error("Unable to persist badge class entry. reason is:" + jObjResponse.get("message").getAsString());
-                        return false;
-                    }
-
-                    BadgeClass objBadgeClass = new BadgeClass();
-                    objBadgeClass.setTemplateBadgeId(jObjResponse.get("_id").getAsString());
-                    objBadgeClass.setName(jObjResponse.get("name").getAsString());
-                    objBadgeClass.setType("BadgeClass");
-                    objBadgeClass.setDescription(jObjResponse.get("description").getAsString());
-                    objBadgeClass.setBadgeRequestInum(objBadgeRequest.getInum());
-                    objBadgeClass.setImage(jObjResponse.get("image").getAsString());
-                    objBadgeClass.setGuid(utils.generateRandomGUID());
-                    objBadgeClass.setKey(utils.generateRandomKey(12));
-
-                    objBadgeClass.setId(utils.getBaseURL(servletRequest) + "/badgeClass/" + objBadgeClass.getGuid() + "?key=" + objBadgeClass.getKey());
-
-                    objBadgeClass = BadgeClassesCommands.createBadgeClass(objBadgeClass);
-
-                    if (objBadgeClass != null && objBadgeClass.getInum() != null) {
-                        Badges objBadge = createBadge(servletRequest, objBadgeClass, approveBadgeRequest);
-                        if (objBadge != null && objBadge.getInum() != null) {
-                            return true;
-                        } else {
-                            logger.error("Unable to persist badge entry");
-                            return false;
-                        }
-                    } else {
-                        logger.error("Unable to persist badge entry. reason is: badge class not persisted");
-                        return false;
-                    }
+            JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
+            if (jObjResponse != null) {
+                if (jObjResponse.has("message") && jObjResponse.get("message").getAsString().equalsIgnoreCase("Badge not found")) {
+                    logger.error("Unable to persist badge class entry. reason is:" + jObjResponse.get("message").getAsString());
+                    return false;
                 }
-            } else {
-                logger.error("Unable to persist badge class entry.");
-                return false;
+
+                BadgeClass objBadgeClass = new BadgeClass();
+                objBadgeClass.setTemplateBadgeId(jObjResponse.get("_id").getAsString());
+                objBadgeClass.setName(jObjResponse.get("name").getAsString());
+                objBadgeClass.setType("BadgeClass");
+                objBadgeClass.setDescription(jObjResponse.get("description").getAsString());
+                objBadgeClass.setBadgeRequestInum(objBadgeRequest.getInum());
+                objBadgeClass.setImage(jObjResponse.get("image").getAsString());
+                objBadgeClass.setGuid(utils.generateRandomGUID());
+                objBadgeClass.setKey(utils.generateRandomKey(12));
+
+                objBadgeClass.setId(utils.getBaseURL(servletRequest) + "/badgeClass/" + objBadgeClass.getGuid() + "?key=" + objBadgeClass.getKey());
+
+                objBadgeClass = BadgeClassesCommands.createBadgeClass(objBadgeClass);
+
+                if (objBadgeClass != null && objBadgeClass.getInum() != null) {
+                    Badges objBadge = createBadge(servletRequest, objBadgeClass, approveBadgeRequest, person);
+                    if (objBadge != null && objBadge.getInum() != null) {
+                        return true;
+                    } else {
+                        logger.error("Unable to persist badge entry");
+                        return false;
+                    }
+                } else {
+                    logger.error("Unable to persist badge entry. reason is: badge class not persisted");
+                    return false;
+                }
             }
+
         } catch (Exception ex) {
             logger.error("Exception in insert badge assertion entry in createBadgeClass():" + ex.getMessage());
             ex.printStackTrace();
@@ -407,15 +405,72 @@ public class BadgeRequestController {
         return false;
     }
 
-    private Badges createBadge(HttpServletRequest servletRequest, BadgeClass objBadgeClass, ApproveBadge approveBadge) {
+    private Badges createBadge(HttpServletRequest servletRequest, BadgeClass objBadgeClass, ApproveBadge approveBadge, Person person) {
         Badges objBadge = new Badges();
 
         try {
+
+            String userinfo = "{\"email\":\"test_user@test.org\",\"email_verified\":\"true\",\"sub\":\"K6sBjQkZQl3RP-XILa1gLa2k211zv4BgoVJCtvfRZjA\",\"zoneinfo\":\"America/Chicago\",\"nickname\":\"user\",\"website\":\"http://www.gluu.org\",\"middle_name\":\"User\",\"locale\":\"en-US\",\"preferred_username\":\"user\",\"given_name\":\"Test\",\"picture\":\"http://www.gluu.org/wp-content/uploads/2012/04/mike3.png\",\"updated_at\":\"20170224125915.538Z\",\"name\":\"oxAuth Test User\",\"birthdate\":\"1983-1-6\",\"family_name\":\"User\",\"gender\":\"Male\",\"profile\":\"http://www.mywebsite.com/profile\"}";
+            if (person != null) {
+
+                JsonArray jArraySub = new JsonArray();
+                jArraySub.add(person.getSub() == null ? "" : person.getSub());
+                JsonArray jArrayEmail = new JsonArray();
+                jArrayEmail.add(person.getEmail() == null ? "" : person.getEmail());
+                JsonArray jArrayWebsite = new JsonArray();
+                jArrayWebsite.add(person.getWebsite() == null ? "" : person.getWebsite());
+                JsonArray jArrayZoneInfo = new JsonArray();
+                jArrayZoneInfo.add(person.getZoneinfo() == null ? "" : person.getZoneinfo());
+                JsonArray jArrayEmailVerified = new JsonArray();
+                jArrayEmailVerified.add(person.getEmail_verified() == null ? "" : person.getEmail_verified());
+                JsonArray jArrayGender = new JsonArray();
+                jArrayGender.add(person.getGender() == null ? "" : person.getGender());
+                JsonArray jArrayProfile = new JsonArray();
+                jArrayProfile.add(person.getProfile() == null ? "" : person.getProfile());
+                JsonArray jArrayPreferredUserName = new JsonArray();
+                jArrayPreferredUserName.add(person.getPreferredUsername() == null ? "" : person.getPreferredUsername());
+                JsonArray jArrayGivenName = new JsonArray();
+                jArrayGivenName.add(person.getGivenName() == null ? "" : person.getGivenName());
+                JsonArray jArrayMiddleName = new JsonArray();
+                jArrayMiddleName.add(person.getMiddle_name() == null ? "" : person.getMiddle_name());
+                JsonArray jArrayLocale = new JsonArray();
+                jArrayLocale.add(person.getLocale() == null ? "" : person.getLocale());
+                JsonArray jArrayPicture = new JsonArray();
+                jArrayPicture.add(person.getPicture() == null ? "" : person.getPicture());
+                JsonArray jArrayUpdatedAt = new JsonArray();
+                jArrayUpdatedAt.add(person.getUpdated_at() == null ? "" : person.getUpdated_at());
+                JsonArray jArrayName = new JsonArray();
+                jArrayName.add(person.getDisplayName() == null ? "" : person.getDisplayName());
+                JsonArray jArrayNickName = new JsonArray();
+                jArrayNickName.add(person.getNickname() == null ? "" : person.getNickname());
+                JsonArray jArrayBirthDate = new JsonArray();
+                jArrayBirthDate.add(person.getBirthdate() == null ? "" : person.getBirthdate());
+
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.add("sub", jArraySub);
+                jsonObject.add("website", jArrayWebsite);
+                jsonObject.add("zoneinfo", jArrayZoneInfo);
+                jsonObject.add("email_verified", jArrayEmailVerified);
+                jsonObject.add("gender", jArrayGender);
+                jsonObject.add("profile", jArrayProfile);
+                jsonObject.add("preferred_username", jArrayPreferredUserName);
+                jsonObject.add("given_name", jArrayGivenName);
+                jsonObject.add("middle_name", jArrayMiddleName);
+                jsonObject.add("locale", jArrayLocale);
+                jsonObject.add("picture", jArrayPicture);
+                jsonObject.add("updated_at", jArrayUpdatedAt);
+                jsonObject.add("name", jArrayName);
+                jsonObject.add("nickname", jArrayNickName);
+                jsonObject.add("email", jArrayEmail);
+
+                userinfo = jsonObject.toString();
+            }
+
             //Create actual badge entry(badge assertion)
             objBadge.setContext("https://w3id.org/openbadges/v2");
             objBadge.setType("Assertion");
             objBadge.setRecipientType("text");
-            objBadge.setRecipientIdentity(jwtUtil.generateJWT("{\"email\":\"test_user@test.org\",\"email_verified\":\"true\",\"sub\":\"K6sBjQkZQl3RP-XILa1gLa2k211zv4BgoVJCtvfRZjA\",\"zoneinfo\":\"America/Chicago\",\"nickname\":\"user\",\"website\":\"http://www.gluu.org\",\"middle_name\":\"User\",\"locale\":\"en-US\",\"preferred_username\":\"user\",\"given_name\":\"Test\",\"picture\":\"http://www.gluu.org/wp-content/uploads/2012/04/mike3.png\",\"updated_at\":\"20170224125915.538Z\",\"name\":\"oxAuth Test User\",\"birthdate\":\"1983-1-6\",\"family_name\":\"User\",\"gender\":\"Male\",\"profile\":\"http://www.mywebsite.com/profile\"}"));
+            objBadge.setRecipientIdentity(jwtUtil.generateJWT(userinfo));
             objBadge.setVerificationType("hosted");
             objBadge.setBadgeClassInum(objBadgeClass.getInum());
             objBadge.setGuid(utils.generateRandomGUID());
@@ -433,6 +488,6 @@ public class BadgeRequestController {
             ex.printStackTrace();
             logger.error("Exception in persist badge entry in createBadge()" + ex.getMessage());
         }
-       return objBadge;
+        return objBadge;
     }
 }
