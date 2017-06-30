@@ -17,7 +17,7 @@ Let's take a look and understand the flow of this useful application.
 ### Splash Screen
 As soon as app get launched, it will show this splash screen for a while.
 
-![Splash Screen](../mobile_screenshots/1SplashScreen.png)
+![Splash Screen](../mobile_screenshots/1SplashScreen.jpg)
 
 In a few seconds it will redirect to the next screen of the app
 
