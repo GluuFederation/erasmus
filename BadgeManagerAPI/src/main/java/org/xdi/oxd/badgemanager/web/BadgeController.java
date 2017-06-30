@@ -4,6 +4,7 @@ import com.google.common.hash.Hashing;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.tozny.e3db.client.Client;
 import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Connection;
@@ -33,6 +34,7 @@ import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
 import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
+import org.xdi.oxd.badgemanager.service.E3DBService;
 import org.xdi.oxd.badgemanager.service.RedisService;
 import org.xdi.oxd.badgemanager.service.UserInfoService;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
@@ -70,7 +72,7 @@ public class BadgeController {
     private static final Logger logger = LoggerFactory.getLogger(BadgeController.class);
 
     @Autowired
-    public RedisTemplate<Object, Object> redisTemplate;
+    private RedisTemplate<Object, Object> redisTemplate;
 
     @Autowired
     private UserInfoService userInfoService;
@@ -84,7 +86,10 @@ public class BadgeController {
     private final ServletContext context;
 
     @Inject
-    public NotificationController notificationController;
+    private NotificationController notificationController;
+
+//    @Inject
+//    private E3DBService e3DBService;
 
     @Autowired
     public BadgeController(ServletContext context) {
@@ -160,7 +165,7 @@ public class BadgeController {
     }
 
     @RequestMapping(value = "verify/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String verifyBadge(@PathVariable String id, HttpServletResponse response) {
+    public String verifyBadge(@PathVariable String id, HttpServletResponse response, boolean checkAccess) {
 
         JsonObject jsonResponse = new JsonObject();
 
@@ -168,11 +173,13 @@ public class BadgeController {
             Badges badges = BadgeCommands.getBadgeById(id);
             if (badges != null && badges.getGuid() != null) {
 
-                if (badges.getGluuValidatorAccess() == null || !badges.getGluuValidatorAccess().equalsIgnoreCase("true")) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    jsonResponse.addProperty("error", true);
-                    jsonResponse.addProperty("errorMsg", "You're not authorized to see this badge");
-                    return jsonResponse.toString();
+                if (checkAccess) {
+                    if (badges.getGluuValidatorAccess() == null || !badges.getGluuValidatorAccess().equalsIgnoreCase("true")) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        jsonResponse.addProperty("error", true);
+                        jsonResponse.addProperty("errorMsg", "You're not authorized to see this badge");
+                        return jsonResponse.toString();
+                    }
                 }
 
                 BadgeResponse badgeResponse = BadgeCommands.getBadgeResponseById(id);
@@ -331,6 +338,12 @@ public class BadgeController {
                     Badges badges = BadgeCommands.getBadgeByBadgeClassInum(badgeClass.getInum());
                     if (badges != null && badges.getInum() != null) {
 
+//                        Client client = e3DBService.getE3DBClient();
+//                        if (client != null) {
+//                            UUID uuid = e3DBService.writeRecord(client, jwtUtil.generateJWT(userInfo.getUserInfoJSON()));
+//                            e3DBService.readRecord(client, uuid);
+//                        }
+
                         badges.setRecipientIdentity(jwtUtil.generateJWT(userInfo.getUserInfoJSON()));
                         if (!BadgeCommands.updateBadge(badges)) {
                             response.setStatus(HttpServletResponse.SC_OK);
@@ -365,7 +378,7 @@ public class BadgeController {
                             logger.error("Failed to generate QR Code");
                             response.setStatus(HttpServletResponse.SC_OK);
                             jsonResponse.addProperty("error", true);
-                            jsonResponse.addProperty("errorMsg", "No such badge found");
+                            jsonResponse.addProperty("errorMsg", "Failed to get badge details");
                             return jsonResponse.toString();
                         }
                     } else {
