@@ -183,6 +183,7 @@ public class PendingBadgeFragment extends Fragment {
 
                                     } else {
                                         Log.v("TAG", "pending badge requests retrieved:" + objResponse.getBadgeRequests().getApprovedBadgeRequests().size());
+                                        Application.pendingBadgeRequests = objResponse.getBadgeRequests().getPendingBadgeRequests();
                                         showPendingBadgeRequests();
                                     }
                                 }

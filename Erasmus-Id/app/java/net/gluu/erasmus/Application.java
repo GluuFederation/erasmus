@@ -45,6 +45,7 @@ import net.gluu.erasmus.utils.JsonUtils;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,8 +70,8 @@ public final class Application extends android.app.Application {
     private static AuthStateManager mStateManager;
     private static AuthorizationService mAuthService;
     public static Handler applicationHandler;
-    public static List<ApprovedBadgeRequest> approvedBadgeRequests;
-    public static List<PendingBadgeRequest> pendingBadgeRequests;
+    public static List<ApprovedBadgeRequest> approvedBadgeRequests = new ArrayList<>();
+    public static List<PendingBadgeRequest> pendingBadgeRequests = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -115,20 +116,20 @@ public final class Application extends android.app.Application {
                         JSONObject jObj = new JSONObject(userInfo);
                         JsonObject jsonObject = new JsonParser().parse(jObj.getString("userinfo")).getAsJsonObject();
                         userInfo1 = new UserInfo();
-                        userInfo1.setEmail(JsonUtils.getValueFromJson("email",jsonObject));
-                        userInfo1.setZoneInfo(JsonUtils.getValueFromJson("zoneinfo",jsonObject));
-                        userInfo1.setNickName(JsonUtils.getValueFromJson("nickname",jsonObject));
-                        userInfo1.setWebsite(JsonUtils.getValueFromJson("website",jsonObject));
-                        userInfo1.setMiddleName(JsonUtils.getValueFromJson("middle_name",jsonObject));
-                        userInfo1.setLocale(JsonUtils.getValueFromJson("locale",jsonObject));
-                        userInfo1.setPreferredUsername(JsonUtils.getValueFromJson("preferred_username",jsonObject));
-                        userInfo1.setGivenName(JsonUtils.getValueFromJson("given_name",jsonObject));
-                        userInfo1.setPicture(JsonUtils.getValueFromJson("picture",jsonObject));
-                        userInfo1.setName(JsonUtils.getValueFromJson("name",jsonObject));
-                        userInfo1.setBirthdate(JsonUtils.getValueFromJson("birthdate",jsonObject));
-                        userInfo1.setFamilyName(JsonUtils.getValueFromJson("family_name",jsonObject));
-                        userInfo1.setGender(JsonUtils.getValueFromJson("gender",jsonObject));
-                        userInfo1.setProfile(JsonUtils.getValueFromJson("profile",jsonObject));
+                        userInfo1.setEmail(JsonUtils.getValueFromJson("email", jsonObject));
+                        userInfo1.setZoneInfo(JsonUtils.getValueFromJson("zoneinfo", jsonObject));
+                        userInfo1.setNickName(JsonUtils.getValueFromJson("nickname", jsonObject));
+                        userInfo1.setWebsite(JsonUtils.getValueFromJson("website", jsonObject));
+                        userInfo1.setMiddleName(JsonUtils.getValueFromJson("middle_name", jsonObject));
+                        userInfo1.setLocale(JsonUtils.getValueFromJson("locale", jsonObject));
+                        userInfo1.setPreferredUsername(JsonUtils.getValueFromJson("preferred_username", jsonObject));
+                        userInfo1.setGivenName(JsonUtils.getValueFromJson("given_name", jsonObject));
+                        userInfo1.setPicture(JsonUtils.getValueFromJson("picture", jsonObject));
+                        userInfo1.setName(JsonUtils.getValueFromJson("name", jsonObject));
+                        userInfo1.setBirthdate(JsonUtils.getValueFromJson("birthdate", jsonObject));
+                        userInfo1.setFamilyName(JsonUtils.getValueFromJson("family_name", jsonObject));
+                        userInfo1.setGender(JsonUtils.getValueFromJson("gender", jsonObject));
+                        userInfo1.setProfile(JsonUtils.getValueFromJson("profile", jsonObject));
                         return userInfo1;
                     }
                 } catch (Exception ex) {

@@ -184,6 +184,7 @@ public class ApproveBadgeFragment extends Fragment {
 
                                     } else {
                                         Log.v("TAG", "approved badge requests retrieved:" + objResponse.getBadgeRequests().getApprovedBadgeRequests().size());
+                                        Application.approvedBadgeRequests = objResponse.getBadgeRequests().getApprovedBadgeRequests();
                                         showApprovedBadgeRequests();
                                     }
                                 }
