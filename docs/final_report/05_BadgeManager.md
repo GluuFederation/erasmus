@@ -412,7 +412,7 @@ User can request a badge for approved badge request by using the API exposed by 
 
 Badge manager generates badge QR code and return basic badge info along with badge QR code image url and user info.
 
-This API will be used by Asserter to present badge to the verifier in mobile app for badge verification.
+This API will be used by `Asserter` to present badge to the `Validator` in mobile app for badge verification.
  
 API Endpoint: `/badges/details` 
 
@@ -445,14 +445,14 @@ Response:
 ### (10) Verify badge and provide actual badge information
 Badge manager exposes an APIs to mobile app to verify badge and returns actual badge information after successful verification.
 
-This process will get complete in 3 steps:
+This process will get completed in 3 steps:
 
-1. When `validator` scans badge qr code in order to verify badge, notification will be sent to `asserter`
- indicating some one wants to see his/her badge with `Allow` and `Deny` options.
+1. When `Validator` scans badge qr code in order to verify badge, notification will be sent to `Asserter`
+ which prompt with message that some one wants to see his/her badge along with `Allow` and `Deny` options.
  
     At the time of badge QR code image creation, Id of the badge stored as a data in QR code.
     
-    This Id will be used in following API to send notification to the `asserter`.
+    This Id will be used in following API to send notification to the `Asserter`.
     
     API Endpoint: `/notification/send` 
     
@@ -477,9 +477,9 @@ This process will get complete in 3 steps:
     }
     ```    
  
-2. When `asserter` chooses action(Allow or Deny), `validator` will be notified the same.
+2. `Asserter` sets badge permission
     
-    `asserter` can set permission of badge access to `validator` using following API.
+    `Asserter` can set permission of badge access to `Validator` using following API which will notify `Validator` the same.
     
      API Endpoint: `/badges/setPermission` 
         
@@ -503,13 +503,12 @@ This process will get complete in 3 steps:
        "message": "Permission to see this badge granted successfully"
      }
      ```
-     If `asserter` chooses `Allow`, then temporary link of the badge which is an endpoint for retrieving actual badge information get generated and sent to `validator` along with notification using which validator
+     If `Asserter` chooses `Allow`, then temporary link of the badge which is an endpoint for retrieving actual badge information get generated and sent to `Validator` along with notification using which validator
      can validate the badge and see actual information.
      
-     If `asserter` chooses `Deny`, then `validator` will not be able to see th badge and
-     badge.
+     If `Asserter` chooses `Deny`, then `Validator` will not be able to see the badge.
     
-3. `asserter` will be notified after successful badge verification.
+3. `Asserter` will be notified after successful badge verification.
 
     For badge privacy, two GUIDs `Id` and `Key` are used to secure badge information and temporary link is generated in a way that it's become hard to guess.
  
@@ -521,7 +520,7 @@ This process will get complete in 3 steps:
 
     Private badge will get verified by matching both Id and Key.
 
-    `Note: Temporary link will get expire in 90 seconds.`
+    `Note: Temporary link will get expired in 90 seconds.`
      
     API Endpoint: `/tmp/{id}`
       
@@ -615,11 +614,9 @@ This process will get complete in 3 steps:
         }
         ```  
         
-        Notification will be sent to `asserter` indicating that his/her badge verified successfully or not with the response of above API.
+        Notification will be sent to `Asserter` indicating that his/her badge verified successfully or not with the response of above API.
     
 ### (11) Temporary and permanent badge link
-As mentioned in above section, temporary link of the badge will get created and stored in QR code which will expire after 90 seconds.
-
 `Temporary link will be generated for both public and private badges but permanent badge link will be generated for public badges only which has no expiration.`
 
 For example,
@@ -729,5 +726,5 @@ As soon as badge get verified by verifier in mobile app, Badge manager will revo
  
 #### Important note
 - APIs which are exposing to mobile app will require `AccessToken` as a header which is the access token retrieved using app auth in mobile app and this access token will be used in Badge Manager to verify user and retrieving user info using oxd. 
-- APIs which are exposing to FIDES are secure with static access token(for now).
+- APIs which are exposing to FIDES are secured with static access token(for now).
   
