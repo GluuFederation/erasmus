@@ -24,7 +24,7 @@ In a few seconds it will redirect to the next screen of the app
 ### States and Cities listing
 All States and Cities of USA are displayed in this screen
 
-![State-City Selection](../mobile_screenshots/2StateCityListing.png)
+![State-City Selection](../mobile_screenshots/2StateCityListing.jpg)
 
 User can change state from the spinner and cities of that state will be 
 populated in the list which user can tap on and navigate to next screen.
@@ -33,7 +33,7 @@ populated in the list which user can tap on and navigate to next screen.
 Based on the state and city selected in previous screen, Participants will be 
 displayed which are retrieved from badge mgr API.
 
-![Participants](../mobile_screenshots/3ParticipantsListing.png)
+![Participants](../mobile_screenshots/3ParticipantsListing.jpg)
 
 Badge mgr API will retrieve participants from FIDES and returns participants
 list to mobile app.
@@ -41,7 +41,7 @@ list to mobile app.
 ### Login
 User can select participant which will redirect to Login screen.
 
-![Login](../mobile_screenshots/4Login.png)
+![Login](../mobile_screenshots/4Login.jpg)
 
 `Login` button in this screen will authenticate the user.
  
@@ -54,7 +54,7 @@ in browser based on the selected participant's opHost and user will be
 authenticated to oxAuth using app auth and redirected back to app after 
 successful authentication.
 
-![Authentication](../mobile_screenshots/5Authentication.png)
+![Authentication](../mobile_screenshots/5Authentication.jpg)
 
 ### U2F registration and authentication
 After successful authentication, user will be redirected to this screen 
@@ -63,7 +63,7 @@ which will perform U2F registration and authentication.
 First, user registration will be performed and if user is already registered 
 with U2F then authentication will be done.
 
-![U2F](../mobile_screenshots/6U2F.png)
+![U2F](../mobile_screenshots/6U2F.jpg)
 
 After successful completion of this process by clicking `Approve` or `Decline` 
 button, user will be redirected to Badge status screen.
@@ -71,7 +71,7 @@ button, user will be redirected to Badge status screen.
 ### Badge Status
 All `Approved` and `Pending` badge requests will be displayed in this screen.
 
-![Badge Status](../mobile_screenshots/7BadgeStatus.png)
+![Badge Status](../mobile_screenshots/7BadgeStatus.jpg)
 
 User can perform following operations in this screen.
 
@@ -101,7 +101,7 @@ and make new request.
 Badge Mgr API returns template badges retrieving from FIDES based on the
 selected participant.
 
-![Template badges](../mobile_screenshots/8TemplateBadges.png)
+![Template badges](../mobile_screenshots/8TemplateBadges.jpg)
 
 After successful badge request, user will be redirected to badge status 
 screen where he/she can see newly requested pending badge.
@@ -112,7 +112,7 @@ button at the bottom of the badge status screen.
 
 It will open scanner using which user can scan the barcode.
 
-![Scanner](../mobile_screenshots/9Scanner.jpeg)
+![Scanner](../mobile_screenshots/9Scanner.jpg)
 
 - As soon as `Validator` scan qr code, It will notify `Asserter` that 
 someone want to see your badge. It will show popup with `Allow` and `Deny`
@@ -130,10 +130,10 @@ for badge verification will get expires after 90 seconds.
 
 Verification success screen will be as follow:
 
-![Success](../mobile_screenshots/10ScanSuccess.jpeg)
+![Success](../mobile_screenshots/10ScanSuccess.jpg)
 
 In case of badge verification failure, `Validator` will be redirected to 
 following failure screen.
 
-![Fail](../mobile_screenshots/11ScanFailed.png)
+![Fail](../mobile_screenshots/11ScanFailed.jpg)
 
