@@ -73,6 +73,8 @@ All `Approved` and `Pending` badge requests will be displayed in this screen.
 
 ![Badge Status](../mobile_screenshots/7BadgeStatus.jpg)
 
+![Pending Badge Requests](../mobile_screenshots/7PendingBadgeRequests.jpg)
+
 User can perform following operations in this screen.
 
 1.Toggle privacy(Private/Public) of approved badge.
