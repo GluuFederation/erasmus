@@ -1,0 +1,115 @@
+--------------------------------------------------------------
+I.  INTRODUCTION
+--------------------------------------------------------------
+
+I began public service in San Marcos, Texas in 1989 as a Firefighter. In 1991,
+I was tapped to be the San Marcos Fire Marshal. In 1998, I became the City
+Emergency Management Coordinator in addition to the FM duties. In 2003, I was
+commissioned to sit on the Capital Area Homeland Security Task Force
+(representing 10 Central Texas counties), where I served as Chair of the task
+force and Chair of the Technical Response Committee.  In 2006, I was tasked
+with running a newly formed Marshals Office division managing Emergency
+Management, Park Rangers, Fire Investigators, HAZMAT, Code Enforcement, Health
+Department, Animal Control , and Court Marshal's. In 2003, I was placed on
+the Governor's First Responder Advisory Committee to facilitate representation
+for first responders to the state legislature. In November of 2016, I retired
+from the City of San Marcos and moved to North Texas where I am currently
+working with the Rowlett Fire Marshal's Office as a Deputy Fire Marshal.
+
+"We are gathering background information to understand digital identity in
+the emergency responder community. We want to find out how different
+organizations are approaching":
+a) What kinds of digital and in person credenitals FR's are using.
+b) What kinds of websites and mobile applications FR's are using for work.
+C) How much friction exists accessing digital resources.
+
+1. When responding to a large, multi-jurisdictional disaster:
+
+ a. Can you share your thoughts or concerns about the process for
+ identifying people in person?
+
+ Generally, you make a request to an agency,
+
+ Sometimes manifest is delivered on arrival, provided to reception people,
+ inputted into ICS forms and list.
+
+ State issues:
+ Four years ago we were very close to success in using DPS to facilitate
+ issuance of First Responders. Also have access to state firewalls
+ and database systems.
+
+ State of Texas has disparate systems in every licensing agency, which
+ don't communicate--that in and of itself is a huge undertaking.
+ Nothing is the same.
+
+ Should pay attention to it because TX has the largest and most numerous,
+ finances, who's on scene, how long they were there, whether they were
+ qualified. We want to get to having credentialing in the state.
+
+ Financials is the biggest impact, understanding who was where when.
+ Three years after, I have to say who was where when... worked well
+ since 1973, we're millions in the whole because we didn't understand
+ which people were there. People lose a lot of money because they did
+ not track correctly in Texas.
+
+ The death in which she was speaking was volunteer resources, when you
+ have 10,000 people.
+
+ b. Ability of incident commanders or others to use certain digital
+ tools (mobile applications, websites)?
+
+ GIS technology in the field, integrated with drone technology, LTE,
+ areal and mapping. Proprietary systems are a big problem.
+
+ c. How are skills and certifications of the responders l/e and fire currently
+ shared? Interoperability for either in-state or out-of-state responders?
+
+ Only very few nationally accepted credenitals. Law enforcement doesn't have one,
+ but not all states subscribe to those programs. There is no 50 state equitability
+ for any of those program. Red card in New Mexico, blue card.
+
+ In Texas, we don't certify rescue people. There is no statewide skill database.
+
+ Public health is not aligned structurally with first responders--public health
+ has more counties then the first responder planning groups.
+
+2. Are the sites/apps being used protected only by passwords, or are there
+stronger authentication technologies in use?
+
+Two factor-authentication is for DHS. CEGIS covers law enforcement, usually
+require two factor.
+
+Pencil and paper during an actual emergency. We have to assume that at any
+moment that the systems will fail. There is very little confidentiality
+in a distater.
+
+3. Are there new digital applications that you believe will help you do
+your job, that are becoming available within the next five years?
+
+During initial response, there is a day or two of chaos. In the heat of
+the battle, the financials, legal ramifications are out the window.
+24-48 into it, you better have your technology aligned.
+
+4. Are there any specific examples you can think of where
+better tools for personal identification would have helped?
+
+Even though it's clunky, we have personal accountability for everyone
+that is there. 4000 employees. When 10,000 people showed up with
+shovels afterward. Being able to calcualte their hours, what jobs
+they did. The federal government will pay for volunteers. But if
+can demonstrate that I put in 25% of volunteers--but I have to prove
+it.
+
+The government has not decided whether it will participate from
+the federal system.
+
+5. With regard to the communication of skills for first responders,
+can you think of specific examples where non-interoperability or availability
+of skills impeded a response or had an impact? For example in the military,
+there are codes that convey skills and certifications.
+
+The biggest technology problem we have is smart phones... bad battery life.
+In a disaster, phones are very unreliable.
+
+6. What are the different layers of tools being used between agencies:
+law enforcement versus fire (personal identification, CAD).

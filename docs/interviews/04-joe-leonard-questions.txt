@@ -1,0 +1,27 @@
+1. What areas of IT by incident managers do you see undergoing
+the most rapid transformation, both before, during and after an
+event?
+
+2. Can you share your thoughts or concerns about the process for
+in person identification during an event? Is the risk of fraud
+(ie a person impersonating someone else) a major or minor concern?
+
+3. Many organizations issue certifications. Is there a need for
+greater certification interoperability? Can you think of any specific
+examples where this was an issue?
+
+4. Can you share your thoughts about the challenges of accounting for
+which people responded to an event (post event).
+
+5. What kinds of digital sites/apps reliance on password authentication
+could present a risk?
+
+6. Can you think of any specific examples where better tools for
+person identification or the communication of skills would have helped?
+
+7. The project we are working on will try to enroll federal, state,
+and local government agencies into a common mobile credential platform.
+It will also potentially include private organizations. If this could be
+accomplished in a secure, privacy protecting manner, can you anticipate
+any objections? Can you think of any incentives that would drive
+participation?
