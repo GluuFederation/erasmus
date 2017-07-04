@@ -55,14 +55,14 @@
           return false;
         }
 
-        if (vm.validity < 1 || vm.validity > 10) {
-          toastr.error('Please enter days between 1 to 10', 'Badge', {});
-          return;
-        }
+        // if (vm.validity < 1 || vm.validity > 10) {
+        //   toastr.error('Please enter days between 1 to 10', 'Badge', {});
+        //   return;
+        // }
 
         var formData = {
           inum: badge.inum,
-          validity: vm.validity,
+          validity: 90, // vm.validity,
           privacy: 'Public'
         };
         userBadgeRequestService.badgeApprove(formData).then(onSuccess).catch(onError);

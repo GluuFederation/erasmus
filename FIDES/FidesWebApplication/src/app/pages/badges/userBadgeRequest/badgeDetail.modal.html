@@ -10,23 +10,23 @@
       <table class="table table-bordered">
         <tbody>
         <tr>
-          <td style="vertical-align: middle"><img src="{{!!vm.badge.badge.name ? ::vm.badge.badge.name : '/assets/img/theme/no-photo.png'}}" height="70" width="70" class="img-rounded img-circle" alt="image"/></td>
+          <td style="vertical-align: middle"><img src="{{!!vm.badge.userInfo.picture[0] ? vm.badge.userInfo.picture[0] : '/assets/img/theme/no-photo.png'}}" height="70" width="70" class="img-rounded img-circle" alt="image"/></td>
           <td>
-            <strong>User</strong>: {{::vm.badge.userInfo.name}}
+            <strong>User</strong>: {{vm.badge.userInfo.name[0] || vm.badge.userInfo.name}}
             <br/>
-            <strong>Email</strong>: {{::vm.badge.userInfo.email}}
+            <strong>Email</strong>: {{vm.badge.userInfo.email[0] || vm.badge.userInfo.email}}
             <br/>
-            <strong>Web site</strong>: {{::vm.badge.userInfo.website}}
+            <strong>Web site</strong>: {{vm.badge.userInfo.website[0] || vm.badge.userInfo.website}}
           </td>
         </tr>
         <tr>
-          <td style="vertical-align: middle"><img src="{{::vm.badge.badge.image}}" class="img-rounded img-circle" height="70" width="70" alt="image"/></td>
+          <td style="vertical-align: middle"><img src="{{vm.badge.badge.image}}" class="img-rounded img-circle" height="70" width="70" alt="image"/></td>
           <td>
-            <strong>Badge</strong>: {{::vm.badge.badge.name}}
+            <strong>Badge</strong>: {{vm.badge.badge.name}}
             <br/>
-            <strong>Description</strong>: {{::vm.badge.badge.description}}
+            <strong>Description</strong>: {{vm.badge.badge.description}}
             <br/>
-            <strong>Criteria</strong>: {{::vm.badge.badge.criteria.narrative}}
+            <strong>Criteria</strong>: {{vm.badge.badge.criteria.narrative}}
           </td>
         </tr>
         </tbody>
