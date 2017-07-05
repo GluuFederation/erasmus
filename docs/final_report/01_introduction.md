@@ -11,7 +11,7 @@ In such situations, it is crucial to have a simple, easy, and secure method to c
 Can a decentralized identity infrastructure convey the identity, skills and authorizations of a first responder in real time? Can the risks inherent in the varying security capabilities of 65,000 organizations be conveyed, enabling applications that consume this data to present it as actionable information? To achieve this goal, we need dependable technology (tools) and scalable organizational cooperation (rules).
 
 ## Scope of Pilot
-Phase I of the ErasmErasmus Project was a 6-month pilot project (February -August 2017) that would test whether technology is available to make this security versus adoption trade-off. The goal of the pilot was to develop a proof of concept that would:
+Phase I of the Erasmus Project was a 6-month pilot project (February -August 2017) that would test whether technology is available to make this security versus adoption trade-off. The goal of the pilot was to develop a proof of concept that would:
 
     1.      Demonstrate how a decentralized identity federation could provide an inclusive, flexible infrastructure.
     2.	Leverage the latest identity standards to meet the need of applications for electronic verification of identity, skills, and authorizations while simultaneously allowing for greater accountability on the scene of a disaster.
