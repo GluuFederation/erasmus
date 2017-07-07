@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.TestPropertySource;
 import org.xdi.oxd.client.CommandClient;
 import org.xdi.oxd.common.Command;
 import org.xdi.oxd.common.CommandResponse;
@@ -24,9 +23,6 @@ import java.util.Arrays;
 public class OxdServiceImpl implements OxdService {
 
     private static final Logger logger = LoggerFactory.getLogger(OxdServiceImpl.class);
-
-//    @Value("${oxd.server.op-host}")
-//    private String opHost;
 
     @Value("${oxd.server.host}")
     private String host;

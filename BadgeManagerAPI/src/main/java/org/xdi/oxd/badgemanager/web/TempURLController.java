@@ -62,9 +62,9 @@ public class TempURLController {
                         if (arURL1.length > 0) {
                             strId = arURL1[0];
                             strKey = arURL1[1];
-                            return badgeController.verifyPrivateBadge(strId, strKey, request, response);
+                            return badgeController.verifyPrivateBadge(strId, strKey, response);
                         } else {
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            response.setStatus(HttpServletResponse.SC_OK);
                             jsonResponse.addProperty("error", true);
                             jsonResponse.addProperty("errorMsg", "No such badge found");
                             return jsonResponse.toString();
@@ -76,13 +76,13 @@ public class TempURLController {
                     }
                 } else {
                     //no badge found
-                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
                 }
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "No such badge found");
                 return jsonResponse.toString();

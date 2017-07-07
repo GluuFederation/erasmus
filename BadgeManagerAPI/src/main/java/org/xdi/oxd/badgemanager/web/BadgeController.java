@@ -4,7 +4,6 @@ import com.google.common.hash.Hashing;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.tozny.e3db.client.Client;
 import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Connection;
@@ -34,7 +33,6 @@ import org.xdi.oxd.badgemanager.ldap.service.GsonService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
 import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
-import org.xdi.oxd.badgemanager.service.E3DBService;
 import org.xdi.oxd.badgemanager.service.RedisService;
 import org.xdi.oxd.badgemanager.service.UserInfoService;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
@@ -209,7 +207,7 @@ public class BadgeController {
     }
 
     @RequestMapping(value = "verify", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String verifyPrivateBadge(@RequestParam String id, @RequestParam String key, HttpServletRequest request, HttpServletResponse response) {
+    public String verifyPrivateBadge(@RequestParam String id, @RequestParam String key, HttpServletResponse response) {
 
         JsonObject jsonResponse = new JsonObject();
 
@@ -473,13 +471,13 @@ public class BadgeController {
                         return jsonResponse.toString();
                     }
                 } else {
-                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.setStatus(HttpServletResponse.SC_OK);
                     jsonResponse.addProperty("error", true);
                     jsonResponse.addProperty("errorMsg", "No such badge found");
                     return jsonResponse.toString();
                 }
             } else {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "No such badge found");
                 return jsonResponse.toString();

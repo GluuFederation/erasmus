@@ -79,7 +79,7 @@ public class NotificationController {
 
             Badges badges = BadgeCommands.getBadgeById(notificationRequest.getBadge());
             if (badges == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. No such badge");
                 return jsonResponse.toString();
@@ -90,7 +90,7 @@ public class NotificationController {
 
             Person person = PersonCommands.getPersonByEmail(badgeRequests.getGluuBadgeRequester());
             if (person == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. Asserter entry not found");
                 return jsonResponse.toString();
@@ -98,7 +98,7 @@ public class NotificationController {
             List<DeviceRegistration> deviceRegistrations = PersonCommands.getDeviceRegistrationByPerson(person.getInum());
             logger.info("Device registration counts: " + deviceRegistrations.size());
             if (deviceRegistrations.size() == 0) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. Device entry not found");
                 return jsonResponse.toString();
@@ -107,7 +107,7 @@ public class NotificationController {
             logger.info("Device data: " + deviceRegistration.getDeviceData());
             DeviceData deviceData = deviceRegistration.getDeviceData();
             if(!deviceData.getPlatform().equalsIgnoreCase("android")){
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(HttpServletResponse.SC_OK);
                 jsonResponse.addProperty("error", true);
                 jsonResponse.addProperty("errorMsg", "You're not authorized to perform this request. Device entry not found");
                 return jsonResponse.toString();
