@@ -1,6 +1,8 @@
 "use strict";
 
-const Federation = require('../models/federation');
+const common = require('./common');
+common.ottoConfig.isServerStart = false;
+const Federation = require('otto-node-package')(common.ottoConfig).model.federationModel;
 
 /**
  * Get all active federations
@@ -53,10 +55,13 @@ let getFederationByName = (name) => {
  * @return {err} - return error
  */
 let addFederation = (req) => {
-  let oFederation = new Federation();
-  oFederation.name = req.name;
-  oFederation.isActive = req.isActive || false;
+  let oFederation = new Federation({
+    name: req.name,
+    isActive: req.isActive || false,
+  });
+
   oFederation.sponsor.push(req.sponsor || null);
+
   return oFederation.save()
     .then(federation => Promise.resolve(federation))
     .catch(err => Promise.reject(err));
@@ -74,9 +79,12 @@ let updateFederation = (req) => {
     .findById(id)
     .exec()
     .then((oFederation) => {
-      oFederation.name = req.name || oFederation.name;
-      oFederation.isActive = req.isActive || oFederation.isActive;
-      return oFederation.save()
+      var obj = {
+        name: req.name || oFederation.name,
+        isActive: req.isActive || oFederation.isActive
+      };
+
+      return Federation.findOneAndUpdate({_id: oFederation._id}, obj)
         .then(updatedFederation => Promise.resolve(updatedFederation))
         .catch(err => Promise.reject(err));
     })

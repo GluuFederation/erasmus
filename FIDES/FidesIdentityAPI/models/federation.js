@@ -80,4 +80,4 @@ function setUrl(next, done) {
 }
 
 // create the model for federations and expose it to our app
-module.exports = mongoose.model('Federation', federationSchema);
+//module.exports = mongoose.model('Federation', federationSchema);

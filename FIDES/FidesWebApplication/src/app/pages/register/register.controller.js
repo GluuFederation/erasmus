@@ -10,6 +10,7 @@
 
     // data members
     vm.entityInfo = {};
+    vm.entityInfo.discoveryUrl = "https://";
     vm.states = [];
     vm.cities = [];
     vm.stateCityList = {};
@@ -69,6 +70,11 @@
     }
 
     function register() {
+      if (!vm.entityInfo.discoveryUrl.startsWith("https://")) {
+        toastr.error(error.data.message, 'URL must be https', {});
+        return;
+      }
+
       vm.entityInfo.redirectUrls = [urls.BASE.concat('/login.html'), urls.BASE.concat('/register.html')];
       registerService.validateRegistrationDetail(vm.entityInfo, onSuccess, onError);
 

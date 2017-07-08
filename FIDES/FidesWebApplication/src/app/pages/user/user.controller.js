@@ -98,17 +98,16 @@
         vm.modalUser.firstName = userData.firstName;
         vm.modalUser.lastName = userData.lastName;
         vm.modalUser.email = userData.email;
-        vm.modalUser.roleId = userData.role._id;
-        vm.selectedRole = userData.role.name;
+        vm.modalUser.roleId = userData.role[0]._id;
+        vm.selectedRole = userData.role[0].name;
         vm.modalUser.phoneNo = userData.phoneNo;
         vm.modalUser.address = userData.address;
         vm.modalUser.zipcode = userData.zipcode;
         vm.modalUser.state = userData.state;
         vm.modalUser.city = userData.city;
         vm.modalUser.description = userData.description;
-
         if(userData.participant) {
-          vm.modalUser.participant = userData.participant._id;
+          vm.modalUser.participant = userData.participant[0]._id;
         }
       }
 
@@ -184,7 +183,7 @@
         if (vm.isInEditMode) {
           userService.updateUser(JSON.stringify(vm.modalUser), onSuccess, onError);
         } else {
-          userService.createUser(JSON.stringify(vm.modalUser), onSuccess, onError);
+         // userService.createUser(JSON.stringify(vm.modalUser), onSuccess, onError);
         }
 
         function onSuccess(response) {

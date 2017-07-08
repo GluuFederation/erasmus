@@ -124,9 +124,8 @@
           }
 
           var formData = {
-            participantId: vm.modalParticipant._id,
-            federationId: vm.modalParticipant.federationId._id,
-            federationOttoId: vm.modalParticipant.federationId.ottoId
+            pid: vm.modalParticipant._id,
+            fid: vm.modalParticipant.federationId._id
           };
           participantService.approveParticipant(formData, onSuccess, onError);
           return;

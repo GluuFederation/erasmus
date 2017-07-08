@@ -1,8 +1,9 @@
 "use strict";
-
-const Participant = require('../models/participant');
-const Entity = require('../models/entity');
-const Federation = require('../models/federation');
+const mongoose = require('mongoose');
+const common = require('./common');
+common.ottoConfig.isServerStart = false;
+const Participant = require('otto-node-package')(common.ottoConfig).model.participantModel;
+const Federation = require('otto-node-package')(common.ottoConfig).model.federationModel;
 
 /**
  * Get all active participants
@@ -135,10 +136,16 @@ let approveParticipant = (orgId, fedId) => {
     .exec()
     .then((oParticipant) => {
       oParticipant.memberOf.push(fedId);
-      oParticipant.isApproved = true;
-      return oParticipant.save();
+      var obj = {
+        isApproved: true,
+        memberOf: oParticipant.memberOf
+      };
+      return Participant.findOneAndUpdate({_id: oParticipant._id}, obj);
+      //return oParticipant.save();
     })
-    .then((updateParticipant) => Participant.populate(updateParticipant, 'memberOf'))
+    .then((updateParticipant) => {
+      return Participant.findById(updateParticipant._id).populate('memberOf');
+    })
     .then((oParticipant) => Promise.resolve(oParticipant))
     .catch(err => Promise.reject(err));
 };
@@ -175,7 +182,7 @@ let setOwnerParticipant = (oid, fid) => {
     .exec()
     .then((oParticipant) => {
       if (oParticipant.federations.indexOf(fid) > -1) {
-        return Promise.reject({ error: 'Federation already exist'});
+        return Promise.reject({error: 'Federation already exist'});
       }
       oParticipant.federations.push(fid);
       return oParticipant.save();
@@ -200,10 +207,33 @@ let setOwnerParticipant = (oid, fid) => {
  */
 let getBadgeByParticipant = (oid) => {
   return Participant
-    .findById(oid)
-    .exec()
-    .then(oParticipant => Participant.populate(oParticipant, 'approvedBadges pendingBadges'))
-    .then(oParticipant => Promise.resolve(oParticipant))
+    .aggregate([
+      {
+        $lookup: {
+          from: "badges",
+          localField: "pendingBadges",
+          foreignField: "_id",
+          as: "pendingBadges"
+        }
+      },
+      {
+        $lookup: {
+          from: "badges",
+          localField: "approvedBadges",
+          foreignField: "_id",
+          as: "approvedBadges"
+        }
+      },
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(oid)
+        }
+      }
+    ])
+    .then(oParticipant => {
+      oParticipant = oParticipant[0];
+      return Promise.resolve(oParticipant)
+    })
     .catch(err => Promise.reject(err));
 };
 

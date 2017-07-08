@@ -48,4 +48,4 @@ function setUrl(next, done) {
   next();
 }
 
-module.exports = mongoose.model('RegistrationAuthority', registrationAuthoritySchema);
+//module.exports = mongoose.model('RegistrationAuthority', registrationAuthoritySchema);

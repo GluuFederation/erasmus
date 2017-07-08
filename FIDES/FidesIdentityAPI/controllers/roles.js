@@ -9,7 +9,7 @@ const express = require('express'),
 /**
  * Get all available roles.
  */
-router.get('/getAllRoles', (req, res, next) => {
+router.get('/role', (req, res, next) => {
   Roles.getAllRoles()
     .then((roles) => {
       if (!roles) {
@@ -23,7 +23,7 @@ router.get('/getAllRoles', (req, res, next) => {
 /**
  * Get role by name string.
  */
-router.get('/getRoleByName/:name', (req, res, next) => {
+router.get('/role/:name', (req, res, next) => {
   if (!req.params.name) {
     return res.name(406).send({
       'message': 'Please provide name.'

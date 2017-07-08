@@ -31,4 +31,4 @@ function setUrl(next, done) {
   next();
 }
 
-module.exports = mongoose.model('Metadata', metadataSchema);
+//module.exports = mongoose.model('Metadata', metadataSchema);

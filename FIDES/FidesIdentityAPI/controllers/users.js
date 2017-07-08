@@ -31,7 +31,7 @@ router.post('/validateEmail', (req, res, next) => {
     });
   }
 
-  return Users.getUser(req.body)
+  return Users.getUserByIdentity(req.body)
     .then((user) => {
       if (!user.entity) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({
@@ -90,7 +90,7 @@ router.post('/login', (req, res, next) => {
     });
   }
   let user = null;
-  return Users.getUser(req.body)
+  return Users.getUserByIdentity(req.body)
     .then((fUser) => {
       user = fUser;
       if (!user) {
@@ -159,7 +159,7 @@ router.post('/login', (req, res, next) => {
       });
 
       return res.status(httpStatus.OK).send({
-        user: user.safeModel(),
+        user: user,
         role: user.role.name,
         token: token
       });
@@ -181,7 +181,7 @@ router.post('/login', (req, res, next) => {
 /**
  * Remove user. (TODO: update detail to SCIM)
  */
-router.delete('/removeUser/:id', (req, res, next) => {
+router.delete('/user/:id', (req, res, next) => {
   if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide username.'
@@ -195,50 +195,6 @@ router.delete('/removeUser/:id', (req, res, next) => {
       }
 
       return res.status(httpStatus.OK).send(user);
-    })
-    .catch((err) => {
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-        err: err,
-        message: common.message.INTERNAL_SERVER_ERROR
-      });
-    });
-});
-
-/**
- * Add user. (TODO: Add detail to SCIM)
- */
-router.post('/signup', (req, res, next) => {
-  if (!req.body.username) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide username.'
-    });
-  }
-
-  if (!req.body.email) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide email.'
-    });
-  }
-
-  if (!req.body.password) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide password.'
-    });
-  }
-
-  if (!req.body.roleId) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide at least one role.'
-    });
-  }
-
-  Users.createUser(req.body)
-    .then((user) => {
-      if (!user) {
-        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'User ' + common.message.NOT_FOUND});
-      }
-
-      return res.status(httpStatus.OK).send(user.safeModel());
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -289,7 +245,7 @@ router.post('/updatePassword', (req, res, next) => {
 /**
  * Update user detail. (TODO: update detail to SCIM)
  */
-router.post('/updateUser', (req, res, next) => {
+router.put('/user', (req, res, next) => {
   if (!req.body.username) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide username.'
@@ -313,26 +269,7 @@ router.post('/updateUser', (req, res, next) => {
       if (!user) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'User ' + common.message.NOT_FOUND});
       }
-      return res.status(httpStatus.OK).send(user.safeModel());
-    })
-    .catch((err) => {
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-        err: err,
-        message: common.message.INTERNAL_SERVER_ERROR
-      });
-    });
-});
-
-/**
- * Get list of all the participants.
- */
-router.get('/getAllParticipants', (req, res, next) => {
-  Users.getAllParticipants(req.query)
-    .then((participants) => {
-      if (!participants) {
-        return res.status(httpStatus.OK).send({message: 'Participant ' + common.message.NOT_FOUND});
-      }
-      return res.status(httpStatus.OK).send(participants);
+      return res.status(httpStatus.OK).send(user);
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -345,32 +282,13 @@ router.get('/getAllParticipants', (req, res, next) => {
 /**
  * Get list of all the users.
  */
-router.get('/getAllUsers', (req, res, next) => {
+router.get('/user', (req, res, next) => {
   Users.getAllUsers()
     .then((user) => {
       if (!user) {
         return res.status(httpStatus.OK).send({message: 'Users ' + common.message.NOT_FOUND});
       }
       return res.status(httpStatus.OK).send(user);
-    })
-    .catch((err) => {
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-        err: err,
-        message: common.message.INTERNAL_SERVER_ERROR
-      });
-    });
-});
-
-/**
- * Get all entitys. Accepts userId as parameter if user is participant admin.
- */
-router.get('/getAllEntities/:userId', (req, res, next) => {
-  Users.getAllEntities(req.params.userId)
-    .then((entitys) => {
-      if (!entitys) {
-        return res.status(httpStatus.OK).send({message: 'Users ' + common.message.NOT_FOUND});
-      }
-      return res.status(httpStatus.OK).send(entitys);
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -390,7 +308,7 @@ router.post('/getUser', (req, res, next) => {
     });
   }
 
-  Users.getUser(req.body)
+  Users.getUserByIdentity(req.body)
     .then((user) => {
       if (!user) {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Users ' + common.message.NOT_FOUND});
@@ -416,7 +334,7 @@ router.get('/isUserAlreadyExist/:email', (req, res, next) => {
     });
   }
 
-  Users.getUser({email: req.params.email})
+  Users.getUserByIdentity({email: req.params.email})
     .then((user) => {
       return res.status(httpStatus.OK).send({isExists: !!user});
     })
@@ -473,7 +391,7 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
         }));
       }
 
-      return Users.getUser({email: entityInfo.email});
+      return Users.getUserByIdentity({email: entityInfo.email});
     })
     .then((user) => {
       let isExists = !!user;
@@ -841,7 +759,10 @@ router.post('/encrypt', (req, res, next) => {
 
 function addEntityAndUser(data, res) {
   // Add entity
-  data.entityInfo.participant = data.participantId;
+  data.entityInfo.operatedBy = {
+    id: data.participantId,
+    type: 'participant'
+  };
   return Entities.addEntity(data.entityInfo)
     .then((entity) => {
       // Add user

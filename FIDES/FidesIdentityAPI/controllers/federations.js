@@ -5,13 +5,12 @@ const express = require('express'),
   request = require('request-promise'),
   common = require('../helpers/common'),
   httpStatus = require('http-status'),
-  Federations = require('../helpers/federations'),
-  Participant = require('../helpers/participants');
+  Federations = require('../helpers/federations');
 
 /**
  * Get all active federations
  */
-router.get('/getAllFederations', (req, res, next) => {
+router.get('/federations', (req, res, next) => {
   Federations.getAllFederations()
     .then((federation) => {
       if (!federation) {
@@ -28,8 +27,7 @@ router.get('/getAllFederations', (req, res, next) => {
 /**
  * Create federation
  */
-router.post('/addFederation', (req, res, next) => {
-  let federation = null;
+router.post('/federations', (req, res, next) => {
   req.body.sponsor = common.constant.OWNER_PARTICIPANT_ID;
 
   return Federations.addFederation(req.body)
@@ -49,7 +47,7 @@ router.post('/addFederation', (req, res, next) => {
 /**
  * Update federation
  */
-router.put('/updateFederation', (req, res, next) => {
+router.put('/federations', (req, res, next) => {
   if (!req.body._id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
@@ -72,7 +70,7 @@ router.put('/updateFederation', (req, res, next) => {
 /**
  * Remove federation
  */
-router.delete('/removeFederation/:id', (req, res, next) => {
+router.delete('/federations/:id', (req, res, next) => {
   if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID

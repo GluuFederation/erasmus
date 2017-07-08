@@ -13,15 +13,15 @@
     };
 
     function badgeRequest(formData) {
-      return $http.post(urls.BASE_API + '/badgeRequest', formData);
+      return $http.post(urls.FIDES_BASE_API + '/badgeRequest', formData);
     }
 
     function badgeApprove(formData) {
-      return $http.post(urls.BASE_API + '/badgeApprove', formData);
+      return $http.post(urls.FIDES_BASE_API + '/badgeApprove', formData);
     }
 
     function getParticipantById(oid) {
-      return $http.get(urls.BASE_API + '/participant/' + oid);
+      return $http.get(urls.FIDES_BASE_API + '/participant/' + oid);
     }
 
     return service;

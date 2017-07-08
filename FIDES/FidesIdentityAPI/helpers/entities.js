@@ -1,6 +1,7 @@
 "use strict";
-
-const Entity = require('../models/entity');
+const common = require('./common');
+common.ottoConfig.isServerStart = false;
+const Entity = require('otto-node-package')(common.ottoConfig).model.entityModel;
 
 /**
  * Get all active entities
@@ -47,15 +48,16 @@ let getEntityByUrl = (url, done) => {
  * @return {err} - return error
  */
 let addEntity = (req) => {
-  let oEntity = new Entity();
-  oEntity.name = req.name;
-  oEntity.discoveryUrl = req.discoveryUrl;
-  oEntity.oxdId = req.oxdId;
-  oEntity.redirectUris = req.redirectUris;
-  oEntity.participant = req.participant;
-  oEntity.responseTypes = req.responseTypes;
-  oEntity.createdBy = req.createdBy;
-  oEntity.isApproved = false;
+  let oEntity = new Entity({
+    name: req.name,
+    discoveryUrl: req.discoveryUrl,
+    oxdId: req.oxdId,
+    redirectUris: req.redirectUris,
+    operatedBy: req.operatedBy,
+    responseTypes: req.responseTypes,
+    createdBy: req.createdBy,
+    isApproved: false
+  });
 
   return oEntity.save()
     .then(entity => Promise.resolve(entity))
@@ -72,11 +74,13 @@ let updateEntity = (req) => {
   return Entity.findById(req._id)
     .exec()
     .then((oEntity) => {
-      oEntity.name = req.name || oEntity.name;
-      oEntity.discoveryUrl = req.discoveryUrl || oEntity.discoveryUrl;
-      oEntity.participant = req.participantId || oEntity.participant;
-
-      return oEntity.save();
+      const obj = {
+        name: req.name || oEntity.name,
+        signedJwksUri: req.signedJwksUri || oEntity.signedJwksUri || '',
+        signingKeys: req.signingKeys || oEntity.signingKeys || '',
+        type: req.type || oEntity.type || ''
+      };
+      return Entity.findOneAndUpdate({_id: oEntity._id}, obj);
     })
     .then((savedEntity) => Entity.populate(savedEntity, 'participant'))
     .then((savedEntity) => Promise.resolve(savedEntity))
@@ -114,13 +118,44 @@ let approveEntity = (id) => {
     .findById(id)
     .exec()
     .then((oEntity) => {
-      oEntity.isApproved = true;
-      return oEntity.save();
+      return Entity.findOneAndUpdate({_id: oEntity._id}, {isApproved: true});
     })
     .then(updatedEntity => Promise.resolve(updatedEntity))
     .catch(err => Promise.reject(err));
 };
 
+let getEntityWithParticipant = (id) => {
+  return Entity
+    .aggregate([
+      {
+        $lookup:{
+          from:"participants",
+          localField:"operatedBy.id",
+          foreignField:"_id",
+          as:"participant"
+        }
+      },
+      {
+        $match:{
+          _id:id
+        }
+      }
+    ])
+    .then((oEntity) => {
+      oEntity[0].participant = oEntity[0].participant[0];
+      oEntity = oEntity[0];
+      return Promise.resolve(oEntity);
+    })
+    .catch(err => Promise.reject(err));
+};
+
 module.exports = {
-  getAllEntities, getEntityById, getEntityByUrl, addEntity, updateEntity, removeEntity, approveEntity
+  getAllEntities,
+  getEntityById,
+  getEntityByUrl,
+  addEntity,
+  updateEntity,
+  removeEntity,
+  approveEntity,
+  getEntityWithParticipant
 };

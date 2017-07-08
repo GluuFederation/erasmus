@@ -3,6 +3,8 @@
 require('dotenv').config({path: './.env-dev'}); //for development
 // require('dotenv').config({path: './.env-prod'}); // for production
 
+const common = require('./helpers/common');
+
 const express = require('express'),
   app = express(),
   cookieParser = require('cookie-parser'),
@@ -15,6 +17,7 @@ const express = require('express'),
   swagger = require('swagger-express'),
   router = express.Router(),
   cors = require('cors'),
+  otto = require('otto-node-package')(common.ottoConfig),
   server = require('http').Server(app);
 
 // MongoDB connection configuration

@@ -15,27 +15,23 @@
     };
 
     function getEntities(userId, onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/getAllEntities/" + userId).then(onSuccess).catch(onError);
+      return $http.get(urls.FIDES_BASE_API + "/entity?uid=" + userId).then(onSuccess).catch(onError);
     }
 
     function removeEntity(entityId, onSuccess, onError) {
-      return $http.delete(urls.BASE_API + "/removeEntity/" + entityId).then(onSuccess).catch(onError);
+      return $http.delete(urls.FIDES_BASE_API + "/entity/" + entityId).then(onSuccess).catch(onError);
     }
 
     function approveEntity(entityId, onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/approveEntity/" + entityId).then(onSuccess).catch(onError);
+      return $http.post(urls.FIDES_BASE_API + "/entity/approve/" + entityId).then(onSuccess).catch(onError);
     }
 
     function createEntity(formData, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/createEntity", formData).then(onSuccess).catch(onError);
+      return $http.post(urls.FIDES_BASE_API + "/entity", formData).then(onSuccess).catch(onError);
     }
 
     function updateEntity(formData, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/updateEntity", formData).then(onSuccess).catch(onError);
-    }
-
-    function getAllOrganizations(onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/getAllOrganizations").then(onSuccess).catch(onError);
+      return $http.post(urls.FIDES_BASE_API + "/entity", formData).then(onSuccess).catch(onError);
     }
 
     return service;

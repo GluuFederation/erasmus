@@ -14,19 +14,19 @@
         };
 
         function getAllBadgeCategory() {
-            return $http.get(urls.BASE_API + '/badgeCategory');
+            return $http.get(urls.FIDES_BASE_API + '/badgeCategory');
         }
 
         function removeBadgeCategory(id) {
-            return $http.delete(urls.BASE_API + '/badgeCategory/' + id);
+            return $http.delete(urls.FIDES_BASE_API + '/badgeCategory/' + id);
         }
 
         function updateBadgeCategory(formData, id) {
-            return $http.put(urls.BASE_API + '/badgeCategory/' + id, formData);
+            return $http.put(urls.FIDES_BASE_API + '/badgeCategory/' + id, formData);
         }
 
         function createBadgeCategory(formData) {
-            return $http.post(urls.BASE_API + '/badgeCategory', formData);
+            return $http.post(urls.FIDES_BASE_API + '/badgeCategory', formData);
         }
         return service;
     }

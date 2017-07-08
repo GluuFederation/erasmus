@@ -16,29 +16,29 @@
     };
 
     function getBadges() {
-      return $http.get(urls.BASE_API + '/badges');
+      return $http.get(urls.FIDES_BASE_API + '/badges');
     }
 
     function removeBadge(id) {
-      return $http.delete(urls.BASE_API + '/badges/' + id);
+      return $http.delete(urls.FIDES_BASE_API + '/badges/' + id);
     }
 
     function updateBadge(id, formData) {
-      return $http.put(urls.BASE_API + '/badges/' + id, formData, {
+      return $http.put(urls.FIDES_BASE_API + '/badges/' + id, formData, {
         transformRequest: angular.identity,
         headers: {'Content-Type': undefined}
       });
     }
 
     function createBadge(formData) {
-      return $http.post(urls.BASE_API + '/badges', formData, {
+      return $http.post(urls.FIDES_BASE_API + '/badges', formData, {
         transformRequest: angular.identity,
         headers: {'Content-Type': undefined}
       });
     }
 
     function getBadgeByParticipant(id, status) {
-      return $http.get(urls.BASE_API + '/getBadgeByParticipant/' + id + '/' + status);
+      return $http.get(urls.FIDES_BASE_API + '/participant/' + id + '/badge/status/' + status);
     }
 
     return service;

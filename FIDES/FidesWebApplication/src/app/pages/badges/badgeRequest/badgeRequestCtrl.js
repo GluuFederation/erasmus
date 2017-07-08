@@ -34,8 +34,8 @@
           vm.reqBadge = _.union(response.data.pendingBadges, response.data.approvedBadges) || [];
           vm.selectedBadges = angular.copy(vm.reqBadge);
           vm.allBadges = vm.allBadges.map(function (item) {
-            (response.data.pendingBadges.indexOf(item._id) > -1) ? item.isPending = true : '';
-            (response.data.approvedBadges.indexOf(item._id) > -1) ? item.isApproved = true : '';
+            (!!response.data.pendingBadges && response.data.pendingBadges.indexOf(item._id) > -1) ? item.isPending = true : '';
+            (!!response.data.approvedBadges && response.data.approvedBadges.indexOf(item._id) > -1) ? item.isApproved = true : '';
             return item;
           });
           vm.allSafeBadges = vm.allBadges;

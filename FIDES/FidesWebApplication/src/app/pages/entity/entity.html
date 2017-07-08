@@ -12,17 +12,16 @@
             <th class="table-id" st-sort="id" st-sort-default="true" style="display: none;">#</th>
             <th st-sort="name">Name</th>
             <th st-sort="discoveryUrl">Discovery URL</th>
-            <th st-sort="clientId" style="max-width: 250px;">Client ID</th>
             <th st-sort="participant.name">Participant</th>
             <th></th>
             <th>Actions</th>
           </tr>
           <tr>
             <th style="display: none;"></th>
-            <th colspan="7" ng-show="vm.entities"><input st-search="" placeholder="Search"
+            <th colspan="6" ng-show="vm.entities"><input st-search="" placeholder="Search"
                                                           class="input-sm form-control search-input" type="search"/>
             </th>
-            <th colspan="7" ng-show="!vm.entities" style="color: #e85656;">There are no records to display.</th>
+            <th colspan="6" ng-show="!vm.entities" style="color: #e85656;">There are no records to display.</th>
           </tr>
           </thead>
           <tbody>
@@ -33,9 +32,6 @@
             </td>
             <td class="ellipis" style="max-width: 250px;" title="{{entity.discoveryUrl}}">
               {{entity.discoveryUrl}}
-            </td>
-            <td class="ellipis" style="max-width: 250px;" title="{{entity.clientId}}">
-              {{entity.clientId}}
             </td>
             <td>
               {{entity.participant.name}}

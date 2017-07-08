@@ -92,4 +92,4 @@ function setUrl(next, done) {
 }
 
 // create the model for openid connect entity and expose it to our app
-module.exports = mongoose.model('Entity', entitySchema);
+//module.exports = mongoose.model('Entity', entitySchema);

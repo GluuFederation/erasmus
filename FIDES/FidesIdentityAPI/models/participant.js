@@ -102,4 +102,4 @@ function setUrl(next, done) {
 }
 
 // create the model for participants and expose it to our app
-module.exports = mongoose.model('Participant', participantSchema);
+//module.exports = mongoose.model('Participant', participantSchema);

@@ -73,10 +73,10 @@
             <td>{{user.state}}</td>
             <td>{{user.city}}</td>
             <td>
-              {{user.role.nameSlug}}
+              {{user.role[0].nameSlug}}
             </td>
             <td>
-              {{user.participant.name}}
+              {{user.participant[0].name}}
             </td>
             <td>
               <div class="buttons" ng-show="!rowform.$visible">

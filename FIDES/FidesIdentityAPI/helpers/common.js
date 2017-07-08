@@ -10,7 +10,7 @@ const message = {
 };
 
 const constant = {
-  OWNER_PARTICIPANT_ID: '58f45055cc0db2199f9edd4a',
+  OWNER_PARTICIPANT_ID: '595f8d4eba8a3155b4f916b7',
   TRUST_MARK_FILEPATH: '/public/images/trustmark',
   BADGE_IMAGE_PATH: '/public/images/badges',
   OTTO_BASE_URL: 'http://localhost:5053',
@@ -69,10 +69,29 @@ const smtpConfig = {
 
 const registrationEmailTemplate = `<html><head><title>Registration</title></head><p>Thank you <b>{{0}}</b>, for registration with us with client id <b>{{1}}</b>. <br/> Please maintain your client and extend your client expire date for connect with us.</p><p> Regards, <br/> Gluu Team.</p></html>`;
 
+var ottoConfig = {
+  dbConfig: "mongodb://localhost:27017/otto-fides",
+  port: "5053",
+  RA_NAME: "otto-test",
+  baseURL: "http://localhost:5053",
+  contextParticipant: "https://rawgit.com/KantaraInitiative/wg-otto/master/html/otto-vocab-1.0.html#participant",
+  contextFederation: "https://rawgit.com/KantaraInitiative/wg-otto/master/html/otto-vocab-1.0.html#federation",
+  contextEntity: "https://rawgit.com/KantaraInitiative/wg-otto/master/html/otto-vocab-1.0.html#entity",
+  contextRegistrationAuthority: "https://rawgit.com/KantaraInitiative/wg-otto/master/html/otto-vocab-1.0.html#registration-authority",
+  contextMetadata: "https://rawgit.com/KantaraInitiative/wg-otto/master/html/otto-vocab-1.0.html#metadata",
+  contextRequirement: "https://rawgit.com/KantaraInitiative/wg-otto/master/html/otto-vocab-1.0.html#requirement",
+  contextACR: "https://rawgit.com/KantaraInitiative/wg-otto/master/html/otto-vocab-1.0.html#acr",
+  contextSchemaClass: "https://rawgit.com/KantaraInitiative/wg-otto/master/html/otto-vocab-1.0.html#schema",
+  contextBadge: "https://w3id.org/openbadges/v2",
+  RA_ID: "58f5da4957d53d2ffbbb31df",
+  isServerStart: true
+};
+
 module.exports = {
   message,
   constant,
   smtpConfig,
   registrationEmailTemplate,
-  func
+  func,
+  ottoConfig
 };

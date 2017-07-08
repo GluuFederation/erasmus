@@ -27,21 +27,25 @@ const upload = multer({storage: storage}).any();
 /**
  * get approved Badge By Participant
  */
-router.get('/getBadgeByParticipant/:oid/:status', (req, res, next) => {
-  Participant.getBadgeByParticipant(req.params.oid)
+router.get('/participant/:pid/badge/status/:status', (req, res, next) => {
+  Participant.getBadgeByParticipant(req.params.pid)
     .then((org) => {
+      if (!org) {
+        return res.status(httpStatus.OK).send([]);
+      }
+
       if (req.params.status == 'approved') {
         return res.status(httpStatus.OK).send(org.approvedBadges);
       } else if (req.params.status == 'pending') {
         return res.status(httpStatus.OK).send(org.pendingBadges);
       } else {
         org.approvedBadges = _.forEach(org.approvedBadges, function (element) {
-          if (element._doc)
-            element._doc.isApproved = true;
+          if (!!element)
+            element.isApproved = true;
         });
         org.pendingBadges = _.forEach(org.pendingBadges, function (element) {
-          if (element._doc)
-            element._doc.isApproved = false;
+          if (!!element)
+            element.isApproved = false;
         });
         return res.status(httpStatus.OK).send(_.union(org.approvedBadges, org.pendingBadges));
       }
@@ -88,7 +92,7 @@ router.get('/participant', (req, res, next) => {
 /**
  * Update participant
  */
-router.put('/updateParticipant', upload, (req, res, next) => {
+router.put('/participant', upload, (req, res, next) => {
   if (!req.body._id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
@@ -121,7 +125,7 @@ router.put('/updateParticipant', upload, (req, res, next) => {
 /**
  * Remove participant
  */
-router.delete('/removeParticipant/:id', (req, res, next) => {
+router.delete('/participant/:id', (req, res, next) => {
   if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
@@ -138,18 +142,18 @@ router.delete('/removeParticipant/:id', (req, res, next) => {
 /**
  * Approve participant
  */
-router.post('/approveParticipant', (req, res, next) => {
-  if (!req.body.participantId) {
+router.post('/participant/:pid/federation/:fid', (req, res, next) => {
+  if (!req.params.pid) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
     });
   }
-  Participant.getParticipantById(req.body.participantId)
+  Participant.getParticipantById(req.params.pid)
     .then((response) => {
       // link participant with federation
-      return Federation.addParticipant(req.body.federationId, req.body.participantId);
+      return Federation.addParticipant(req.params.fid, req.params.pid);
     })
-    .then((response) => Participant.approveParticipant(req.body.participantId, req.body.federationId))
+    .then((response) => Participant.approveParticipant(req.params.pid, req.params.fid))
     .then((participant) => res.status(httpStatus.OK).send(participant))
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,

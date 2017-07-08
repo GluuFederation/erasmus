@@ -11,7 +11,6 @@
     'FidesWebApplication.pages.entity',
     'FidesWebApplication.pages.login',
     'FidesWebApplication.pages.register',
-    'FidesWebApplication.pages.encrypt',
     'FidesWebApplication.pages.badges'
   ]).config(routeConfig);
 

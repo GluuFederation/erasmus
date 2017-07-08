@@ -10,11 +10,11 @@
     vm.participant = (!!$localStorage.currentUser) ? $localStorage.currentUser.user.participant : null;
     vm.isShow = (!!$localStorage.currentUser) ? $localStorage.currentUser.role === 'orgadmin' : false;
     var file = '';
-    vm.BASE_API = urls.BASE_API;
+    vm.FIDES_BASE_API = urls.FIDES_BASE_API;
 
     vm.openParticipantModal = openParticipantModal;
 
-    $http.get(urls.BASE_API + "/loggedIn").then(onSuccess).catch(onError);
+    $http.get(urls.FIDES_BASE_API + "/loggedIn").then(onSuccess).catch(onError);
 
     function onSuccess(response) {
       //console.log(response.data);

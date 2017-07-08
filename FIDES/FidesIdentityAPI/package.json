@@ -21,14 +21,15 @@
     "https": "^1.0.0",
     "jsonwebtoken": "7.1.9",
     "keypair": "^1.0.1",
-    "mongoose": "^4.9.6",
+    "mongoose": "^4.10.8",
     "multer": "^1.2.0",
     "node-uuid": "^1.4.8",
     "nodemailer": "^3.1.7",
     "oxd-node": "^1.1.6",
     "request": "^2.79.0",
     "request-promise": "^4.1.1",
-    "swagger-express": "1.0.5"
+    "swagger-express": "1.0.5",
+    "otto-node-package": "1.0.0"
   },
   "repository": {
     "type": "git",

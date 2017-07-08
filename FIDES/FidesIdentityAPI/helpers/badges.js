@@ -1,8 +1,10 @@
 "use strict";
-
+const mongoose = require('mongoose');
+const common = require('./common');
+common.ottoConfig.isServerStart = false;
+const Entity = require('otto-node-package')(common.ottoConfig).model.entityModel;
+const Participant = require('otto-node-package')(common.ottoConfig).model.participantModel;
 const Badge = require('../models/badge');
-const Participant = require('../models/participant');
-const Entity = require('../models/entity');
 const User = require('../models/user');
 
 /**
@@ -130,12 +132,16 @@ let badgeRequest = (oid, bids) => {
   return Participant
     .findOne({_id: oid, pendingBadges: { $nin: bids }})
     .exec()
-    .then((oOrg) => {
+    .then((participant) => {
+      participant = participant._doc;
       bids = bids.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+      if (!participant.pendingBadges) {
+        participant.pendingBadges = []
+      }
       bids.forEach((item) => {
-        oOrg.pendingBadges.push(item);
+        participant.pendingBadges.push(mongoose.Types.ObjectId(item));
       });
-      return oOrg.save();
+      return Participant.findOneAndUpdate({_id: participant._id}, { pendingBadges: participant.pendingBadges});
     })
     .then((participant) => Promise.resolve(participant))
     .catch(err => Promise.reject(err));
@@ -152,13 +158,22 @@ let badgeApprove = (oid, bids) => {
   return Participant
     .findById(oid)
     .exec()
-    .then((oOrg) => {
+    .then((participant) => {
+      participant = participant._doc;
+      if (!participant.approvedBadges) {
+        participant.approvedBadges = []
+      }
+
       bids.forEach((item) => {
-        oOrg.approvedBadges.push(item);
+        participant.approvedBadges.push(mongoose.Types.ObjectId(item));
       });
-      oOrg.pendingBadges = oOrg.pendingBadges.filter(function(item){ return oOrg.approvedBadges.indexOf(String(item)) == -1; });
-      return oOrg.save();
+      participant.pendingBadges = participant.pendingBadges.filter(function(item){
+        return participant.approvedBadges.toString().indexOf(item.toString()) == -1;
+      });
+
+      return Participant.findOneAndUpdate({_id: participant._id}, { pendingBadges: participant.pendingBadges, approvedBadges: participant.approvedBadges });
     })
+    .then((participant) => Participant.findById(participant._id))
     .then((participant) => Promise.resolve(participant))
     .catch(err => Promise.reject(err));
 };

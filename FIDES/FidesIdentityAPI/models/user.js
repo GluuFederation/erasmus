@@ -118,7 +118,7 @@ userSchema.pre('findById', populateMasters);
 userSchema.pre('find', populateMasters);
 
 function populateMasters() {
-  this.populate('role participant entity');
+  this.populate('role');
   return this;
 }
 // create the model for users and expose it to our app

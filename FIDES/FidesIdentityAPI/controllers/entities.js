@@ -7,92 +7,112 @@ const express = require('express'),
   common = require('../helpers/common'),
   httpStatus = require('http-status'),
   Entity = require('../helpers/entities'),
-  Participant = require('../helpers/participants');
+  Participant = require('../helpers/participants'),
+  Users = require('../helpers/users');
+
+/**
+ * Get all entitys. Accepts userId as parameter if user is participant admin.
+ */
+router.get('/entity', (req, res, next) => {
+  Users.getAllEntities(req.query.uid)
+    .then((entities) => {
+      if (!entities) {
+        return res.status(httpStatus.OK).send({message: 'Users ' + common.message.NOT_FOUND});
+      }
+      return res.status(httpStatus.OK).send(entities);
+    })
+    .catch((err) => {
+      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+        err: err,
+        message: common.message.INTERNAL_SERVER_ERROR
+      });
+    });
+});
 
 /**
  * Add entity.
  */
-router.post('/createEntity', (req, res, next) => {
-  if (!req.body.name) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide name.'
-    });
-  }
-
-  if (!req.body.discoveryUrl) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide discovery URL.'
-    });
-  }
-  if (!req.body.participant) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide participant.'
-    });
-  }
-
-  Entity.addEntity(req.body)
-    .then((entity) => {
-      return res.status(httpStatus.OK).send(entity);
-    })
-    .catch((err) => {
-      if (err.code === 11000) {
-        // already exist for discoveryUrl
-        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Entity ' + common.message.NOT_ACCEPTABLE_NAME});
-      }
-
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-        err: err,
-        message: common.message.INTERNAL_SERVER_ERROR
-      });
-    });
-});
+// router.post('/createEntity', (req, res, next) => {
+//   if (!req.body.name) {
+//     return res.status(httpStatus.NOT_ACCEPTABLE).send({
+//       message: 'Please provide name.'
+//     });
+//   }
+//
+//   if (!req.body.discoveryUrl) {
+//     return res.status(httpStatus.NOT_ACCEPTABLE).send({
+//       message: 'Please provide discovery URL.'
+//     });
+//   }
+//   if (!req.body.participant) {
+//     return res.status(httpStatus.NOT_ACCEPTABLE).send({
+//       message: 'Please provide participant.'
+//     });
+//   }
+//
+//   Entity.addEntity(req.body)
+//     .then((entity) => {
+//       return res.status(httpStatus.OK).send(entity);
+//     })
+//     .catch((err) => {
+//       if (err.code === 11000) {
+//         // already exist for discoveryUrl
+//         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Entity ' + common.message.NOT_ACCEPTABLE_NAME});
+//       }
+//
+//       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+//         err: err,
+//         message: common.message.INTERNAL_SERVER_ERROR
+//       });
+//     });
+// });
 
 /**
  * Update detail of entity.
  */
-router.post('/updateEntity', (req, res, next) => {
-  if (!req.body._id) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide id.'
-    });
-  }
-  if (!req.body.name) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide name.'
-    });
-  }
-  if (!req.body.discoveryUrl) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide discovery URL.'
-    });
-  }
-  if (!req.body.participant) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Please provide participant.'
-    });
-  }
-
-  Entity.updateEntity(req.body)
-    .then((entity) => {
-      return res.status(httpStatus.OK).send(entity);
-    })
-    .catch((err) => {
-      if (err.code === 11000) {
-        // already exist for discoveryUrl
-        return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Entity ' + common.message.NOT_ACCEPTABLE_NAME});
-      }
-
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-        err: err,
-        message: common.message.INTERNAL_SERVER_ERROR
-      });
-    });
-});
+// router.post('/updateEntity', (req, res, next) => {
+//   if (!req.body._id) {
+//     return res.status(httpStatus.NOT_ACCEPTABLE).send({
+//       message: 'Please provide id.'
+//     });
+//   }
+//   if (!req.body.name) {
+//     return res.status(httpStatus.NOT_ACCEPTABLE).send({
+//       message: 'Please provide name.'
+//     });
+//   }
+//   if (!req.body.discoveryUrl) {
+//     return res.status(httpStatus.NOT_ACCEPTABLE).send({
+//       message: 'Please provide discovery URL.'
+//     });
+//   }
+//   if (!req.body.participant) {
+//     return res.status(httpStatus.NOT_ACCEPTABLE).send({
+//       message: 'Please provide participant.'
+//     });
+//   }
+//
+//   Entity.updateEntity(req.body)
+//     .then((entity) => {
+//       return res.status(httpStatus.OK).send(entity);
+//     })
+//     .catch((err) => {
+//       if (err.code === 11000) {
+//         // already exist for discoveryUrl
+//         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Entity ' + common.message.NOT_ACCEPTABLE_NAME});
+//       }
+//
+//       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+//         err: err,
+//         message: common.message.INTERNAL_SERVER_ERROR
+//       });
+//     });
+// });
 
 /**
  * Remove entity. Accepts entityId as parameter.
  */
-router.delete('/removeEntity/:id', (req, res, next) => {
+router.delete('/entity/:id', (req, res, next) => {
   if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide id.'
@@ -114,7 +134,7 @@ router.delete('/removeEntity/:id', (req, res, next) => {
 /**
  *1 Approve entity. Accepts entityId as parameter.
  */
-router.get('/approveEntity/:id', (req, res, next) => {
+router.post('/entity/approve/:id', (req, res, next) => {
   if (!req.params.id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide id.'
@@ -132,16 +152,10 @@ router.get('/approveEntity/:id', (req, res, next) => {
         });
       }
 
-      if (entity.participant.isApproved !== true) {
-        return res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Please approve related participant first to proceed.'
-        });
-      }
-
       // Get entity configuration using discovery URL.
       const option = {
         method: 'GET',
-        uri: entity.discoveryUrl + '/.well-known/openid-configuration',
+        uri: entity._doc.discoveryUrl + '/.well-known/openid-configuration',
         resolveWithFullResponse: true
       };
 
@@ -187,20 +201,21 @@ router.get('/approveEntity/:id', (req, res, next) => {
         }
       }
 
-      dataJson.id = dataJson.issuer;
-      dataJson.name = entity.name;
+      // dataJson.id = dataJson.issuer;
       dataJson.keys = keysJson.keys;
 
-      entity.id = dataJson.issuer;
-      entity.name = dataJson.name;
-      entity.signedJwksUri = dataJson.signed_jwks_uri;
-      entity.signingKeys = dataJson.signing_key;
-      entity.type = 'openid_entity';
-
-      return entity.save();
+      // entity.id = dataJson.issuer;
+      const obj = {
+        _id: entity._doc._id,
+        signedJwksUri: dataJson.signed_jwks_uri,
+        signingKeys: dataJson.signing_key,
+        type: 'openid_entity'
+      };
+      return Entity.updateEntity(obj);
     })
-    .then((updatedEntity) => Participant.addEntityInPartcipant(updatedEntity.participant._id, updatedEntity._id))
+    .then((updatedEntity) => Participant.addEntityInPartcipant(updatedEntity.operatedBy.id, updatedEntity._id))
     .then((response) => Entity.approveEntity(req.params.id))
+    .then((response) => Entity.getEntityWithParticipant(response._id))
     .then((entity) => res.status(200).send(entity))
     .catch((err) => {
       if (!err.statusCode) {

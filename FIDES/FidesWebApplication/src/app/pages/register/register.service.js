@@ -15,18 +15,18 @@
     };
 
     function validateRegistrationDetail(entityInfo, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/validateRegistrationDetail", entityInfo).then(onSuccess).catch(onError);
+      return $http.post(urls.FIDES_BASE_API + "/validateRegistrationDetail", entityInfo).then(onSuccess).catch(onError);
     }
 
     function registerDetail(entityInfo, clientInfo, onSuccess, onError) {
-      return $http.post(urls.BASE_API + "/registerDetail", {
+      return $http.post(urls.FIDES_BASE_API + "/registerDetail", {
         entityInfo: entityInfo,
         clientInfo: clientInfo
       }).then(onSuccess).catch(onError);
     }
 
     function isUserAlreadyExist(personInfo, onSuccess, onError) {
-      return $http.get(urls.BASE_API + "/isUserAlreadyExist/" + personInfo.email).then(onSuccess).catch(onError);
+      return $http.get(urls.FIDES_BASE_API + "/isUserAlreadyExist/" + personInfo.email).then(onSuccess).catch(onError);
     }
 
     function getUSStateCity() {
