@@ -1,0 +1,111 @@
+--------------------------------------------------------------
+I.  INTRODUCTION
+--------------------------------------------------------------
+
+Mobile PD
+
+Advise--sending mission critical information to officers smart phone,
+can geofence information to o
+
+We have our own authentication, it's not done through their own agency.
+Some of the smaller ones, don't have their own identity managment.
+
+No PD has said, we have our own passwords.
+People are changing positions frequently, change roles, leave.
+For advise, it's been tedious.
+
+ Not actually been supporting active directory yet.
+
+ 10-15 people at the agency.
+
+ It's internet facing application, so they could be at home.
+
+Who is a first responder? What if you're part time? Someone mentioned
+that after Katrina, there were volunteer fire fighters, but they could
+not get in because they didn't have the right badge. The ability to
+issue credentials.
+
+People assume pd's are high tech, but for the most part law enforcement
+don't even know the right questions to ask.
+
+"We are gathering background information to understand digital identiy in
+emergency responder community."
+
+More and more, paper tasks are moving to apps.
+
+Super bowl, different agencies need to share data. Match local law
+enforcement and school resource officers.
+
+ All this focus on building out networks, but the majority of officers
+ don't have agency issued smart phones. Policy issues and funding
+ issues around.  Some officers won't put work related information
+ on their smart phones, and can't be mandated.
+
+ There is a lot they haven't figured it out.
+
+We want to find out how different organizations are approaching"
+
+a) What kinds of digital and in person credenitals FR's are using.
+b) What kinds of websites and mobile applications FR's are using for work.
+C) How much friction exists accessing digital resources.
+
+--------------------------------------------------------------
+II.  QUESTIONS FOR END USER (e.g. __________, __________, ________)
+--------------------------------------------------------------
+
+The first few questions are contextual, so we better understand the
+information you're sharing:
+
+1. Person / Organization
+
+   Tell us about the purpose of your organization?
+   What is your role?
+   What is the size and structure of your organization?
+
+2. IT staff:
+
+   Is there a dedicated IT staff?
+   Is there IT staff dedicated to user and access management?
+
+--------------------------------------------------------------
+III.  QUESTIONS FOR IT STAFF PERSON WHO IS RESPONSIBLE FOR USER MGT
+--------------------------------------------------------------
+
+1. Tell us about identity practices?
+
+   a. In rough terms, how many usernames and passwords (or other types
+   of authentication) do you have? What are some of the systems people need
+   to access? Does your organization have a single sign-on system that
+   provides access to multiple websites?
+
+   b. (IT Question) Do you know where the organization stores usernames
+   and passwords?
+      1. Microsoft Active Directory
+      2. SaaS Identity Provider (Okta, OneLogin, Microsoft Azure, Google,
+      Salesforce, other SaaS)
+      3. Other LDAP (Sun, Oracle, IBM, CA, OpenLDAP)
+      4. Relational database (MySQL, Postgress, Oracle, MS SQL)
+      5. Other: please explain __________________
+
+4. Does the first responder have a smart card that complies with federal
+standards? Can you share your thoughts on these credentials? Do you think
+usage should be extended to more people? What are some of the challenges
+for issuing more smart cards (or using them)?
+
+5. What would you think about a mobile identity card for first responders?
+
+6. Do you think people in your organization would object to using to using
+their person smart phone to apply for a first responder mobile identity card?
+
+7. When responding to a large, multi-jurisdictional disaster, can you share
+your thoughts or concerns about the process for identifying people either in
+person, or when they use certain digital tools (mobile applications, websites)?
+
+8. Are there standard certifications that you think would be important to
+convey via the mobile identity card. Is interoperability an issue?
+
+9. Can you share your thoughts about using credentials other then passwords
+(or smartcards) to access websites or mobile applications?
+
+10. What are the most important organizational applications that your
+organization sees the need to upgrade within the next five years?
