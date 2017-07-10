@@ -20,6 +20,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/home").permitAll().antMatchers("/user").hasAuthority(AuthoritiesConstants.ADMIN)
                 .antMatchers("/logout").hasAnyAuthority(AuthoritiesConstants.ADMIN)
                 .antMatchers("/img").permitAll()
+                .antMatchers("/images/*").permitAll()
+
                 .antMatchers("/organization").permitAll();
 
 

@@ -3,6 +3,8 @@ package org.xdi.oxd.badgemanager.web;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
+import org.xdi.oxd.badgemanager.ldap.service.HttpService;
 import org.xdi.oxd.badgemanager.model.Participant;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
 
@@ -37,23 +40,12 @@ public class ParticipantController {
 
         try {
 
-            final String uri = Global.API_ENDPOINT + Global.participant;
 
-            DisableSSLCertificateCheckUtil.disableChecks();
-            RestTemplate restTemplate = new RestTemplate();
+            ArrayList<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("state", state));
+            params.add(new BasicNameValuePair("city", city));
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
-
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(uri)
-                    .queryParam("state", state)
-                    .queryParam("city", city);
-
-            HttpEntity<String> request = new HttpEntity<>(headers);
-
-            HttpEntity<String> resp = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, request, String.class);
-
-            String result = resp.getBody();
+            String result = HttpService.callGet(Global.participant, params, true);
 
             JsonArray jArrayResponse = new JsonParser().parse(result).getAsJsonArray();
 
