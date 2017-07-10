@@ -28,9 +28,9 @@
             <td>{{participant.name}}</td>
             <td>{{participant.pendingBadges.length}}</td>
             <td>
-              <button class="btn btn-primary btn-icon"
+              <button class="btn btn-primary"
                       ng-disabled="!participant.isApproved"
-                      ng-click="vm.openBadgeApproveModel(participant)" title="Edit"><i class="ion-checkmark-round"></i></button>
+                      ng-click="vm.openBadgeApproveModel(participant)" title="Approve Badges"><i class="ion-checkmark-round"></i> Approve Badges</button>
             </td>
           </tr>
           </tbody>

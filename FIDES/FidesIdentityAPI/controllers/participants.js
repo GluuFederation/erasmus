@@ -142,7 +142,7 @@ router.delete('/participant/:id', (req, res, next) => {
 /**
  * Approve participant
  */
-router.post('/participant/:pid/federation/:fid', (req, res, next) => {
+router.post('/participant/:pid/federation/approve', (req, res, next) => {
   if (!req.params.pid) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
@@ -153,7 +153,7 @@ router.post('/participant/:pid/federation/:fid', (req, res, next) => {
       // link participant with federation
       return Federation.addParticipant(req.params.fid, req.params.pid);
     })
-    .then((response) => Participant.approveParticipant(req.params.pid, req.params.fid))
+    .then((response) => Participant.approveParticipant(req.params.pid))
     .then((participant) => res.status(httpStatus.OK).send(participant))
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,

@@ -66,7 +66,7 @@
           <tr ng-repeat="participant in vm.displayedCollection track by $index" style="background: {{participant.isApproved ? '#fff' : '#ffcdd2'}}">
             <td style="display: none;"></td>
             <td>{{participant.name}}</td>
-            <td>{{participant.memberOf[0].name}}</td>
+            <td><span ng-repeat="item in participant.memberOf">{{item.name}} {{ $index == participant.memberOf.length -1 ? '' : ',' }} </span> </td>
             <td>{{participant.phoneNo}}</td>
             <!--<td class="col-lg-4">{{participant.address}}</td>-->
             <td>{{participant.zipcode}}</td>

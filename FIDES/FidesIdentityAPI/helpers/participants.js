@@ -65,7 +65,8 @@ let addParticipant = (req) => {
     state: req.state,
     city: req.city,
     type: req.type,
-    description: req.description
+    description: req.description,
+    memberOf: req.memberOf
   });
 
   return oParticipant.save()
@@ -131,18 +132,15 @@ let removeParticipant = (id) => {
  * @return {participant} - return participant
  * @return {err} - return error
  */
-let approveParticipant = (orgId, fedId) => {
+let approveParticipant = (orgId) => {
   return Participant
     .findById(orgId)
     .exec()
     .then((oParticipant) => {
-      oParticipant.memberOf.push(fedId);
       var obj = {
         isApproved: true,
-        memberOf: oParticipant.memberOf
       };
       return Participant.findOneAndUpdate({_id: oParticipant._id}, obj);
-      //return oParticipant.save();
     })
     .then((updateParticipant) => {
       return Participant.findById(updateParticipant._id).populate('memberOf');

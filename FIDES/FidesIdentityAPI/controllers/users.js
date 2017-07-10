@@ -701,7 +701,8 @@ router.post('/registerDetail', (req, res, next) => {
         city: entityInfo.city,
         type: entityInfo.type,
         zipcode: entityInfo.zipcode,
-        description: entityInfo.description
+        description: entityInfo.description,
+        memberOf: entityInfo.memberOf
       };
       return Participants.addParticipant(participantInfo);
     })
@@ -722,6 +723,7 @@ router.post('/registerDetail', (req, res, next) => {
       data.entityInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
       data.entityInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
       data.entityInfo.isApproved = false;
+      data.entityInfo.federatedBy = entityInfo.memberOf;
 
       return addEntityAndUser(data, res);
     })
