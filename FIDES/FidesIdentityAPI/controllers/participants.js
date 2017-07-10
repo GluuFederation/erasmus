@@ -99,7 +99,7 @@ router.put('/participant', upload, (req, res, next) => {
     });
   }
   const filePath = common.constant.TRUST_MARK_FILEPATH;
-  req.body.trustMarkFile = (!!req.files) ? process.env.BASE_URL + filePath.substr(7, filePath.length) + '/' + req.files[0].filename : null;
+  req.body.trustMarkFile = (!!req.files && !!req.files[0]) ? process.env.BASE_URL + filePath.substr(7, filePath.length) + '/' + req.files[0].filename : null;
   if (req.body.trustMarkFile && (req.body.trustMarkFile != req.body.oldtrustMarkFile)) {
     try {
       fs.unlinkSync(common.constant.TRUST_MARK_FILEPATH + req.body.oldtrustMarkFile);
