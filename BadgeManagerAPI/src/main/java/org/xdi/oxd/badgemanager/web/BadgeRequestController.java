@@ -23,6 +23,7 @@ import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.models.Person;
 import org.xdi.oxd.badgemanager.ldap.models.fido.u2f.DeviceRegistration;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
+import org.xdi.oxd.badgemanager.ldap.service.HttpService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.service.UserInfoService;
 import org.xdi.oxd.badgemanager.util.DisableSSLCertificateCheckUtil;
@@ -63,6 +64,7 @@ public class BadgeRequestController {
 
         try {
 
+            System.out.println("############## access token =" + accessToken + "CreateBadgeRequest" + GsonService.getGson().toJson(badgeRequest));
             if (accessToken == null || accessToken.length() == 0 || badgeRequest == null
                     || badgeRequest.getOpHost() == null || badgeRequest.getOpHost().length() == 0) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -73,6 +75,8 @@ public class BadgeRequestController {
 
 //            retrieve user info
             UserInfo userInfo = userInfoService.getUserInfo(badgeRequest.getOpHost(), accessToken);
+            System.out.println("############## access token =" + accessToken + "   userInfo" + GsonService.getGson().toJson(userInfo));
+
             if (userInfo == null || userInfo.getEmail() == null || userInfo.getEmail().equalsIgnoreCase("")) {
                 jsonResponse.addProperty("error", true);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -351,16 +355,7 @@ public class BadgeRequestController {
 
             final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + objBadgeRequest.getTemplateBadgeId();
 
-            DisableSSLCertificateCheckUtil.disableChecks();
-            RestTemplate restTemplate = new RestTemplate();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
-
-            HttpEntity<String> request = new HttpEntity<>(headers);
-            HttpEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
-
-            String result = response.getBody();
+            String result = HttpService.callGet(uri, new ArrayList<>(), true);
 
             JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
             if (jObjResponse != null) {

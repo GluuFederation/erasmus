@@ -13,7 +13,8 @@ import java.nio.file.Paths;
 public class WebConfig extends WebMvcConfigurerAdapter {
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
             "classpath:/META-INF/resources/", "classpath:/ /",
-            "classpath:/static/", "classpath:/public/" };
+            "classpath:/static/", "classpath:/public/"};
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**");
@@ -26,6 +27,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
     /**
      * Registering resource directories to save resources such as Images
+     *
      * @param registry
      */
     @Override
@@ -33,6 +35,10 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         if (!registry.hasMappingForPattern("/img/**")) {
             registry.addResourceHandler("/img/**").addResourceLocations(
                     Paths.get("src/main/resources/img").toUri().toString());
+        }
+        if (!registry.hasMappingForPattern("/images/**")) {
+            registry.addResourceHandler("/images/**").addResourceLocations(
+                    Paths.get("src/main/resources/static/images").toUri().toString());
         }
 
         if (!registry.hasMappingForPattern("/**")) {

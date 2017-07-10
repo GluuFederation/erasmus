@@ -30,6 +30,7 @@ import org.xdi.oxd.badgemanager.ldap.models.Badges;
 import org.xdi.oxd.badgemanager.ldap.models.Person;
 import org.xdi.oxd.badgemanager.ldap.models.fido.u2f.DeviceRegistration;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
+import org.xdi.oxd.badgemanager.ldap.service.HttpService;
 import org.xdi.oxd.badgemanager.model.*;
 import org.xdi.oxd.badgemanager.qrcode.QRCBuilder;
 import org.xdi.oxd.badgemanager.qrcode.ZXingQRCodeBuilder;
@@ -126,19 +127,7 @@ public class BadgeController {
 
             IssuerBadgeRequest issuerBadgeRequest = new IssuerBadgeRequest(issuer, templateBadgeRequest.getType());
 
-            final String uri = Global.API_ENDPOINT + Global.getTemplateBadgesByParticipant;
-
-            DisableSSLCertificateCheckUtil.disableChecks();
-            RestTemplate restTemplate = new RestTemplate();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
-
-            HttpEntity<IssuerBadgeRequest> request = new HttpEntity<IssuerBadgeRequest>(issuerBadgeRequest, headers);
-
-            HttpEntity<String> strResponse = restTemplate.exchange(uri, HttpMethod.POST, request, String.class);
-
-            String result = strResponse.getBody();
+            String result = HttpService.callPost( Global.getTemplateBadgesByParticipant,issuerBadgeRequest,true);
 
             JsonArray jObjResponse = new JsonParser().parse(result).getAsJsonArray();
             if (jObjResponse != null && jObjResponse.size() > 0) {

@@ -15,6 +15,7 @@ import org.xdi.oxd.badgemanager.config.DefaultConfig;
 import org.xdi.oxd.badgemanager.global.Global;
 import org.xdi.oxd.badgemanager.ldap.models.BadgeClass;
 import org.xdi.oxd.badgemanager.ldap.service.GsonService;
+import org.xdi.oxd.badgemanager.ldap.service.HttpService;
 import org.xdi.oxd.badgemanager.ldap.service.InumService;
 import org.xdi.oxd.badgemanager.ldap.service.LDAPService;
 import org.xdi.oxd.badgemanager.model.BadgeClassResponse;
@@ -333,19 +334,9 @@ public class BadgeClassesCommands {
             Issuer issuer = new Issuer();
             Verification verification = new Verification();
 
-            final String uri = Global.API_ENDPOINT + Global.getTemplateBadgeById + "/" + badge.getTemplateBadgeId();
 
-            DisableSSLCertificateCheckUtil.disableChecks();
-            RestTemplate restTemplate = new RestTemplate();
+            String result = HttpService.callGet(Global.getTemplateBadgeById + "/" + badge.getTemplateBadgeId(), new ArrayList<>(), true);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + Global.Request_AccessToken);
-
-            HttpEntity<String> request = new HttpEntity<>(headers);
-
-            HttpEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET, request, String.class);
-
-            String result = response.getBody();
 
             JsonObject jObjResponse = new JsonParser().parse(result).getAsJsonObject();
 
