@@ -56,7 +56,7 @@ router.get('/templateBadge/:id', upload, (req, res, next) => {
 /**
  * get approved Badge By issuer
  */
-router.post('/getBadgeTemplatesByIssuer', (req, res, next) => {
+router.post('/templateBadge/issuer', (req, res, next) => {
   if (!req.body.issuer) {
     return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({message: 'Issuer ' + common.message.NOT_FOUND});
   }

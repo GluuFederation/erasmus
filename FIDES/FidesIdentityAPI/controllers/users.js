@@ -314,7 +314,7 @@ router.post('/getUser', (req, res, next) => {
         return res.status(httpStatus.NOT_ACCEPTABLE).send({message: 'Users ' + common.message.NOT_FOUND});
       }
 
-      return res.status(httpStatus.OK).send(user.safeModel());
+      return res.status(httpStatus.OK).send(user);
     })
     .catch((err) => {
       return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({

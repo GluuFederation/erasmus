@@ -85,20 +85,21 @@ let updateParticipant = (req) => {
     .findById(id)
     .exec()
     .then((oParticipant) => {
-      oParticipant.name = req.name || oParticipant.name;
-      oParticipant.isApproved = req.isApproved || oParticipant.isApproved;
-      oParticipant.phoneNo = req.phoneNo || oParticipant.phoneNo;
-      oParticipant.address = req.address || oParticipant.address;
-      oParticipant.zipcode = req.zipcode || oParticipant.zipcode;
-      oParticipant.state = req.state || oParticipant.state;
-      oParticipant.city = req.city || oParticipant.city;
-      oParticipant.type = req.type || oParticipant.type;
-      oParticipant.description = req.description || oParticipant.description;
-      oParticipant.trustMarkFile = req.trustMarkFile || oParticipant.trustMarkFile;
-
-      return oParticipant.save();
+      var obj = {
+        name: req.name || oParticipant.name,
+        isApproved: req.isApproved || oParticipant.isApproved,
+        phoneNo: req.phoneNo || oParticipant.phoneNo,
+        address: req.address || oParticipant.address,
+        zipcode: req.zipcode || oParticipant.zipcode,
+        state: req.state || oParticipant.state,
+        city: req.city || oParticipant.city,
+        type: req.type || oParticipant.type,
+        description: req.description || oParticipant.description,
+        trustMarkFile: req.trustMarkFile || oParticipant.trustMarkFile
+      };
+      return Participant.findOneAndUpdate({_id: oParticipant._id}, obj);
     })
-    .then((updateParticipant) => Participant.populate(updateParticipant, 'federationId'))
+    .then((updateParticipant) => Participant.findById(updateParticipant._id).populate('memberOf'))
     .then((oParticipant) => Promise.resolve(oParticipant))
     .catch(err => Promise.reject(err));
 };

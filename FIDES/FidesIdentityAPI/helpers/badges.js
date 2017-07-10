@@ -130,18 +130,20 @@ let removeBadge = (id) => {
  */
 let badgeRequest = (oid, bids) => {
   return Participant
-    .findOne({_id: oid, pendingBadges: { $nin: bids }})
+    .findOne({_id: oid, pendingBadges: {$nin: bids}})
     .exec()
     .then((participant) => {
       participant = participant._doc;
-      bids = bids.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
+      bids = bids.filter(function (item, i, ar) {
+        return ar.indexOf(item) === i;
+      });
       if (!participant.pendingBadges) {
         participant.pendingBadges = []
       }
       bids.forEach((item) => {
         participant.pendingBadges.push(mongoose.Types.ObjectId(item));
       });
-      return Participant.findOneAndUpdate({_id: participant._id}, { pendingBadges: participant.pendingBadges});
+      return Participant.findOneAndUpdate({_id: participant._id}, {pendingBadges: participant.pendingBadges});
     })
     .then((participant) => Promise.resolve(participant))
     .catch(err => Promise.reject(err));
@@ -167,11 +169,14 @@ let badgeApprove = (oid, bids) => {
       bids.forEach((item) => {
         participant.approvedBadges.push(mongoose.Types.ObjectId(item));
       });
-      participant.pendingBadges = participant.pendingBadges.filter(function(item){
+      participant.pendingBadges = participant.pendingBadges.filter(function (item) {
         return participant.approvedBadges.toString().indexOf(item.toString()) == -1;
       });
 
-      return Participant.findOneAndUpdate({_id: participant._id}, { pendingBadges: participant.pendingBadges, approvedBadges: participant.approvedBadges });
+      return Participant.findOneAndUpdate({_id: participant._id}, {
+        pendingBadges: participant.pendingBadges,
+        approvedBadges: participant.approvedBadges
+      });
     })
     .then((participant) => Participant.findById(participant._id))
     .then((participant) => Promise.resolve(participant))
@@ -193,7 +198,25 @@ let getBadgeByIssuer = (discoveryUrl) => {
       if (!oEntity) {
         return Promise.resolve(null);
       }
-      return Participant.findById(oEntity.participant._id).populate('approvedBadges');
+      return Participant
+        .aggregate([
+          {
+            $lookup: {
+              from: "badges",
+              localField: "approvedBadges",
+              foreignField: "_id",
+              as: "approvedBadges"
+            }
+          },
+          {
+            $match: {
+              _id: mongoose.Types.ObjectId(oEntity._doc.operatedBy.id)
+            }
+          }
+        ]);
+    })
+    .then(oParticipant => {
+      return Promise.resolve(oParticipant[0]);
     })
     .catch((err) => Promise.reject(err));
 };

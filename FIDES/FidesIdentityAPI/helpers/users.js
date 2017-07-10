@@ -225,30 +225,48 @@ let getUserByIdentity = (req) => {
     req.email = req.email.toLowerCase();
 
   return User
-    .aggregate([{
-      $lookup: {
-        from: "participants",
-        localField: "participant",
-        foreignField: "_id",
-        as: "participant"
+    .aggregate([
+      {
+        $lookup: {
+          from: "participants",
+          localField: "participant",
+          foreignField: "_id",
+          as: "participant"
+        }
+      },
+      {
+        $unwind: {
+          path: "$participant",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "federations",
+          localField: "participant.memberOf",
+          foreignField: "_id",
+          as: "participant.memberOf"
+        }
+      },
+      {
+        $lookup: {
+          from: "entities",
+          localField: "entity",
+          foreignField: "_id",
+          as: "entity"
+        }
+      },
+      {
+        $lookup: {
+          from: "roles",
+          localField: "role",
+          foreignField: "_id",
+          as: "role"
+        }
+      },
+      {
+        $match: {$or: [{'username': req.username}, {'email': req.email}]}
       }
-    }, {
-      $lookup: {
-        from: "entities",
-        localField: "entity",
-        foreignField: "_id",
-        as: "entity"
-      }
-    }, {
-      $lookup: {
-        from: "roles",
-        localField: "role",
-        foreignField: "_id",
-        as: "role"
-      }
-    }, {
-      $match: {$or: [{'username': req.username}, {'email': req.email}]}
-    }
     ])
     .exec()
     .then((user) => {
@@ -256,7 +274,7 @@ let getUserByIdentity = (req) => {
       if (user.length == 0) {
         return Promise.reject(false);
       }
-      user[0].participant = user[0].participant[0];
+      user[0].participant = user[0].participant;
       user[0].entity = user[0].entity[0];
       user[0].role = user[0].role[0];
       user = user[0];
@@ -388,7 +406,7 @@ let getAllParticipants = (params) => {
 let getAllEntities = (userId) => {
   return Roles.getRoleByName('admin')
     .then((role) => {
-      let query = { role: {$ne: role._id}};
+      let query = {role: {$ne: role._id}};
       if (!!userId && userId !== 'undefined') {
         query._id = mongoose.Types.ObjectId(userId);
       }
