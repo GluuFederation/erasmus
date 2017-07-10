@@ -1,6 +1,5 @@
-1. What areas of IT by incident managers do you see undergoing
-the most rapid transformation, both before, during and after an
-event?
+1. What areas of IT do you see undergoing the most rapid transformation,
+both before, during and after an event?
 
 2. Can you share your thoughts or concerns about the process for
 in person identification during an event? Is the risk of fraud
