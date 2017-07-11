@@ -5,6 +5,7 @@
         <div class="add-row-editable-table">
           <button class="btn btn-primary" ng-if="vm.isShow" ng-click="vm.openBadgeModal({})">Add</button>
           <button class="btn btn-primary" ng-if="!vm.isShow" ui-sref="badges.badgeRequest">Request for Badge</button>
+          <button class="btn btn-primary btn-with-icon" ng-if="!vm.isShow" ng-click="vm.getBadges()"><i class="ion-android-refresh"></i>Refresh</button>
         </div>
 
         <table class="table table-hover table-condensed" st-safe-src="vm.safeBadges" st-table="vm.badges">
