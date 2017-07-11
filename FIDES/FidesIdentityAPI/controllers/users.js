@@ -406,10 +406,10 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
     .then((entity) => {
       let isExists = !!entity;
       /*if (isExists) {
-        return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Entity is already exists.'
-        }));
-      }*/
+       return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
+       message: 'Entity is already exists.'
+       }));
+       }*/
       const option = {
         method: 'GET',
         uri: entityInfo.discoveryUrl + '/.well-known/openid-configuration',
@@ -433,7 +433,7 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
           message: 'Discovery URL is invalid. Please check and correct it.'
         }));
       }
-      
+
       const client = {
         redirect_uris: entityInfo.redirectUrls,
         application_type: 'native',
@@ -765,73 +765,74 @@ function addEntityAndUser(data, res) {
     id: data.participantId,
     type: 'participant'
   };
+  let entityId = 0;
   return Entities.addEntity(data.entityInfo)
     .then((entity) => {
-      // Add user
-      data.personInfo.entity = entity._id;
+      entityId = entity._id;
+      return Participants.addEntityInPartcipant(data.participantId, entityId);
+    })
+    .then(() => {
+      data.personInfo.entity = entityId;
       data.personInfo.participant = data.participantId;
       return Users.createUser(data.personInfo)
-        .then((user) => {
-          // region Adding user to SCIM.
-          let userDetail =
-            {
-              'externalId': user._id,
-              'userName': user.username,
-              'name': {
-                'givenName': user.firstName,
-                'familyName': user.lastName
-              },
-              'displayName': user.firstName.concat(' ' + user.lastName).trim(),
-              'emails': [{
-                'value': user.email.toLowerCase(),
-                'type': 'work',
-                'primary': 'true'
-              }
-              ],
-              'userType': 'OrgAdmin',
-              'title': 'Participant Admin',
-              'active': 'true',
-              //'password': data.personInfo.password,
-              'roles': [{
-                'value': 'orgadmin'
-              }],
-              'role': 'orgadmin',
-              'entitlements': [{
-                'value': 'Access to manage participant and entity added by user.'
-              }],
-              'meta': {
-                'created': user.createdOn,
-                'lastModified': user.createdOn,
-                'version': user.__v,
-                'location': ''
-              }
-            };
+    })
+    .then((user) => {
+      // region Adding user to SCIM.
+      let userDetail =
+        {
+          'externalId': user._id,
+          'userName': user.username,
+          'name': {
+            'givenName': user.firstName,
+            'familyName': user.lastName
+          },
+          'displayName': user.firstName.concat(' ' + user.lastName).trim(),
+          'emails': [{
+            'value': user.email.toLowerCase(),
+            'type': 'work',
+            'primary': 'true'
+          }
+          ],
+          'userType': 'OrgAdmin',
+          'title': 'Participant Admin',
+          'active': 'true',
+          //'password': data.personInfo.password,
+          'roles': [{
+            'value': 'orgadmin'
+          }],
+          'role': 'orgadmin',
+          'entitlements': [{
+            'value': 'Access to manage participant and entity added by user.'
+          }],
+          'meta': {
+            'created': user.createdOn,
+            'lastModified': user.createdOn,
+            'version': user.__v,
+            'location': ''
+          }
+        };
 
-          // send email
-          const mailOption = {
-            from: common.smtpConfig.auth.user, // sender address
-            to: user.email.toLowerCase(), // list of receivers
-            subject: 'Registration : Gluu Federation', // Subject line
-            html: common.registrationEmailTemplate.format(user.name, data.entityInfo.clientId) // html body
-          };
+      // send email
+      const mailOption = {
+        from: common.smtpConfig.auth.user, // sender address
+        to: user.email.toLowerCase(), // list of receivers
+        subject: 'Registration : Gluu Federation', // Subject line
+        html: common.registrationEmailTemplate.format(user.name, data.entityInfo.clientId) // html body
+      };
 
-          //Message.sendEmail(mailOption);
+      //Message.sendEmail(mailOption);
 
-          return res.status(httpStatus.OK).send(user);
-          // scim.addUser(userDetail).then(function (data) {
-          //     return updateScimId(data.id, user._id, entity._id, data.participantId, res);
-          // }).catch(function (error) {
-          //     console.log(error);
-          //     return deleteUserEntityAndOrg(user._id, entity._id, data.participantId, res);
-          // });
-          // endregion
-        })
-        .catch((err) => {
-          return deleteEntityAndOrg(entity._id, data.participantId, res);
-        });
+      return res.status(httpStatus.OK).send(user);
+      // scim.addUser(userDetail).then(function (data) {
+      //     return updateScimId(data.id, user._id, entity._id, data.participantId, res);
+      // }).catch(function (error) {
+      //     console.log(error);
+      //     return deleteUserEntityAndOrg(user._id, entity._id, data.participantId, res);
+      // });
+      // endregion
     })
     .catch((err) => {
-      return deleteParticipant(data.participantId, res);
+      return deleteEntityAndOrg(entityId, data.participantId, res);
     });
 }
 
@@ -932,7 +933,6 @@ function getUserClaims(clientInfo) {
   });
 }
 
-//string format prototype
 String.prototype.format = function () {
   var formatted = this;
   for (var i = 0; i < arguments.length; i++) {

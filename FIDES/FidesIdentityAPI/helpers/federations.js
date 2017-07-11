@@ -116,15 +116,40 @@ let removeFederation = (id) => {
  * @return {ObjectId} id - Participant id
  * @return {err} - return error
  */
-let addParticipant = (fid, oid) => {
+let addParticipant = (fid, pid) => {
   return Federation
     .findById(fid)
     .exec()
     .then((oFederation) => {
-      if (oFederation.member.indexOf(oid) > -1) {
+      if (oFederation.member.indexOf(pid) > -1) {
         return Promise.reject({error: 'Participant already exist'});
       }
-      oFederation.member.push(oid);
+      oFederation.member.push(pid);
+      return oFederation.save();
+    })
+    .then((oFederation) => Promise.resolve(oFederation))
+    .catch(err => Promise.reject(err));
+};
+
+/**
+ * Add Participant in Federation as Participant
+ * @param {ObjectId} id - Federation id
+ * @return {ObjectId} id - Participant id
+ * @return {err} - return error
+ */
+let addParticipantEntity = (fid, pid, eid) => {
+  return Federation
+    .findById(fid)
+    .exec()
+    .then((oFederation) => {
+      if (oFederation.member.indexOf(pid) > -1) {
+        return Promise.reject({error: 'Participant already exist'});
+      }
+      if (oFederation.federates.indexOf(eid) > -1) {
+        return Promise.reject({error: 'Entity already exist'});
+      }
+      oFederation.federates.push(eid);
+      oFederation.member.push(pid);
       return oFederation.save();
     })
     .then((oFederation) => Promise.resolve(oFederation))
@@ -138,5 +163,6 @@ module.exports = {
   addFederation,
   updateFederation,
   removeFederation,
-  addParticipant
+  addParticipant,
+  addParticipantEntity
 };

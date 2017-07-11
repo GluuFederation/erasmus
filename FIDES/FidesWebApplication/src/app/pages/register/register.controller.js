@@ -77,7 +77,6 @@
         return;
       }
 
-      debugger;
       vm.entityInfo.memberOf = vm.entityInfo.memberOf.map(function (item) {
         return item._id;
       });
