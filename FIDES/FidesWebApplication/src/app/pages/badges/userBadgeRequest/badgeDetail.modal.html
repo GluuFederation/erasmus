@@ -4,7 +4,7 @@
       <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
         <em class="ion-ios-close-empty sn-link-close"></em>
       </button>
-      <h4 class="modal-title" id="createBadgeLabel">Badge Information</h4>
+      <h4 class="modal-title" id="createBadgeLabel">Badge Information </h4>
     </div>
     <div class="modal-body">
       <table class="table table-bordered">
@@ -12,11 +12,11 @@
         <tr>
           <td style="vertical-align: middle"><img src="{{!!vm.badge.userInfo.picture[0] ? vm.badge.userInfo.picture[0] : '/assets/img/theme/no-photo.png'}}" height="70" width="70" class="img-rounded img-circle" alt="image"/></td>
           <td>
-            <strong>User</strong>: {{vm.badge.userInfo.name[0] || vm.badge.userInfo.name}}
+            <strong>User</strong>: {{ (vm.badge.userInfo.name | typeof) == 'string' ? vm.badge.userInfo.name : vm.badge.userInfo.name[0] }}
             <br/>
-            <strong>Email</strong>: {{vm.badge.userInfo.email[0] || vm.badge.userInfo.email}}
+            <strong>Email</strong>: {{ (vm.badge.userInfo.email | typeof) == 'string' ? vm.badge.userInfo.email : vm.badge.userInfo.email[0] }}
             <br/>
-            <strong>Web site</strong>: {{vm.badge.userInfo.website[0] || vm.badge.userInfo.website}}
+            <strong>Web site</strong>: {{ (vm.badge.userInfo.website | typeof) == 'string' ? vm.badge.userInfo.website : vm.badge.userInfo.website[0] }}
           </td>
         </tr>
         <tr>
