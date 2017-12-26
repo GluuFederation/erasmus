@@ -1,10 +1,10 @@
 "use strict";
 const scimConfig = {
   keyAlg: 'RS256',
-  domain: 'https://gluu.local.org/',
+  domain: 'https://gluu.local.org',
   privateKey: 'scim-rp-sample.key',
-  clientId: '@!8AEA.A0CF.482A.7912!0001!C0A0.3826!0008!6C3E.0965',
-  keyId: '67a769f3-65f3-44ed-ad04-67aee51fbab0'
+  clientId: '@!22C7.C0DF.5025.85C9!0001!9E47.F467!0008!0FEE.DB3C',
+  keyId: 'e03d78c4-d528-4231-ad69-5b516bf9e798'
 };
 const scim = require('scim-node')(scimConfig);
 
@@ -406,10 +406,10 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
     .then((entity) => {
       let isExists = !!entity;
       /*if (isExists) {
-        return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Entity is already exists.'
-        }));
-      }*/
+       return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
+       message: 'Entity is already exists.'
+       }));
+       }*/
       const option = {
         method: 'GET',
         uri: entityInfo.discoveryUrl + '/.well-known/openid-configuration',
@@ -433,48 +433,8 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
           message: 'Discovery URL is invalid. Please check and correct it.'
         }));
       }
-      
-      const client = {
-        redirect_uris: entityInfo.redirectUrls,
-        application_type: 'native',
-        client_name: entityInfo.participantName,
-        token_endpoint_auth_method: 'client_secret_basic',
-        scopes: discoveryJson.scopes_supported
-        //sector_identifier_uri: process.env.BASE_URL + '/images/trustmark/url.json'
-      };
 
-      const options = {
-        method: 'POST',
-        uri: discoveryJson.registration_endpoint,
-        body: JSON.stringify(client),
-        resolveWithFullResponse: true
-      };
-
-      return request(options);
-    })
-    .then((response) => {
-      if (!response) {
-        return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Unable to register client. Please try after some time.'
-        }));
-      }
-
-      try {
-        clientJson = JSON.parse(response.body);
-      } catch (exception) {
-        console.log(exception.toString());
-        return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Unable to register client due to invalid response. Please try after some time.'
-        }));
-      }
-
-      if (clientJson.error) {
-        return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-          message: clientJson.error_description
-        }));
-      }
-
-      registreUrl = clientJson.redirect_uris.filter(function (value) {
+      registreUrl = entityInfo.redirectUrls.filter(function (value) {
         return value.indexOf('register.html') > 0
       });
 
@@ -482,15 +442,12 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
       oxdRequest = {
         authorization_redirect_uri: registreUrl[0],
         op_host: entityInfo.discoveryUrl,
-        redirect_uris: clientJson.redirect_uris,
-        scopes: clientJson.scopes,
-        response_types: clientJson.response_types,
-        client_id: clientJson.client_id,
-        client_secret: clientJson.client_secret,
-        client_token_endpoint_auth_method: clientJson.client_token_endpoint_auth_method,
-        client_registration_client_uri: clientJson.registration_client_uri,
-        access_token: clientJson.registration_access_token,
-        port: process.env.OXD_PORT
+        redirect_uris: entityInfo.redirectUrls,
+        scopes: discoveryJson.scopes_supported,
+        token_endpoint_auth_method: 'client_secret_basic',
+        application_type: 'native',
+        port: process.env.OXD_PORT,
+        client_name: entityInfo.participantName
       };
       oxd.Request = oxdRequest;
       return new Promise((resolve, reject) => {
@@ -529,7 +486,6 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
           authEndpoint: url,
           state: state,
           token: oxdRequest.access_token,
-          client_id: oxdRequest.client_id,
           oxd_id: oxdId,
         });
       });
@@ -548,7 +504,6 @@ router.post('/validateRegistrationDetail', (req, res, next) => {
       });
     });
 });
-
 /**
  * Register user, participant and entity. Adds user to gluu server using SCOM 2.0.
  */
@@ -589,97 +544,18 @@ router.post('/registerDetail', (req, res, next) => {
       message: 'User login code is not valid. Please try after some time.'
     });
   }
-  if (!clientInfo.client_id) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Client ID is not valid. Please try after some time.'
-    });
-  }
-  if (!clientInfo.token) {
-    return res.status(httpStatus.NOT_ACCEPTABLE).send({
-      message: 'Client token not found. Please try after some time.'
-    });
-  }
+
   if (!clientInfo.oxd_id) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: 'Please provide oxd Id.'
     });
   }
-// endregion
-  let discoveryMetadata = {};
-  let clientMetadata = {};
+
+  // endregion
   let userInfo = null;
   let role = null;
-  const option = {
-    method: 'GET',
-    uri: entityInfo.discoveryUrl + '/.well-known/openid-configuration',
-    resolveWithFullResponse: true
-  };
-  return request.get(option)
-    .then((response) => {
-      if (!response) {
-        return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Metadata not found from Discovery URL. Please check Discovery URL.'
-        }));
-      }
 
-      try {
-        discoveryMetadata = JSON.parse(response.body);
-      } catch (exception) {
-        console.log(exception.toString());
-        return Promise.reject(res.status(httpStatus.NOT_ACCEPTABLE).send({
-          message: 'Discovery URL is invalid. Please check and correct it.'
-        }));
-      }
-
-      let clientRequestOptions = {
-        method: 'GET',
-        uri: discoveryMetadata.registration_endpoint,
-        qs: {client_id: clientInfo.client_id},
-        headers: {authorization: 'Bearer ' + clientInfo.token},
-        resolveWithFullResponse: true
-      };
-
-      return request(clientRequestOptions);
-    })
-    .then((response) => {
-      if (!response) {
-        return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-          message: common.message.INTERNAL_SERVER_ERROR
-        }));
-      }
-
-      try {
-        clientMetadata = JSON.parse(response.body);
-      } catch (exception) {
-        console.log(exception.toString());
-        return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-          message: common.message.INTERNAL_SERVER_ERROR
-        }));
-      }
-
-      if (clientMetadata.error) {
-        return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-          message: clientMetadata.error_description
-        }));
-      }
-
-      let data = {};
-      data.discoveryMetadata = discoveryMetadata;
-      data.client_id = clientMetadata.client_id;
-      data.client_secret = clientMetadata.client_secret;
-      data.redirect_uri = clientMetadata.redirect_uris[0];
-      data.code = clientInfo.code;
-
-      // Get access token for fetch user information
-      oxd.Request = {
-        oxd_id: clientInfo.oxd_id,
-        code: clientInfo.code,
-        state: clientInfo.state,
-        port: process.env.OXD_PORT
-      };
-
-      return getUserClaims(clientInfo);
-    })
+  return getUserClaims(clientInfo)
     .then((claimsUserInfo) => {
       if (!claimsUserInfo || !claimsUserInfo.data.claims.email) {
         return Promise.reject(res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
@@ -701,7 +577,8 @@ router.post('/registerDetail', (req, res, next) => {
         city: entityInfo.city,
         type: entityInfo.type,
         zipcode: entityInfo.zipcode,
-        description: entityInfo.description
+        description: entityInfo.description,
+        memberOf: entityInfo.memberOf
       };
       return Participants.addParticipant(participantInfo);
     })
@@ -719,9 +596,10 @@ router.post('/registerDetail', (req, res, next) => {
       data.entityInfo.name = entityInfo.participantName;
       data.entityInfo.discoveryUrl = entityInfo.discoveryUrl;
       data.entityInfo.oxdId = clientInfo.oxd_id;
-      data.entityInfo.redirectUris = JSON.stringify(clientMetadata.redirect_uris);
-      data.entityInfo.responseTypes = JSON.stringify(clientMetadata.response_types);
+      data.entityInfo.redirectUris = JSON.stringify(entityInfo.redirectUrls);
+      data.entityInfo.responseTypes = 'code';
       data.entityInfo.isApproved = false;
+      data.entityInfo.federatedBy = entityInfo.memberOf;
 
       return addEntityAndUser(data, res);
     })
@@ -763,73 +641,74 @@ function addEntityAndUser(data, res) {
     id: data.participantId,
     type: 'participant'
   };
+  let entityId = 0;
   return Entities.addEntity(data.entityInfo)
     .then((entity) => {
-      // Add user
-      data.personInfo.entity = entity._id;
+      entityId = entity._id;
+      return Participants.addEntityInPartcipant(data.participantId, entityId);
+    })
+    .then(() => {
+      data.personInfo.entity = entityId;
       data.personInfo.participant = data.participantId;
       return Users.createUser(data.personInfo)
-        .then((user) => {
-          // region Adding user to SCIM.
-          let userDetail =
-            {
-              'externalId': user._id,
-              'userName': user.username,
-              'name': {
-                'givenName': user.firstName,
-                'familyName': user.lastName
-              },
-              'displayName': user.firstName.concat(' ' + user.lastName).trim(),
-              'emails': [{
-                'value': user.email.toLowerCase(),
-                'type': 'work',
-                'primary': 'true'
-              }
-              ],
-              'userType': 'OrgAdmin',
-              'title': 'Participant Admin',
-              'active': 'true',
-              //'password': data.personInfo.password,
-              'roles': [{
-                'value': 'orgadmin'
-              }],
-              'role': 'orgadmin',
-              'entitlements': [{
-                'value': 'Access to manage participant and entity added by user.'
-              }],
-              'meta': {
-                'created': user.createdOn,
-                'lastModified': user.createdOn,
-                'version': user.__v,
-                'location': ''
-              }
-            };
+    })
+    .then((user) => {
+      // region Adding user to SCIM.
+      let userDetail =
+        {
+          'externalId': user._id,
+          'userName': user.username,
+          'name': {
+            'givenName': user.firstName,
+            'familyName': user.lastName
+          },
+          'displayName': user.firstName.concat(' ' + user.lastName).trim(),
+          'emails': [{
+            'value': user.email.toLowerCase(),
+            'type': 'work',
+            'primary': 'true'
+          }
+          ],
+          'userType': 'OrgAdmin',
+          'title': 'Participant Admin',
+          'active': 'true',
+          //'password': data.personInfo.password,
+          'roles': [{
+            'value': 'orgadmin'
+          }],
+          'role': 'orgadmin',
+          'entitlements': [{
+            'value': 'Access to manage participant and entity added by user.'
+          }],
+          'meta': {
+            'created': user.createdOn,
+            'lastModified': user.createdOn,
+            'version': user.__v,
+            'location': ''
+          }
+        };
 
-          // send email
-          const mailOption = {
-            from: common.smtpConfig.auth.user, // sender address
-            to: user.email.toLowerCase(), // list of receivers
-            subject: 'Registration : Gluu Federation', // Subject line
-            html: common.registrationEmailTemplate.format(user.name, data.entityInfo.clientId) // html body
-          };
+      // send email
+      const mailOption = {
+        from: common.smtpConfig.auth.user, // sender address
+        to: user.email.toLowerCase(), // list of receivers
+        subject: 'Registration : Gluu Federation', // Subject line
+        html: common.registrationEmailTemplate.format(user.name, data.entityInfo.clientId) // html body
+      };
 
-          //Message.sendEmail(mailOption);
+      //Message.sendEmail(mailOption);
 
-          return res.status(httpStatus.OK).send(user);
-          // scim.addUser(userDetail).then(function (data) {
-          //     return updateScimId(data.id, user._id, entity._id, data.participantId, res);
-          // }).catch(function (error) {
-          //     console.log(error);
-          //     return deleteUserEntityAndOrg(user._id, entity._id, data.participantId, res);
-          // });
-          // endregion
-        })
-        .catch((err) => {
-          return deleteEntityAndOrg(entity._id, data.participantId, res);
-        });
+      return res.status(httpStatus.OK).send(user);
+      // scim.scim2.addUser(userDetail).then(function (data) {
+      //     return updateScimId(data.id, user._id, entityId, data.participantId, res);
+      // }).catch(function (error) {
+      //     console.log(error);
+      //     return deleteUserEntityAndOrg(user._id, entityId, data.participantId, res);
+      // });
+      // endregion
     })
     .catch((err) => {
-      return deleteParticipant(data.participantId, res);
+      return deleteEntityAndOrg(entityId, data.participantId, res);
     });
 }
 
@@ -930,7 +809,6 @@ function getUserClaims(clientInfo) {
   });
 }
 
-//string format prototype
 String.prototype.format = function () {
   var formatted = this;
   for (var i = 0; i < arguments.length; i++) {

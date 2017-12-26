@@ -14,10 +14,12 @@
     vm.states = [];
     vm.cities = [];
     vm.stateCityList = {};
+    vm.federations = [];
     // member functions
     vm.register = register;
     vm.onIndexChange = onIndexChange;
     vm.stateChanged = stateChanged;
+    vm.fetchFederation = fetchFederation;
 
     // definations
     vm.params = $location.search();
@@ -75,6 +77,10 @@
         return;
       }
 
+      vm.entityInfo.memberOf = vm.entityInfo.memberOf.map(function (item) {
+        return item._id;
+      });
+
       vm.entityInfo.redirectUrls = [urls.BASE.concat('/login.html'), urls.BASE.concat('/register.html')];
       registerService.validateRegistrationDetail(vm.entityInfo, onSuccess, onError);
 
@@ -124,10 +130,25 @@
       vm.cities = vm.stateCityList[vm.entityInfo.state];
     }
 
+    function fetchFederation() {
+      registerService.getAllFederations(onSuccess, onError);
+      function onSuccess(response) {
+        if (response.data && response.data.length > 0) {
+          vm.federations = response.data;
+        }
+      }
+
+      function onError(error) {
+        toastr.error(error.data.message, 'Federations', {});
+      }
+    }
+
     // init
     registerService.getUSStateCity().then(function (response) {
       vm.stateCityList = response.data;
       vm.states = Object.keys(response.data);
     });
+
+    vm.fetchFederation();
   }
 })();

@@ -11,7 +11,8 @@
       validateRegistrationDetail: validateRegistrationDetail,
       registerDetail: registerDetail,
       isUserAlreadyExist: isUserAlreadyExist,
-      getUSStateCity: getUSStateCity
+      getUSStateCity: getUSStateCity,
+      getAllFederations: getAllFederations
     };
 
     function validateRegistrationDetail(entityInfo, onSuccess, onError) {
@@ -32,6 +33,11 @@
     function getUSStateCity() {
       return $http.get(urls.BASE + '/us_states_cities.json');
     }
+
+    function getAllFederations(onSuccess, onError) {
+      return $http.get(urls.FIDES_BASE_API + "/federations").then(onSuccess).catch(onError);
+    }
+
     return service;
   }
 })();

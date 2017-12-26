@@ -116,6 +116,10 @@ angular.module('FidesWebApplication', [
     }
     return r;
   };
+}).filter('typeof', function() {
+  return function(obj) {
+    return typeof obj
+  };
 });
 
 function removeTokenAndRedirect($localStorage, $http, $window, urls, redirectToLogin, message) {

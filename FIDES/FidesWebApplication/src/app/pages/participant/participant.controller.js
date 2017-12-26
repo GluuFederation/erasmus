@@ -60,7 +60,7 @@
       vm.participantModal = $uibModal.open({
         animation: true,
         templateUrl: 'app/pages/participant/manageParticipant.modal.html',
-        size: 'lg',
+        size: isBtnApprove ? 'md' : 'lg',
         controller: ['$uibModalInstance', 'participantData', 'federationService', 'stateCityService', 'participantService', createParticipantController],
         controllerAs: 'vm',
         resolve: {
@@ -118,14 +118,14 @@
 
         // for approve
         if (vm.modalParticipant.isBtnApprove) {
-          if (vm.modalParticipant.federationId == null) {
-            toastr.error('Please select federation.', 'Participant', {});
-            return null;
-          }
+          // if (vm.modalParticipant.federationId == null) {
+          //   toastr.error('Please select federation.', 'Participant', {});
+          //   return null;
+          // }
 
           var formData = {
-            pid: vm.modalParticipant._id,
-            fid: vm.modalParticipant.federationId._id
+            pid: vm.modalParticipant._id
+            //fid: vm.modalParticipant.federationId._id
           };
           participantService.approveParticipant(formData, onSuccess, onError);
           return;

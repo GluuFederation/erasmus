@@ -7,6 +7,8 @@
     'ngStorage',
     'ui.bootstrap',
     'ui.sortable',
+    'ui.select',
+    'ngSanitize',
     'ui.router',
     'ngTouch',
     'toastr',

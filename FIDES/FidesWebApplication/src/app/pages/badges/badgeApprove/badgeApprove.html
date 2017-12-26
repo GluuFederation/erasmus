@@ -1,6 +1,7 @@
 <div class="widgets">
   <div class="row">
     <div class="col-lg-8 col-md-8">
+      <div class="button-wrapper" style="text-align: right"><button type="button" ng-click="vm.getAllPendingParticipant()" class="btn btn-primary btn-with-icon" ><i class="ion-android-refresh"></i>Refresh</button></div>
       <div ba-panel ba-panel-class="with-scroll">
         <table st-safe-src="vm.participants" st-table="vm.displayedCollection"
                class="table table-hover table-condensed">
@@ -28,9 +29,9 @@
             <td>{{participant.name}}</td>
             <td>{{participant.pendingBadges.length}}</td>
             <td>
-              <button class="btn btn-primary btn-icon"
+              <button class="btn btn-primary"
                       ng-disabled="!participant.isApproved"
-                      ng-click="vm.openBadgeApproveModel(participant)" title="Edit"><i class="ion-checkmark-round"></i></button>
+                      ng-click="vm.openBadgeApproveModel(participant)" title="Approve Badges"><i class="ion-checkmark-round"></i> Approve Badges</button>
             </td>
           </tr>
           </tbody>

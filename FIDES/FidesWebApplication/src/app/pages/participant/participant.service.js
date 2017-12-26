@@ -23,7 +23,7 @@
     }
 
     function approveParticipant(formData, onSuccess, onError) {
-      return $http.post(urls.FIDES_BASE_API + "/participant/" + formData.pid + "/federation/" + formData.fid).then(onSuccess).catch(onError);
+      return $http.post(urls.FIDES_BASE_API + "/participant/" + formData.pid + "/federation/approve").then(onSuccess).catch(onError);
     }
 
     function getAllParticipants(onSuccess, onError) {

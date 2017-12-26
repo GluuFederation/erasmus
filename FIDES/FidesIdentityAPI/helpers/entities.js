@@ -56,7 +56,8 @@ let addEntity = (req) => {
     operatedBy: req.operatedBy,
     responseTypes: req.responseTypes,
     createdBy: req.createdBy,
-    isApproved: false
+    isApproved: false,
+    federatedBy: req.federatedBy
   });
 
   return oEntity.save()

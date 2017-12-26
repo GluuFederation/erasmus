@@ -20,7 +20,7 @@
         </tr>
         <tr>
           <td><strong>Federation</strong></td>
-          <td>{{vm.participant.memberOf[0].name}}</td>
+          <td><span ng-repeat="item in vm.participant.memberOf">{{item.name}} {{ $index == vm.participant.memberOf.length -1 ? '' : ',' }} </span></td>
         </tr>
         <tr>
           <td><strong>Phone No</strong></td>

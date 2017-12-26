@@ -59,8 +59,10 @@
                       <div class="form-group"
                            ng-class="{'has-error': vm.participantForm.participantName.$invalid && (vm.participantForm.participantName.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgName">Name</label>
-                        <input autofocus type="text" class="form-control" id="orgName" name="participantName" title="Please enter the participant name."
-                               placeholder="participant name" ng-model="vm.entityInfo.participantName" ng-required="true"/>
+                        <input autofocus type="text" class="form-control" id="orgName" name="participantName"
+                               title="Please enter the participant name."
+                               placeholder="participant name" ng-model="vm.entityInfo.participantName"
+                               ng-required="true"/>
                       </div>
                     </div>
                     <div class="col-md-6">
@@ -69,7 +71,8 @@
                         <label class="control-label" for="orgPhoneNo">Phone No</label>
                         <input type="text" class="form-control" id="orgPhoneNo" name="phoneNo"
                                title="Please enter the phone no."
-                               placeholder="phone no" ng-model="vm.entityInfo.phoneNo" ng-required="true" ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/"/>
+                               placeholder="phone no" ng-model="vm.entityInfo.phoneNo" ng-required="true"
+                               ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/"/>
                       </div>
                     </div>
                   </div>
@@ -89,7 +92,8 @@
                         <label class="control-label" for="orgZipcode">zipcode</label>
                         <input type="text" class="form-control" id="orgZipcode" name="zipcode"
                                title="Please enter the zipcode"
-                               placeholder="zipcode" ng-model="vm.entityInfo.zipcode" ng-required="true" ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/"/>
+                               placeholder="zipcode" ng-model="vm.entityInfo.zipcode" ng-required="true"
+                               ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/"/>
                       </div>
                     </div>
                   </div>
@@ -98,7 +102,8 @@
                       <div class="form-group"
                            ng-class="{'has-error': vm.participantForm.state.$invalid && (vm.participantForm.state.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgState">State</label>
-                        <select name="state" class="form-control" id="orgState" title="Select State" ng-change="vm.stateChanged()"
+                        <select name="state" class="form-control" id="orgState" title="Select State"
+                                ng-change="vm.stateChanged()"
                                 selectpicker required
                                 ng-model="vm.entityInfo.state"
                                 ng-options="state as state for state in vm.states">
@@ -132,9 +137,41 @@
                       <div class="form-group"
                            ng-class="{'has-error': vm.participantForm.description.$invalid && (vm.participantForm.description.$dirty || vm.participantForm.$submitted)}">
                         <label class="control-label" for="orgDesc">Description</label>
-                        <input type="text" class="form-control" id="orgDesc" name="description" title="Please enter description"
+                        <input type="text" class="form-control" id="orgDesc" name="description"
+                               title="Please enter description"
                                placeholder="description" ng-model="vm.entityInfo.description"/>
                       </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <!--<div class="form-group"-->
+                           <!--ng-class="{'has-error': vm.participantForm.memberOf.$invalid && (vm.participantForm.memberOf.$dirty || vm.participantForm.$submitted)}">-->
+                        <!--<label for="memberOf">Federation</label>-->
+                        <!--<select class="form-control" id="memberOf" name="memberOf" title="Select Federation"-->
+                                <!--selectpicker-->
+                                <!--ng-model="vm.modalParticipant.memberOf"-->
+                                <!--ng-options="federation as federation.name for federation in vm.federations" required-->
+                                <!--multiple>-->
+                          <!--<option value="">Select Federation</option>-->
+                        <!--</select>-->
+                      <!--</div>-->
+                      <div class="form-group">
+                        <label>Federation</label>
+                        <ui-select multiple ng-model="vm.entityInfo.memberOf"
+                                   ng-disabled="false"
+                                   search-enabled="true"
+                                   append-to-body="true"
+                                   class="form-control">
+                          <ui-select-match placeholder="Multiple Select">
+                            {{$item.name}}
+                          </ui-select-match>
+                          <ui-select-choices repeat="multipleItem in vm.federations | filter: $select.search">
+                            {{multipleItem.name}}
+                          </ui-select-choices>
+                        </ui-select>
+                      </div>
+
                     </div>
                   </div>
                 </form>

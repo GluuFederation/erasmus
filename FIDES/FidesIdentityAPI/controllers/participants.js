@@ -10,6 +10,7 @@ const express = require('express'),
   _ = require('lodash'),
   common = require('../helpers/common'),
   Participant = require('../helpers/participants'),
+  Entity = require('../helpers/entities'),
   Users = require('../helpers/users'),
   Federation = require('../helpers/federations');
 
@@ -142,18 +143,26 @@ router.delete('/participant/:id', (req, res, next) => {
 /**
  * Approve participant
  */
-router.post('/participant/:pid/federation/:fid', (req, res, next) => {
+router.post('/participant/:pid/federation/approve', (req, res, next) => {
   if (!req.params.pid) {
     return res.status(httpStatus.NOT_ACCEPTABLE).send({
       message: common.message.PROVIDE_ID
     });
   }
+  let entityId = 0;
   Participant.getParticipantById(req.params.pid)
     .then((response) => {
-      // link participant with federation
-      return Federation.addParticipant(req.params.fid, req.params.pid);
+      entityId = response.operates;
+      response.memberOf.forEach((item) => {
+        Federation.addParticipantEntity(item.toString(), req.params.pid, entityId);
+      });
     })
-    .then((response) => Participant.approveParticipant(req.params.pid, req.params.fid))
+    .then((response) => {
+      return Entity.approveEntity(entityId)
+    })
+    .then((response) => {
+      return Participant.approveParticipant(req.params.pid)
+    })
     .then((participant) => res.status(httpStatus.OK).send(participant))
     .catch((err) => res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
       err: err,

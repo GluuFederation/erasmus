@@ -4,30 +4,33 @@
       <button type="button" class="close" ng-click="$dismiss()" aria-label="Close">
         <em class="ion-ios-close-empty sn-link-close"></em>
       </button>
-      <h4 class="modal-title" id="createProviderLabel">{{vm.modalParticipant.isBtnApprove ? 'Approve' : 'Edit'}} Participant</h4>
+      <h4 class="modal-title" id="createProviderLabel">{{vm.modalParticipant.isBtnApprove ? 'Are you sure want to
+        approve participant?' : 'Edit Participant'}}</h4>
     </div>
-    <div ng-if="vm.modalParticipant.isBtnApprove" class="modal-body">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group"
-               ng-class="{'has-error': vm.participantForm.federationId.$invalid && (vm.participantForm.federationId.$dirty || vm.participantForm.$submitted)}">
-            <label for="orgFed">Federation</label>
-            <select class="form-control" id="orgFed" name="federationId" title="Select Federation" selectpicker
-                    ng-model="vm.modalParticipant.federationId"
-                    ng-options="federation as federation.name for federation in vm.federations" required>
-              <option value="">Select Federation</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!--<div ng-if="vm.modalParticipant.isBtnApprove" class="modal-body">-->
+    <!--<div class="row">-->
+    <!--<div class="col-md-6">-->
+    <!--<div class="form-group"-->
+    <!--ng-class="{'has-error': vm.participantForm.federationId.$invalid && (vm.participantForm.federationId.$dirty || vm.participantForm.$submitted)}">-->
+    <!--<label for="orgFed">Federation</label>-->
+    <!--<select class="form-control" id="orgFed" name="federationId" title="Select Federation" selectpicker-->
+    <!--ng-model="vm.modalParticipant.federationId"-->
+    <!--ng-options="federation as federation.name for federation in vm.federations" required>-->
+    <!--<option value="">Select Federation</option>-->
+    <!--</select>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
     <div ng-if="!vm.modalParticipant.isBtnApprove" class="modal-body">
       <div class="row">
         <div class="col-md-6">
           <div class="form-group"
                ng-class="{'has-error': vm.participantForm.participantName.$invalid && (vm.participantForm.participantName.$dirty || vm.participantForm.$submitted)}">
             <label class="control-label" for="orgName">Name</label>
-            <input autofocus type="text" class="form-control" id="orgName" name="participantName" title="Please enter the participant name."
+            <input autofocus type="text" class="form-control" id="orgName" name="participantName"
+                   title="Please enter the participant name."
                    placeholder="participant name" ng-model="vm.modalParticipant.name" ng-required="true"/>
           </div>
         </div>
@@ -37,7 +40,8 @@
             <label class="control-label" for="orgPhoneNo">Phone No</label>
             <input type="text" class="form-control" id="orgPhoneNo" name="phoneNo"
                    title="Please enter the phone no."
-                   placeholder="phone no" ng-model="vm.modalParticipant.phoneNo" ng-required="true" ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/" />
+                   placeholder="phone no" ng-model="vm.modalParticipant.phoneNo" ng-required="true"
+                   ng-pattern="/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/"/>
           </div>
         </div>
       </div>
@@ -57,7 +61,8 @@
             <label class="control-label" for="orgZipcode">zipcode</label>
             <input type="text" class="form-control" id="orgZipcode" name="zipcode"
                    title="Please enter the zipcode"
-                   placeholder="zipcode" ng-model="vm.modalParticipant.zipcode" ng-required="true" ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/" />
+                   placeholder="zipcode" ng-model="vm.modalParticipant.zipcode" ng-required="true"
+                   ng-pattern="/(^\d{5}$)|(^\d{5}-\d{4}$)/"/>
           </div>
         </div>
       </div>
@@ -107,10 +112,12 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
-      <button type="submit" class="btn btn-primary" ng-click="vm.pushParticipant(vm.participantForm.$valid)">
-        {{vm.modalParticipant.isBtnApprove ? 'Approve' : 'Update'}}
-      </button>
+      <center>
+        <button type="button" class="btn btn-default" ng-click="$dismiss()">Close</button>
+        <button type="submit" class="btn btn-primary" ng-click="vm.pushParticipant(vm.participantForm.$valid)">
+          {{vm.modalParticipant.isBtnApprove ? 'Approve' : 'Update'}}
+        </button>
+      </center>
     </div>
   </form>
 </div>
