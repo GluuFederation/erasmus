@@ -5,18 +5,19 @@ package net.gluu.erasmus.model;
  */
 
 public class APIBadgeRequest {
-    private String opHost, status, participant, templateBadgeId, templateBadgeTitle;
+    private String opHost, status, participant, templateBadgeId, templateBadgeTitle, deviceData;
 
     public APIBadgeRequest(String strOpHost, String strStatus) {
         this.opHost = strOpHost;
         this.status = strStatus;
     }
 
-    public APIBadgeRequest(String strOpHost, String strParticipant, String strTemplateBadgeId, String strTemplateBadgeTitle) {
+    public APIBadgeRequest(String strOpHost, String strParticipant, String strTemplateBadgeId, String strTemplateBadgeTitle, String deviceData) {
         this.opHost = strOpHost;
         this.participant = strParticipant;
         this.templateBadgeId = strTemplateBadgeId;
         this.templateBadgeTitle = strTemplateBadgeTitle;
+        this.deviceData = deviceData;
     }
 
     public String getOpHost() {

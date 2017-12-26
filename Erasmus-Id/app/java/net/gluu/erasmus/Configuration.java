@@ -236,6 +236,7 @@ public final class Configuration {
         }
 
         value = value.trim();
+
         if (TextUtils.isEmpty(value)) {
             return;
         }

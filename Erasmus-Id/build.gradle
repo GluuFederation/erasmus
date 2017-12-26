@@ -7,7 +7,7 @@ buildscript {
         maven { url '/media/lcom64/D/sdk' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.android.tools.build:gradle:2.3.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
         classpath 'org.ajoberstar:gradle-git:1.5.1'
@@ -27,7 +27,7 @@ subprojects {
 
 ext.verifyKeystore()
 
-def grgit = org.ajoberstar.grgit.Grgit.open(dir: '..')
+def grgit = org.ajoberstar.grgit.Grgit.open(currentDir: file('.'))
 def lastCommit = grgit.head()
 
 project.ext.versionNum = grgit.log(includes:['HEAD']).size()

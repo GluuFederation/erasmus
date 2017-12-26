@@ -11,6 +11,8 @@ public class APIService {
     public static final String API_BASE_URL = "https://erasmusdev.gluu.org/badge-mgr/";
     //Local
 //    public static final String API_BASE_URL = "http://192.168.200.64:8088/";
+    //local-Jetty
+//    public static final String API_BASE_URL = "http://192.168.200.64:8080/badge-mgr/";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 

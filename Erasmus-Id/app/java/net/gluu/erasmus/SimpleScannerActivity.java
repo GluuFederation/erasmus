@@ -2,22 +2,29 @@ package net.gluu.erasmus;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.gson.Gson;
 import com.google.zxing.Result;
 
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.api.AccessToken;
+import net.gluu.erasmus.device.DeviceUuidManager;
 import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.DisplayBadge;
 import net.gluu.erasmus.model.NotificationRequest;
 import net.gluu.erasmus.model.ScanResponse;
 import net.gluu.erasmus.model.ScanResponseSuccess;
 import net.gluu.erasmus.model.SetPermissionRequest;
+import net.gluu.erasmus.store.AndroidKeyDataStore;
+import net.gluu.erasmus.u2f.v2.SoftwareDevice;
+import net.gluu.erasmus.u2f.v2.model.DeviceData;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,7 +98,25 @@ public class SimpleScannerActivity extends Activity implements ZXingScannerView.
                 @Override
                 public void onAccessTokenSuccess(String accessToken) {
                     Log.v("TAG", "Access token in sendNotification(): " + accessToken);
-                    NotificationRequest notificationRequest = new NotificationRequest(badge, Application.participant.getOpHost(), Application.participant.getName());
+
+                    AndroidKeyDataStore dataStore = new AndroidKeyDataStore(Application.mApplicationContext);
+
+                    SoftwareDevice softwareDevice = new SoftwareDevice(Application.mApplicationContext, dataStore);
+                    String deviceType = softwareDevice.getDeviceType();
+                    String versionName = softwareDevice.getVersionName();
+
+                    DeviceData deviceData = new DeviceData();
+                    deviceData.setUuid(DeviceUuidManager.getDeviceUuid(Application.mApplicationContext).toString());
+                    deviceData.setPushToken(FirebaseInstanceId.getInstance().getToken());
+                    deviceData.setType(deviceType);
+                    deviceData.setPlatform("android");
+                    deviceData.setName(Build.MODEL);
+                    deviceData.setOsName(versionName);
+                    deviceData.setOsVersion(Build.VERSION.RELEASE);
+
+                    String deviceDataString = new Gson().toJson(deviceData);
+
+                    NotificationRequest notificationRequest = new NotificationRequest(badge, Application.participant.getOpHost(), Application.participant.getName(),deviceDataString);
                     Call<BadgeRequest> call = mObjAPI.sendNotification(accessToken, notificationRequest);
                     call.enqueue(new Callback<BadgeRequest>() {
                         @Override

@@ -28,16 +28,25 @@ public class OxPush2Request {
 
     private String created;
 
+    private String enrollment;
+
+    @SerializedName("req_ip")
+    private String locationIP;
+
+    @SerializedName("req_loc")
+    private String locationCity;
+
     public OxPush2Request() {
     }
 
-    public OxPush2Request(String userName, String issuer, String app, String state, String method, String created) {
+    public OxPush2Request(String userName, String issuer, String app, String state, String method, String created, String enrollment) {
         this.userName = userName;
         this.issuer = issuer;
         this.app = app;
         this.state = state;
         this.method = method;
         this.created = created;
+        this.enrollment = enrollment;
     }
 
     public String getUserName() {
@@ -47,6 +56,8 @@ public class OxPush2Request {
     public String getIssuer() {
         return issuer;
     }
+
+    public void setIssuer(String issuer){this.issuer = issuer;}
 
     public String getApp() {
         return app;
@@ -60,6 +71,8 @@ public class OxPush2Request {
         return method;
     }
 
+    public void setMethod(String method){ this.method = method;}
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -68,23 +81,29 @@ public class OxPush2Request {
         return created;
     }
 
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
+    public void setCreated(String created){this.created = created;}
+
+    public String getLocationIP() {
+        return locationIP;
     }
 
-    public void setApp(String app) {
-        this.app = app;
+    public void setLocationIP(String locationIP) {
+        this.locationIP = locationIP;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public String getLocationCity() {
+        return locationCity;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public void setLocationCity(String locationCity) {
+        this.locationCity = locationCity;
     }
 
-    public void setCreated(String created) {
-        this.created = created;
+    public String getEnrollment() {
+        return enrollment;
+    }
+
+    public void setEnrollment(String enrollment) {
+        this.enrollment = enrollment;
     }
 }

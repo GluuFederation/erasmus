@@ -21,6 +21,7 @@ import net.gluu.erasmus.adapters.CitiesAdapter;
 import net.gluu.erasmus.adapters.StateAdapter;
 import net.gluu.erasmus.model.City;
 import net.gluu.erasmus.model.State;
+import net.gluu.erasmus.utils.PrefrenceUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     Spinner mSpState;
     RecyclerView mRvCities;
     ArrayList<State> arStates;
+    private PrefrenceUtils prefrenceUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         initToolbar();
         initSpinner();
+        prefrenceUtil = new PrefrenceUtils();
     }
 
     private void initToolbar() {

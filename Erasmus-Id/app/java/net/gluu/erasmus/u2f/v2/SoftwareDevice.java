@@ -235,7 +235,7 @@ public class SoftwareDevice {
         return tokenResponse;
     }
 
-    private String getDeviceType() {
+    public String getDeviceType() {
         UiModeManager uiModeManager = (UiModeManager) context.getSystemService(Context.UI_MODE_SERVICE);
 
         int modeType = uiModeManager.getCurrentModeType();
@@ -258,7 +258,7 @@ public class SoftwareDevice {
         return Integer.toString(modeType);
     }
 
-    private String getVersionName() {
+    public String getVersionName() {
         Field[] fields = Build.VERSION_CODES.class.getFields();
         for (Field field : fields) {
             String fieldName = field.getName();

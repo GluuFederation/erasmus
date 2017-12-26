@@ -21,6 +21,7 @@ import net.gluu.erasmus.adapters.OPAdapter;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.model.ParticipantsResponse;
+import net.gluu.erasmus.utils.PrefrenceUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,6 +34,7 @@ public class SelectOpActivity extends AppCompatActivity {
     RecyclerView mRvOrganization;
     APIInterface mObjAPI;
     ProgressDialog mProgress;
+    private PrefrenceUtils prefrenceUtil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +49,9 @@ public class SelectOpActivity extends AppCompatActivity {
         initToolbar();
         mRvOrganization = (RecyclerView) findViewById(R.id.rvOrganization);
         mRvOrganization.setLayoutManager(new LinearLayoutManager(this));
+        prefrenceUtil = new PrefrenceUtils();
+        prefrenceUtil.setCity(Application.City);
+        prefrenceUtil.setState(Application.State);
         getOp();
     }
 

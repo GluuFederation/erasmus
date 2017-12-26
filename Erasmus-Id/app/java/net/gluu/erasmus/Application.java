@@ -65,7 +65,7 @@ public final class Application extends android.app.Application {
     public static String U2F_Username = "test";
     public static String U2F_Issuer = "https://ce-release.gluu.org";
     public static String U2F_State = "27218b33-20bd-40f9-b881-beda2f73a92f";
-    public static String U2F_Method = "authenticate";
+    public static String U2F_Method = "enroll";
     public static String U2F_App = "/identity/authentication/authcode";
     private static AuthStateManager mStateManager;
     private static AuthorizationService mAuthService;

@@ -18,6 +18,7 @@ import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.AnyThread;
@@ -32,6 +33,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import net.gluu.appauth.AppAuthConfiguration;
 import net.gluu.appauth.AuthState;
 import net.gluu.appauth.AuthorizationException;
@@ -44,6 +47,9 @@ import net.gluu.appauth.RegistrationResponse;
 import net.gluu.appauth.ResponseTypeValues;
 import net.gluu.appauth.browser.AnyBrowserMatcher;
 import net.gluu.appauth.browser.BrowserMatcher;
+import net.gluu.erasmus.model.Participant;
+import net.gluu.erasmus.model.u2f.U2fMetaData;
+import net.gluu.erasmus.utils.PrefrenceUtils;
 
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
@@ -85,10 +91,12 @@ public final class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mExecutor = Executors.newSingleThreadExecutor();
         mAuthStateManager = AuthStateManager.getInstance(this);
         mConfiguration = Configuration.getInstance(this);
+        restoreData();
+
+        mExecutor = Executors.newSingleThreadExecutor();
+
         mConfiguration.setDiscoveryUri(Application.participant.getOpHost() + Application.wellknownurl);
         Application.U2F_Issuer = Application.participant.getOpHost();
 //        mConfiguration.setDiscoveryUri("https://erasmusdev.gluu.org" + Application.wellknownurl);
@@ -102,11 +110,15 @@ public final class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
 
-        mProgress = new ProgressDialog(this);
+        mProgress = new ProgressDialog(LoginActivity.this);
         mProgress.setMessage("Loading..");
 
         ((TextView) findViewById(R.id.tv_organization)).setText(Application.participant.getName());
-        findViewById(R.id.tv_change_organization).setOnClickListener((View view) -> finish());
+        findViewById(R.id.tv_change_organization).setOnClickListener((View view) -> {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        });
         findViewById(R.id.start_auth).setOnClickListener((View view) -> startAuth());
 
         if (!mConfiguration.isValid()) {
@@ -115,12 +127,12 @@ public final class LoginActivity extends AppCompatActivity {
         }
 
         configureBrowserSelector();
-        if (mConfiguration.hasConfigurationChanged()) {
-            // discard any existing authorization state due to the change of configuration
-            Log.i(TAG, "Configuration change detected, discarding old state");
-            mAuthStateManager.replace(new AuthState());
-            mConfiguration.acceptConfiguration();
-        }
+//        if (mConfiguration.hasConfigurationChanged()) {
+//            // discard any existing authorization state due to the change of configuration
+//            Log.i(TAG, "Configuration change detected, discarding old state");
+//            mAuthStateManager.replace(new AuthState());
+//            mConfiguration.acceptConfiguration();
+//        }
 
         if (getIntent().getBooleanExtra(EXTRA_FAILED, false)) {
             Snackbar.make(findViewById(R.id.coordinator),
@@ -130,7 +142,24 @@ public final class LoginActivity extends AppCompatActivity {
         }
 
         displayLoading("Initializing");
+
+        if (mConfiguration.hasConfigurationChanged()) {
+            // discard any existing authorization state due to the change of configuration
+            Log.i(TAG, "Configuration change detected, discarding old state");
+            mAuthStateManager.replace(new AuthState());
+            mConfiguration.acceptConfiguration();
+        }
         mExecutor.submit(this::initializeAppAuth);
+    }
+
+    private void restoreData() {
+        PrefrenceUtils prefrenceUtils = new PrefrenceUtils();
+        Participant participant = new Gson().fromJson(prefrenceUtils.getGetOpDetails(), Participant.class);
+        if (Application.participant == null || !Application.participant.getOpHost().equals(participant.getOpHost())) {
+//            mAuthStateManager.replace(new AuthState());
+//            mConfiguration.acceptConfiguration();
+        }
+        Application.participant = participant;
     }
 
     @Override
@@ -149,11 +178,13 @@ public final class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-
+        if (mProgress != null && mProgress.isShowing())
+            mProgress.dismiss();
         if (mAuthService != null) {
             mAuthService.dispose();
         }
+        super.onDestroy();
+
     }
 
     @MainThread

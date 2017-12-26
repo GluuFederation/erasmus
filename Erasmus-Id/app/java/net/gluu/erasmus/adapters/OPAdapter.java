@@ -9,10 +9,16 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
+import net.gluu.appauth.AuthState;
 import net.gluu.erasmus.Application;
+import net.gluu.erasmus.AuthStateManager;
+import net.gluu.erasmus.Configuration;
 import net.gluu.erasmus.LoginActivity;
 import net.gluu.erasmus.R;
 import net.gluu.erasmus.model.Participant;
+import net.gluu.erasmus.utils.PrefrenceUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +56,11 @@ public class OPAdapter extends RecyclerView.Adapter<OPAdapter.ViewHolder> {
                 LinearLayout mLL = (LinearLayout) v;
                 Integer mPos = (Integer) mLL.getTag(R.string.app_name);
                 Application.participant = organizationList.get(mPos);
+                new PrefrenceUtils().setGetOpDetails(new Gson().toJson(Application.participant));
+                Configuration configuration = Configuration.getInstance(Application.mApplicationContext);
+                AuthStateManager mAuthStateManager = AuthStateManager.getInstance(Application.mApplicationContext);
+                mAuthStateManager.replace(new AuthState());
+                configuration.acceptConfiguration();
                 Intent i = new Intent(mContext, LoginActivity.class);
                 i.putExtra("opName", op.getName());
                 mContext.startActivity(i);

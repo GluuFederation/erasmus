@@ -80,7 +80,7 @@ android {
 //                            "                \"QzHQdLJREpp3UqcgXH0/4bnehsAqt1ej3wkSI219PWHCqPz/q3Wl13anW69NmAwD89H1oLk=\\n\" +\n" +
 //                            "                \"-----END CERTIFICATE-----\""
             buildConfigField "String", "OX_SERVER_CERT", "\"\""
-            buildConfigField "boolean", "TRUST_ALL_CERT", "false"
+            buildConfigField "boolean", "TRUST_ALL_CERT", "true"
 
             buildConfigField "String", "PROJECT_NUMBER", "\"815756138308\""
         }

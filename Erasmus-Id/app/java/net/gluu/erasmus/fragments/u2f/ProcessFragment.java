@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.MainThread;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,8 +21,12 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import net.gluu.appauth.AuthState;
+import net.gluu.erasmus.Application;
+import net.gluu.erasmus.AuthStateManager;
 import net.gluu.erasmus.BadgeStatusActivity;
 import net.gluu.erasmus.BuildConfig;
+import net.gluu.erasmus.LoginActivity;
 import net.gluu.erasmus.R;
 import net.gluu.erasmus.listener.OxPush2RequestListener;
 import net.gluu.erasmus.model.u2f.OxPush2Request;
@@ -47,7 +52,7 @@ import java.util.Map;
 
 /**
  * Process Fido U2F request fragment
- *
+ * <p>
  * Created by Yuriy Movchan on 01/07/2016.
  */
 public class ProcessFragment extends Fragment implements View.OnClickListener {
@@ -64,7 +69,10 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
 
     private OxPush2RequestListener oxPush2RequestListener;
 
-    public ProcessFragment() {}
+    private DataStore dataStore;
+
+    public ProcessFragment() {
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -114,7 +122,7 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
         if (context instanceof OxPush2RequestListener) {
             oxPush2RequestListener = (OxPush2RequestListener) context;
         } else {
-            throw new RuntimeException(context.toString()  + " must implement OxPush2RequestListener");
+            throw new RuntimeException(context.toString() + " must teaimplement OxPush2RequestListener");
         }
     }
 
@@ -130,30 +138,31 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
             return;
         }
 
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.button_approve:
                 onOxPushApproveRequest(false);
                 //// TODO: 19/6/17 only for testing
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent i=new Intent(getActivity(), BadgeStatusActivity.class);
-                        startActivity(i);
-                    }
-                }, 2000);
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Intent i=new Intent(getActivity(), BadgeStatusActivity.class);
+//                        startActivity(i);
+//                    }
+//                }, 2000);
+//                    @Override
                 break;
             case R.id.button_decline:
                 onOxPushApproveRequest(true);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent i=new Intent(getActivity(), BadgeStatusActivity.class);
-                        startActivity(i);
-                    }
-                }, 2000);
+//                new Handler().postDelayed(new Runnable() {
+//                    public void run() {
+//                        Intent i=new Intent(getActivity(), BadgeStatusActivity.class);
+//                        startActivity(i);
+//                    }
+//                }, 2000);
                 break;
         }
     }
+
     private void runOnUiThread(Runnable runnable) {
         Activity activity = getActivity();
         if (activity != null) {
@@ -212,90 +221,126 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        final boolean oneStep = Utils.isEmpty(oxPush2Request.getUserName());
 
-        final Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("application", oxPush2Request.getApp());
-        parameters.put("session_state", oxPush2Request.getState());
-        if (!oneStep) {
-            parameters.put("username", oxPush2Request.getUserName());
-        }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final U2fMetaData u2fMetaData = getU2fMetaData();
+        if (oxPush2Request != null) {
+            final boolean oneStep = Utils.isEmpty(oxPush2Request.getUserName());
 
-                    DataStore dataStore = oxPush2RequestListener.onGetDataStore();
-                    final List<byte[]> keyHandles = dataStore.getKeyHandlesByIssuerAndAppId(oxPush2Request.getIssuer(), oxPush2Request.getApp());
+            final Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put("application", oxPush2Request.getApp());
+            if (!oneStep) {
+                parameters.put("username", oxPush2Request.getUserName());
+            }
 
-                    final boolean isEnroll = (keyHandles.size() == 0) || StringUtils.equals(oxPush2Request.getMethod(), "enroll");
-                    final String u2fEndpoint;
-                    if (isEnroll) {
-                        u2fEndpoint = u2fMetaData.getRegistrationEndpoint();
-                        if (BuildConfig.DEBUG) Log.i(TAG, "Authentication method: enroll");
-                    } else {
-                        u2fEndpoint = u2fMetaData.getAuthenticationEndpoint();
-                        if (BuildConfig.DEBUG) Log.i(TAG, "Authentication method: authenticate");
-                    }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        final U2fMetaData u2fMetaData = getU2fMetaData();
 
-                    final String challengeJsonResponse;
-                    if (oneStep && (keyHandles.size() > 0)) {
-                        // Try to get challenge using all keyHandles associated with issuer and application
+                    dataStore = oxPush2RequestListener.onGetDataStore();
+                        final List<byte[]> keyHandles = dataStore.getKeyHandlesByIssuerAndAppId(oxPush2Request.getIssuer(), oxPush2Request.getApp());
 
-                        String validChallengeJsonResponse = null;
-                        for (byte[] keyHandle : keyHandles) {
-                            parameters.put("keyhandle", Utils.base64UrlEncode(keyHandle));
-                            try {
-                                validChallengeJsonResponse = CommunicationService.get(u2fEndpoint, parameters);
-                                break;
-                            } catch (FileNotFoundException ex) {
-                                Log.i(TAG, "Found invalid keyHandle: " + Utils.base64UrlEncode(keyHandle));
-                            }
+                        final boolean isEnroll = StringUtils.equals(oxPush2Request.getMethod(), "enroll");//(keyHandles.size() == 0) ||
+                        final String u2fEndpoint;
+                        if (isEnroll) {
+                            u2fEndpoint = u2fMetaData.getRegistrationEndpoint();
+                            if (BuildConfig.DEBUG) Log.i(TAG, "Authentication method: enroll");
+                        } else {
+                            u2fEndpoint = u2fMetaData.getAuthenticationEndpoint();
+                            if (BuildConfig.DEBUG)
+                                Log.i(TAG, "Authentication method: authenticate");
                         }
 
-                        challengeJsonResponse = validChallengeJsonResponse;
-                        if (BuildConfig.DEBUG) Log.d(TAG, "Get U2F JSON response: " + challengeJsonResponse);
+                        //Check if we're using cred manager - in that case "state"== null and we should use "enrollment" parameter
+                        if (oxPush2Request.getState() == null){//using cred-manager
+                            parameters.put("enrollment_code", oxPush2Request.getEnrollment());
+                        } else {//using standard workflow
+                            //Check is old or new version of server
+                            String state_key = u2fEndpoint.contains("seam") ? "session_state" : "session_id";
+                            parameters.put(state_key, oxPush2Request.getState());
+                        }
 
-                    } else {
-                        challengeJsonResponse = CommunicationService.get(u2fEndpoint, parameters);
-                        if (BuildConfig.DEBUG) Log.d(TAG, "Get U2F JSON response: " + challengeJsonResponse);
-                    }
+                        final String challengeJsonResponse;
+                        if (oneStep && (keyHandles.size() > 0)) {
+                            // Try to get challenge using all keyHandles associated with issuer and application
 
-                    if (Utils.isEmpty(challengeJsonResponse)) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                setFinalStatus(R.string.no_valid_key_handles);
-                            }
-                        });
-                    } else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
+                            String validChallengeJsonResponse = null;
+                            for (byte[] keyHandle : keyHandles) {
+                                parameters.put("keyhandle", Utils.base64UrlEncode(keyHandle));
                                 try {
-                                    onChallengeReceived(isEnroll, u2fMetaData, u2fEndpoint, challengeJsonResponse, isDeny);
-                                } catch (Exception ex) {
-                                    Log.e(TAG, "Failed to process challengeJsonResponse: " + challengeJsonResponse, ex);
-                                    setFinalStatus(R.string.failed_process_challenge);
-                                    if (BuildConfig.DEBUG) setErrorStatus(ex);
+                                    validChallengeJsonResponse = CommunicationService.get(u2fEndpoint, parameters);
+                                    break;
+                                } catch (FileNotFoundException ex) {
+                                    Log.i(TAG, "Found invalid keyHandle: " + Utils.base64UrlEncode(keyHandle));
                                 }
                             }
+
+                            challengeJsonResponse = validChallengeJsonResponse;
+                            if (BuildConfig.DEBUG)
+                                Log.d(TAG, "Get U2F JSON response: " + challengeJsonResponse);
+
+                        } else {
+                            challengeJsonResponse = CommunicationService.get(u2fEndpoint, parameters);
+                            if (BuildConfig.DEBUG)
+                                Log.d(TAG, "Get U2F JSON response: " + challengeJsonResponse);
+                        }
+
+                        if (Utils.isEmpty(challengeJsonResponse)) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setFinalStatus(R.string.no_valid_key_handles);
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        onChallengeReceived(isEnroll, u2fMetaData, u2fEndpoint, challengeJsonResponse, isDeny);
+                                    } catch (Exception ex) {
+                                        Log.e(TAG, "Failed to process challengeJsonResponse: " + challengeJsonResponse, ex);
+                                        setFinalStatus(R.string.failed_process_challenge);
+                                        if (BuildConfig.DEBUG) setErrorStatus(ex);
+                                        signOut();
+                                    }
+                                }
+                            });
+                        }
+                    } catch (final Exception ex) {
+                        Log.e(TAG, ex.getLocalizedMessage(), ex);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setFinalStatus(R.string.wrong_u2f_metadata);
+                                if (BuildConfig.DEBUG) setErrorStatus(ex);
+//                                signOut();
+                            }
                         });
                     }
-                } catch (final Exception ex) {
-                    Log.e(TAG, "Failed to get Fido U2F metadata", ex);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setFinalStatus(R.string.wrong_u2f_metadata);
-                            if (BuildConfig.DEBUG) setErrorStatus(ex);
-                        }
-                    });
                 }
-            }
-        }).start();
+            }).start();
+        }    }
+
+    @MainThread
+    private void signOut() {
+        // discard the authorization and token state, but retain the configuration and
+        // dynamic client registration (if applicable), to save from retrieving them again.
+        AuthStateManager mStateManager = AuthStateManager.getInstance(ProcessFragment.this.getActivity());
+
+        AuthState currentState = mStateManager.getCurrent();
+        AuthState clearedState =
+                new AuthState(currentState.getAuthorizationServiceConfiguration());
+        if (currentState.getLastRegistrationResponse() != null) {
+            clearedState.update(currentState.getLastRegistrationResponse());
+        }
+        mStateManager.replace(clearedState);
+
+        Intent mainIntent = new Intent(getActivity(), LoginActivity.class);
+        mainIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(mainIntent);
+        getActivity().finish();
     }
 
     private U2fMetaData getU2fMetaData() throws IOException {
@@ -346,14 +391,16 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
             public void run() {
                 try {
                     final String resultJsonResponse = CommunicationService.post(u2fEndpoint, parameters);
-                    if (BuildConfig.DEBUG) Log.i(TAG, "Get U2F JSON result response: " + resultJsonResponse);
+                    if (BuildConfig.DEBUG)
+                        Log.i(TAG, "Get U2F JSON result response: " + resultJsonResponse);
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 final U2fOperationResult u2fOperationResult = new Gson().fromJson(resultJsonResponse, U2fOperationResult.class);
-                                if (BuildConfig.DEBUG) Log.i(TAG, "Get U2f operation result: " + u2fOperationResult);
+                                if (BuildConfig.DEBUG)
+                                    Log.i(TAG, "Get U2f operation result: " + u2fOperationResult);
 
                                 handleResult(u2fMetaData, tokenResponse, u2fOperationResult, isDeny);
                             } catch (Exception ex) {
@@ -383,7 +430,7 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
 
         if (StringUtils.equals("success", u2fOperationResult.getStatus())) {
             int message = R.string.auth_result_success;
-            if (isDeny){
+            if (isDeny) {
                 message = R.string.enroll_result_success;
             }
             setFinalStatus(message);
@@ -393,12 +440,9 @@ public class ProcessFragment extends Fragment implements View.OnClickListener {
             setFinalStatus(R.string.auth_result_failed);
         }
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent i=new Intent(getActivity(), BadgeStatusActivity.class);
-                startActivity(i);
-            }
+        new Handler().postDelayed(() -> {
+            Intent i = new Intent(getActivity(), BadgeStatusActivity.class);
+            startActivity(i);
         }, 2000);
     }
 }

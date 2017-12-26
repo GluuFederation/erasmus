@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.gson.Gson;
+
 import net.gluu.erasmus.Application;
 import net.gluu.erasmus.BadgeStatusActivity;
 import net.gluu.erasmus.R;
@@ -23,10 +27,15 @@ import net.gluu.erasmus.RequestBadgeActivity;
 import net.gluu.erasmus.api.APIInterface;
 import net.gluu.erasmus.api.APIService;
 import net.gluu.erasmus.api.AccessToken;
+import net.gluu.erasmus.device.DeviceUuidManager;
 import net.gluu.erasmus.model.APIBadgeRequest;
 import net.gluu.erasmus.model.Badge;
 import net.gluu.erasmus.model.BadgeRequest;
 import net.gluu.erasmus.model.Issuer;
+import net.gluu.erasmus.push.service.PushNotificationManager;
+import net.gluu.erasmus.store.AndroidKeyDataStore;
+import net.gluu.erasmus.u2f.v2.SoftwareDevice;
+import net.gluu.erasmus.u2f.v2.model.DeviceData;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -138,8 +147,25 @@ public class BadgeTemplatesAdapter extends RecyclerView.Adapter<BadgeTemplatesAd
             }
 
             showProgressBar();
+            AndroidKeyDataStore dataStore = new AndroidKeyDataStore(Application.mApplicationContext);
 
-            APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), participant, templateBadgeId, badgeTemplate.getName());
+            SoftwareDevice softwareDevice = new SoftwareDevice(Application.mApplicationContext, dataStore);
+            String deviceType = softwareDevice.getDeviceType();
+            String versionName = softwareDevice.getVersionName();
+
+            DeviceData deviceData = new DeviceData();
+            deviceData.setUuid(DeviceUuidManager.getDeviceUuid(Application.mApplicationContext).toString());
+            deviceData.setPushToken(FirebaseInstanceId.getInstance().getToken());
+            deviceData.setType(deviceType);
+            deviceData.setPlatform("android");
+            deviceData.setName(Build.MODEL);
+            deviceData.setOsName(versionName);
+            deviceData.setOsVersion(Build.VERSION.RELEASE);
+
+            String deviceDataString = new Gson().toJson(deviceData);
+
+
+            APIBadgeRequest badgeRequest = new APIBadgeRequest(Application.participant.getOpHost(), participant, templateBadgeId, badgeTemplate.getName(), deviceDataString);
 
             Application.getAccessToken(new AccessToken() {
                 @Override

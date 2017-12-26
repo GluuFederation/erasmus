@@ -98,7 +98,6 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 
         // Init network layer
         CommunicationService.init();
-
         // Init device UUID service
         DeviceUuidManager deviceUuidFactory = new DeviceUuidManager();
         deviceUuidFactory.init(this);
@@ -266,6 +265,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
     @Override
     public void onPushRegistrationFailure(Exception ex) {
         Toast.makeText(getApplicationContext(), R.string.failed_subscribe_push_notification, Toast.LENGTH_LONG).show();
+        signOut();
     }
 
     @Override
@@ -322,9 +322,12 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        if(mAuthService!=null)
         mAuthService.dispose();
+        if(mExecutor!=null)
         mExecutor.shutdownNow();
+        super.onDestroy();
+
     }
 
     @MainThread
@@ -447,7 +450,7 @@ public class U2FActivity extends AppCompatActivity implements OxPush2RequestList
 
     @MainThread
     private void exchangeAuthorizationCode(AuthorizationResponse authorizationResponse) {
-        Application.U2F_State = authorizationResponse.additionalParameters.get("session_state");
+        Application.U2F_State = authorizationResponse.additionalParameters.get("session_id");
         displayLoading("Exchanging authorization code");
         performTokenRequest(
                 authorizationResponse.createTokenExchangeRequest(),

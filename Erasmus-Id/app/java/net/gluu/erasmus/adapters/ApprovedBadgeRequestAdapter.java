@@ -70,17 +70,19 @@ public class ApprovedBadgeRequestAdapter extends RecyclerView.Adapter<ApprovedBa
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(mContext).setMessage("Do you want to Request " + badgeRequest.getTemplateBadgeTitle() + " Badge?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getBadgeDetails(badgeRequest);
-                    }
-                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).show();
+                getBadgeDetails(badgeRequest);
+
+//                new AlertDialog.Builder(mContext).setMessage("Do you want to Request " + badgeRequest.getTemplateBadgeTitle() + " Badge?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        getBadgeDetails(badgeRequest);
+//                    }
+//                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                }).show();
             }
         });
 
@@ -229,7 +231,7 @@ public class ApprovedBadgeRequestAdapter extends RecyclerView.Adapter<ApprovedBa
 
     private void getBadgeDetails(ApprovedBadgeRequest badgeRequest) {
         if (Application.checkInternetConnection(mContext)) {
-            showProgressBar("Requesting badge..");
+            showProgressBar("Fetching badge details..");
 
             Application.getAccessToken(new AccessToken() {
                 @Override

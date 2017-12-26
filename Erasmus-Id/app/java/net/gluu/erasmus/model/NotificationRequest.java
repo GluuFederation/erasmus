@@ -5,12 +5,16 @@ package net.gluu.erasmus.model;
  */
 
 public class NotificationRequest {
-    private String badge, opHost, participant;
+    private String badge;
+    private String opHost;
+    private String participant;
+    private String validatorToken;
 
-    public NotificationRequest(String badge, String opHost, String participant) {
+    public NotificationRequest(String badge, String opHost, String participant, String validatorToken) {
         this.badge = badge;
         this.opHost = opHost;
         this.participant = participant;
+        this.validatorToken = validatorToken;
     }
 
     public String getBadge() {
